@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import os
 
 import requests
 
@@ -26,7 +27,7 @@ def create_jira_tasks():
     # --------------------------
     JIRA_URL = "https://apintegrations-team.atlassian.net"
     JIRA_EMAIL = "alec@apintegrations.com"
-    JIRA_API_TOKEN = "os.getenv("JIRA_API_TOKEN", "")"
+    JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN", "")  # Get from environment variable
     PROJECT_KEY = "SCRUM"
 
     logger.debug(f"JIRA_URL: {JIRA_URL}")

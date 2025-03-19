@@ -78,7 +78,7 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     # AI/ML settings
-    HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "os.getenv("HUGGINGFACE_API_KEY", "") ")
+    HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
     HUGGINGFACE_TEXT_MODEL: str = os.getenv("HUGGINGFACE_TEXT_MODEL", "gpt2")
     HUGGINGFACE_SENTIMENT_MODEL: str = os.getenv(
         "HUGGINGFACE_SENTIMENT_MODEL", 
