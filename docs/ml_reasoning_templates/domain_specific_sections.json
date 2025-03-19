@@ -1,0 +1,154 @@
+{
+  "nlp": {
+    "ML Architecture": "### NLP Architecture\n- **Model Type:** [e.g., Transformer, LSTM, BERT, GPT, etc.]\n- **Tokenization Approach:** [WordPiece, BPE, character-level, etc.]\n- **Embedding Strategy:** [pre-trained, custom, contextual, static]\n- **Contextual Understanding:** [approaches to handle context]\n- **Linguistic Features:** [syntax, semantics, pragmatics considerations]",
+    "Data Requirements": "### NLP Data Requirements\n- **Corpus Characteristics:** [domain, size, diversity]\n- **Annotation Requirements:** [entity tagging, sentiment, relations]\n- **Language Coverage:** [monolingual, multilingual, specific dialects]\n- **Quality Assurance:** [approaches to validate text quality]",
+    "Ethical Considerations": "### NLP-Specific Ethical Considerations\n- **Language Bias Assessment:** [methods to detect and mitigate bias]\n- **Multilingual Fairness:** [ensuring equitable performance across languages]\n- **Content Moderation:** [toxic language detection, safety measures]\n- **Cultural Sensitivity:** [addressing cultural context and nuances]"
+  },
+  "time_series": {
+    "ML Architecture": "### Time Series Architecture\n- **Model Type:** [e.g., ARIMA, Prophet, LSTM, Transformer, etc.]\n- **Temporal Resolution:** [granularity of predictions]\n- **Forecasting Horizon:** [short-term, medium-term, long-term]\n- **Seasonality Handling:** [methods for detecting/modeling seasonal patterns]\n- **Trend Components:** [approaches to model trends]",
+    "Data Requirements": "### Time Series Data Requirements\n- **Historical Data Span:** [minimum history needed]\n- **Sampling Frequency:** [regular vs. irregular intervals]\n- **Missing Data Strategy:** [imputation, interpolation approaches]\n- **Seasonal Considerations:** [relevant seasonal factors]\n- **External Regressors:** [exogenous variables to consider]",
+    "Development Approach": "### Time Series Development Considerations\n- **Train-Test Split Strategy:** [temporal splitting approaches]\n- **Cross-Validation Method:** [time series specific CV methods]\n- **Feature Lag Selection:** [appropriate lag features]\n- **Stationarity Handling:** [transformation techniques]",
+    "problem_analysis": {
+      "temporal_patterns": "Identify key temporal patterns to model",
+      "seasonality_analysis": "Analyze daily, weekly, and longer-term patterns",
+      "stationarity_assessment": "Determine if the time series is stationary",
+      "ultradian_cycle_alignment": "Assess 90-minute focus/rest cycles in user data"
+    },
+    "component_mapping": {
+      "forecasting_models": "Select appropriate forecasting models (ARIMA, LSTM, Transformers)",
+      "feature_extraction": "Design temporal feature extraction processes",
+      "validation_approach": "Define cross-validation strategies for time series",
+      "circadian_feature_integration": "Integrate with Epic 1's circadian rhythm models"
+    },
+    "research_alignment": {
+      "sleep_wake_phase": "Incorporate personalized chronotype detection insights",
+      "light_exposure_impacts": "Consider impacts of light exposure on task-switching",
+      "attention_patterns": "Apply time-on-task decay models from PMC5701950"
+    },
+    "development_approach": {
+      "sliding_window_strategy": "Define sliding window approaches for prediction",
+      "adaptive_sampling": "Consider variable sampling rates based on activity",
+      "real_time_analysis": "Design for real-time vs. batch processing needs"
+    },
+    "ethical_considerations": {
+      "prediction_confidence": "Communicate prediction uncertainty appropriately",
+      "intervention_timing": "Ethical considerations for when to intervene",
+      "user_autonomy": "Balance automation with user control and agency"
+    }
+  },
+  "computer_vision": {
+    "ML Architecture": "### Computer Vision Architecture\n- **Model Type:** [e.g., CNN, YOLO, ResNet, U-Net, ViT, etc.]\n- **Image Resolution:** [input dimensions, scaling strategy]\n- **Feature Extraction:** [approaches to extract visual features]\n- **Augmentation Pipeline:** [transformations, diversity generation]\n- **Transfer Learning Strategy:** [pre-trained models to leverage]",
+    "Data Requirements": "### Computer Vision Data Requirements\n- **Image Characteristics:** [lighting, angles, quality considerations]\n- **Annotation Type:** [bounding boxes, segmentation masks, keypoints]\n- **Dataset Diversity:** [coverage of different visual scenarios]\n- **Synthetic Data Generation:** [approaches if needed]",
+    "Ethical Considerations": "### Vision-Specific Ethical Considerations\n- **Identity Protection:** [face blurring, anonymization techniques]\n- **Dataset Representation:** [demographic diversity, bias prevention]\n- **Surveillance Implications:** [privacy safeguards, usage limitations]\n- **Accessibility Considerations:** [support for visually impaired users]"
+  },
+  "reinforcement_learning": {
+    "ML Architecture": "### Reinforcement Learning Architecture\n- **Agent Type:** [e.g., DQN, PPO, SAC, A3C, etc.]\n- **State Representation:** [how environment state is encoded]\n- **Action Space:** [discrete vs. continuous, constraints]\n- **Reward Design:** [reward shaping, sparse vs. dense]\n- **Memory/Experience:** [replay buffer strategy, prioritization]",
+    "Data Requirements": "### RL Environment Requirements\n- **Simulation Fidelity:** [required realism level]\n- **Episode Length:** [timespan, termination conditions]\n- **Reset Conditions:** [environment reset parameters]\n- **State Distribution:** [initial state sampling approach]",
+    "Development Approach": "### RL-Specific Development Considerations\n- **Exploration Strategy:** [epsilon-greedy, Thompson sampling, etc.]\n- **Curriculum Design:** [progressive learning stages]\n- **Hyperparameter Optimization:** [RL-specific search approaches]\n- **Baseline Comparisons:** [rule-based benchmarks, previous SOTAs]",
+    "problem_analysis": {
+      "state_space_definition": "Define the state representation for the RL environment",
+      "action_space_definition": "Define the available actions and their parameters",
+      "reward_function": "Specify how rewards are calculated",
+      "environment_constraints": "Identify constraints and edge cases specific to ADHD scheduling"
+    },
+    "component_mapping": {
+      "rl_architecture_selection": "Select from available RL architectures (DQN, PPO, A2C, etc.)",
+      "policy_network_design": "Design the policy network architecture",
+      "experience_replay_strategy": "Define experience collection and replay strategy",
+      "momentum_considerations": "Address time-on-task decay models specific to ADHD users"
+    },
+    "research_alignment": {
+      "learning_paradigm": "Choose between value-based, policy-based, or actor-critic approaches",
+      "threshold_based_policies": "Consider threshold-based policy optimization for behavioral interventions",
+      "ethical_frameworks": "Implement adversarial debiasing modules to prevent schedule bias"
+    },
+    "development_approach": {
+      "simulator_design": "Design a simulator for offline training and evaluation",
+      "hybrid_approaches": "Consider combining RL with traditional scheduling algorithms",
+      "progressive_learning": "Implement curriculum learning for gradually increasing task complexity"
+    },
+    "ethical_considerations": {
+      "fairness_across_subtypes": "Ensure fairness across different ADHD subtypes",
+      "reward_shaping_ethics": "Ethical considerations in reward design and reinforcement schedules",
+      "transparency_in_decisions": "Methods to explain RL-based scheduling decisions to users"
+    }
+  },
+  "recommendation": {
+    "ML Architecture": "### Recommendation System Architecture\n- **Algorithm Type:** [e.g., Collaborative Filtering, Content-Based, Hybrid, etc.]\n- **Embedding Approach:** [user/item representation method]\n- **Cold Start Strategy:** [handling new users/items]\n- **Ranking Mechanism:** [sorting and presentation of results]\n- **Feedback Incorporation:** [explicit vs. implicit feedback handling]",
+    "Data Requirements": "### Recommendation Data Requirements\n- **Interaction Data:** [clicks, purchases, ratings, views]\n- **Content Features:** [item metadata, descriptions, categories]\n- **User Features:** [profile data, demographics if available]\n- **Temporal Aspects:** [recency considerations, seasonal patterns]",
+    "Ethical Considerations": "### Recommendation Ethics\n- **Filter Bubble Prevention:** [diversity and serendipity mechanisms]\n- **Fairness Metrics:** [exposure equality across item categories]\n- **Transparency Features:** [explanation mechanisms for recommendations]\n- **Addiction Prevention:** [healthy usage encouragement features]"
+  },
+  "tabular": {
+    "ML Architecture": "### Tabular ML Architecture\n- **Model Type:** [e.g., Gradient Boosting, Random Forest, Neural Networks, etc.]\n- **Feature Interaction:** [handling column interdependencies]\n- **Categorical Encoding:** [approaches for non-numeric data]\n- **Numerical Feature Scaling:** [normalization, standardization strategy]\n- **Ensemble Strategy:** [if applicable, blend/stack approach]",
+    "Data Requirements": "### Tabular Data Requirements\n- **Row Count Requirements:** [minimum samples needed]\n- **Column Characteristics:** [feature types, ranges, distributions]\n- **Missing Data Profile:** [expected sparsity, handling approach]\n- **Data Quality Checks:** [outlier detection, consistency validation]",
+    "Development Approach": "### Tabular ML Development\n- **Feature Selection:** [importance analysis, dimensionality reduction]\n- **Cross-Validation Strategy:** [k-fold variants, stratification]\n- **Hyperparameter Tuning:** [search strategy, resource allocation]\n- **Model Comparison Framework:** [evaluation pipeline details]"
+  },
+  "anomaly_detection": {
+    "ML Architecture": "### Anomaly Detection Architecture\n- **Detection Approach:** [e.g., Statistical, Isolation Forest, Autoencoders, etc.]\n- **Multivariate Handling:** [correlation consideration across variables]\n- **Threshold Determination:** [decision boundary setting approach]\n- **Online vs. Batch:** [real-time or retrospective analysis]\n- **Adaptation Strategy:** [concept drift handling]",
+    "Data Requirements": "### Anomaly Detection Data Requirements\n- **Normal Behavior Data:** [establishing baseline requirements]\n- **Anomaly Examples:** [if available, rare case representation]\n- **Contextual Factors:** [environmental variables affecting normality]\n- **Data Frequency:** [sampling rate considerations]",
+    "Evaluation Metrics": "### Anomaly Detection Evaluation\n- **Precision-Recall Tradeoff:** [optimization approach]\n- **Time-to-Detection:** [latency considerations]\n- **False Positive Management:** [acceptable alert noise level]\n- **Coverage Analysis:** [detection capability across anomaly types]"
+  },
+  "clustering": {
+    "ML Architecture": "### Clustering Architecture\n- **Algorithm Type:** [e.g., K-Means, DBSCAN, Hierarchical, etc.]\n- **Distance Metric:** [similarity measurement approach]\n- **Dimensionality Considerations:** [high-dimensional data handling]\n- **Cluster Count Determination:** [if applicable, selection method]\n- **Initialization Strategy:** [starting point selection approach]",
+    "Data Requirements": "### Clustering Data Requirements\n- **Feature Engineering:** [preparation for distance calculations]\n- **Scaling Requirements:** [normalization approaches]\n- **Minimum Sample Size:** [data volume considerations]\n- **Structural Assumptions:** [expected cluster shapes, densities]",
+    "Evaluation Metrics": "### Clustering Evaluation\n- **Internal Validation:** [cohesion, separation metrics]\n- **External Validation:** [if labeled data available]\n- **Stability Analysis:** [consistency across samples]\n- **Interpretability Approaches:** [methods to explain cluster characteristics]"
+  },
+  "multi_modal": {
+    "problem_analysis": {
+      "modality_definition": "Define relevant data modalities (calendar, biometric, self-report)",
+      "alignment_challenges": "Identify alignment issues between modalities",
+      "missing_data_patterns": "Analyze patterns of missing data across modalities",
+      "integration_points": "Define how modalities will be combined"
+    },
+    "component_mapping": {
+      "fusion_architecture": "Design early vs. late fusion architecture",
+      "modality_processors": "Select appropriate processors for each modality",
+      "attention_mechanisms": "Design cross-modal attention mechanisms",
+      "wearable_integration": "Specify integration with wearable device data"
+    },
+    "research_alignment": {
+      "wearable_research": "Apply insights from wearable devices for ADHD",
+      "federated_approaches": "Consider privacy-preserving federated techniques",
+      "behavioral_markers": "Incorporate digital phenotyping research"
+    },
+    "development_approach": {
+      "asynchronous_processing": "Handle asynchronous data streams",
+      "unified_representation": "Create unified representations across modalities",
+      "incremental_learning": "Design for incremental learning as new data arrives"
+    },
+    "ethical_considerations": {
+      "modality_weighting": "Ethical considerations in weighting different data types",
+      "sensitive_modalities": "Special handling for sensitive data modalities",
+      "interpretability": "Ensure interpretability across modalities"
+    }
+  },
+  "optimization": {
+    "problem_analysis": {
+      "objective_function": "Define clear optimization objectives for scheduling",
+      "constraint_definition": "Identify hard and soft constraints on schedules",
+      "solution_space": "Characterize the solution space and its complexity",
+      "opportunity_cost_framework": "Define how opportunity costs will be calculated"
+    },
+    "component_mapping": {
+      "optimizer_selection": "Select appropriate optimization algorithm",
+      "search_strategy": "Define search strategy and termination criteria",
+      "constraint_handling": "Approach to handling constraints in optimization",
+      "multi_objective_approach": "Strategy for balancing competing objectives"
+    },
+    "research_alignment": {
+      "task_allocation_research": "Apply insights from optimal task allocation research",
+      "neurodiverse_considerations": "Incorporate ADHD-specific optimization parameters",
+      "scheduling_heuristics": "Leverage research on effective scheduling heuristics"
+    },
+    "development_approach": {
+      "anytime_algorithms": "Consider anytime algorithms for responsive optimization",
+      "dynamic_rebalancing": "Design for continuous rebalancing vs. batch optimization",
+      "adaptivity_criteria": "Define conditions that trigger reoptimization"
+    },
+    "ethical_considerations": {
+      "user_preferences": "Balance optimization with user preferences",
+      "cognitive_load": "Consider cognitive load of schedule changes",
+      "diversity_of_outcomes": "Ensure diversity in recommended schedules"
+    }
+  }
+} 

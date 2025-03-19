@@ -1,0 +1,41 @@
+--- File: navigation/RootNavigator.js ---
+
+
+--- File: navigation/AppStack.js ---
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import TasksScreen from '../screens/TasksScreen';
+import EnergyMappingScreen from '../screens/EnergyMappingScreen';
+import HyperfocusScreen from '../screens/HyperfocusScreen';
+
+const Tab = createBottomTabNavigator();
+
+export default function AppStack() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Tasks" component={TasksScreen} />
+      <Tab.Screen name="Energy" component={EnergyMappingScreen} />
+      <Tab.Screen name="Hyperfocus" component={HyperfocusScreen} />
+    </Tab.Navigator>
+  );
+}
+
+
+--- File: navigation/AuthStack.js ---
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+
+const Stack = createStackNavigator();
+
+export default function AuthStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+    </Stack.Navigator>
+  );
+}
+
+

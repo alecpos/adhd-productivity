@@ -1,0 +1,33 @@
+# Test requirements for Stochastic Time Estimation Engine
+# These specific versions have been tested for compatibility
+
+# Testing framework
+pytest==8.3.4
+pytest-asyncio==0.25.3
+
+# Bayesian modeling
+pymc3==3.11.4
+theano-pymc==1.1.2
+numpy==1.22.1  # Specific version required for compatibility with pymc3
+scipy==1.8.0
+
+# Machine learning
+scikit-learn==1.0.2
+
+# Deep learning 
+tensorflow==2.12.0  # Last version with fewer compatibility issues
+keras==2.12.0
+
+# NLP Libraries
+nltk==3.9.1
+spacy==3.7.4
+transformers==4.30.0
+
+# Data handling
+pandas==2.0.0
+xarray==2022.6.0
+
+# Utilities
+tqdm==4.65.0
+filelock==3.12.0
+h5py==3.8.0 

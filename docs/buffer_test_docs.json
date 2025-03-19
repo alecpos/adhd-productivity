@@ -1,0 +1,852 @@
+[
+  {
+    "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+    "tests": [
+      {
+        "name": "test_init",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test the initialization of the calculator.",
+        "source_code": "    async def test_init(self, calculator):\n        \"\"\"Test the initialization of the calculator.\"\"\"\n        assert calculator.db is not None\n        assert calculator.min_buffer_minutes == 5\n        assert calculator.base_transition_times is not None\n        assert calculator.context_change_weights is not None\n        assert calculator.adaptation_rate == 0.2",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert calculator.db is not None",
+          "        assert calculator.min_buffer_minutes == 5",
+          "        assert calculator.base_transition_times is not None",
+          "        assert calculator.context_change_weights is not None",
+          "        assert calculator.adaptation_rate == 0.2"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [],
+        "lineno": 176,
+        "end_lineno": 182,
+        "is_async": true,
+        "generated_docstring": "Test the initialization of the calculator."
+      },
+      {
+        "name": "test_calculate_buffer_no_db",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test buffer calculation with no database.",
+        "source_code": "    async def test_calculate_buffer_no_db(self):\n        \"\"\"Test buffer calculation with no database.\"\"\"\n        calculator = TimeBufferCalculator(db=None)\n        buffer = await calculator.calculate_buffer(\"task-1\", \"task-2\")\n        assert buffer == {\n            \"error\": \"No database connection available\",\n            \"buffer_minutes\": calculator.min_buffer_minutes\n        }",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert buffer == {\n            \"error\": \"No database connection available\",\n            \"buffer_minutes\": calculator.min_buffer_minutes\n        }"
+        ],
+        "fixtures": [],
+        "dependencies": [
+          "TimeBufferCalculator",
+          "calculate_buffer"
+        ],
+        "lineno": 185,
+        "end_lineno": 192,
+        "is_async": true,
+        "generated_docstring": "Test buffer calculation with no database."
+      },
+      {
+        "name": "test_calculate_buffer_tasks_not_found",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test buffer calculation with non-existent tasks.",
+        "source_code": "    async def test_calculate_buffer_tasks_not_found(self, calculator):\n        \"\"\"Test buffer calculation with non-existent tasks.\"\"\"\n        # Mock _get_task to return None\n        calculator._get_task = AsyncMock(return_value=None)\n    \n        # Calculate buffer\n        buffer = await calculator.calculate_buffer(\"non-existent-task-1\", \"non-existent-task-2\")\n        \n        # Verify result\n        assert buffer[\"error\"] == \"One or both tasks not found\"\n        assert buffer[\"buffer_minutes\"] == calculator.min_buffer_minutes",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert buffer[\"error\"] == \"One or both tasks not found\"",
+          "        assert buffer[\"buffer_minutes\"] == calculator.min_buffer_minutes"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "AsyncMock",
+          "calculate_buffer"
+        ],
+        "lineno": 195,
+        "end_lineno": 205,
+        "is_async": true,
+        "generated_docstring": "Test buffer calculation with non-existent tasks."
+      },
+      {
+        "name": "test_calculate_buffer_same_task",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test buffer calculation for the same task.",
+        "source_code": "    async def test_calculate_buffer_same_task(self, calculator):\n        \"\"\"Test buffer calculation for the same task.\"\"\"\n        # Mock _get_task to return the same task twice\n        task = create_mock_task_model(task_id=\"task-1\")\n        calculator._get_task = AsyncMock(return_value=task)\n    \n        # Calculate buffer\n        buffer = await calculator.calculate_buffer(\"task-1\", \"task-1\")\n        \n        # Verify result\n        assert buffer[\"buffer_minutes\"] == calculator.min_buffer_minutes",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert buffer[\"buffer_minutes\"] == calculator.min_buffer_minutes"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "AsyncMock",
+          "calculate_buffer"
+        ],
+        "lineno": 208,
+        "end_lineno": 218,
+        "is_async": true,
+        "generated_docstring": "Test buffer calculation for the same task."
+      },
+      {
+        "name": "test_calculate_buffer_no_transition_history",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test buffer calculation with no transition history.",
+        "source_code": "    async def test_calculate_buffer_no_transition_history(self, calculator):\n        \"\"\"Test buffer calculation with no transition history.\"\"\"\n        # Mock _get_task to return different tasks\n        task1 = create_mock_task_model(\n            task_id=\"task-1\",\n            location=\"home\",\n            tools_needed=[\"computer\"],\n            energy_required=3\n        )\n        task2 = create_mock_task_model(\n            task_id=\"task-2\",\n            location=\"office\",\n            tools_needed=[\"phone\", \"notepad\"],\n            energy_required=4\n        )\n        \n        # Use AsyncMock with side_effect to handle different task IDs\n        async def mock_get_task(task_id):\n            if task_id == \"task-1\":\n                return task1\n            elif task_id == \"task-2\":\n                return task2\n            return None\n        \n        calculator._get_task = AsyncMock(side_effect=mock_get_task)\n        \n        # Mock _get_transition_stats to return None\n        calculator._get_transition_stats = AsyncMock(return_value=None)\n        \n        # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string\n        calculator._analyze_transition_difficulty = AsyncMock(return_value=(\n            TransitionDifficulty.MODERATE,  # Use enum instead of string\n            {\n                \"location_change\": True,\n                \"tools_needed\": True,\n                \"mental_context\": True,\n                \"energy_shift\": True,\n                \"difficulty_score\": 4.4\n            }\n        ))\n        \n        # Calculate buffer\n        buffer = await calculator.calculate_buffer(\"task-1\", \"task-2\")\n        \n        # Verify result\n        assert buffer[\"buffer_minutes\"] >= calculator.min_buffer_minutes\n        # Changed assertion to handle the case where base_transition_times uses enum values as keys\n        min_buffer = calculator.base_transition_times.get(TransitionDifficulty.MINIMAL.value, 5)\n        assert buffer[\"buffer_minutes\"] >= min_buffer  # Should be at least the minimal buffer",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert buffer[\"buffer_minutes\"] >= calculator.min_buffer_minutes",
+          "        assert buffer[\"buffer_minutes\"] >= min_buffer  # Should be at least the minimal buffer"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_id"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "AsyncMock",
+          "AsyncMock",
+          "AsyncMock",
+          "get",
+          "calculate_buffer"
+        ],
+        "lineno": 221,
+        "end_lineno": 269,
+        "is_async": true,
+        "generated_docstring": "Test buffer calculation with no transition history."
+      },
+      {
+        "name": "test_calculate_buffer_with_transition_history",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test buffer calculation with transition history.",
+        "source_code": "    async def test_calculate_buffer_with_transition_history(self, calculator):\n        \"\"\"Test buffer calculation with transition history.\"\"\"\n        # Mock _get_task to return different tasks\n        task1 = create_mock_task_model(\n            task_id=\"task-1\",\n            location=\"home\",\n            tools_needed=[\"computer\"],\n            energy_required=3\n        )\n        task2 = create_mock_task_model(\n            task_id=\"task-2\",\n            location=\"office\",\n            tools_needed=[\"phone\", \"notepad\"],\n            energy_required=4\n        )\n        \n        # Use AsyncMock with side_effect to handle different task IDs\n        async def mock_get_task(task_id):\n            if task_id == \"task-1\":\n                return task1\n            elif task_id == \"task-2\":\n                return task2\n            return None\n        \n        calculator._get_task = AsyncMock(side_effect=mock_get_task)\n        \n        # Mock _get_transition_stats to return history\n        transition_stats = {\n            \"count\": 5,\n            \"avg_actual_minutes\": 15,\n            \"min_actual_minutes\": 10,\n            \"max_actual_minutes\": 20,\n            \"recent_observations\": [\n                {\"actual_minutes\": 15, \"predicted_minutes\": 12},\n                {\"actual_minutes\": 18, \"predicted_minutes\": 15}\n            ]\n        }\n        calculator._get_transition_stats = AsyncMock(return_value=transition_stats)\n        \n        # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string\n        calculator._analyze_transition_difficulty = AsyncMock(return_value=(\n            TransitionDifficulty.MODERATE,  # Use enum instead of string\n            {\n                \"location_change\": True,\n                \"tools_needed\": True,\n                \"mental_context\": True,\n                \"energy_shift\": True,\n                \"difficulty_score\": 4.4\n            }\n        ))\n        \n        # Calculate buffer\n        buffer = await calculator.calculate_buffer(\"task-1\", \"task-2\")\n        \n        # Verify result\n        assert buffer[\"buffer_minutes\"] >= calculator.min_buffer_minutes\n        assert \"transition_difficulty\" in buffer\n        assert \"difficulty_factors\" in buffer\n        assert \"context_changes\" in buffer\n        assert \"adjustment_factors\" in buffer\n        assert \"user_id\" in buffer\n        assert \"calculation_timestamp\" in buffer",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert buffer[\"buffer_minutes\"] >= calculator.min_buffer_minutes",
+          "        assert \"transition_difficulty\" in buffer",
+          "        assert \"difficulty_factors\" in buffer",
+          "        assert \"context_changes\" in buffer",
+          "        assert \"adjustment_factors\" in buffer",
+          "        assert \"user_id\" in buffer",
+          "        assert \"calculation_timestamp\" in buffer"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_id"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "AsyncMock",
+          "AsyncMock",
+          "AsyncMock",
+          "calculate_buffer"
+        ],
+        "lineno": 272,
+        "end_lineno": 333,
+        "is_async": true,
+        "generated_docstring": "Test buffer calculation with transition history."
+      },
+      {
+        "name": "test_update_with_observation",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test updating the model with a new transition observation.",
+        "source_code": "    async def test_update_with_observation(self, calculator):\n        \"\"\"Test updating the model with a new transition observation.\"\"\"\n        # Mock _get_task (not _get_tasks) to return task objects\n        original_get_task = calculator._get_task\n        \n        async def mock_get_task_side_effect(task_id):\n            if task_id == \"task-1\":\n                return create_mock_task_model(\n                    task_id=\"task-1\",\n                    user_id=\"test-user-1\"\n                )\n            elif task_id == \"task-2\":\n                return create_mock_task_model(\n                    task_id=\"task-2\",\n                    user_id=\"test-user-1\"\n                )\n            return None\n        \n        calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)\n        \n        # Mock _store_transition_observation\n        calculator._store_transition_observation = AsyncMock()\n        \n        try:\n            # Update with observation\n            result = await calculator.update_with_observation(\"task-1\", \"task-2\", 18.5)\n            \n            # Verify method calls - it's called 4 times because calculate_buffer also calls it\n            assert calculator._get_task.call_count >= 2\n            calculator._store_transition_observation.assert_called_once()\n            \n            # Check the result\n            assert result[\"current_task_id\"] == \"task-1\"\n            assert result[\"next_task_id\"] == \"task-2\"\n            assert result[\"actual_minutes\"] == 18.5\n            assert \"category_keys\" in result\n        finally:\n            # Restore original _get_task method\n            calculator._get_task = original_get_task",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "            assert calculator._get_task.call_count >= 2",
+          "            assert result[\"current_task_id\"] == \"task-1\"",
+          "            assert result[\"next_task_id\"] == \"task-2\"",
+          "            assert result[\"actual_minutes\"] == 18.5",
+          "            assert \"category_keys\" in result"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_id"
+        ],
+        "dependencies": [
+          "AsyncMock",
+          "AsyncMock",
+          "assert_called_once",
+          "create_mock_task_model",
+          "update_with_observation",
+          "create_mock_task_model"
+        ],
+        "lineno": 336,
+        "end_lineno": 374,
+        "is_async": true,
+        "generated_docstring": "Test updating the model with a new transition observation."
+      },
+      {
+        "name": "test_calculate_buffers_for_task_sequence",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test calculating buffers for a sequence of tasks.",
+        "source_code": "    async def test_calculate_buffers_for_task_sequence(self, calculator):\n        \"\"\"Test calculating buffers for a sequence of tasks.\"\"\"\n        # Mock calculate_buffer to return predictable values\n        calculator.calculate_buffer = AsyncMock()\n        calculator.calculate_buffer.side_effect = [\n            {\"buffer_minutes\": 10.0},\n            {\"buffer_minutes\": 15.0},\n            {\"buffer_minutes\": 12.0}\n        ]\n    \n        # Custom implementation of calculate_buffers_for_task_sequence\n        async def calculate_buffers_for_task_sequence(task_ids):\n            result = []\n            for i in range(len(task_ids) - 1):\n                buffer = await calculator.calculate_buffer(task_ids[i], task_ids[i + 1])\n                result.append(buffer[\"buffer_minutes\"])\n            return result\n            \n        # Calculate buffers for sequence\n        task_ids = [\"task-1\", \"task-2\", \"task-3\", \"task-4\"]\n        buffers = await calculate_buffers_for_task_sequence(task_ids)\n        \n        # Verify result\n        assert len(buffers) == 3\n        assert buffers == [10.0, 15.0, 12.0]",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert len(buffers) == 3",
+          "        assert buffers == [10.0, 15.0, 12.0]"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_ids"
+        ],
+        "dependencies": [
+          "AsyncMock",
+          "range",
+          "calculate_buffers_for_task_sequence",
+          "len",
+          "append",
+          "len",
+          "calculate_buffer"
+        ],
+        "lineno": 377,
+        "end_lineno": 401,
+        "is_async": true,
+        "generated_docstring": "Test calculating buffers for a sequence of tasks."
+      },
+      {
+        "name": "test_analyze_transition_difficulty",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test analyzing transition difficulty.",
+        "source_code": "    def test_analyze_transition_difficulty(self, calculator):\n        \"\"\"Test analyzing transition difficulty.\"\"\"\n        # Create tasks with different characteristics\n        task1 = create_mock_task_model(\n            location=\"home\",\n            tools_needed=[\"computer\"],\n            energy_required=2,\n            focus_required=3\n        )\n        \n        task2 = create_mock_task_model(\n            location=\"office\",\n            tools_needed=[\"whiteboard\", \"projector\"],\n            energy_required=4,\n            focus_required=5\n        )\n        \n        # Create async function to call _analyze_transition_difficulty\n        async def run_analysis():\n            return await calculator._analyze_transition_difficulty(task1, task2)\n            \n        # Run analysis\n        difficulty, result = asyncio.run(run_analysis())\n        \n        # Verify result\n        assert difficulty in TransitionDifficulty\n        assert \"location_change\" in result\n        assert result[\"location_change\"] is True\n        assert \"tool_change\" in result\n        assert result[\"tool_change\"] is True\n        assert \"focus_difference\" in result\n        assert \"energy_difference\" in result\n        assert \"score\" in result",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert difficulty in TransitionDifficulty",
+          "        assert \"location_change\" in result",
+          "        assert result[\"location_change\"] is True",
+          "        assert \"tool_change\" in result",
+          "        assert result[\"tool_change\"] is True",
+          "        assert \"focus_difference\" in result",
+          "        assert \"energy_difference\" in result",
+          "        assert \"score\" in result"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "run",
+          "run_analysis",
+          "_analyze_transition_difficulty"
+        ],
+        "lineno": 403,
+        "end_lineno": 435,
+        "is_async": false,
+        "generated_docstring": "Test analyzing transition difficulty."
+      },
+      {
+        "name": "test_calculate_context_changes",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test analyzing context changes between tasks.",
+        "source_code": "    def test_calculate_context_changes(self, calculator):\n        \"\"\"Test analyzing context changes between tasks.\"\"\"\n        # Create tasks with different characteristics\n        task1 = create_mock_task_model(\n            location=\"home\",\n            tools_needed=[\"computer\"],\n            category=\"work\"\n        )\n        \n        task2 = create_mock_task_model(\n            location=\"home\",  # Same location\n            tools_needed=[\"computer\", \"notebook\"],  # Different tools\n            category=\"personal\"  # Different category\n        )\n        \n        # Create async function to call _calculate_context_changes\n        async def run_analysis():\n            return await calculator._calculate_context_changes(task1, task2)\n            \n        # Run analysis\n        changes = asyncio.run(run_analysis())\n        \n        # Verify result\n        assert \"location\" in changes\n        assert changes[\"location\"][\"change_factor\"] == 0.0  # Same location\n        assert \"tools\" in changes\n        assert changes[\"tools\"][\"change_factor\"] > 0.0  # Different tools\n        assert \"mental_context\" in changes\n        assert changes[\"mental_context\"][\"change_factor\"] > 0.0  # Different category",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert \"location\" in changes",
+          "        assert changes[\"location\"][\"change_factor\"] == 0.0  # Same location",
+          "        assert \"tools\" in changes",
+          "        assert changes[\"tools\"][\"change_factor\"] > 0.0  # Different tools",
+          "        assert \"mental_context\" in changes",
+          "        assert changes[\"mental_context\"][\"change_factor\"] > 0.0  # Different category"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "run",
+          "run_analysis",
+          "_calculate_context_changes"
+        ],
+        "lineno": 437,
+        "end_lineno": 465,
+        "is_async": false,
+        "generated_docstring": "Test analyzing context changes between tasks."
+      },
+      {
+        "name": "test_calculate_energy_level_impact",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test calculating energy shift between tasks.",
+        "source_code": "    def test_calculate_energy_level_impact(self, calculator):\n        \"\"\"Test calculating energy shift between tasks.\"\"\"\n        # Create tasks with different energy requirements\n        task1 = create_mock_task_model(energy_required=2)\n        task2 = create_mock_task_model(energy_required=4)\n        \n        # Create async function to call _calculate_context_changes\n        async def run_analysis():\n            changes = await calculator._calculate_context_changes(task1, task2)\n            return changes[ContextChangeType.ENERGY_LEVEL.value][\"change_factor\"]\n            \n        # Test with energy increase\n        energy_shift = asyncio.run(run_analysis())\n        \n        # Verify results\n        assert energy_shift > 0.0  # Energy increased, should be positive",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert energy_shift > 0.0  # Energy increased, should be positive"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "run",
+          "run_analysis",
+          "_calculate_context_changes"
+        ],
+        "lineno": 467,
+        "end_lineno": 482,
+        "is_async": false,
+        "generated_docstring": "Test calculating energy shift between tasks."
+      },
+      {
+        "name": "test_calculate_mental_context_impact",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test calculating mental context shift between tasks.",
+        "source_code": "    def test_calculate_mental_context_impact(self, calculator):\n        \"\"\"Test calculating mental context shift between tasks.\"\"\"\n        # Create tasks with different focus types\n        task1 = create_mock_task_model(\n            focus_type=\"analytical\",\n            category=\"work\"\n        )\n        task2 = create_mock_task_model(\n            focus_type=\"creative\",\n            category=\"personal\"\n        )\n        \n        # Create async function to call _calculate_context_changes\n        async def run_analysis():\n            changes = await calculator._calculate_context_changes(task1, task2)\n            return changes[ContextChangeType.MENTAL_CONTEXT.value][\"change_factor\"]\n            \n        # Test with focus type and category change\n        mental_shift = asyncio.run(run_analysis())\n        \n        # Verify results\n        assert mental_shift > 0.0  # Mental context changed, should be positive",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert mental_shift > 0.0  # Mental context changed, should be positive"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "run",
+          "run_analysis",
+          "_calculate_context_changes"
+        ],
+        "lineno": 484,
+        "end_lineno": 505,
+        "is_async": false,
+        "generated_docstring": "Test calculating mental context shift between tasks."
+      },
+      {
+        "name": "test_get_task",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test retrieving tasks from the database.",
+        "source_code": "    async def test_get_task(self, calculator):\n        \"\"\"Test retrieving tasks from the database.\"\"\"\n        \n        # Mock up a task directly in the db fixture\n        if hasattr(calculator.db, 'tasks'):\n            # Use the mock db's tasks dictionary directly if it exists\n            calculator.db.tasks = {\n                \"task-1\": create_mock_task_model(\n                    task_id=\"task-1\",\n                    user_id=\"test-user-1\"\n                )\n            }\n        \n        # Directly mock the _get_task method just for this test \n        original_get_task = calculator._get_task\n        \n        async def mock_get_task_side_effect(task_id):\n            if task_id == \"task-1\":\n                return create_mock_task_model(\n                    task_id=\"task-1\",\n                    user_id=\"test-user-1\"\n                )\n            return None\n        \n        calculator._get_task = mock_get_task_side_effect\n        \n        try:\n            # Test with existing task\n            task = await calculator._get_task(\"task-1\")\n            \n            # Verify result\n            assert task is not None\n            assert task.id == \"task-1\"\n            \n            # Test with non-existent task\n            task = await calculator._get_task(\"non-existent-task\")\n            \n            # Verify result\n            assert task is None\n        finally:\n            # Restore original method\n            calculator._get_task = original_get_task",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "            assert task is not None",
+          "            assert task.id == \"task-1\"",
+          "            assert task is None"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_id"
+        ],
+        "dependencies": [
+          "hasattr",
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "_get_task",
+          "_get_task"
+        ],
+        "lineno": 508,
+        "end_lineno": 549,
+        "is_async": true,
+        "generated_docstring": "Test retrieving tasks from the database."
+      },
+      {
+        "name": "test_get_transition_stats",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test retrieving transition statistics.",
+        "source_code": "    async def test_get_transition_stats(self, calculator):\n        \"\"\"Test retrieving transition statistics.\"\"\"\n        # Setup\n        user_id = \"test-user-1\"\n        transitions = [\n            {\n                \"actual_minutes\": 15,\n                \"predicted_minutes\": 10\n            },\n            {\n                \"actual_minutes\": 20,\n                \"predicted_minutes\": 15\n            }\n        ]\n        \n        # Create an async method that simulates the internal method that gets transition history\n        calculator._get_transition_history = AsyncMock(return_value=transitions)\n        \n        # Call method\n        stats = await calculator.get_user_transition_stats(user_id)\n        \n        # Verify\n        assert stats is not None\n        assert \"average_transition_time\" in stats",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert stats is not None",
+          "        assert \"average_transition_time\" in stats"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "AsyncMock",
+          "get_user_transition_stats"
+        ],
+        "lineno": 552,
+        "end_lineno": 575,
+        "is_async": true,
+        "generated_docstring": "Test retrieving transition statistics."
+      },
+      {
+        "name": "test_save_transition_observation",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test saving a transition observation.",
+        "source_code": "    async def test_save_transition_observation(self, calculator):\n        \"\"\"Test saving a transition observation.\"\"\"\n        # Setup parameters\n        user_id = \"test-user-1\"\n        current_task_id = \"task-1\"\n        next_task_id = \"task-2\"\n        predicted_minutes = 15\n        actual_minutes = 20\n        \n        # Mock methods\n        calculator._store_transition_observation = AsyncMock()\n        \n        # Mock _get_task to return task objects\n        original_get_task = calculator._get_task\n        \n        async def mock_get_task_side_effect(task_id):\n            if task_id == \"task-1\":\n                return create_mock_task_model(\n                    task_id=\"task-1\",\n                    user_id=\"test-user-1\"\n                )\n            elif task_id == \"task-2\":\n                return create_mock_task_model(\n                    task_id=\"task-2\",\n                    user_id=\"test-user-1\"\n                )\n            return None\n        \n        calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)\n        \n        # Make sure calculate_buffer returns a valid result\n        calculator.calculate_buffer = AsyncMock(return_value={\"buffer_minutes\": 15})\n        \n        try:\n            # Test - update signature to match actual method\n            result = await calculator.update_with_observation(\n                current_task_id=current_task_id, \n                next_task_id=next_task_id, \n                actual_transition_minutes=actual_minutes,\n                user_id=user_id\n            )\n            \n            # Verify the method completed successfully\n            assert isinstance(result, dict)\n            assert \"current_task_id\" in result\n            assert \"next_task_id\" in result\n            assert result[\"current_task_id\"] == current_task_id\n            assert result[\"next_task_id\"] == next_task_id\n            \n            # The _store_transition_observation should have been called\n            assert calculator._store_transition_observation.call_count >= 1\n        finally:\n            # Restore original method\n            calculator._get_task = original_get_task",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "            assert isinstance(result, dict)",
+          "            assert \"current_task_id\" in result",
+          "            assert \"next_task_id\" in result",
+          "            assert result[\"current_task_id\"] == current_task_id",
+          "            assert result[\"next_task_id\"] == next_task_id",
+          "            assert calculator._store_transition_observation.call_count >= 1"
+        ],
+        "fixtures": [
+          "calculator",
+          "task_id"
+        ],
+        "dependencies": [
+          "AsyncMock",
+          "AsyncMock",
+          "AsyncMock",
+          "isinstance",
+          "create_mock_task_model",
+          "update_with_observation",
+          "create_mock_task_model"
+        ],
+        "lineno": 578,
+        "end_lineno": 631,
+        "is_async": true,
+        "generated_docstring": "Test saving a transition observation."
+      },
+      {
+        "name": "test_save_and_load",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test saving and loading the calculator.",
+        "source_code": "    def test_save_and_load(self, calculator):\n        \"\"\"Test saving and loading the calculator.\"\"\"\n        # Set up calculator parameters\n        calculator.min_buffer_minutes = 5\n        calculator.base_transition_times = {\n            \"minimal\": 5,\n            \"easy\": 10,\n            \"moderate\": 15,\n            \"difficult\": 20,\n            \"severe\": 30\n        }\n        calculator.context_change_weights = {\n            \"location\": 1.5,\n            \"tools\": 1.2,\n            \"mental_context\": 1.3,\n            \"energy_level\": 1.4\n        }\n        calculator.adaptation_rate = 0.2\n        \n        # Create temp file for saving\n        with tempfile.NamedTemporaryFile(delete=False) as temp:\n            filepath = temp.name\n            \n            # Save calculator\n            calculator.save(filepath)\n            \n            # Check that file exists and has content\n            assert os.path.exists(filepath)\n            assert os.path.getsize(filepath) > 0\n            \n            # Load calculator\n            loaded_calculator = TimeBufferCalculator.load(filepath)\n            \n            # Verify loaded parameters\n            assert loaded_calculator.min_buffer_minutes == calculator.min_buffer_minutes\n            assert loaded_calculator.base_transition_times == calculator.base_transition_times\n            assert loaded_calculator.context_change_weights == calculator.context_change_weights\n            assert loaded_calculator.adaptation_rate == calculator.adaptation_rate\n            \n            # Clean up\n            os.unlink(filepath)",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "            assert os.path.exists(filepath)",
+          "            assert os.path.getsize(filepath) > 0",
+          "            assert loaded_calculator.min_buffer_minutes == calculator.min_buffer_minutes",
+          "            assert loaded_calculator.base_transition_times == calculator.base_transition_times",
+          "            assert loaded_calculator.context_change_weights == calculator.context_change_weights",
+          "            assert loaded_calculator.adaptation_rate == calculator.adaptation_rate"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "NamedTemporaryFile",
+          "save",
+          "exists",
+          "load",
+          "unlink",
+          "getsize"
+        ],
+        "lineno": 633,
+        "end_lineno": 673,
+        "is_async": false,
+        "generated_docstring": "Test saving and loading the calculator."
+      },
+      {
+        "name": "test_context_change_weights",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test impact of context change weights.",
+        "source_code": "    def test_context_change_weights(self, calculator):\n        \"\"\"Test impact of context change weights.\"\"\"\n        # Verify the context change weights are properly set\n        assert calculator.context_change_weights is not None\n        assert \"location\" in calculator.context_change_weights\n        assert \"tools\" in calculator.context_change_weights\n        assert \"mental_context\" in calculator.context_change_weights\n        assert \"energy_level\" in calculator.context_change_weights\n        \n        # Test the _calculate_context_impact_factor method\n        context_changes = {\n            \"location\": {\"change_factor\": 1.0, \"details\": {}},\n            \"tools\": {\"change_factor\": 0.5, \"details\": {}},\n            \"mental_context\": {\"change_factor\": 0.0, \"details\": {}},\n            \"energy_level\": {\"change_factor\": 0.0, \"details\": {}}\n        }\n        \n        # Should increase the factor based on the changes\n        impact_factor = calculator._calculate_context_impact_factor(context_changes)\n        assert impact_factor > 1.0\n        \n        # Empty changes should result in no impact\n        assert calculator._calculate_context_impact_factor({}) == 1.0",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert calculator.context_change_weights is not None",
+          "        assert \"location\" in calculator.context_change_weights",
+          "        assert \"tools\" in calculator.context_change_weights",
+          "        assert \"mental_context\" in calculator.context_change_weights",
+          "        assert \"energy_level\" in calculator.context_change_weights",
+          "        assert impact_factor > 1.0",
+          "        assert calculator._calculate_context_impact_factor({}) == 1.0"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "_calculate_context_impact_factor",
+          "_calculate_context_impact_factor"
+        ],
+        "lineno": 675,
+        "end_lineno": 697,
+        "is_async": false,
+        "generated_docstring": "Test impact of context change weights."
+      },
+      {
+        "name": "test_min_max_buffer_limits",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test minimum and maximum buffer time limits.",
+        "source_code": "    def test_min_max_buffer_limits(self, calculator):\n        \"\"\"Test minimum and maximum buffer time limits.\"\"\"\n        # Verify the min and max buffer times are set\n        assert calculator.min_buffer_minutes > 0\n        assert calculator.max_buffer_minutes > calculator.min_buffer_minutes",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert calculator.min_buffer_minutes > 0",
+          "        assert calculator.max_buffer_minutes > calculator.min_buffer_minutes"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [],
+        "lineno": 699,
+        "end_lineno": 703,
+        "is_async": false,
+        "generated_docstring": "Test minimum and maximum buffer time limits."
+      },
+      {
+        "name": "test_adaptation_rate",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test adaptation rate for transition time updates.",
+        "source_code": "    def test_adaptation_rate(self, calculator):\n        \"\"\"Test adaptation rate for transition time updates.\"\"\"\n        # Verify adaptation rate is set\n        assert calculator.adaptation_rate > 0\n        assert calculator.adaptation_rate < 1.0 ",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert calculator.adaptation_rate > 0",
+          "        assert calculator.adaptation_rate < 1.0 "
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [],
+        "lineno": 705,
+        "end_lineno": 709,
+        "is_async": false,
+        "generated_docstring": "Test adaptation rate for transition time updates."
+      },
+      {
+        "name": "test_analyze_context_changes",
+        "class_name": "TestTimeBufferCalculator",
+        "file_path": "app/tests/ml/stochastic_time_estimation/test_time_buffer_calculator.py",
+        "existing_docstring": "Test analyzing context changes between tasks.",
+        "source_code": "    def test_analyze_context_changes(self, calculator):\n        \"\"\"Test analyzing context changes between tasks.\"\"\"\n        # Create tasks with different contexts\n        from_task = create_mock_task_model(\n            task_id=\"task-1\",\n            category=\"work\",\n            location=\"office\",\n            tools_needed=[\"laptop\", \"notebook\"],\n            energy_required=4,\n            focus_required=5,\n            focus_type=\"analytical\"\n        )\n        \n        to_task = create_mock_task_model(\n            task_id=\"task-2\",\n            category=\"personal\",\n            location=\"home\",\n            tools_needed=[\"phone\", \"headphones\"],\n            energy_required=2,\n            focus_required=3,\n            focus_type=\"creative\"\n        )\n        \n        # Run analysis synchronously through an async wrapper\n        async def run_analysis():\n            return await calculator._analyze_context_changes(from_task, to_task)\n        \n        result = asyncio.run(run_analysis())\n        \n        # Verify result structure\n        assert isinstance(result, dict)\n        assert ContextChangeType.LOCATION.value in result\n        assert ContextChangeType.TOOLS.value in result\n        assert ContextChangeType.MENTAL_CONTEXT.value in result\n        assert ContextChangeType.ENERGY_LEVEL.value in result\n        assert \"total_context_change_score\" in result\n        \n        # Verify sensible values\n        assert result[ContextChangeType.LOCATION.value][\"change_factor\"] > 0  # Different locations\n        assert result[ContextChangeType.TOOLS.value][\"change_factor\"] > 0  # Different tools\n        assert result[ContextChangeType.MENTAL_CONTEXT.value][\"change_factor\"] > 0  # Different categories\n        assert result[\"total_context_change_score\"] > 0\n        \n        # Test with identical tasks (should have minimal context change)\n        async def run_same_analysis():\n            return await calculator._analyze_context_changes(from_task, from_task)\n            \n        same_result = asyncio.run(run_same_analysis())\n        assert same_result[\"total_context_change_score\"] < result[\"total_context_change_score\"]",
+        "context_docstring": "Tests for the Time Buffer Calculator\n\nThis module contains unit and integration tests for the TimeBufferCalculator\nclass that calculates buffer times between tasks.\n\nClass: TestTimeBufferCalculator\nTest suite for the Time Buffer Calculator.",
+        "import_lines": [
+          "import sys",
+          "from unittest.mock import MagicMock, patch, AsyncMock",
+          "import numpy as np",
+          "import pytest",
+          "import asyncio",
+          "import os",
+          "import tempfile",
+          "import json",
+          "from datetime import datetime, timedelta",
+          "from typing import Dict, Any, List, Optional",
+          "import uuid",
+          "from app.ml.stochastic_time_estimation.time_buffer_calculator import (\n    TimeBufferCalculator,\n    TransitionDifficulty,\n    ContextChangeType\n)",
+          "from app.tests.ml.stochastic_time_estimation.test_utils import (\n    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test\n)"
+        ],
+        "assertions": [
+          "        assert isinstance(result, dict)",
+          "        assert ContextChangeType.LOCATION.value in result",
+          "        assert ContextChangeType.TOOLS.value in result",
+          "        assert ContextChangeType.MENTAL_CONTEXT.value in result",
+          "        assert ContextChangeType.ENERGY_LEVEL.value in result",
+          "        assert \"total_context_change_score\" in result",
+          "        assert result[ContextChangeType.LOCATION.value][\"change_factor\"] > 0  # Different locations",
+          "        assert result[ContextChangeType.TOOLS.value][\"change_factor\"] > 0  # Different tools",
+          "        assert result[ContextChangeType.MENTAL_CONTEXT.value][\"change_factor\"] > 0  # Different categories",
+          "        assert result[\"total_context_change_score\"] > 0",
+          "        assert same_result[\"total_context_change_score\"] < result[\"total_context_change_score\"]"
+        ],
+        "fixtures": [
+          "calculator"
+        ],
+        "dependencies": [
+          "create_mock_task_model",
+          "create_mock_task_model",
+          "run",
+          "isinstance",
+          "run",
+          "run_analysis",
+          "run_same_analysis",
+          "_analyze_context_changes",
+          "_analyze_context_changes"
+        ],
+        "lineno": 711,
+        "end_lineno": 759,
+        "is_async": false,
+        "generated_docstring": "Test analyzing context changes between tasks."
+      }
+    ]
+  }
+]

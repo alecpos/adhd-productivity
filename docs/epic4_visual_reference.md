@@ -1,0 +1,1518 @@
+# Epic 4: Visual Reference Document - Part 1
+# Dynamic Schedule Rebalancing with Circadian Rhythm Optimization
+
+## System Architecture Diagrams
+
+### High-Level System Architecture
+
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│                        Client Applications                             │
+│                                                                       │
+│  ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐      │
+│  │  Web Interface  │   │  Mobile App     │   │  Calendar       │      │
+│  │                 │   │                 │   │  Integrations   │      │
+│  └────────┬────────┘   └────────┬────────┘   └────────┬────────┘      │
+└───────────┼─────────────────────┼─────────────────────┼───────────────┘
+            │                     │                     │
+            └──────────┬──────────┴──────────┬──────────┘
+                       │                     │
+┌──────────────────────▼─────────────────────▼──────────────────────────┐
+│                         API Gateway Layer                             │
+│                                                                       │
+│  ┌───────────────────┐ ┌───────────────────┐ ┌───────────────────┐    │
+│  │  Authentication   │ │  Request Routing  │ │  Rate Limiting    │    │
+│  └───────────────────┘ └───────────────────┘ └───────────────────┘    │
+└───────────────────────────────────┬───────────────────────────────────┘
+                                    │
+                  ┌─────────────────┴──────────────────┐
+                  │                                    │
+┌─────────────────▼────────────────┐    ┌──────────────▼─────────────────┐
+│                                  │    │                                │
+│   Scheduling Service Domain      │    │  Circadian Model Domain        │
+│                                  │    │                                │
+│  ┌───────────────────────────┐   │    │  ┌───────────────────────────┐ │
+│  │  Schedule Optimization    │   │    │  │  Energy Pattern           │ │
+│  │  Service                  │   │    │  │  Prediction Service       │ │
+│  └─────────────┬─────────────┘   │    │  └─────────────┬─────────────┘ │
+│                │                 │    │                │               │
+│  ┌─────────────▼─────────────┐   │    │  ┌─────────────▼─────────────┐ │
+│  │  Constraint Processing    │   │    │  │  User Pattern             │ │
+│  │  Service                  │   │    │  │  Detection Service        │ │
+│  └─────────────┬─────────────┘   │    │  └─────────────┬─────────────┘ │
+│                │                 │    │                │               │
+│  ┌─────────────▼─────────────┐   │    │  ┌─────────────▼─────────────┐ │
+│  │  Calendar Integration     │   │    │  │  Model Training           │ │
+│  │  Service                  │   │    │  │  Service                  │ │
+│  └───────────────────────────┘   │    │  └───────────────────────────┘ │
+└──────────────────┬───────────────┘    └───────────────┬────────────────┘
+                   │                                    │
+                   └────────────────┬──────────────────┘
+                                    │
+┌───────────────────────────────────▼───────────────────────────────────┐
+│                         Database Layer                                │
+│                                                                       │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │
+│  │  PostgreSQL     │  │  MongoDB        │  │  Redis Cache    │        │
+│  │  Relational     │  │  Document       │  │                 │        │
+│  │  Database       │  │  Database       │  │                 │        │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘        │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+### Service Communication Patterns
+
+```
+┌───────────────────┐      HTTP/REST       ┌───────────────────┐
+│                   │◄────────────────────►│                   │
+│   API Gateway     │                      │  Client App       │
+│                   │                      │                   │
+└────────┬──────────┘                      └───────────────────┘
+         │
+         │ gRPC
+         │
+┌────────▼──────────┐     Message Queue    ┌───────────────────┐
+│                   │◄────────────────────►│                   │
+│  Service Registry │                      │  Notification     │
+│                   │                      │  Service          │
+└────────┬──────────┘                      └───────────────────┘
+         │
+         │ gRPC
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                    Service Mesh                             │
+│                                                             │
+└──┬─────────────┬───────────────┬────────────────┬───────────┘
+   │             │               │                │
+   │ gRPC        │ gRPC          │ gRPC           │ gRPC
+   ▼             ▼               ▼                ▼
+┌─────────┐  ┌─────────┐  ┌─────────────┐  ┌───────────────┐
+│         │  │         │  │             │  │               │
+│Scheduler│  │Circadian│  │Task Profile │  │Model Training │
+│Service  │  │Service  │  │Service      │  │Service        │
+│         │  │         │  │             │  │               │
+└─────────┘  └─────────┘  └─────────────┘  └───────────────┘
+```
+
+### Database Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   PostgreSQL Cluster                    │
+│                                                         │
+│  ┌─────────────┐     ┌─────────────┐    ┌─────────────┐ │
+│  │             │     │             │    │             │ │
+│  │   Primary   │────►│  Replica 1  │    │  Replica 2  │ │
+│  │             │     │             │    │             │ │
+│  └─────────────┘     └─────────────┘    └─────────────┘ │
+│         ▲                                               │
+└─────────┼───────────────────────────────────────────────┘
+          │
+          │ Write Operations
+          │
+┌─────────▼───────────────────────────────────────────────┐
+│                                                         │
+│                 Application Services                    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+          │
+          │ Read Operations
+          ▼
+┌─────────────────────────────────────────────────────────┐
+│                    Read Replicas                        │
+│                                                         │
+│  ┌─────────────┐     ┌─────────────┐    ┌─────────────┐ │
+│  │             │     │             │    │             │ │
+│  │  Replica 1  │     │  Replica 2  │    │  Replica 3  │ │
+│  │             │     │             │    │             │ │
+│  └─────────────┘     └─────────────┘    └─────────────┘ │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### MongoDB Collection Relationships
+
+```
+┌───────────────────────────────┐
+│      CircadianModels          │
+├───────────────────────────────┤
+│ _id: ObjectId                 │
+│ model_id: UUID                │
+│ user_id: UUID                 │──────┐
+│ parameters: Object            │      │
+│ dimension_parameters: Object  │      │
+│ created_at: Timestamp         │      │
+│ updated_at: Timestamp         │      │
+└───────────────────────────────┘      │
+                                       │
+┌───────────────────────────────┐      │
+│   TaskCognitiveProfiles       │      │
+├───────────────────────────────┤      │
+│ _id: ObjectId                 │      │
+│ task_id: UUID  ───────────────┼─────┐│
+│ user_id: UUID  ───────────────┼─────┼┘
+│ cognitive_profile: Object     │     ││
+│ nlp_analysis: Object          │     ││
+│ created_at: Timestamp         │     ││
+└───────────────────────────────┘     ││
+                                       ││
+┌───────────────────────────────┐     ││
+│   ScheduleOptimizations       │     ││
+├───────────────────────────────┤     ││
+│ _id: ObjectId                 │     ││
+│ optimization_id: UUID         │     ││
+│ user_id: UUID  ───────────────┼─────┘│
+│ tasks: Array<Object> ─────────┼──────┘
+│ energy_curves: Object         │ 
+│ result: Object                │
+│ applied_at: Timestamp         │
+└───────────────────────────────┘
+```
+
+# Epic 4: Visual Reference Document - Part 2
+# Data Flow and Component Interaction
+
+## Data Flow Diagrams
+
+### Energy Data Collection & Model Training Flow
+
+```
+┌───────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│               │    │                 │    │                 │
+│ User Reports  │───►│ Energy Data     │───►│ Data Validation │
+│ Energy Level  │    │ Collection API  │    │ & Processing    │
+│               │    │                 │    │                 │
+└───────────────┘    └─────────────────┘    └────────┬────────┘
+                                                     │
+┌───────────────┐    ┌─────────────────┐    ┌────────▼────────┐
+│               │    │                 │    │                 │
+│ Model         │◄───│ Model Training  │◄───│ Feature         │
+│ Persistence   │    │ Pipeline        │    │ Extraction      │
+│               │    │                 │    │                 │
+└───────┬───────┘    └─────────────────┘    └─────────────────┘
+        │
+        │                     ┌─────────────────┐
+        │                     │                 │
+        └────────────────────►│ Energy         │
+                              │ Prediction API  │
+                              │                 │
+                              └─────────────────┘
+```
+
+### Schedule Optimization Process Flow
+
+```
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│              │      │              │      │              │
+│ User Tasks   │─────►│ Task Cognitive│─────►│ Circadian    │
+│ & Constraints│      │ Profiling    │      │ Energy Curve │
+│              │      │              │      │              │
+└──────────────┘      └──────────────┘      └──────┬───────┘
+                                                   │
+┌──────────────┐      ┌──────────────┐      ┌──────▼───────┐
+│              │      │              │      │              │
+│ Calendar     │◄─────│ Schedule     │◄─────│ DQN          │
+│ Integration  │      │ Application  │      │ Optimization │
+│              │      │              │      │ Algorithm    │
+└──────────────┘      └──────────────┘      └──────────────┘
+```
+
+### Feedback Loop Process
+
+```
+┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+│               │     │               │     │               │
+│ User Completes│────►│ Task          │────►│ Completion    │
+│ Task          │     │ Completion API│     │ Analysis      │
+│               │     │               │     │               │
+└───────────────┘     └───────────────┘     └───────┬───────┘
+                                                    │
+┌───────────────┐     ┌───────────────┐     ┌───────▼───────┐
+│               │     │               │     │               │
+│ Model Update  │◄────│ Learning      │◄────│ Performance   │
+│ Pipeline      │     │ Algorithm     │     │ Metrics       │
+│               │     │               │     │               │
+└───────────────┘     └───────────────┘     └───────────────┘
+```
+
+## Component Interaction Diagrams
+
+### CircadianDQNModel Components
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     CircadianDQNModel                       │
+│                                                             │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ State Space   │──►│ Q-Network     │──►│ Action        │  │
+│  │ Generator     │   │               │   │ Selection     │  │
+│  │               │   │               │   │               │  │
+│  └───────┬───────┘   └───────────────┘   └───────┬───────┘  │
+│          │                                       │          │
+│  ┌───────▼───────┐                     ┌─────────▼─────┐    │
+│  │               │                     │               │    │
+│  │ Circadian     │                     │ Schedule      │    │
+│  │ Feature       │                     │ Builder       │    │
+│  │ Extractor     │                     │               │    │
+│  │               │                     │               │    │
+│  └───────┬───────┘                     └───────────────┘    │
+│          │                                                  │
+│  ┌───────▼───────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ Energy        │◄──┤ Reward        │◄──┤ Experience    │  │
+│  │ Prediction    │   │ Function      │   │ Memory        │  │
+│  │ Client        │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### CircadianRhythmModel Components
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   CircadianRhythmModel                      │
+│                                                             │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ Harmonic      │──►│ Parameter     │──►│ Energy        │  │
+│  │ Component     │   │ Estimator     │   │ Predictor     │  │
+│  │ Generator     │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────┬───────┘  │
+│                                                  │          │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────▼───────┐  │
+│  │               │   │               │   │               │  │
+│  │ User Data     │──►│ Bayesian      │──►│ Multi-        │  │
+│  │ Repository    │   │ Updater       │   │ Dimensional   │  │
+│  │               │   │               │   │ Predictor     │  │
+│  └───────────────┘   └───────────────┘   └───────────────┘  │
+│                                                             │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ Default       │   │ Contextual    │   │ Optimal       │  │
+│  │ Pattern       │   │ Adjustment    │   │ Window        │  │
+│  │ Provider      │   │ Engine        │   │ Detector      │  │
+│  │               │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### TaskCognitiveProfiler Components
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   TaskCognitiveProfiler                     │
+│                                                             │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ Text          │──►│ TF-IDF        │──►│ Multi-Output  │  │
+│  │ Preprocessor  │   │ Vectorizer    │   │ Regressor     │  │
+│  │               │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────┬───────┘  │
+│                                                  │          │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────▼───────┐  │
+│  │               │   │               │   │               │  │
+│  │ Feature       │──►│ Model         │──►│ Prediction    │  │
+│  │ Extractor     │   │ Trainer       │   │ Generator     │  │
+│  │               │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────────────┘  │
+│                                                             │
+│  ┌───────────────┐   ┌───────────────┐   ┌───────────────┐  │
+│  │               │   │               │   │               │  │
+│  │ NLP           │   │ Classification│   │ Confidence    │  │
+│  │ Analyzer      │   │ Engine        │   │ Estimator     │  │
+│  │               │   │               │   │               │  │
+│  └───────────────┘   └───────────────┘   └───────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+# Epic 4: Visual Reference Document - Part 3
+# UI/UX Mockups and User Interaction Flows
+
+## User Interface Mockups
+
+### Energy Reporting Interface
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  Energy Check-in                                       X  [_] [■]   │
+│  ──────────────────────────────────────────────────────────────     │
+│                                                                     │
+│  How is your energy right now?                                      │
+│                                                                     │
+│  Overall Energy:                                                    │
+│                                                                     │
+│  ○───○───●───○───○                                                  │
+│  1   2   3   4   5                                                  │
+│  Low             High                                               │
+│                                                                     │
+│  Focus Capacity:                                                    │
+│                                                                     │
+│  ○───○───○───●───○                                                  │
+│  1   2   3   4   5                                                  │
+│  Scattered    Focused                                               │
+│                                                                     │
+│  Creative Energy:                                                   │
+│                                                                     │
+│  ○───○───●───○───○                                                  │
+│  1   2   3   4   5                                                  │
+│  Practical    Creative                                              │
+│                                                                     │
+│  Context: ┌─────────────────────┐                                   │
+│           │ Just finished lunch │                                   │
+│           └─────────────────────┘                                   │
+│                                                                     │
+│                                                                     │
+│           [  Skip  ]     [ Remind Later ]     [ Submit ]            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Schedule Optimization View
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  Schedule Optimization                              X  [_] [■]      │
+│  ──────────────────────────────────────────────────────────────     │
+│                                                                     │
+│  Time Period: [Monday, Sept 4 - Friday, Sept 8, 2023] ▼             │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────┐      │
+│  │                  Energy Curve Preview                     │      │
+│  │                                                           │      │
+│  │  Energy    ╭───╮         ╭───╮         ╭───╮             │      │
+│  │  Level  10 │   │         │   │         │   │             │      │
+│  │            │   │         │   │         │   │             │      │
+│  │            │   │         │   │         │   │             │      │
+│  │          5 │   │╰───╮╭───╯   │╰───╮╭───╯   │╰───╮        │      │
+│  │            │   │    │        │    │        │    │        │      │
+│  │            │   │    │        │    │        │    │        │      │
+│  │          0 └───┴────┴────────┴────┴────────┴────┴────────┘      │
+│  │             Mon      Tue      Wed      Thu      Fri             │
+│  └───────────────────────────────────────────────────────────┘      │
+│                                                                     │
+│  Tasks to Schedule:                                                 │
+│  ┌───────────────────────────────────────────────────────────┐      │
+│  │ ☑ Write project proposal (2h, high focus)                 │      │
+│  │ ☑ Team meeting (1h, fixed: Wed 2pm)                       │      │
+│  │ ☑ Code review (45min, medium focus)                       │      │
+│  │ ☑ Documentation (1h, low focus)                           │      │
+│  │ ☑ Brainstorming session (1h, high creative)               │      │
+│  │ ☐ Add more tasks...                                       │      │
+│  └───────────────────────────────────────────────────────────┘      │
+│                                                                     │
+│  Optimization Settings:                                             │
+│  ┌───────────────────────────────────────────────────────────┐      │
+│  │ Optimization Strength: [------------●-------] 70%          │      │
+│  │ ☑ Respect existing calendar events                        │      │
+│  │ ☑ Include breaks between tasks                            │      │
+│  │ ☑ Group similar tasks when possible                       │      │
+│  │ ☐ Allow tasks outside work hours                          │      │
+│  └───────────────────────────────────────────────────────────┘      │
+│                                                                     │
+│           [ Cancel ]                        [ Optimize ]            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Optimized Schedule Result View
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  Optimized Schedule                                 X  [_] [■]      │
+│  ──────────────────────────────────────────────────────────────     │
+│                                                                     │
+│  Monday, September 4                                                │
+│  ┌───────┬───────────────────────────┬───────────────┬──────────┐   │
+│  │ Time  │ Activity                  │ Energy Match  │ Actions  │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 9:00  │ Write project proposal    │ Focus: 9.3/10 │ 🔄 ✎ ✕   │   │
+│  │ -11:00│                           │ ⭐⭐⭐⭐⭐      │          │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 11:00 │ Break                     │      -        │    -     │   │
+│  │ -11:15│                           │               │          │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 11:15 │ Documentation             │ Focus: 6.1/10 │ 🔄 ✎ ✕   │   │
+│  │ -12:15│                           │ ⭐⭐⭐☆☆      │          │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 12:15 │ Lunch                     │      -        │    -     │   │
+│  │ -1:15 │                           │               │          │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 1:15  │ Code review               │ Focus: 6.8/10 │ 🔄 ✎ ✕   │   │
+│  │ -2:00 │                           │ ⭐⭐⭐☆☆      │          │   │
+│  ├───────┼───────────────────────────┼───────────────┼──────────┤   │
+│  │ 3:30  │ Brainstorming session     │ Create: 8.7/10│ 🔄 ✎ ✕   │   │
+│  │ -4:30 │                           │ ⭐⭐⭐⭐☆      │          │   │
+│  └───────┴───────────────────────────┴───────────────┴──────────┘   │
+│                                                                     │
+│  Schedule quality score: 87/100                                     │
+│                                                                     │
+│  Insights:                                                          │
+│  • High-focus tasks scheduled during morning energy peak            │
+│  • Creative task aligned with afternoon creative energy rise        │
+│  • 15-minute buffer added before meetings                           │
+│  • 2 hours of free time available for unexpected tasks              │
+│                                                                     │
+│  [ Further Adjust ]   [ Save as Template ]   [ Apply to Calendar ]  │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Task Cognitive Demand Assessment
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  Task Cognitive Assessment                           X  [_] [■]     │
+│  ──────────────────────────────────────────────────────────────     │
+│                                                                     │
+│  Title: Quarterly Financial Report                                  │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │ Compile and analyze Q3 financial data, create visualizations,│    │
+│  │ and write executive summary for leadership team.            │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                     │
+│  Estimated duration: [  2  ] hours [ 30 ] minutes                   │
+│                                                                     │
+│  Cognitive Demands (AI-Assessed):                                   │
+│                                                                     │
+│  Focus Required:       [▮▮▮▮▮▮▮▯▯▯] 7/10                           │
+│  Executive Function:   [▮▮▮▮▮▮▮▯▯▯] 7/10                           │
+│  Creative Thinking:    [▮▮▮▮▮▯▯▯▯▯] 5/10                           │
+│  Overall Complexity:   [▮▮▮▮▮▮▮▯▯▯] 7/10                           │
+│                                                                     │
+│  Scheduling Recommendations:                                        │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │ • Best scheduled during morning focus peak (9-11am)         │    │
+│  │ • Consider breaking into multiple sessions                  │    │
+│  │ • Schedule when executive function is high                  │    │
+│  │ • Avoid scheduling after lunch (energy dip period)          │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                     │
+│  [ Adjust Assessment ]             [ Add to Tasks & Schedule ]      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## User Interaction Flows
+
+### Energy Reporting Flow
+
+```
+┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
+│           │     │           │     │           │     │           │
+│  App      │────►│ Energy    │────►│ Rating    │────►│ Context   │
+│  Reminder │     │ Check-in  │     │ Selection │     │ (Optional)│
+│           │     │ Prompt    │     │           │     │           │
+└───────────┘     └───────────┘     └───────────┘     └───────────┘
+                                                            │
+┌───────────┐     ┌───────────┐     ┌───────────┐          │
+│           │     │           │     │           │          │
+│ Next      │◄────│ Thank You │◄────│ Submit    │◄─────────┘
+│ Reminder  │     │ Screen    │     │ Ratings   │
+│ Scheduling│     │           │     │           │
+└───────────┘     └───────────┘     └───────────┘
+```
+
+### Schedule Optimization Flow
+
+```
+┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
+│           │     │           │     │           │     │           │
+│ Select    │────►│ Configure │────►│ Review    │────►│ Processing│
+│ Time Range│     │ Settings  │     │ Tasks     │     │ Animation │
+│           │     │           │     │           │     │           │
+└───────────┘     └───────────┘     └───────────┘     └───────────┘
+                                                            │
+┌───────────┐     ┌───────────┐     ┌───────────┐          │
+│           │     │           │     │           │          │
+│ Apply to  │◄────│ Adjust    │◄────│ View      │◄─────────┘
+│ Calendar  │     │ (Optional)│     │ Results   │
+│           │     │           │     │           │
+└───────────┘     └───────────┘     └───────────┘
+```
+
+### Task Completion Feedback Flow
+
+```
+┌───────────┐     ┌───────────┐     ┌───────────┐
+│           │     │           │     │           │
+│ Task      │────►│ Completion│────►│ Rate      │
+│ Completion│     │ Dialog    │     │ Experience│
+│           │     │           │     │           │
+└───────────┘     └───────────┘     └───────────┘
+                                          │
+┌───────────┐     ┌───────────┐          │
+│           │     │           │          │
+│ View      │◄────│ Submit    │◄─────────┘
+│ Updated   │     │ Feedback  │
+│ Analytics │     │           │
+└───────────┘     └───────────┘
+```
+
+## Energy Pattern Visualizations
+
+### Daily Energy Pattern
+
+```
+Energy
+Level
+  ^
+10│                                                           
+  │                ┌─┐                     ┌─┐                
+ 8│               ┌┘ └┐                   ┌┘ └┐              
+  │              ┌┘   └┐                 ┌┘   └┐             
+ 6│          ┌─┐ │     │     ┌─┐         │     │ ┌─┐         
+  │         ┌┘ └┐│     │    ┌┘ └┐        │     │┌┘ └┐        
+ 4│        ┌┘   └┘     └┐  ┌┘   └┐       │     ││   │        
+  │       ┌┘            └┐┌┘     └┐      │     ││   │        
+ 2│      ┌┘              └┘       └┐     │     ││   │        
+  │     ┌┘                         └┐    │     ││   │        
+ 0└─────┴───────────────────────────┴────┴─────┴┴───┴────────►
+  0     2     4     6     8     10    12    14    16    18    Hours
+       └─────┬─────┘     └────┬────┘      └────┬────┘         
+          Sleep          Morning           Afternoon           
+                           Peak        Post-Lunch Dip       
+```
+
+### Weekly Pattern Visualization
+
+```
+    MON   TUE   WED   THU   FRI   SAT   SUN
+    ─────────────────────────────────────────  
+ 8  ░░░   ░░░   ░░░   ░░░   ░░░   ░░░   ▒▒▒    Sleep
+ 9  ░░░   ░░░   ░░░   ░░░   ░░░   ▒▒▒   ▒▒▒
+10  ███   ███   ███   ███   ███   ▒▒▒   ▒▒▒    High Energy
+11  ███   ███   ███   ███   ███   ███   ▒▒▒    (8-10)
+12  ███   ███   ███   ███   ███   ███   ███
+13  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ███   ███
+14  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ███   ███    Medium Energy 
+15  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓    (5-7)
+16  ███   ███   ███   ███   ███   ▓▓▓   ▓▓▓
+17  ███   ███   ███   ███   ███   ▓▓▓   ▓▓▓
+18  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓    Low Energy
+19  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓    (1-4)
+20  ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓   ▓▓▓
+21  ░░░   ░░░   ░░░   ░░░   ░░░   ░░░   ░░░    Sleep
+```
+
+### Task-Energy Alignment Visualization
+
+```
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│  Task-Energy Alignment                                    │
+│                                                           │
+│  Energy                                                   │
+│  Level    Focus                                           │
+│    10 ┼        ╭───╮                                      │
+│       │       ╱│▓▓▓│╲                                     │
+│     8 ┼      ╱ │▓▓▓│ ╲                                    │
+│       │     ╱  │▓▓▓│  ╲    Writing Task                   │
+│     6 ┼    ╱   │▓▓▓│   ╲   ▓▓▓▓▓▓▓▓▓▓                     │
+│       │   ╱    │▓▓▓│    ╲                                 │
+│     4 ┼  ╱     │   │     ╲     Emails                     │
+│       │ ╱      │   │      ╲    ▓▓▓▓▓▓                     │
+│     2 ┼╱       │   │       ╲                              │
+│       │        │   │        ╲                             │
+│     0 ┼────────────────────────────────────────────       │
+│       6am     9am     12pm     3pm     6pm                │
+│                                                           │
+│  Task-Energy Match Score: 87%                             │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+# Epic 4: Visual Reference Document - Part 4
+# Developer Reference Guides
+
+## Key API Usage Examples
+
+### Retrieving Energy Predictions
+
+```typescript
+// Example: Retrieving a user's energy predictions for a specific day
+async function getEnergyPredictions(userId: string, date: string): Promise<EnergyPredictionResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/circadian/energy-curve?start_date=${date}T00:00:00Z&end_date=${date}T23:59:59Z`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Energy prediction request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    return {
+      date,
+      predictions: data.energy_data[0].hourly_levels,
+      optimalWindows: data.optimal_windows[0].windows,
+      modelConfidence: data.confidence_score
+    };
+  } catch (error) {
+    console.error('Failed to get energy predictions:', error);
+    // Implement fallback here (use cached data or population defaults)
+    return getFallbackPredictions(date);
+  }
+}
+```
+
+### Reporting Energy Levels
+
+```typescript
+// Example: Submitting a user energy report
+async function submitEnergyReport(
+  userId: string, 
+  energyLevel: number, 
+  focusLevel?: number, 
+  creativeLevel?: number, 
+  context?: string
+): Promise<boolean> {
+  try {
+    const timestamp = new Date().toISOString();
+    
+    const reportData = {
+      timestamp,
+      energy_level: energyLevel,
+      focus_level: focusLevel,
+      creative_level: creativeLevel,
+      context: context ? { notes: context } : undefined
+    };
+    
+    const response = await fetch(`${API_BASE_URL}/circadian/report-energy`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(reportData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Energy report submission failed: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    // Schedule next reminder based on response
+    scheduleNextEnergyReminder(result.next_reminder_suggestion);
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to submit energy report:', error);
+    
+    // Queue for retry later if offline
+    if (!navigator.onLine) {
+      queueOfflineEnergyReport(userId, energyLevel, focusLevel, creativeLevel, context);
+    }
+    
+    return false;
+  }
+}
+```
+
+### Requesting Schedule Optimization
+
+```typescript
+// Example: Requesting a schedule optimization
+async function optimizeSchedule(
+  userId: string,
+  startDate: string,
+  endDate: string,
+  tasks: Task[],
+  preferences: OptimizationPreferences
+): Promise<OptimizationResult> {
+  try {
+    // Show optimization in progress UI
+    showOptimizationInProgress();
+    
+    const requestData = {
+      start_date: `${startDate}T00:00:00Z`,
+      end_date: `${endDate}T23:59:59Z`,
+      tasks: tasks.map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        duration_minutes: task.durationMinutes,
+        focus_required: task.focusRequired,
+        executive_function_load: task.executiveFunction,
+        creative_required: task.creativeRequired,
+        complexity: task.complexity,
+        priority: task.priority,
+        is_flexible: task.isFlexible,
+        deadline: task.deadline ? task.deadline.toISOString() : undefined
+      })),
+      preferences: {
+        work_hours: preferences.workHours,
+        weekend_different: preferences.weekendDifferent,
+        weekend_work_hours: preferences.weekendWorkHours,
+        optimization_strength: preferences.optimizationStrength,
+        respect_existing_events: preferences.respectExistingEvents,
+        allow_breaks: preferences.allowBreaks,
+        break_duration_minutes: preferences.breakDurationMinutes
+      }
+    };
+    
+    const response = await fetch(`${API_BASE_URL}/scheduling/circadian-optimize`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Schedule optimization failed: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    // Hide optimization in progress UI
+    hideOptimizationInProgress();
+    
+    return {
+      optimizationId: result.optimization_id,
+      schedule: result.schedule,
+      energyCurves: result.energy_curves,
+      unscheduledTasks: result.unscheduled_tasks || [],
+      qualityMetrics: result.quality_metrics,
+      message: result.message
+    };
+  } catch (error) {
+    console.error('Schedule optimization failed:', error);
+    hideOptimizationInProgress();
+    showOptimizationError(error.message);
+    return null;
+  }
+}
+```
+
+## Integration Code Examples
+
+### Calendar Integration
+
+```typescript
+// Example: Applying an optimization to a user's calendar
+async function applyOptimizationToCalendar(
+  optimizationId: string, 
+  calendarId: string, 
+  notifyUser: boolean = true
+): Promise<boolean> {
+  try {
+    // Get the optimization result first
+    const optimization = await getOptimizationById(optimizationId);
+    if (!optimization) {
+      throw new Error(`Optimization with ID ${optimizationId} not found`);
+    }
+    
+    // Transform schedule items to calendar-compatible format
+    const modifications = optimization.schedule.map(item => ({
+      task_id: item.task_id,
+      action: 'SCHEDULE',
+      start_time: item.start_time,
+      end_time: item.end_time
+    }));
+    
+    // Send the application request
+    const response = await fetch(`${API_BASE_URL}/scheduling/apply-circadian-optimization`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        optimization_id: optimizationId,
+        calendar_id: calendarId,
+        modifications,
+        notify_user: notifyUser
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Calendar application failed: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    // Show success message with result details
+    showApplicationSuccess(
+      result.applied_changes, 
+      result.failed_changes, 
+      result.calendar_link
+    );
+    
+    return result.success;
+  } catch (error) {
+    console.error('Failed to apply to calendar:', error);
+    showApplicationError(error.message);
+    return false;
+  }
+}
+```
+
+### Task Cognitive Analysis
+
+```typescript
+// Example: Analyzing the cognitive demands of a task
+async function analyzeTaskCognitiveDemands(
+  title: string, 
+  description: string, 
+  durationEstimateMinutes: number
+): Promise<CognitiveAnalysis> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tasks/analyze-cognitive-demands`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        duration_estimate_minutes: durationEstimateMinutes,
+        task_type: detectTaskType(title, description)
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Task analysis failed: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    return {
+      focusRequired: result.analysis.focus_required,
+      executiveFunctionLoad: result.analysis.executive_function_load,
+      creativeRequired: result.analysis.creative_required,
+      complexity: result.analysis.complexity,
+      energyDemand: result.analysis.energy_demand,
+      expectedDurationMinutes: result.analysis.expected_duration_minutes,
+      confidence: result.analysis.confidence,
+      recommendations: result.recommendations
+    };
+  } catch (error) {
+    console.error('Task analysis failed:', error);
+    // Fallback to heuristic-based analysis
+    return performLocalTaskAnalysis(title, description, durationEstimateMinutes);
+  }
+}
+```
+
+### Energy Curve Visualization
+
+```typescript
+// Example: Rendering an energy curve visualization with D3
+function renderEnergyCurve(container, energyData, taskSchedule) {
+  const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+  const width = 800 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
+  
+  // Clear previous content
+  d3.select(container).html('');
+  
+  // Create SVG container
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+  
+  // Parse data
+  const data = energyData.map(d => ({
+    hour: d.hour,
+    energyLevel: d.energy_level,
+    focusCapacity: d.focus_capacity,
+    creativeCapacity: d.creative_capacity,
+    executiveFunctionCapacity: d.executive_function_capacity
+  }));
+  
+  // X scale (time)
+  const x = d3.scaleLinear()
+    .domain([0, 23])
+    .range([0, width]);
+  
+  // Y scale (energy level)
+  const y = d3.scaleLinear()
+    .domain([0, 10])
+    .range([height, 0]);
+  
+  // Line generator for energy metrics
+  const lineEnergy = d3.line()
+    .x(d => x(d.hour))
+    .y(d => y(d.energyLevel))
+    .curve(d3.curveCatmullRom);
+  
+  const lineFocus = d3.line()
+    .x(d => x(d.hour))
+    .y(d => y(d.focusCapacity))
+    .curve(d3.curveCatmullRom);
+  
+  const lineCreative = d3.line()
+    .x(d => x(d.hour))
+    .y(d => y(d.creativeCapacity))
+    .curve(d3.curveCatmullRom);
+  
+  // Draw x-axis
+  svg.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(d3.axisBottom(x).tickFormat(d => `${d}:00`));
+  
+  // Draw y-axis
+  svg.append('g')
+    .call(d3.axisLeft(y));
+  
+  // Draw energy line
+  svg.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', '#2196F3')
+    .attr('stroke-width', 3)
+    .attr('d', lineEnergy);
+  
+  // Draw focus line
+  svg.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', '#FF5722')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '5,5')
+    .attr('d', lineFocus);
+  
+  // Draw creative line
+  svg.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', '#4CAF50')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '3,3')
+    .attr('d', lineCreative);
+  
+  // Add scheduled tasks as bars
+  if (taskSchedule && taskSchedule.length > 0) {
+    taskSchedule.forEach(task => {
+      const startHour = new Date(task.start_time).getHours() + 
+                        new Date(task.start_time).getMinutes() / 60;
+      const endHour = new Date(task.end_time).getHours() + 
+                      new Date(task.end_time).getMinutes() / 60;
+      
+      svg.append('rect')
+        .attr('x', x(startHour))
+        .attr('y', 0)
+        .attr('width', x(endHour) - x(startHour))
+        .attr('height', height)
+        .attr('fill', 'rgba(0, 0, 0, 0.1)')
+        .attr('stroke', 'none');
+      
+      svg.append('text')
+        .attr('x', x(startHour) + 5)
+        .attr('y', 15)
+        .attr('fill', '#333')
+        .style('font-size', '12px')
+        .text(task.title);
+    });
+  }
+  
+  // Add legend
+  const legend = svg.append('g')
+    .attr('transform', `translate(${width - 150}, 10)`);
+  
+  // Energy legend
+  legend.append('line')
+    .attr('x1', 0)
+    .attr('y1', 5)
+    .attr('x2', 20)
+    .attr('y2', 5)
+    .attr('stroke', '#2196F3')
+    .attr('stroke-width', 3);
+  
+  legend.append('text')
+    .attr('x', 25)
+    .attr('y', 10)
+    .text('Overall Energy')
+    .style('font-size', '12px');
+  
+  // Focus legend
+  legend.append('line')
+    .attr('x1', 0)
+    .attr('y1', 25)
+    .attr('x2', 20)
+    .attr('y2', 25)
+    .attr('stroke', '#FF5722')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '5,5');
+  
+  legend.append('text')
+    .attr('x', 25)
+    .attr('y', 30)
+    .text('Focus Capacity')
+    .style('font-size', '12px');
+  
+  // Creative legend
+  legend.append('line')
+    .attr('x1', 0)
+    .attr('y1', 45)
+    .attr('x2', 20)
+    .attr('y2', 45)
+    .attr('stroke', '#4CAF50')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '3,3');
+  
+  legend.append('text')
+    .attr('x', 25)
+    .attr('y', 50)
+    .text('Creative Capacity')
+    .style('font-size', '12px');
+}
+```
+
+## Error Handling Patterns
+
+### API Error Handling with Fallbacks
+
+```typescript
+// Example: Energy prediction with multi-level fallbacks
+async function getReliableEnergyPredictions(userId, date) {
+  // Try from cache first (fastest)
+  const cachedPredictions = await getCachedPredictions(userId, date);
+  if (cachedPredictions && !isPredictionStale(cachedPredictions)) {
+    logMetric('energy_prediction_source', 'cache_hit');
+    return cachedPredictions;
+  }
+  
+  try {
+    // Try to get from API
+    const apiPredictions = await fetchEnergyPredictionsFromAPI(userId, date);
+    
+    // Cache the result for future use
+    await cachePredictions(userId, date, apiPredictions);
+    
+    logMetric('energy_prediction_source', 'api_success');
+    return apiPredictions;
+  } catch (apiError) {
+    logError('api_energy_prediction_failed', apiError);
+    
+    // Log the failure with details
+    logErrorDetails('api_prediction_error', {
+      userId,
+      date,
+      errorType: apiError.name,
+      errorMessage: apiError.message,
+      statusCode: apiError.statusCode
+    });
+    
+    // Try to get from local model
+    try {
+      const localPredictions = await generateLocalPredictions(userId, date);
+      logMetric('energy_prediction_source', 'local_model');
+      
+      // Return with lower confidence indicator
+      return {
+        ...localPredictions,
+        source: 'local_model',
+        confidence: Math.min(localPredictions.confidence, 0.7) // Cap confidence
+      };
+    } catch (localError) {
+      logError('local_prediction_failed', localError);
+      
+      // Ultimate fallback - population defaults
+      const defaultPredictions = getPopulationDefaultPredictions(date);
+      logMetric('energy_prediction_source', 'population_defaults');
+      
+      return {
+        ...defaultPredictions,
+        source: 'population_defaults',
+        confidence: 0.5, // Low confidence indicator
+        message: 'Using default energy patterns. Report your energy levels to improve predictions.'
+      };
+    }
+  }
+}
+```
+
+### Graceful Degradation Example
+
+```typescript
+// Example: Graceful degradation for optimization
+class ScheduleOptimizer {
+  // Try different optimization approaches with fallbacks
+  async optimizeWithFallbacks(request, options = {}) {
+    const start = performance.now();
+    const strategies = [
+      this.fullDQNOptimization.bind(this),
+      this.simplifiedDQNOptimization.bind(this),
+      this.heuristicOptimization.bind(this),
+      this.priorityBasicScheduling.bind(this)
+    ];
+    
+    let lastError = null;
+    let result = null;
+    
+    // Try each strategy in sequence until one succeeds
+    for (let i = 0; i < strategies.length; i++) {
+      const strategy = strategies[i];
+      const strategyName = strategy.name;
+      
+      try {
+        logger.info(`Trying optimization strategy: ${strategyName}`);
+        result = await strategy(request, options);
+        
+        // Calculate and log execution time
+        const executionTime = performance.now() - start;
+        logger.info(`Strategy ${strategyName} succeeded in ${executionTime}ms`);
+        
+        // Add metadata about which strategy was used
+        result.optimization_metadata = {
+          strategy: strategyName,
+          execution_time_ms: executionTime,
+          fallback_level: i
+        };
+        
+        // Log metric for monitoring
+        metrics.timing('optimization.execution_time', executionTime, {
+          strategy: strategyName,
+          fallback_level: i,
+          task_count: request.tasks.length
+        });
+        
+        // Success - return the result
+        return result;
+      } catch (error) {
+        lastError = error;
+        logger.warn(`Strategy ${strategyName} failed: ${error.message}`);
+        
+        // Log failure metric
+        metrics.increment('optimization.strategy_failure', {
+          strategy: strategyName,
+          error_type: error.name,
+          fallback_level: i
+        });
+        
+        // Continue to next strategy
+        continue;
+      }
+    }
+    
+    // If we got here, all strategies failed
+    logger.error('All optimization strategies failed', lastError);
+    
+    // Throw the last error
+    throw new OptimizationError('Failed to optimize schedule after trying all strategies', {
+      cause: lastError
+    });
+  }
+}
+```
+
+## Testing Code Examples
+
+### Unit Testing the CircadianRhythmModel
+
+```typescript
+// Example: Unit test for the CircadianRhythmModel
+describe('CircadianRhythmModel', () => {
+  let model;
+  
+  beforeEach(() => {
+    // Mock the model parameters to ensure consistent test results
+    const mockParameters = {
+      base_level: 5.0,
+      primary_amplitude: 2.5,
+      primary_phase: 10, // 10am peak
+      secondary_amplitude: 1.2,
+      secondary_phase: 16, // 4pm secondary peak
+      tertiary_amplitude: 0.5,
+      tertiary_phase: 2,
+      day_adjustment: [0, 0.2, 0.1, -0.1, -0.2, 0.5, 0.3]
+    };
+    
+    // Create a model instance with mock dependencies
+    model = new CircadianRhythmModel('test-user-123');
+    jest.spyOn(model, '_loadBaseParameters').mockReturnValue(mockParameters);
+    jest.spyOn(model, '_loadUserParameters').mockReturnValue({});
+  });
+  
+  describe('predict_energy_levels', () => {
+    it('should predict higher energy during typical morning peak times', () => {
+      // Test morning peak (10am)
+      const morningTime = new Date('2023-09-01T10:00:00Z');
+      const morningPrediction = model.predict_energy_levels(morningTime);
+      
+      // Test afternoon dip (2pm)
+      const afternoonTime = new Date('2023-09-01T14:00:00Z');
+      const afternoonPrediction = model.predict_energy_levels(afternoonTime);
+      
+      // Morning should be higher than afternoon
+      expect(morningPrediction.energy_level).toBeGreaterThan(afternoonPrediction.energy_level);
+      expect(morningPrediction.energy_level).toBeGreaterThan(7); // Should be high during peak
+    });
+    
+    it('should show different energy patterns on weekends', () => {
+      // Test Friday (weekday) at 9am
+      const fridayMorning = new Date('2023-09-01T09:00:00Z'); // September 1, 2023 was a Friday
+      fridayMorning.setUTCDate(fridayMorning.getUTCDate() + (5 - fridayMorning.getUTCDay())); // Ensure it's Friday
+      const fridayPrediction = model.predict_energy_levels(fridayMorning);
+      
+      // Test Saturday (weekend) at same time
+      const saturdayMorning = new Date(fridayMorning);
+      saturdayMorning.setUTCDate(saturdayMorning.getUTCDate() + 1); // Next day (Saturday)
+      const saturdayPrediction = model.predict_energy_levels(saturdayMorning);
+      
+      // Verify weekend adjustment is applied
+      expect(saturdayPrediction.energy_level).not.toEqual(fridayPrediction.energy_level);
+      expect(saturdayPrediction.energy_level).toBeCloseTo(fridayPrediction.energy_level + model._getParameters().day_adjustment[5], 1);
+    });
+    
+    it('should predict multiple dimensions of energy', () => {
+      const time = new Date('2023-09-01T10:00:00Z');
+      const prediction = model.predict_energy_levels(time);
+      
+      // Should predict all dimensions
+      expect(prediction).toHaveProperty('energy_level');
+      expect(prediction).toHaveProperty('focus_capacity');
+      expect(prediction).toHaveProperty('creative_capacity');
+      expect(prediction).toHaveProperty('executive_function_capacity');
+      
+      // All values should be between 1-10
+      Object.values(prediction).forEach(value => {
+        expect(value).toBeGreaterThanOrEqual(1);
+        expect(value).toBeLessThanOrEqual(10);
+      });
+    });
+  });
+  
+  describe('detect_optimal_windows', () => {
+    it('should identify optimal focus windows correctly', () => {
+      const date = new Date('2023-09-01');
+      const windows = model.detect_optimal_windows(date, 'focus_capacity', 0.7);
+      
+      // Should find at least one window
+      expect(windows.length).toBeGreaterThan(0);
+      
+      // Each window should have start, end, and average_capacity
+      windows.forEach(window => {
+        expect(window).toHaveProperty('start');
+        expect(window).toHaveProperty('end');
+        expect(window).toHaveProperty('average_capacity');
+        expect(window.average_capacity).toBeGreaterThanOrEqual(7); // 70% threshold converted to 0-10 scale
+      });
+      
+      // A morning window should exist (9-11am)
+      const hasMorningWindow = windows.some(window => {
+        const startHour = window.start.getHours();
+        return startHour >= 9 && startHour <= 11;
+      });
+      
+      expect(hasMorningWindow).toBe(true);
+    });
+  });
+});
+```
+
+### Integration Testing the Optimization Flow
+
+```typescript
+// Example: Integration test for the schedule optimization flow
+describe('Schedule Optimization Integration', () => {
+  let schedulingService;
+  let circadianService;
+  let taskService;
+  
+  // Mock user and task data
+  const userId = 'test-user-123';
+  const startDate = '2023-09-04'; // Monday
+  const endDate = '2023-09-08';   // Friday
+  
+  // Sample tasks with different cognitive profiles
+  const tasks = [
+    {
+      id: 'task-1',
+      title: 'Write project proposal',
+      description: 'Create detailed proposal for client project',
+      durationMinutes: 120,
+      focusRequired: 8,
+      executiveFunction: 7,
+      creativeRequired: 5,
+      complexity: 7,
+      priority: 'HIGH',
+      isFlexible: true,
+      deadline: new Date('2023-09-07T17:00:00Z')
+    },
+    {
+      id: 'task-2',
+      title: 'Team meeting',
+      description: 'Weekly team sync',
+      durationMinutes: 60,
+      focusRequired: 6,
+      executiveFunction: 5,
+      creativeRequired: 4,
+      complexity: 4,
+      priority: 'MEDIUM',
+      isFlexible: false,
+      deadline: new Date('2023-09-06T14:00:00Z')
+    },
+    {
+      id: 'task-3',
+      title: 'Brainstorming session',
+      description: 'Generate ideas for new product features',
+      durationMinutes: 90,
+      focusRequired: 5,
+      executiveFunction: 6,
+      creativeRequired: 9,
+      complexity: 6,
+      priority: 'MEDIUM',
+      isFlexible: true,
+      deadline: null
+    }
+  ];
+  
+  // Mock energy data
+  const mockEnergyData = {
+    dates: ['2023-09-04', '2023-09-05', '2023-09-06', '2023-09-07', '2023-09-08'],
+    hourlyPredictions: {
+      // For each date, 24 hourly predictions with energy dimensions
+      // This is a simplified version
+      '2023-09-04': Array.from({ length: 24 }, (_, hour) => ({
+        hour,
+        energy_level: calculateMockEnergyForHour(hour, 'MONDAY'),
+        focus_capacity: calculateMockFocusForHour(hour, 'MONDAY'),
+        creative_capacity: calculateMockCreativityForHour(hour, 'MONDAY'),
+        executive_function_capacity: calculateMockExecutiveFunctionForHour(hour, 'MONDAY')
+      }))
+      // Additional days would be defined similarly
+    }
+  };
+  
+  beforeEach(async () => {
+    // Set up service mocks
+    schedulingService = new SchedulingService();
+    circadianService = new CircadianModelService();
+    taskService = new TaskProfileService();
+    
+    // Mock the energy prediction API
+    jest.spyOn(circadianService, 'getUserEnergyPredictions').mockImplementation(
+      (_userId, date) => Promise.resolve(mockEnergyData.hourlyPredictions[date] || [])
+    );
+    
+    // Mock the task analysis to return the predefined cognitive demands
+    jest.spyOn(taskService, 'analyzeTaskCognitiveProfile').mockImplementation(
+      (task) => Promise.resolve({
+        task_id: task.id,
+        cognitive_profile: {
+          focus_required: task.focusRequired,
+          executive_function_load: task.executiveFunction,
+          creative_required: task.creativeRequired,
+          complexity: task.complexity
+        },
+        confidence: 0.9
+      })
+    );
+  });
+  
+  it('should optimize a schedule using circadian patterns', async () => {
+    // Define optimization request
+    const request = {
+      userId,
+      startDate,
+      endDate,
+      tasks,
+      preferences: {
+        workHours: { start: '09:00', end: '17:00' },
+        optimizationStrength: 0.8,
+        respectExistingEvents: true,
+        allowBreaks: true
+      }
+    };
+    
+    // Call the optimization service
+    const result = await schedulingService.optimizeSchedule(request);
+    
+    // Verify the result structure
+    expect(result).toHaveProperty('optimizationId');
+    expect(result).toHaveProperty('schedule');
+    expect(result).toHaveProperty('energyCurves');
+    expect(result).toHaveProperty('qualityMetrics');
+    
+    // All tasks should be scheduled
+    expect(result.schedule.length).toEqual(tasks.length);
+    
+    // High-focus tasks should be scheduled during high-focus periods
+    const highFocusTask = tasks.find(t => t.focusRequired >= 7);
+    const highFocusScheduled = result.schedule.find(s => s.task_id === highFocusTask.id);
+    
+    // Get the energy level at the scheduled time
+    const scheduledStartHour = new Date(highFocusScheduled.start_time).getHours();
+    const scheduledDate = new Date(highFocusScheduled.start_time).toISOString().split('T')[0];
+    const hourlyEnergy = mockEnergyData.hourlyPredictions[scheduledDate].find(
+      h => h.hour === scheduledStartHour
+    );
+    
+    // Verify high-focus task is scheduled during high-focus time
+    expect(hourlyEnergy.focus_capacity).toBeGreaterThanOrEqual(7);
+    
+    // Verify high-creative task is scheduled during high-creativity time
+    const highCreativeTask = tasks.find(t => t.creativeRequired >= 7);
+    const highCreativeScheduled = result.schedule.find(s => s.task_id === highCreativeTask.id);
+    
+    const creativeStartHour = new Date(highCreativeScheduled.start_time).getHours();
+    const creativeDate = new Date(highCreativeScheduled.start_time).toISOString().split('T')[0];
+    const hourlyCreative = mockEnergyData.hourlyPredictions[creativeDate].find(
+      h => h.hour === creativeStartHour
+    );
+    
+    // Verify high-creative task is scheduled during high-creativity time
+    expect(hourlyCreative.creative_capacity).toBeGreaterThanOrEqual(7);
+    
+    // Quality metrics should be reasonable
+    expect(result.qualityMetrics.overall_score).toBeGreaterThanOrEqual(0.7);
+  });
+  
+  // Helper functions to generate mock energy data
+  function calculateMockEnergyForHour(hour, dayType) {
+    // Morning peak around 10am, afternoon dip around 2pm, evening recovery around 5pm
+    if (hour >= 9 && hour <= 11) return 8 + Math.random();
+    if (hour >= 14 && hour <= 15) return 4 + Math.random();
+    if (hour >= 16 && hour <= 18) return 7 + Math.random();
+    if (hour >= 0 && hour <= 6) return 2 + Math.random(); // Night time
+    return 5 + Math.random();
+  }
+  
+  function calculateMockFocusForHour(hour, dayType) {
+    // Focus peaks in morning
+    if (hour >= 9 && hour <= 12) return 8 + Math.random();
+    if (hour >= 14 && hour <= 15) return 3 + Math.random();
+    if (hour >= 16 && hour <= 18) return 6 + Math.random();
+    if (hour >= 0 && hour <= 6) return 1 + Math.random();
+    return 5 + Math.random();
+  }
+  
+  function calculateMockCreativityForHour(hour, dayType) {
+    // Creativity peaks in afternoon/evening
+    if (hour >= 9 && hour <= 11) return 6 + Math.random();
+    if (hour >= 15 && hour <= 18) return 8 + Math.random();
+    if (hour >= 0 && hour <= 6) return 2 + Math.random();
+    return 5 + Math.random();
+  }
+  
+  function calculateMockExecutiveFunctionForHour(hour, dayType) {
+    // Executive function follows general energy but with morning emphasis
+    if (hour >= 8 && hour <= 12) return 8 + Math.random();
+    if (hour >= 14 && hour <= 15) return 4 + Math.random();
+    if (hour >= 16 && hour <= 18) return 6 + Math.random();
+    if (hour >= 0 && hour <= 6) return 2 + Math.random();
+    return 5 + Math.random();
+  }
+});

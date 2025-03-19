@@ -1,0 +1,35 @@
+# Dockerfile for running Stochastic Time Estimation Engine tests
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better layer caching
+COPY tests/ml/stochastic_time_estimation/test-requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r test-requirements.txt
+
+# Install spaCy model
+RUN python -m spacy download en_core_web_sm
+
+# Install NLTK data
+RUN python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet')"
+
+# Copy the source code and tests
+COPY app/ /app/app/
+COPY tests/ /app/tests/
+
+# Set the PYTHONPATH to include the application code
+ENV PYTHONPATH=/app
+
+# Set the entrypoint to pytest
+ENTRYPOINT ["pytest"]
+
+# Default command runs all STE tests with verbose output
+CMD ["tests/ml/stochastic_time_estimation/", "-v"] 

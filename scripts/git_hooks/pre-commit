@@ -1,0 +1,74 @@
+#!/bin/bash
+# Pre-commit hook that scans changed files for technical debt markers.
+# 
+# Install by creating a symlink to this file in .git/hooks:
+#   ln -sf ../../scripts/git_hooks/pre-commit .git/hooks/pre-commit
+#
+# To bypass this hook, use:
+#   git commit --no-verify
+
+set -e
+
+echo "Scanning for technical debt in staged files..."
+
+# Get modified/added python files
+STAGED_PY_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(py|js|ts|jsx|tsx)$" || echo "")
+
+if [ -z "$STAGED_PY_FILES" ]; then
+    echo "No relevant files staged for commit."
+    exit 0
+fi
+
+# Add parent directory to Python path
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export PYTHONPATH="$PYTHONPATH:$(cd $SCRIPT_DIR/../.. && pwd)"
+
+# Scan for technical debt tags in staged files
+FOUND_TECH_DEBT=0
+TECH_DEBT_MARKER_REGEX="(TODO|FIXME)\(tech-debt\)|TECH-DEBT"
+
+for FILE in $STAGED_PY_FILES; do
+    # Check if the file exists (it might have been deleted)
+    if [ -f "$FILE" ]; then
+        if grep -q -E "$TECH_DEBT_MARKER_REGEX" "$FILE"; then
+            FOUND_TECH_DEBT=1
+            echo "Technical debt found in $FILE:"
+            grep -n -E "$TECH_DEBT_MARKER_REGEX" "$FILE" | while read -r LINE; do
+                LINE_NUM=$(echo "$LINE" | cut -d':' -f1)
+                CONTENT=$(echo "$LINE" | cut -d':' -f2-)
+                echo "  Line $LINE_NUM: $CONTENT"
+            done
+            echo ""
+        fi
+    fi
+done
+
+if [ $FOUND_TECH_DEBT -eq 1 ]; then
+    echo "Technical debt markers found in staged files."
+    echo ""
+    echo "Options:"
+    echo "  1. Add these items to the technical debt tracker using:"
+    echo "     python scripts/tech_debt_cli.py scan --auto-add"
+    echo ""
+    echo "  2. Continue with commit anyway using:"
+    echo "     git commit --no-verify"
+    echo ""
+    echo "  3. Fix the issues before committing."
+    echo ""
+    
+    # Prompt for action
+    read -p "Would you like to add these items to the tech debt tracker? [y/N] " ADD_TO_TRACKER
+    if [[ "$ADD_TO_TRACKER" =~ ^[Yy]$ ]]; then
+        echo "Adding technical debt items to tracker..."
+        python "$(cd $SCRIPT_DIR/../.. && pwd)/scripts/tech_debt_cli.py" scan --auto-add
+        echo "Items added to tech debt tracker. You can continue with your commit."
+        exit 0
+    else
+        echo "Items not added to tracker. Commit aborted."
+        echo "Use git commit --no-verify to commit anyway without tracking the technical debt."
+        exit 1
+    fi
+fi
+
+echo "No technical debt markers found in staged files."
+exit 0 
