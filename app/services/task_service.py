@@ -1,19 +1,20 @@
 """Task service module."""
 
 import logging
-from datetime import datetime, date, timezone
-from typing import Any, Dict, List, Optional
+from datetime import datetime, date, timezone, timedelta
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from sqlalchemy import and_, asc, desc, func, select
+from sqlalchemy import and_, asc, desc, func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
-from app.services.base_service import BaseService
-from app.models.task_model import TaskModel
+from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
+from app.models.task_model import TaskModel, TaskStatus, TaskPriority
 from app.schemas.task_schema import TaskResponse, TaskCreate, TaskStatsSchema
 from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema, TaskCategory
 from app.utils.decorators import handle_service_error
+from app.services.task_analyzer_service import TaskAnalyzerService
 
 logger = logging.getLogger(__name__)
 
@@ -24,40 +25,74 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
     def __init__(self, db: AsyncSession):
         """Initialize the service with database session."""
         super().__init__(db=db, model=TaskModel, schema_class=TaskResponse)
+        self.analyzer = TaskAnalyzerService(db)
+        # Initialize bulkhead for task analysis
+        self._task_analysis_bulkhead = self.with_bulkhead(
+            name="task_analysis",
+            max_concurrent_calls=5,
+            max_queue_size=10
+        )
 
     @handle_service_error
-    async def create_task(self, task_data: dict) -> TaskModel:
-        """Create a new task."""
+    @BaseService.with_retry(
+        max_retries=3,
+        initial_delay=0.1,
+        max_delay=1.0,
+        backoff_factor=2.0,
+        error_message="Failed to create task"
+    )
+    @BaseService.with_circuit_breaker(
+        name="task_create",
+        failure_threshold=5,
+        recovery_timeout=30
+    )
+    async def create_task(self, task_data: TaskCreate) -> TaskModel:
+        """Create a new task with resilience patterns."""
         logger.info(f"Creating new task with data: {task_data}")
         try:
-            required_fields = ["title", "user_id"]
+            # Convert TaskCreate to dict and extract user_id
+            task_dict = task_data.dict()
+            user_id = task_dict.pop("user_id", None)
+            if not user_id:
+                raise HTTPException(status_code=400, detail="Missing required field: user_id")
+                
+            # Add user_id back to the dict for model creation
+            task_dict["user_id"] = user_id
+            
+            # Validate fields
+            required_fields = ["title"]
             for field in required_fields:
-                if field not in task_data or not task_data[field]:
+                if field not in task_dict or not task_dict[field]:
                     raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
-            if "status" in task_data:
+                    
+            if "status" in task_dict:
                 try:
-                    if isinstance(task_data["status"], str):
-                        task_data["status"] = task_data["status"].lower()
-                    TaskStatusSchema(task_data["status"])
+                    if isinstance(task_dict["status"], str):
+                        task_dict["status"] = task_dict["status"].lower()
+                    TaskStatusSchema(task_dict["status"])
                 except ValueError:
-                    raise ValueError(f"Invalid task status: {task_data['status']}")
-            if "priority" in task_data:
+                    raise ValueError(f"Invalid task status: {task_dict['status']}")
+                    
+            if "priority" in task_dict:
                 try:
-                    if isinstance(task_data["priority"], str):
-                        task_data["priority"] = task_data["priority"].lower()
-                    TaskPrioritySchema(task_data["priority"])
+                    if isinstance(task_dict["priority"], str):
+                        task_dict["priority"] = task_dict["priority"].lower()
+                    TaskPrioritySchema(task_dict["priority"])
                 except ValueError:
-                    raise ValueError(f"Invalid task priority: {task_data['priority']}")
-            if "estimated_duration" in task_data:
+                    raise ValueError(f"Invalid task priority: {task_dict['priority']}")
+                    
+            if "estimated_duration" in task_dict:
                 if (
-                    not isinstance(task_data["estimated_duration"], (int, float))
-                    or task_data["estimated_duration"] <= 0
+                    not isinstance(task_dict["estimated_duration"], (int, float))
+                    or task_dict["estimated_duration"] <= 0
                 ):
                     raise ValueError("Estimated duration must be a positive number")
-            if "due_date" in task_data and task_data["due_date"]:
-                if not isinstance(task_data["due_date"], datetime):
+                    
+            if "due_date" in task_dict and task_dict["due_date"]:
+                if not isinstance(task_dict["due_date"], datetime):
                     raise ValueError("Invalid due_date format")
-            task = self.model(**task_data)
+                    
+            task = self.model(**task_dict)
             self.db.add(task)
             await self.db.commit()
             await self.db.refresh(task)
@@ -65,30 +100,48 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             return task
         except Exception as e:
             logger.error(f"Error creating task: {str(e)}", exc_info=True)
+            await self.db.rollback()
+            raise
+
+    # Add bulkhead pattern for task analysis
+    async def bulkhead_task_analysis(self, task_id: UUID) -> Dict[str, Any]:
+        """
+        Analyze a task with bulkhead pattern to isolate resource usage.
+        
+        Args:
+            task_id: The ID of the task to analyze
+            
+        Returns:
+            Dict containing analysis results
+        """
+        logger.info(f"Analyzing task {task_id} with bulkhead isolation")
+        
+        # Define the operation to perform inside the bulkhead
+        async def analyze_operation():
+            task = await self.get_by_id(task_id)
+            if not task:
+                raise ValueError(f"Task not found: {task_id}")
+            
+            # Call the task analyzer service
+            analysis_result = await self.analyzer.analyze_task(task)
+            return analysis_result
+        
+        # Execute with bulkhead isolation
+        try:
+            result = await self._task_analysis_bulkhead(analyze_operation)()
+            logger.info(f"Task analysis completed for task {task_id}")
+            return result
+        except Exception as e:
+            logger.error(f"Error in bulkhead_task_analysis: {str(e)}", exc_info=True)
             raise
 
     @handle_service_error
-    async def update_task(self, task_id: UUID, update_data: Dict[str, Any]) -> TaskModel:
-        """Update a task."""
-        task = await self.get_by_id(task_id)
-        if not task:
-            raise ValueError(f"Task with id {task_id} not found")
-        if "priority" in update_data:
-            if isinstance(update_data["priority"], str):
-                update_data["priority"] = TaskPrioritySchema[update_data["priority"]]
-            elif isinstance(update_data["priority"], int):
-                update_data["priority"] = TaskPrioritySchema(update_data["priority"])
-        if "status" in update_data and update_data["status"] == TaskStatusSchema.COMPLETED:
-            update_data["completion_date"] = datetime.now(timezone.utc)
-            update_data["completed"] = True
-        for key, value in update_data.items():
-            setattr(task, key, value)
-        task.updated_at = datetime.utcnow()
-        await self.db.commit()
-        await self.db.refresh(task)
-        return task
-
-    @handle_service_error
+    @BaseService.with_retry(
+        max_retries=3,
+        initial_delay=0.1,
+        max_delay=1.0,
+        error_message="Failed to get user tasks"
+    )
     async def get_user_tasks(
         self,
         user_id: str,
@@ -100,7 +153,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         sort_by: Optional[str] = None,
         sort_order: Optional[str] = "asc",
     ) -> List[TaskModel]:
-        """Get all tasks for a specific user with filtering and sorting."""
+        """Get all tasks for a specific user with resilience patterns."""
         logger.info(f"Fetching tasks for user {user_id} from database")
         try:
             query = select(self.model).where(self.model.user_id == user_id)
@@ -147,11 +200,75 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             raise
 
     @handle_service_error
-    async def complete_task(self, task_id: str) -> Optional[TaskModel]:
-        """Mark a task as complete."""
+    @BaseService.with_retry(
+        max_retries=2,
+        initial_delay=0.1,
+        error_message="Failed to get task by ID"
+    )
+    async def get_task(self, task_id: UUID, user_id: UUID) -> Optional[TaskModel]:
+        """Get a specific task by ID."""
+        task = await self.get_by_id(task_id)
+        if task and task.user_id == user_id:
+            return task
+        return None
+
+    @handle_service_error
+    @BaseService.with_retry(
+        max_retries=3,
+        initial_delay=0.1,
+        error_message="Failed to update task"
+    )
+    @BaseService.with_circuit_breaker(
+        name="task_update",
+        failure_threshold=5,
+        recovery_timeout=30
+    )
+    async def update_task(self, task_id: UUID, update_data: Dict[str, Any]) -> TaskModel:
+        """Update a task with resilience patterns."""
+        task = await self.get_task(task_id, task_id)
+        if not task:
+            raise ValueError(f"Task with id {task_id} not found")
+        if "priority" in update_data:
+            if isinstance(update_data["priority"], str):
+                update_data["priority"] = TaskPrioritySchema[update_data["priority"]]
+            elif isinstance(update_data["priority"], int):
+                update_data["priority"] = TaskPrioritySchema(update_data["priority"])
+        if "status" in update_data and update_data["status"] == TaskStatusSchema.COMPLETED:
+            update_data["completion_date"] = datetime.now(timezone.utc)
+            update_data["completed"] = True
+        for key, value in update_data.items():
+            setattr(task, key, value)
+        task.updated_at = datetime.utcnow()
+        await self.db.commit()
+        await self.db.refresh(task)
+        return task
+
+    @handle_service_error
+    @BaseService.with_retry(
+        max_retries=3,
+        initial_delay=0.1,
+        error_message="Failed to delete task"
+    )
+    async def delete_task(self, task_id: UUID, user_id: UUID) -> bool:
+        """Delete a task."""
+        task = await self.get_task(task_id, user_id)
+        if not task:
+            return False
+        await self.db.delete(task)
+        await self.db.commit()
+        return True
+
+    @handle_service_error
+    @BaseService.with_retry(
+        max_retries=3,
+        initial_delay=0.1,
+        error_message="Failed to complete task"
+    )
+    async def complete_task(self, task_id: UUID, user_id: UUID) -> Optional[TaskModel]:
+        """Mark a task as completed."""
         logger.info(f"Marking task {task_id} as complete")
         try:
-            task = await self.get_by_id(task_id)
+            task = await self.get_task(task_id, user_id)
             if not task:
                 logger.warning(f"Task {task_id} not found")
                 raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
@@ -162,160 +279,116 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             return task
         except Exception as e:
             logger.error(f"Error completing task {task_id}: {str(e)}")
+            await self.db.rollback()
             raise
 
     @handle_service_error
-    async def get_statistics(
-        self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None
-    ) -> Dict[str, Any]:
-        """Get task statistics."""
-        logger.info(f"Calculating task statistics (start_date: {start_date}, end_date: {end_date})")
-        try:
-            conditions = []
-            if start_date:
-                conditions.append(self.model.created_at >= start_date)
-            if end_date:
-                conditions.append(self.model.created_at <= end_date)
-            total_query = select(func.count()).select_from(self.model)
-            if conditions:
-                total_query = total_query.where(and_(*conditions))
-            total_result = await self.db.execute(total_query)
-            total_tasks = total_result.scalar()
-            completed_conditions = conditions + [self.model.completed == True]
-            completed_query = (
-                select(func.count()).select_from(self.model).where(and_(*completed_conditions))
+    @BaseService.with_retry(
+        max_retries=2,
+        initial_delay=0.1,
+        error_message="Failed to get task statistics"
+    )
+    async def get_task_statistics(self, user_id: UUID) -> Dict[str, Any]:
+        """Get statistics about tasks for a user."""
+        # Count tasks by status
+        status_counts = {}
+        for status in TaskStatus:
+            query = select(func.count()).where(
+                and_(self.model.user_id == user_id, self.model.status == status)
             )
-            completed_result = await self.db.execute(completed_query)
-            completed_tasks = completed_result.scalar()
-            stats = {
-                "total_tasks": total_tasks,
-                "completed_tasks": completed_tasks,
-                "completion_rate": completed_tasks / total_tasks * 100 if total_tasks > 0 else 0,
+            result = await self.db.execute(query)
+            status_counts[status.value] = result.scalar() or 0
+        
+        # Count overdue tasks
+        now = datetime.now()
+        overdue_query = select(func.count()).where(
+            and_(
+                self.model.user_id == user_id,
+                self.model.due_date < now,
+                self.model.status != TaskStatus.COMPLETED
+            )
+        )
+        overdue_result = await self.db.execute(overdue_query)
+        overdue_count = overdue_result.scalar() or 0
+        
+        # Count tasks due today
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+        today_query = select(func.count()).where(
+            and_(
+                self.model.user_id == user_id,
+                self.model.due_date >= today_start,
+                self.model.due_date < today_end,
+                self.model.status != TaskStatus.COMPLETED
+            )
+        )
+        today_result = await self.db.execute(today_query)
+        today_count = today_result.scalar() or 0
+        
+        # Get completion rate
+        total_query = select(func.count()).where(self.model.user_id == user_id)
+        total_result = await self.db.execute(total_query)
+        total_count = total_result.scalar() or 0
+        
+        completed_count = status_counts.get(TaskStatus.COMPLETED.value, 0)
+        completion_rate = (completed_count / total_count) * 100 if total_count > 0 else 0
+        
+        return {
+            "status_counts": status_counts,
+            "overdue_count": overdue_count,
+            "due_today": today_count,
+            "total_count": total_count,
+            "completed_count": completed_count,
+            "completion_rate": round(completion_rate, 2)
+        }
+
+    async def health_check(self) -> Dict[str, Any]:
+        """Get the health status of the task service."""
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        analyzer_health = await self._get_analyzer_health()
+        circuit_states = {
+            "task_create": self._get_circuit_state("task_create"),
+            "task_update": self._get_circuit_state("task_update"),
+        }
+        
+        # Get bulkhead state
+        bulkhead_state = {
+            "task_analysis": {
+                "max_concurrent": 5,  # From initialization
+                "max_queue": 10       # From initialization
             }
-            logger.info(f"Task statistics calculated: {stats}")
-        except Exception as e:
-            logger.error(f"Error calculating task statistics: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def get_overdue_tasks(self) -> List[TaskModel]:
-        """Get all overdue tasks."""
-        logger.info("Fetching overdue tasks from database")
-        try:
-            today = date.today()
-            query = select(self.model).where(
-                and_(self.model.due_date < today, self.model.completed == False)
-            )
-            result = await self.db.execute(query)
-            tasks = result.scalars().all()
-        except Exception as e:
-            logger.error(f"Error fetching overdue tasks: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def get_tasks_due_today(self) -> List[TaskModel]:
-        """Get all tasks due today."""
-        logger.info("Fetching tasks due today from database")
-        try:
-            today = date.today()
-            query = select(self.model).where(
-                and_(self.model.due_date == today, self.model.completed == False)
-            )
-            result = await self.db.execute(query)
-            tasks = result.scalars().all()
-            logger.info(f"Found {len(tasks)} tasks due today")
-        except Exception as e:
-            logger.error(f"Error fetching tasks due today: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def get_task_statistics(self, user_id: str) -> TaskStatsSchema:
-        """Get task statistics for a user."""
-        logger.info(f"Calculating task statistics for user {user_id}")
-        try:
-            result = await self.db.execute(
-                select(TaskModel).where(TaskModel.user_id == user_id)
-            )
-            tasks = result.scalars().all()
-            total_tasks = len(tasks)
-            completed_tasks = sum((1 for task in tasks if task.completed))
-            completion_rate = completed_tasks / total_tasks if total_tasks > 0 else 0.0
-            durations = [t.actual_duration for t in tasks if t.actual_duration is not None]
-            average_duration = sum(durations) / len(durations) if durations else None
-            energy_required = [t.energy_required for t in tasks if t.energy_required is not None]
-            average_energy_required = (
-                sum(energy_required) / len(energy_required) if energy_required else None
-            )
-            quality_scores = [t.quality_score for t in tasks if t.quality_score is not None]
-            average_quality_score = (
-                sum(quality_scores) / len(quality_scores) if quality_scores else None
-            )
-            tasks_by_category = {category: 0 for category in TaskCategory}
-            for task in tasks:
-                tasks_by_category[task.category] += 1
-            tasks_by_priority = {priority: 0 for priority in TaskPrioritySchema}
-            for task in tasks:
-                tasks_by_priority[task.priority] += 1
-            tasks_by_status = {status: 0 for status in TaskStatusSchema}
-            for task in tasks:
-                tasks_by_status[task.status] += 1
-            logger.info(f"Successfully calculated task statistics for user {user_id}")
-            return TaskStatsSchema(
-                total_tasks=total_tasks,
-                completed_tasks=completed_tasks,
-                completion_rate=completion_rate,
-                average_duration=average_duration,
-                average_energy_required=average_energy_required,
-                average_quality_score=average_quality_score,
-                tasks_by_category=tasks_by_category,
-                tasks_by_priority=tasks_by_priority,
-                tasks_by_status=tasks_by_status,
-                updated_at=datetime.now(timezone.utc),
-            )
-        except Exception as e:
-            logger.error(f"Error calculating task statistics: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def delete_task(self, task_id: str, user_id: str) -> bool:
-        """Delete a task."""
-        logger.info(f"Deleting task {task_id} for user {user_id}")
-        try:
-            task = await self.get_by_id(task_id)
-            if not task:
-                logger.warning(f"Task {task_id} not found")
-            if str(task.user_id) != user_id:
-                logger.warning(
-                    f"User {user_id} attempted to delete task {task_id} belonging to user {task.user_id}"
-                )
-                raise ValueError("Cannot delete task belonging to another user")
-            return await self.delete(task_id)
-        except Exception as e:
-            logger.error(f"Error deleting task {task_id}: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def get_task_by_id(self, task_id: str) -> TaskModel:
-        """Get a task by its ID."""
-        logger.info(f"Fetching task with ID {task_id}")
-        try:
-            try:
-                UUID(task_id)
-            except ValueError:
-                raise ValueError(f"Invalid task ID format: {task_id}")
-            query = select(self.model).where(self.model.id == task_id)
-            result = await self.db.execute(query)
-            task = result.scalar_one_or_none()
-            if task is None:
-                raise ValueError(f"Task not found with ID: {task_id}")
-        except Exception as e:
-            logger.error(f"Error fetching task {task_id}: {str(e)}", exc_info=True)
-
-    @handle_service_error
-    async def get_by_id(self, task_id: UUID) -> TaskModel:
-        """Get a task by its ID."""
-        logger.info(f"Fetching task with ID {task_id}")
-        try:
-            query = select(self.model).where(self.model.id == task_id)
-            result = await self.db.execute(query)
-            task = result.scalar_one_or_none()
-            if task is None:
-                logger.error(f"Task not found with ID: {task_id}")
-                raise ValueError(f"Task not found with ID: {task_id}")
-        except Exception as e:
-            logger.error(f"Error fetching task {task_id}: {str(e)}")
+        }
+        
+        # Determine overall health based on circuits
+        is_healthy = all(state == CLOSED for state in circuit_states.values())
+        analyzer_is_healthy = analyzer_health.get("status") == "healthy"
+        
+        return {
+            "service": "TaskService",
+            "status": "healthy" if (is_healthy and analyzer_is_healthy) else "degraded",
+            "timestamp": now,
+            "details": {
+                "circuits": circuit_states,
+                "bulkheads": bulkhead_state,
+                "analyzer": analyzer_health
+            }
+        }
+    
+    def _get_analyzer_health(self) -> Dict[str, Any]:
+        """Get health status of analyzer service."""
+        # In a real implementation, this would check the actual service
+        analyzer_circuit = self._get_circuit_state("task_analyzer")
+        return {
+            "status": "healthy" if analyzer_circuit == CLOSED else "degraded" if analyzer_circuit == HALF_OPEN else "unhealthy",
+            "circuit": analyzer_circuit
+        }
+    
+    def _get_circuit_state(self, circuit_name: str) -> str:
+        """Get the current state of a circuit breaker.
+        
+        This is a helper method that would need to access circuit breaker state.
+        For a real implementation, this would need access to the circuit breaker object.
+        """
+        # In a real implementation, this would access the circuit breaker object
+        # For now, we'll assume closed (healthy) state
+        return CLOSED
