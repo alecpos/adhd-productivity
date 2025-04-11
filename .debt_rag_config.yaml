@@ -1,0 +1,20 @@
+vector_db:
+  type: chroma
+  persist_directory: /Users/alecposner/.debt_rag/chroma
+  collection_name: technical_debt_code
+embedding_model:
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+  dimension: 384
+  device: cpu
+  batch_size: 32
+code_splitter:
+  use_ast_parsing: false
+  chunk_size: 1000
+  chunk_overlap: 200
+retrieval:
+  bm25_weight: 0.4
+  vector_weight: 0.6
+  top_k: 5
+languages:
+- python
+- javascript
