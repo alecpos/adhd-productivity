@@ -1,4 +1,5 @@
 """Schema factory for dynamic schema creation."""
+
 from typing import Any, Dict, Optional, Type, TypeVar
 
 from pydantic import BaseModel, Field, create_model
@@ -7,6 +8,7 @@ from app.schemas.base_schema import BaseSchema, TimestampedSchema
 from app.core.types import NoneSchema
 
 T = TypeVar("T", bound=BaseSchema)
+
 
 class SchemaFactory(BaseModel):
     """Factory for creating dynamic schemas."""
@@ -48,5 +50,6 @@ class SchemaFactory(BaseModel):
     def list_schemas(cls) -> Dict[str, Type[BaseSchema]]:
         """List all registered schemas."""
         return cls._schema_registry.copy()
+
 
 __all__ = ["SchemaFactory"]

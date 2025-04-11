@@ -162,4 +162,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default Chip; 
+export default Chip;

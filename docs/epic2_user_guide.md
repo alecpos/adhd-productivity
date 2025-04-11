@@ -390,4 +390,4 @@ A: Yes! Go to Settings → Data Export and select the date range and data types 
 
 ---
 
-We hope this guide helps you make the most of the Stochastic Time Estimation Engine. Remember, the system is designed to adapt to your unique ADHD profile and improve over time. For additional help, visit our support portal or contact our assistance team. 
+We hope this guide helps you make the most of the Stochastic Time Estimation Engine. Remember, the system is designed to adapt to your unique ADHD profile and improve over time. For additional help, visit our support portal or contact our assistance team.

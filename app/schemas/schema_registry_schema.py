@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from app.schemas.schema_factory_schema import SchemaFactory
 
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
 
 
 class SchemaRegistry(BaseModel):
@@ -16,31 +16,22 @@ class SchemaRegistry(BaseModel):
 
     factory: SchemaFactory = Field(default_factory=SchemaFactory)
     validation_rules: Dict[str, List[tuple[Callable[[Any], bool], str]]] = Field(
-        default_factory=dict,
-        description="Validation rules for each schema"
+        default_factory=dict, description="Validation rules for each schema"
     )
     schema_versions: Dict[str, str] = Field(
-        default_factory=dict,
-        description="Version information for each schema"
+        default_factory=dict, description="Version information for each schema"
     )
     schema_dependencies: Dict[str, List[str]] = Field(
-        default_factory=dict,
-        description="Dependencies between schemas"
+        default_factory=dict, description="Dependencies between schemas"
     )
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        from_attributes=True
-    )
+    model_config = ConfigDict(arbitrary_types_allowed=True, from_attributes=True)
 
     def register_validation_rule(
-        self,
-        schema_name: str,
-        rule: Callable[[Any], bool],
-        error_message: str
+        self, schema_name: str, rule: Callable[[Any], bool], error_message: str
     ) -> None:
         """Register a validation rule for a specific schema.
-        
+
         Args:
             schema_name: Name of the schema to add the rule to
             rule: Validation function that returns True if valid
@@ -52,20 +43,16 @@ class SchemaRegistry(BaseModel):
 
     def register_schema_version(self, schema_name: str, version: str) -> None:
         """Register a schema version.
-        
+
         Args:
             schema_name: Name of the schema
             version: Version string (e.g. "1.0.0")
         """
         self.schema_versions[schema_name] = version
 
-    def register_schema_dependencies(
-        self,
-        schema_name: str,
-        dependencies: List[str]
-    ) -> None:
+    def register_schema_dependencies(self, schema_name: str, dependencies: List[str]) -> None:
         """Register dependencies for a schema.
-        
+
         Args:
             schema_name: Name of the schema
             dependencies: List of schema names this schema depends on
@@ -74,14 +61,14 @@ class SchemaRegistry(BaseModel):
 
     def validate_schema(self, schema_name: str, data: dict) -> bool:
         """Validate data against a schema's rules.
-        
+
         Args:
             schema_name: Name of the schema to validate against
             data: Data to validate
-            
+
         Returns:
             True if validation passes
-            
+
         Raises:
             ValueError: If schema not found or validation fails
         """
@@ -109,20 +96,16 @@ class SchemaRegistry(BaseModel):
 
         return True
 
-    def create_schema_instance(
-        self,
-        schema_name: str,
-        data: dict
-    ) -> T:
+    def create_schema_instance(self, schema_name: str, data: dict) -> T:
         """Create and validate a schema instance.
-        
+
         Args:
             schema_name: Name of the schema to create
             data: Data to create the instance with
-            
+
         Returns:
             Validated schema instance
-            
+
         Raises:
             ValueError: If validation fails
         """
@@ -133,10 +116,10 @@ class SchemaRegistry(BaseModel):
 
     def get_schema_metadata(self, schema_name: str) -> Optional[Dict[str, Any]]:
         """Get metadata for a registered schema.
-        
+
         Args:
             schema_name: Name of the schema
-            
+
         Returns:
             Dictionary containing schema metadata or None if not found
         """
@@ -153,7 +136,7 @@ class SchemaRegistry(BaseModel):
 
     def list_registered_schemas(self) -> Dict[str, Dict[str, Any]]:
         """List all registered schemas with their metadata.
-        
+
         Returns:
             Dictionary mapping schema names to their metadata
         """

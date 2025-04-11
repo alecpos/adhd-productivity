@@ -409,7 +409,7 @@ class User:
     is_active: bool
     is_blocked: bool
     permissions: list[str]
-    
+
     def has_permission(self, perm: str) -> bool:
         return perm in self.permissions
 
@@ -417,15 +417,15 @@ def test_is_valid_admin():
     # Test valid admin
     user = User(is_active=True, is_blocked=False, permissions=['admin'])
     assert is_valid_admin(user)
-    
+
     # Test inactive user
     user = User(is_active=False, is_blocked=False, permissions=['admin'])
     assert not is_valid_admin(user)
-    
+
     # Test blocked user
     user = User(is_active=True, is_blocked=True, permissions=['admin'])
     assert not is_valid_admin(user)
-    
+
     # Test no admin permission
     user = User(is_active=True, is_blocked=False, permissions=[])
     assert not is_valid_admin(user)
@@ -482,17 +482,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -547,17 +547,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -612,17 +612,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -677,17 +677,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -742,17 +742,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -807,17 +807,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -872,17 +872,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -937,17 +937,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1002,17 +1002,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1067,17 +1067,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1132,17 +1132,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1197,17 +1197,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1262,17 +1262,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1327,17 +1327,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1392,17 +1392,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1457,17 +1457,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1522,17 +1522,17 @@ def test_process_order():
     # Test valid order
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=True)
     process_order(order)  # Should not raise
-    
+
     # Test invalid order
     order = Order(is_valid=False, has_items=True, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="Invalid order"):
         process_order(order)
-    
+
     # Test no items
     order = Order(is_valid=True, has_items=False, can_be_fulfilled=True)
     with pytest.raises(OrderError, match="No items in order"):
         process_order(order)
-    
+
     # Test cannot fulfill
     order = Order(is_valid=True, has_items=True, can_be_fulfilled=False)
     with pytest.raises(OrderError, match="Cannot fulfill order"):
@@ -1559,10 +1559,10 @@ class User:
     name: str
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
-    
+
     def __post_init__(self):
         self.validate()
-    
+
     def validate(self):
         if not self.id:
             raise ValueError("id is required")
@@ -1575,14 +1575,14 @@ class User:
 @dataclass
 class User:
     # ... existing fields ...
-    
+
     def update(self, **kwargs) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         self.updated_at = datetime.now()
         self.validate()
-    
+
     def to_dict(self) -> dict:
         return dict(
             id=self.id,
@@ -1604,18 +1604,18 @@ def test_FunctionInfo_validation():
     user = User(id='123', name='Test User')
     assert user.id == '123'
     assert user.name == 'Test User'
-    
+
     # Test invalid creation
     with pytest.raises(ValueError, match="id is required"):
         User(id='', name='Test User')
-    
+
     with pytest.raises(ValueError, match="name is required"):
         User(id='123', name='')
 
 def test_FunctionInfo_update():
     user = User(id='123', name='Test User')
     old_updated_at = user.updated_at
-    
+
     user.update(name='New Name')
     assert user.name == 'New Name'
     assert user.updated_at > old_updated_at
@@ -1660,10 +1660,10 @@ def test_extract_imports_validation():
     # Test input validation
     with pytest.raises(ValueError, match="Invalid data"):
         validate_input({})
-    
+
     with pytest.raises(ValueError, match="Missing required field"):
         validate_input({'field1': 'value1'})
-    
+
     # Test valid input
     data = {'field1': 'value1', 'field2': 'value2'}
     validate_input(data)  # Should not raise
@@ -1671,7 +1671,7 @@ def test_extract_imports_validation():
 def test_extract_imports_transformation():
     data = {'field1': 'raw1', 'field2': 'raw2'}
     result = transform_data(data)
-    
+
     assert 'transformed_field1' in result
     assert 'transformed_field2' in result
 ```
@@ -1712,10 +1712,10 @@ def test_extract_functions_validation():
     # Test input validation
     with pytest.raises(ValueError, match="Invalid data"):
         validate_input({})
-    
+
     with pytest.raises(ValueError, match="Missing required field"):
         validate_input({'field1': 'value1'})
-    
+
     # Test valid input
     data = {'field1': 'value1', 'field2': 'value2'}
     validate_input(data)  # Should not raise
@@ -1723,7 +1723,7 @@ def test_extract_functions_validation():
 def test_extract_functions_transformation():
     data = {'field1': 'raw1', 'field2': 'raw2'}
     result = transform_data(data)
-    
+
     assert 'transformed_field1' in result
     assert 'transformed_field2' in result
 ```
@@ -1764,10 +1764,10 @@ def test_process_directories_validation():
     # Test input validation
     with pytest.raises(ValueError, match="Invalid data"):
         validate_input({})
-    
+
     with pytest.raises(ValueError, match="Missing required field"):
         validate_input({'field1': 'value1'})
-    
+
     # Test valid input
     data = {'field1': 'value1', 'field2': 'value2'}
     validate_input(data)  # Should not raise
@@ -1775,7 +1775,7 @@ def test_process_directories_validation():
 def test_process_directories_transformation():
     data = {'field1': 'raw1', 'field2': 'raw2'}
     result = transform_data(data)
-    
+
     assert 'transformed_field1' in result
     assert 'transformed_field2' in result
 ```
@@ -1826,10 +1826,10 @@ import asyncio
 async def test_payment_processing():
     # Test credit card payment
     await process_payment('credit_card', 100.0)
-    
+
     # Test PayPal payment
     await process_payment('paypal', 100.0)
-    
+
     # Test invalid payment method
     with pytest.raises(KeyError):
         await process_payment('invalid_method', 100.0)
@@ -1885,10 +1885,10 @@ import asyncio
 async def test_payment_processing():
     # Test credit card payment
     await process_payment('credit_card', 100.0)
-    
+
     # Test PayPal payment
     await process_payment('paypal', 100.0)
-    
+
     # Test invalid payment method
     with pytest.raises(KeyError):
         await process_payment('invalid_method', 100.0)
@@ -1944,10 +1944,10 @@ import asyncio
 async def test_payment_processing():
     # Test credit card payment
     await process_payment('credit_card', 100.0)
-    
+
     # Test PayPal payment
     await process_payment('paypal', 100.0)
-    
+
     # Test invalid payment method
     with pytest.raises(KeyError):
         await process_payment('invalid_method', 100.0)
@@ -2003,10 +2003,10 @@ import asyncio
 async def test_payment_processing():
     # Test credit card payment
     await process_payment('credit_card', 100.0)
-    
+
     # Test PayPal payment
     await process_payment('paypal', 100.0)
-    
+
     # Test invalid payment method
     with pytest.raises(KeyError):
         await process_payment('invalid_method', 100.0)
@@ -2062,10 +2062,10 @@ import asyncio
 async def test_payment_processing():
     # Test credit card payment
     await process_payment('credit_card', 100.0)
-    
+
     # Test PayPal payment
     await process_payment('paypal', 100.0)
-    
+
     # Test invalid payment method
     with pytest.raises(KeyError):
         await process_payment('invalid_method', 100.0)
@@ -2995,10 +2995,10 @@ class User:
     name: str
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
-    
+
     def __post_init__(self):
         self.validate()
-    
+
     def validate(self):
         if not self.id:
             raise ValueError("id is required")
@@ -3013,14 +3013,14 @@ class User:
 @dataclass
 class User:
     # ... existing fields ...
-    
+
     def update(self, **kwargs) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         self.updated_at = datetime.now()
         self.validate()
-    
+
     def to_dict(self) -> dict:
         return dict(
             id=self.id,

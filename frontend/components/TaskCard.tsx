@@ -83,14 +83,14 @@ export const TaskCard = ({ task, onComplete, onDelete }: TaskCardProps) => {
                 <Text style={styles.description}>{task.description}</Text>
             )}
             <View style={styles.actions}>
-                <Button 
-                    title={task.completed ? "Completed" : "Complete"} 
+                <Button
+                    title={task.completed ? "Completed" : "Complete"}
                     onPress={onComplete}
                     disabled={task.completed}
                 />
                 <Button title="Delete" onPress={onDelete} />
-                <Button 
-                    title="Start Focus" 
+                <Button
+                    title="Start Focus"
                     onPress={handleStartSession}
                 />
             </View>

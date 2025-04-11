@@ -50,7 +50,7 @@ export default function CreateTaskScreen() {
         console.error('Failed to fetch default calendar:', err);
       }
     };
-    
+
     if (user) {
       fetchDefaultCalendar();
     }
@@ -77,7 +77,7 @@ export default function CreateTaskScreen() {
       };
 
       await api.post('/api/calendar/events', eventData);
-      
+
       // Create task
       await api.post('/tasks', {
         title,
@@ -136,12 +136,12 @@ export default function CreateTaskScreen() {
         multiline
         numberOfLines={3}
       />
-      
+
       <View style={styles.dateSection}>
         <Text style={styles.sectionTitle}>Schedule</Text>
-        
-        <TouchableOpacity 
-          style={styles.dateButton} 
+
+        <TouchableOpacity
+          style={styles.dateButton}
           onPress={() => setShowStartPicker(true)}
         >
           <Text style={styles.dateButtonLabel}>Start Time</Text>
@@ -150,8 +150,8 @@ export default function CreateTaskScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.dateButton} 
+        <TouchableOpacity
+          style={styles.dateButton}
           onPress={() => setShowEndPicker(true)}
         >
           <Text style={styles.dateButtonLabel}>End Time</Text>
@@ -187,9 +187,9 @@ export default function CreateTaskScreen() {
             style={styles.picker}
           >
             {RECURRENCE_OPTIONS.map(option => (
-              <Picker.Item 
-                key={option.value} 
-                label={option.label} 
+              <Picker.Item
+                key={option.value}
+                label={option.label}
                 value={option.value}
               />
             ))}
@@ -203,9 +203,9 @@ export default function CreateTaskScreen() {
         onChangeText={setTaskType}
         placeholder="e.g., Focus, Creative, Administrative"
       />
-      
+
       {description && taskType && (
-        <TaskAnalysis 
+        <TaskAnalysis
           taskDescription={description}
           taskType={taskType}
         />

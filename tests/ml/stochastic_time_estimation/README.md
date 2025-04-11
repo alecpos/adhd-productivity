@@ -96,4 +96,4 @@ When adding new features to the Stochastic Time Estimation Engine, please add co
 1. Include both unit tests for individual functions and integration tests
 2. Cover edge cases and failure scenarios
 3. Use proper mocking to isolate the component being tested
-4. Keep tests independent and idempotent 
+4. Keep tests independent and idempotent

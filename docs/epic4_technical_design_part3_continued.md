@@ -20,7 +20,7 @@ try {
       request_id: requestId
     });
   }
-  
+
   if (error instanceof BusinessLogicError) {
     return response.status(error.statusCode).json({
       error: {
@@ -31,7 +31,7 @@ try {
       request_id: requestId
     });
   }
-  
+
   // Unexpected error
   logger.error('Unexpected error in schedule optimization', {
     error: error.toString(),
@@ -39,7 +39,7 @@ try {
     request: sanitizeRequest(request),
     requestId
   });
-  
+
   return response.status(500).json({
     error: {
       code: 'INTERNAL_ERROR',
@@ -67,17 +67,17 @@ async function getEnergyPredictions(userId, date) {
     return await circadianModelService.predictUserEnergy(userId, date);
   } catch (error) {
     logger.warn(`Failed to get user-specific energy predictions: ${error.message}`);
-    
+
     try {
       // Fall back to demographic group patterns
       const userProfile = await userRepository.getUserProfile(userId);
       return await circadianModelService.getDemographicPatterns(
-        userProfile.demographics, 
+        userProfile.demographics,
         date
       );
     } catch (secondError) {
       logger.error(`Failed to get demographic patterns: ${secondError.message}`);
-      
+
       // Last resort: return population default patterns
       return circadianModelService.getDefaultPatterns(date);
     }
@@ -117,34 +117,34 @@ The system uses a combination of Prometheus metrics, structured logging, and dis
 async function optimizeSchedule(userId, request) {
   const tracingContext = tracer.startSpan('optimizeSchedule');
   const startTime = Date.now();
-  
+
   try {
     tracingContext.setTag('user_id', userId);
     tracingContext.setTag('timeframe_days', daysBetween(request.start_date, request.end_date));
     tracingContext.setTag('task_count', request.tasks.length);
-    
+
     // Record the optimization attempt
     metrics.increment('optimization.attempts', { userId });
-    
+
     // Perform the optimization
     const result = await optimizationService.optimize(userId, request);
-    
+
     // Record success metrics
     metrics.increment('optimization.success', { userId });
     metrics.timing('optimization.duration', Date.now() - startTime, { userId });
     metrics.gauge('optimization.task_count', request.tasks.length, { userId });
     metrics.gauge('optimization.quality_score', result.quality_metrics.overall_score, { userId });
-    
+
     return result;
   } catch (error) {
     // Record failure metrics
     metrics.increment('optimization.failures', { userId, errorType: error.constructor.name });
-    
+
     // Add error to tracing context
     tracingContext.setTag('error', true);
     tracingContext.setTag('error.type', error.constructor.name);
     tracingContext.setTag('error.message', error.message);
-    
+
     throw error;
   } finally {
     tracingContext.finish();
@@ -189,14 +189,14 @@ async function getRecentScheduleItems(userId, limit = 100, offset = 0) {
   const query = {
     text: `
       SELECT item_id, task_id, start_time, end_time, status, energy_level, match_score
-      FROM schedule_items 
-      WHERE user_id = $1 
-      ORDER BY start_time DESC 
+      FROM schedule_items
+      WHERE user_id = $1
+      ORDER BY start_time DESC
       LIMIT $2 OFFSET $3
     `,
     values: [userId, limit, offset]
   };
-  
+
   return db.query(query);
 }
 ```
@@ -215,22 +215,22 @@ Example of cache implementation:
 ```typescript
 async function getEnergyPredictions(userId, date) {
   const cacheKey = `user:${userId}:energy_predictions:${formatDate(date)}`;
-  
+
   // Try to get from cache first
   const cachedResult = await cache.get(cacheKey);
   if (cachedResult) {
     metrics.increment('cache.hit', { type: 'energy_predictions' });
     return JSON.parse(cachedResult);
   }
-  
+
   metrics.increment('cache.miss', { type: 'energy_predictions' });
-  
+
   // Generate predictions
   const predictions = await circadianModelService.predictUserEnergy(userId, date);
-  
+
   // Cache the result
   await cache.set(cacheKey, JSON.stringify(predictions), { ttl: 24 * 60 * 60 });
-  
+
   return predictions;
 }
-``` 
+```

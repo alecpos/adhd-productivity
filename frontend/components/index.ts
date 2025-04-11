@@ -18,4 +18,4 @@ export { ScheduleOptimizer } from './epic4/ScheduleOptimizer';
 export { ExplainableAI } from './epic5/ExplainableAI';
 
 // Epic 6: User Experience and Interface Optimization
-export { AdaptiveUI } from './epic6/AdaptiveUI'; 
+export { AdaptiveUI } from './epic6/AdaptiveUI';

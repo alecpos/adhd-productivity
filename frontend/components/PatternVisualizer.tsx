@@ -118,11 +118,11 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ patterns }
               <Text style={styles.barCount}>{count}</Text>
             </View>
             <View style={styles.barWrapper}>
-              <View 
+              <View
                 style={[
-                  styles.bar, 
+                  styles.bar,
                   { width: `${(count / maxCount) * 100}%` }
-                ]} 
+                ]}
               />
             </View>
           </View>
@@ -147,4 +147,4 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ patterns }
       </View>
     </ScrollView>
   );
-}; 
+};

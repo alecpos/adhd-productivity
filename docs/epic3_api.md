@@ -834,4 +834,4 @@ response = client.dialogue.process_message(
 reminders = client.reminders.get_contextual(
     context={"location": "office", "activity": "working"}
 )
-``` 
+```

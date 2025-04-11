@@ -131,40 +131,40 @@
                                        │
 ┌───────────────────────────────┐      │
 │   CircadianRhythmData         │      │
-├───────────────────────────────┤      
-│ _id: ObjectId                 │      
+├───────────────────────────────┤
+│ _id: ObjectId                 │
 │ user_id: UUID  ───────────────┼──────┘
-│ date: Date                    │      
-│ hour: Integer                 │      
-│ energy_level: Float           │      
-│ focus_capacity: Float         │      
-│ sleep_data: Object            │      
-│ created_at: DateTime          │      
-└───────────────────────────────┘      
-                                       
-┌───────────────────────────────┐      
-│   ProductivityCorrelation     │      
-├───────────────────────────────┤      
-│ _id: ObjectId                 │      
-│ user_id: UUID                 │      
-│ factor: String                │      
-│ metric: String                │      
-│ correlation_coefficient: Float│      
-│ significance: Float           │      
-│ time_period: String           │      
-│ created_at: DateTime          │      
-└───────────────────────────────┘      
-                                       
-┌───────────────────────────────┐      
-│   FederatedModelMetadata      │      
-├───────────────────────────────┤      
-│ _id: ObjectId                 │      
-│ user_id: UUID                 │      
-│ model_version: String         │      
-│ last_contribution_time: Date  │      
-│ privacy_budget: Float         │      
-│ created_at: DateTime          │      
-└───────────────────────────────┘      
+│ date: Date                    │
+│ hour: Integer                 │
+│ energy_level: Float           │
+│ focus_capacity: Float         │
+│ sleep_data: Object            │
+│ created_at: DateTime          │
+└───────────────────────────────┘
+
+┌───────────────────────────────┐
+│   ProductivityCorrelation     │
+├───────────────────────────────┤
+│ _id: ObjectId                 │
+│ user_id: UUID                 │
+│ factor: String                │
+│ metric: String                │
+│ correlation_coefficient: Float│
+│ significance: Float           │
+│ time_period: String           │
+│ created_at: DateTime          │
+└───────────────────────────────┘
+
+┌───────────────────────────────┐
+│   FederatedModelMetadata      │
+├───────────────────────────────┤
+│ _id: ObjectId                 │
+│ user_id: UUID                 │
+│ model_version: String         │
+│ last_contribution_time: Date  │
+│ privacy_budget: Float         │
+│ created_at: DateTime          │
+└───────────────────────────────┘
 ```
 
 # Epic 1: Visual Reference Document - Part 2
@@ -234,12 +234,12 @@
         │
         │
         ▼
-┌───────────────┐     ┌───────────────┐     
-│               │     │               │     
-│ Model         │────►│ Local Model   │     
-│ Distribution  │     │ Update        │     
-│               │     │               │     
-└───────────────┘     └───────────────┘     
+┌───────────────┐     ┌───────────────┐
+│               │     │               │
+│ Model         │────►│ Local Model   │
+│ Distribution  │     │ Update        │
+│               │     │               │
+└───────────────┘     └───────────────┘
 ```
 
 ### Correlation Analysis Flow
@@ -662,7 +662,7 @@
 
 ```typescript
 // Example: Retrieving optimal productivity windows for a user
-async function getOptimalTimeWindows(userId: string, taskType: string, 
+async function getOptimalTimeWindows(userId: string, taskType: string,
                                     dateRange: DateRange): Promise<TimeWindow[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/productivity/optimal-windows`, {
@@ -679,13 +679,13 @@ async function getOptimalTimeWindows(userId: string, taskType: string,
         minimum_window_length_minutes: 30
       })
     });
-    
+
     if (!response.ok) {
       throw new Error(`Optimal windows request failed: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     return data.windows.map(window => ({
       startTime: new Date(window.start_time),
       endTime: new Date(window.end_time),
@@ -706,8 +706,8 @@ async function getOptimalTimeWindows(userId: string, taskType: string,
 ```typescript
 // Example: Submitting an energy report and getting predictions
 async function reportAndPredictEnergy(
-  userId: string, 
-  energyLevel: number, 
+  userId: string,
+  energyLevel: number,
   focusLevel: number,
   timestamp: Date
 ): Promise<EnergyPrediction[]> {
@@ -730,11 +730,11 @@ async function reportAndPredictEnergy(
         }
       })
     });
-    
+
     if (!reportResponse.ok) {
       throw new Error(`Energy report submission failed: ${reportResponse.status}`);
     }
-    
+
     // Then, get updated predictions for the next 24 hours
     const predictionResponse = await fetch(`${API_BASE_URL}/circadian/predict`, {
       method: 'GET',
@@ -749,13 +749,13 @@ async function reportAndPredictEnergy(
         include_creativity: true
       }
     });
-    
+
     if (!predictionResponse.ok) {
       throw new Error(`Energy prediction request failed: ${predictionResponse.status}`);
     }
-    
+
     const predictionData = await predictionResponse.json();
-    
+
     return predictionData.predictions.map(pred => ({
       timestamp: new Date(pred.timestamp),
       energyLevel: pred.energy_level,
@@ -776,7 +776,7 @@ async function reportAndPredictEnergy(
 ```typescript
 // Example: Getting productivity correlation insights
 async function getProductivityCorrelations(
-  userId: string, 
+  userId: string,
   timeFrame: string = 'last_90_days',
   minConfidence: number = 0.7
 ): Promise<CorrelationInsight[]> {
@@ -795,13 +795,13 @@ async function getProductivityCorrelations(
         include_details: true
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Correlation analysis request failed: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Transform the response into application-friendly format
     return data.correlations.map(correlation => ({
       factor: correlation.factor_name,
@@ -830,13 +830,13 @@ class ProductivityAwareCalendar {
   private userId: string;
   private calendarService: CalendarService;
   private productivityService: ProductivityPatternService;
-  
+
   constructor(userId: string, calendarService: CalendarService, productivityService: ProductivityPatternService) {
     this.userId = userId;
     this.calendarService = calendarService;
     this.productivityService = productivityService;
   }
-  
+
   // Schedule a task optimized for productivity
   async scheduleOptimizedTask(task: Task): Promise<CalendarEvent> {
     try {
@@ -846,30 +846,30 @@ class ProductivityAwareCalendar {
         startDate: new Date(),
         endDate: addDays(new Date(), 7)
       });
-      
+
       // 2. Identify free time blocks
       const freeBlocks = this.identifyFreeTimeBlocks(existingEvents, {
         minBlockDuration: task.estimatedDuration + 10, // Add buffer
         maxDaysAhead: 7
       });
-      
+
       // 3. Get optimal productivity windows for this task type
       const optimalWindows = await this.productivityService.getOptimalTimeWindows({
         userId: this.userId,
         taskType: task.type,
         dateRange: { startDate: new Date(), endDate: addDays(new Date(), 7) }
       });
-      
+
       // 4. Find overlapping slots between free time and optimal productivity
       const candidates = this.findOverlappingTimeSlots(freeBlocks, optimalWindows);
-      
+
       // Sort by productivity score
       candidates.sort((a, b) => b.productivityScore - a.productivityScore);
-      
+
       if (candidates.length === 0) {
         throw new Error('No suitable time slots found');
       }
-      
+
       // 5. Schedule the task in the best available slot
       const bestSlot = candidates[0];
       const scheduledEvent = await this.calendarService.createEvent({
@@ -884,22 +884,22 @@ class ProductivityAwareCalendar {
           optimized: true
         }
       });
-      
+
       return scheduledEvent;
     } catch (error) {
       console.error('Failed to schedule optimized task:', error);
-      
+
       // Fallback to basic scheduling without optimization
       return this.calendarService.createBasicEvent(this.userId, task);
     }
   }
-  
+
   // Helper methods
   private identifyFreeTimeBlocks(events: CalendarEvent[], options: FreeBlockOptions): TimeBlock[] {
     // Implementation of time block identification
     // ...
   }
-  
+
   private findOverlappingTimeSlots(freeBlocks: TimeBlock[], optimalWindows: OptimalWindow[]): TimeSlot[] {
     // Implementation of overlap detection
     // ...
@@ -915,11 +915,11 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
   const margin = { top: 30, right: 30, bottom: 30, left: 50 };
   const width = 800 - margin.left - margin.right;
   const height = 400 - margin.top - margin.bottom;
-  
+
   // Process the data into a format suitable for a heatmap
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8AM to 7PM
-  
+
   const heatmapData = [];
   for (const day of days) {
     for (const hour of hours) {
@@ -931,7 +931,7 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
       });
     }
   }
-  
+
   // Create SVG container
   const svg = d3.select(`#${containerId}`)
     .append('svg')
@@ -939,25 +939,25 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
-  
+
   // Build X scale and axis
   const x = d3.scaleBand()
     .range([0, width])
     .domain(days)
     .padding(0.05);
-  
+
   svg.append('g')
     .style('font-size', 12)
     .attr('transform', `translate(0, ${height})`)
     .call(d3.axisBottom(x).tickSize(0))
     .select('.domain').remove();
-  
+
   // Build Y scale and axis
   const y = d3.scaleBand()
     .range([height, 0])
     .domain(hours.map(String))
     .padding(0.05);
-  
+
   svg.append('g')
     .style('font-size', 12)
     .call(d3.axisLeft(y)
@@ -965,12 +965,12 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
       .tickFormat(d => `${d}:00`)
     )
     .select('.domain').remove();
-  
+
   // Build color scale
   const color = d3.scaleSequential()
     .interpolator(d3.interpolateViridis)
     .domain([0, 10]); // Assuming productivity score range of 0-10
-  
+
   // Add the squares
   svg.selectAll()
     .data(heatmapData, d => `${d.day}:${d.hour}`)
@@ -988,7 +988,7 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
     .style('opacity', 0.8)
     .on('mouseover', function(event, d) {
       d3.select(this).style('stroke', 'black');
-      
+
       // Add tooltip
       tooltip
         .style('opacity', 1)
@@ -1000,7 +1000,7 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
       d3.select(this).style('stroke', 'none');
       tooltip.style('opacity', 0);
     });
-  
+
   // Add title
   svg.append('text')
     .attr('x', 0)
@@ -1008,22 +1008,22 @@ function renderProductivityHeatmap(containerId: string, productivityData: Produc
     .attr('text-anchor', 'left')
     .style('font-size', 16)
     .text('Weekly Productivity Heatmap');
-  
+
   // Add color legend
   const legend = svg.append('g')
     .attr('transform', `translate(${width - 120}, 0)`);
-  
+
   const legendScale = d3.scaleLinear()
     .domain([0, 10])
     .range([height, 0]);
-  
+
   const legendAxis = d3.axisRight(legendScale)
     .tickValues([0, 2.5, 5, 7.5, 10])
     .tickFormat(d3.format('.1f'));
-  
+
   legend.append('g')
     .call(legendAxis);
-  
+
   // Create tooltip div
   const tooltip = d3.select(`#${containerId}`)
     .append('div')
@@ -1045,51 +1045,51 @@ class FederatedLearningClient {
   private modelVersion: string;
   private privacySettings: PrivacySettings;
   private federatedService: FederatedLearningService;
-  
+
   constructor(userId: string, federatedService: FederatedLearningService) {
     this.userId = userId;
     this.federatedService = federatedService;
     this.modelVersion = '1.0.0';
-    this.privacySettings = { 
+    this.privacySettings = {
       differentialPrivacyEpsilon: 0.1,
       secureAggregation: true,
       dataRetentionDays: 90,
       sharingLevel: 'basic'
     };
   }
-  
+
   // Initialize federated learning for this client
   async initialize(): Promise<void> {
     try {
       // Check if user has given consent
       const userConsent = await this.federatedService.getUserConsent(this.userId);
-      
+
       if (!userConsent.hasConsented) {
         console.log('User has not given consent for federated learning');
         return;
       }
-      
+
       // Apply user's privacy settings
       this.privacySettings = {
         ...this.privacySettings,
         ...userConsent.privacySettings
       };
-      
+
       // Initialize the local model
       await this.federatedService.initializeLocalModel({
         userId: this.userId,
         modelVersion: this.modelVersion,
         privacySettings: this.privacySettings
       });
-      
+
       // Set up update schedule
       this.setupUpdateSchedule();
-      
+
     } catch (error) {
       console.error('Failed to initialize federated learning client:', error);
     }
   }
-  
+
   // Contribute to federated model
   async contributeToGlobalModel(): Promise<void> {
     try {
@@ -1097,16 +1097,16 @@ class FederatedLearningClient {
         console.log('Device offline, skipping contribution');
         return;
       }
-      
+
       // Get local training data (without sending raw data)
       const trainingStats = await this.federatedService.trainLocalModel({
         userId: this.userId,
         differentialPrivacyEpsilon: this.privacySettings.differentialPrivacyEpsilon
       });
-      
+
       // Extract model updates (not the data itself)
       const modelUpdates = await this.federatedService.extractModelUpdates();
-      
+
       // Send model updates to server
       await this.federatedService.contributeModelUpdates({
         userId: this.userId,
@@ -1118,14 +1118,14 @@ class FederatedLearningClient {
           accuracy: trainingStats.accuracy
         }
       });
-      
+
       console.log('Successfully contributed to federated model');
-      
+
     } catch (error) {
       console.error('Failed to contribute to federated model:', error);
     }
   }
-  
+
   // Get insights from the federated model
   async getFederatedInsights(): Promise<FederatedInsight[]> {
     try {
@@ -1134,7 +1134,7 @@ class FederatedLearningClient {
         userId: this.userId,
         sharingLevel: this.privacySettings.sharingLevel
       });
-      
+
       return insights.map(insight => ({
         category: insight.category,
         title: insight.title,
@@ -1143,25 +1143,25 @@ class FederatedLearningClient {
         relevanceScore: insight.relevance_score,
         personalized: insight.personalized
       }));
-      
+
     } catch (error) {
       console.error('Failed to get federated insights:', error);
       return [];
     }
   }
-  
+
   // Helper method to schedule updates
   private setupUpdateSchedule(): void {
     // Schedule periodic model updates
     const updateFrequencyMs = 24 * 60 * 60 * 1000; // Daily
-    
+
     setInterval(() => {
       if (this.isDeviceIdle() && navigator.onLine) {
         this.contributeToGlobalModel();
       }
     }, updateFrequencyMs);
   }
-  
+
   private isDeviceIdle(): boolean {
     // Implementation to check if device is idle
     // ...
@@ -1181,7 +1181,7 @@ class ProductivityPatternService {
   private cacheManager: CacheManager;
   private localStorage: LocalStorage;
   private telemetry: TelemetryService;
-  
+
   constructor(
     apiClient: ApiClient,
     cacheManager: CacheManager,
@@ -1193,7 +1193,7 @@ class ProductivityPatternService {
     this.localStorage = localStorage;
     this.telemetry = telemetry;
   }
-  
+
   // Get productivity patterns with multi-level fallbacks
   async getProductivityPatterns(
     userId: string,
@@ -1205,12 +1205,12 @@ class ProductivityPatternService {
       const cachedPattern = await this.cacheManager.get(
         `productivity_pattern:${userId}:${dateRange.startDate}:${dateRange.endDate}`
       );
-      
+
       if (cachedPattern && !this.isCacheStale(cachedPattern)) {
         this.telemetry.trackEvent('productivity_pattern_source', { source: 'cache' });
         return cachedPattern;
       }
-      
+
       // Cache miss or stale cache, try API
       try {
         const apiPattern = await this.apiClient.get('/productivity/patterns', {
@@ -1220,29 +1220,29 @@ class ProductivityPatternService {
           taskTypes: options.taskTypes || [],
           resolution: options.resolution || 'hourly'
         });
-        
+
         // Cache the fresh result
         await this.cacheManager.set(
           `productivity_pattern:${userId}:${dateRange.startDate}:${dateRange.endDate}`,
           apiPattern,
           { ttl: 3600 } // 1 hour cache
         );
-        
+
         this.telemetry.trackEvent('productivity_pattern_source', { source: 'api' });
         return apiPattern;
       } catch (apiError) {
         // API failed, try local database (might have synced data)
         try {
           const localPattern = await this.localStorage.getProductivityPattern(userId, dateRange);
-          
+
           if (localPattern) {
-            this.telemetry.trackEvent('productivity_pattern_source', { 
+            this.telemetry.trackEvent('productivity_pattern_source', {
               source: 'local_db',
-              api_error: apiError.message 
+              api_error: apiError.message
             });
             return {
               ...localPattern,
-              _metadata: { 
+              _metadata: {
                 source: 'local_db',
                 lastUpdated: localPattern._metadata?.lastUpdated,
                 confidence: Math.min(localPattern._metadata?.confidence || 0.8, 0.8) // Cap confidence
@@ -1251,23 +1251,23 @@ class ProductivityPatternService {
           }
         } catch (localDbError) {
           // Local DB failed too, log it
-          this.telemetry.trackException('local_db_error', { 
+          this.telemetry.trackException('local_db_error', {
             error: localDbError.message,
-            context: 'productivity_pattern_fallback' 
+            context: 'productivity_pattern_fallback'
           });
         }
-        
+
         // Both API and local DB failed, use default patterns
         const defaultPattern = this.getDefaultPatterns(dateRange);
-        
-        this.telemetry.trackEvent('productivity_pattern_source', { 
+
+        this.telemetry.trackEvent('productivity_pattern_source', {
           source: 'defaults',
-          api_error: apiError.message 
+          api_error: apiError.message
         });
-        
+
         return {
           ...defaultPattern,
-          _metadata: { 
+          _metadata: {
             source: 'defaults',
             lastUpdated: new Date(),
             confidence: 0.5, // Low confidence
@@ -1277,32 +1277,32 @@ class ProductivityPatternService {
       }
     } catch (error) {
       // Catch-all for unexpected errors
-      this.telemetry.trackException('productivity_pattern_error', { 
+      this.telemetry.trackException('productivity_pattern_error', {
         error: error.message,
-        stack: error.stack 
+        stack: error.stack
       });
-      
+
       // Provide bare minimum default pattern to prevent UI crashes
       return this.getEmergencyDefaultPattern(dateRange);
     }
   }
-  
+
   // Helper methods
   private isCacheStale(cachedData: any): boolean {
     if (!cachedData._metadata?.lastUpdated) return true;
-    
+
     const cacheTime = new Date(cachedData._metadata.lastUpdated).getTime();
     const now = Date.now();
     const maxAgeMs = 60 * 60 * 1000; // 1 hour
-    
+
     return (now - cacheTime) > maxAgeMs;
   }
-  
+
   private getDefaultPatterns(dateRange: DateRange): ProductivityPattern {
     // Implementation of sensible defaults based on population averages
     // ...
   }
-  
+
   private getEmergencyDefaultPattern(dateRange: DateRange): ProductivityPattern {
     // Simplest possible pattern to prevent app crashes
     // ...
@@ -1318,7 +1318,7 @@ class ErrorHandler {
   private telemetry: TelemetryService;
   private notificationService: NotificationService;
   private retryPolicy: RetryPolicy;
-  
+
   constructor(
     telemetry: TelemetryService,
     notificationService: NotificationService,
@@ -1328,7 +1328,7 @@ class ErrorHandler {
     this.notificationService = notificationService;
     this.retryPolicy = retryPolicy;
   }
-  
+
   // Handle API errors consistently across the application
   handleApiError(error: any, context: ErrorContext): ErrorResult {
     // Log the error with context
@@ -1340,14 +1340,14 @@ class ErrorHandler {
       userId: context.userId,
       timestamp: new Date().toISOString()
     });
-    
+
     // Determine if the error is retryable
     const isRetryable = this.isRetryableError(error);
-    
+
     // For retryable errors, check if we should retry
     if (isRetryable && this.retryPolicy.shouldRetry(context.operation, context.attempts)) {
       const nextRetryDelay = this.retryPolicy.getNextRetryDelay(context.operation, context.attempts);
-      
+
       return {
         type: 'retry',
         userMessage: 'Temporary issue connecting to service. Retrying...',
@@ -1355,10 +1355,10 @@ class ErrorHandler {
         shouldNotifyUser: context.attempts > 2 // Only notify after multiple attempts
       };
     }
-    
+
     // User-facing error messages by error type
     const userMessage = this.getUserFriendlyMessage(error, context);
-    
+
     // For authentication errors, redirect to login
     if (error.code === 'unauthorized' || error.code === 'forbidden') {
       return {
@@ -1368,7 +1368,7 @@ class ErrorHandler {
         shouldNotifyUser: true
       };
     }
-    
+
     // For connectivity errors
     if (error.code === 'network_error' || error.name === 'NetworkError') {
       return {
@@ -1378,7 +1378,7 @@ class ErrorHandler {
         shouldNotifyUser: true
       };
     }
-    
+
     // For service unavailable
     if (error.code === 'service_unavailable') {
       // Notify user and suggest trying later
@@ -1387,7 +1387,7 @@ class ErrorHandler {
         type: 'warning',
         duration: 5000
       });
-      
+
       return {
         type: 'service_error',
         userMessage,
@@ -1395,7 +1395,7 @@ class ErrorHandler {
         fallbackData: context.fallbackData
       };
     }
-    
+
     // Default case - general error
     return {
       type: 'error',
@@ -1404,13 +1404,13 @@ class ErrorHandler {
       fallbackData: context.fallbackData
     };
   }
-  
+
   // Helper methods
   private isRetryableError(error: any): boolean {
     const retryableCodes = ['timeout', 'service_unavailable', 'too_many_requests', 'network_error'];
     return retryableCodes.includes(error.code) || error.status === 429 || error.status === 503;
   }
-  
+
   private getUserFriendlyMessage(error: any, context: ErrorContext): string {
     // Map error codes/types to user-friendly messages
     const errorMessages: Record<string, string> = {
@@ -1421,9 +1421,9 @@ class ErrorHandler {
       'service_unavailable': 'This service is currently unavailable. Please try again later.',
       'timeout': 'The request took too long to complete. Please try again.'
     };
-    
+
     // Return specific message or default message
-    return errorMessages[error.code] || 
+    return errorMessages[error.code] ||
            'An unexpected error occurred. Our team has been notified.';
   }
 }
@@ -1438,7 +1438,7 @@ class ErrorHandler {
 describe('ProductivityPatternLSTM', () => {
   let model: ProductivityPatternLSTM;
   let mockData: ProductivityData[];
-  
+
   beforeEach(() => {
     // Set up test data
     mockData = [
@@ -1452,12 +1452,12 @@ describe('ProductivityPatternLSTM', () => {
       },
       // Additional test data...
     ];
-    
+
     // Create model instance with dependencies
     const mockDataService = {
       getUserData: jest.fn().mockResolvedValue(mockData)
     };
-    
+
     const mockTensorflowService = {
       createModel: jest.fn(),
       trainModel: jest.fn().mockResolvedValue({ loss: 0.15, accuracy: 0.85 }),
@@ -1469,20 +1469,20 @@ describe('ProductivityPatternLSTM', () => {
         }));
       })
     };
-    
+
     model = new ProductivityPatternLSTM(mockDataService, mockTensorflowService);
   });
-  
+
   describe('train', () => {
     it('should process training data correctly', async () => {
       // Arrange
       const userId = 'test-user-1';
       const mockProcessedData = { features: [], labels: [] };
       jest.spyOn(model as any, 'processTrainingData').mockReturnValue(mockProcessedData);
-      
+
       // Act
       const result = await model.train(userId);
-      
+
       // Assert
       expect(model['dataService'].getUserData).toHaveBeenCalledWith(userId);
       expect(model['processTrainingData']).toHaveBeenCalledWith(mockData);
@@ -1493,17 +1493,17 @@ describe('ProductivityPatternLSTM', () => {
       );
       expect(result.accuracy).toBeGreaterThan(0.8);
     });
-    
+
     it('should handle empty training data', async () => {
       // Arrange
       const userId = 'empty-user';
       jest.spyOn(model['dataService'], 'getUserData').mockResolvedValue([]);
-      
+
       // Act & Assert
       await expect(model.train(userId)).rejects.toThrow('Insufficient training data');
     });
   });
-  
+
   describe('predictOptimalWindows', () => {
     it('should identify optimal windows for given task type', async () => {
       // Arrange
@@ -1513,17 +1513,17 @@ describe('ProductivityPatternLSTM', () => {
         startDate: new Date('2023-05-10'),
         endDate: new Date('2023-05-11')
       };
-      
+
       // Mock internal methods
       jest.spyOn(model as any, 'generateTimeSlots').mockReturnValue([
         { dayOfWeek: 1, hour: 9 },
         { dayOfWeek: 1, hour: 10 },
         // ... more time slots
       ]);
-      
+
       // Act
       const windows = await model.predictOptimalWindows(userId, taskType, dateRange);
-      
+
       // Assert
       expect(windows.length).toBeGreaterThan(0);
       windows.forEach(window => {
@@ -1534,7 +1534,7 @@ describe('ProductivityPatternLSTM', () => {
         expect(window.productivityScore).toBeLessThanOrEqual(10);
       });
     });
-    
+
     it('should return windows sorted by productivity score', async () => {
       // Arrange
       const userId = 'test-user-1';
@@ -1543,15 +1543,15 @@ describe('ProductivityPatternLSTM', () => {
         startDate: new Date('2023-05-10'),
         endDate: new Date('2023-05-11')
       };
-      
+
       // Act
       const windows = await model.predictOptimalWindows(userId, taskType, dateRange);
-      
+
       // Assert
       expect(windows).toBeSorted((a, b) => b.productivityScore - a.productivityScore);
     });
   });
-  
+
   // Additional test cases...
 });
 ```
@@ -1563,32 +1563,32 @@ describe('ProductivityPatternLSTM', () => {
 describe('CircadianRhythmModel Integration', () => {
   let model: CircadianRhythmModel;
   let database: TestDatabase;
-  
+
   beforeAll(async () => {
     // Set up test database with seed data
     database = new TestDatabase();
     await database.connect();
     await database.seed('./test/fixtures/circadian_test_data.json');
-    
+
     // Create real instance with test dependencies
     model = new CircadianRhythmModel(
       new DataRepository(database),
       new RhythmProcessor()
     );
   });
-  
+
   afterAll(async () => {
     await database.disconnect();
   });
-  
+
   it('should predict energy levels for a full day', async () => {
     // Arrange
     const userId = 'test-user-1';
     const date = new Date('2023-05-15'); // Monday
-    
+
     // Act
     const predictions = await model.predictDailyEnergyCurve(userId, date);
-    
+
     // Assert
     expect(predictions).toHaveLength(24); // One prediction per hour
     predictions.forEach((prediction, index) => {
@@ -1598,31 +1598,31 @@ describe('CircadianRhythmModel Integration', () => {
       expect(prediction.focusLevel).toBeGreaterThanOrEqual(1);
       expect(prediction.focusLevel).toBeLessThanOrEqual(10);
     });
-    
+
     // Check morning peak (for this test user)
     const morningPeak = predictions.find(p => p.hour === 10);
     expect(morningPeak.energyLevel).toBeGreaterThan(7);
-    
+
     // Check afternoon dip
     const afternoonDip = predictions.find(p => p.hour === 14);
     expect(afternoonDip.energyLevel).toBeLessThan(6);
   });
-  
+
   it('should incorporate recent energy reports', async () => {
     // Arrange
     const userId = 'test-user-1';
     const date = new Date('2023-05-16'); // Tuesday
-    
+
     // Add a recent energy report that should influence the model
     await model.submitEnergyReport(userId, {
       timestamp: new Date('2023-05-16T08:00:00Z'),
       energyLevel: 9, // Very high morning energy
       focusLevel: 8
     });
-    
+
     // Act
     const predictions = await model.predictDailyEnergyCurve(userId, date);
-    
+
     // Assert
     // Morning predictions should be influenced by recent high energy report
     const morningPredictions = predictions.filter(p => p.hour >= 8 && p.hour <= 11);
@@ -1630,36 +1630,36 @@ describe('CircadianRhythmModel Integration', () => {
       expect(prediction.energyLevel).toBeGreaterThan(7);
     });
   });
-  
+
   it('should detect optimal windows based on energy type', async () => {
     // Arrange
     const userId = 'test-user-1';
     const date = new Date('2023-05-17'); // Wednesday
-    
+
     // Act
     const focusWindows = await model.detectOptimalWindows(userId, date, {
       energyType: 'focus',
       minLevel: 7,
       minDurationMinutes: 60
     });
-    
+
     const creativeWindows = await model.detectOptimalWindows(userId, date, {
       energyType: 'creativity',
       minLevel: 7,
       minDurationMinutes: 60
     });
-    
+
     // Assert
     expect(focusWindows.length).toBeGreaterThan(0);
     expect(creativeWindows.length).toBeGreaterThan(0);
-    
+
     // Focus windows should be different from creative windows
     const focusStartTimes = focusWindows.map(w => w.startTime.getTime());
     const creativeStartTimes = creativeWindows.map(w => w.startTime.getTime());
-    
+
     // There should be some difference in the optimal windows
     const differentWindows = focusStartTimes.filter(time => !creativeStartTimes.includes(time));
     expect(differentWindows.length).toBeGreaterThan(0);
   });
 });
-``` 
+```

@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import sys
+import os
 from datetime import datetime, time, timedelta, timezone
 from typing import (
     Any,
@@ -13,7 +14,7 @@ from typing import (
     List,
     TypeVar,
 )
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 import pytest
 import pytest_asyncio
@@ -21,6 +22,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from app.core.security import get_password_hash
 from app.database import get_db
@@ -51,9 +53,12 @@ from app.services.task_service import TaskService
 from app.services.timeline_service import TimelineService
 from app.tests.factories import TestFactory
 from app.models.enums_model import BlockPriority
-
-import os
-from unittest.mock import AsyncMock, MagicMock, patch
+from app.database.base import Base
+from app.schemas.body_doubling_schema import CreateBodyDoublingSchema
+from app.services.body_doubling.session_manager import SessionManager
+from app.services.body_doubling.matching_engine import MatchingEngine
+from app.services.body_doubling.analytics_service import AnalyticsService
+from app.services.body_doubling.notification_service import NotificationService
 
 # Import from our mock modules
 from app.tests.ml.stochastic_time_estimation.mock_pymc import MockTheano
@@ -61,7 +66,7 @@ from app.tests.ml.stochastic_time_estimation.mock_models import (
     MockMentalHealthModel,
     MockEnergyModel,
     MockBaseMLModel,
-    MockFeatureEngineer
+    MockFeatureEngineer,
 )
 
 T = TypeVar("T")  # Add type variable for generic types
@@ -75,7 +80,11 @@ logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.dialects").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.orm").setLevel(logging.WARNING)
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/adhd_calendar_test"
+TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+
+# Mock dependencies that cause issues during testing
+sys.modules["app.routes"] = MagicMock()
+sys.modules["app.routes.body_doubling_routes"] = MagicMock()
 
 
 @pytest.fixture(scope="session")
@@ -84,30 +93,33 @@ def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
     # Create a new event loop
     policy = asyncio.get_event_loop_policy()
     loop = policy.new_event_loop()
-    
+
     # Set the loop as the current event loop
     asyncio.set_event_loop(loop)
-    
+
     # Yield the loop for the tests to use
     yield loop
-    
+
     # Clean up
     loop.close()
     asyncio.set_event_loop(None)  # Reset the event loop after all tests
 
 
 @pytest_asyncio.fixture(scope="session")
-async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
+async def db_engine():
     """Create a test database engine."""
-    engine = create_async_engine(TEST_DATABASE_URL, echo=True, poolclass=NullPool)
+    engine = create_async_engine(TEST_DATABASE_URL, echo=True)
+
     async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    try:
-        yield engine
-    finally:
-        async with engine.begin() as conn:
-            await conn.run_sync(BaseModel.metadata.drop_all)
-        await engine.dispose()
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield engine
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+    await engine.dispose()
 
 
 @pytest.fixture(scope="session")
@@ -118,11 +130,18 @@ def db_session_factory(db_engine: AsyncEngine) -> Any:
     )
 
 
-@pytest_asyncio.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+@pytest_asyncio.fixture
+async def db_session(db_session_factory) -> AsyncSession:
     """Create a test database session."""
-    async with db_module.async_session_maker() as session:
-        yield session
+    async with db_session_factory() as session:
+        try:
+            yield session
+            await session.rollback()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -184,7 +203,17 @@ async def auth_headers(test_user, db_session: AsyncSession) -> DictSchema:
 @pytest.fixture(scope="function")
 async def body_doubling_service(db_session: AsyncSession) -> BodyDoublingService:
     """Create a body doubling service instance."""
-    return BodyDoublingService(db_session)
+    session_manager = SessionManager(db_session)
+    matching_engine = MatchingEngine(session_manager=session_manager)
+    analytics_service = AnalyticsService(session_manager=session_manager)
+    notification_service = NotificationService(session_manager=session_manager)
+
+    return BodyDoublingService(
+        session_manager=session_manager,
+        matching_engine=matching_engine,
+        analytics_service=analytics_service,
+        notification_service=notification_service,
+    )
 
 
 @pytest.fixture(scope="function")
@@ -238,9 +267,7 @@ async def test_streak(test_user: UserModel, db_session: AsyncSession) -> StreakM
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_leaderboard(
-    test_user: UserModel, db_session: AsyncSession
-) -> LeaderboardModel:
+async def test_leaderboard(test_user: UserModel, db_session: AsyncSession) -> LeaderboardModel:
     """Create a test leaderboard entry."""
     logger.debug("Creating test leaderboard entry")
     leaderboard = LeaderboardModel(user_id=test_user.id, category="global", rank=1, score=100.0)
@@ -308,9 +335,7 @@ async def test_badge(test_user: UserModel, db_session: AsyncSession) -> BadgeMod
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_achievement(
-    test_user: UserModel, db_session: AsyncSession
-) -> AchievementModel:
+async def test_achievement(test_user: UserModel, db_session: AsyncSession) -> AchievementModel:
     """Create a test achievement."""
     achievement = AchievementModel(
         id=uuid4(),
@@ -427,9 +452,7 @@ def task_to_block_dict() -> Callable[[TaskSchema], Dict[str, Any]]:
             "duration": duration,
             "block_type": BlockType.TASK,
             "priority": (
-                BlockPriority.HIGH
-                if task.priority == BlockPriority.HIGH
-                else BlockPriority.MEDIUM
+                BlockPriority.HIGH if task.priority == BlockPriority.HIGH else BlockPriority.MEDIUM
             ),
             "energy_level": min(task.energy_required or 5, 10),
             "focus_level": min(task.energy_required or 5, 10),
@@ -476,45 +499,50 @@ def patch_imports():
     Patch imports to use mocks instead of real modules.
     """
     # Mock PyMC3 and its dependencies
-    sys.modules['pymc3'] = MagicMock()
-    sys.modules['theano'] = MockTheano()
-    sys.modules['theano.tensor'] = MagicMock()
-    
+    sys.modules["pymc3"] = MagicMock()
+    sys.modules["theano"] = MockTheano()
+    sys.modules["theano.tensor"] = MagicMock()
+
     # Patch app.models.mental_health_model to include MentalHealthModel
     mental_health_module = MagicMock()
     mental_health_module.MentalHealthModel = MockMentalHealthModel
-    sys.modules['app.models.mental_health_model'] = mental_health_module
-    
+    sys.modules["app.models.mental_health_model"] = mental_health_module
+
     # Patch app.models.energy_model
     energy_module = MagicMock()
     energy_module.EnergyModel = MockEnergyModel
-    sys.modules['app.models.energy_model'] = energy_module
-    
+    sys.modules["app.models.energy_model"] = energy_module
+
     # Patch ML base models
     ml_models_module = MagicMock()
     ml_models_module.BaseMLModel = MockBaseMLModel
-    sys.modules['app.ml.models'] = ml_models_module
-    
+    sys.modules["app.ml.models"] = ml_models_module
+
     # Patch feature engineering
     feature_eng_module = MagicMock()
     feature_eng_module.FeatureEngineer = MockFeatureEngineer
-    sys.modules['app.ml.feature_engineering'] = feature_eng_module
-    
+    sys.modules["app.ml.feature_engineering"] = feature_eng_module
+
     # Patch numpy bool
     try:
         import numpy as np
-        if not hasattr(np, 'bool_'):
+
+        if not hasattr(np, "bool_"):
             np.bool_ = bool
     except ImportError:
         pass
-    
+
     yield
-    
+
     # Clean up after tests complete
     for module in [
-        'pymc3', 'theano', 'theano.tensor', 
-        'app.models.mental_health_model', 'app.models.energy_model',
-        'app.ml.models', 'app.ml.feature_engineering'
+        "pymc3",
+        "theano",
+        "theano.tensor",
+        "app.models.mental_health_model",
+        "app.models.energy_model",
+        "app.ml.models",
+        "app.ml.feature_engineering",
     ]:
         if module in sys.modules:
             del sys.modules[module]
@@ -523,6 +551,7 @@ def patch_imports():
 @pytest.fixture
 def mock_db():
     """Mock database session."""
+
     class MockDB:
         def __init__(self):
             self.data = {}
@@ -548,19 +577,19 @@ def mock_db():
 
 def run_async_test(coroutine):
     """Run an async test within an event loop.
-    
+
     This function ensures that async test functions are properly awaited when run
     outside of pytest's automatic asyncio handling.
-    
+
     Args:
         coroutine: The async function to run
-        
+
     Returns:
         The result of the awaited coroutine
     """
     # Get the current policy
     policy = asyncio.get_event_loop_policy()
-    
+
     try:
         # Try to get the current event loop
         loop = asyncio.get_event_loop()
@@ -568,7 +597,7 @@ def run_async_test(coroutine):
         # If there's no event loop in the current thread, create one
         loop = policy.new_event_loop()
         asyncio.set_event_loop(loop)
-    
+
     if loop.is_running():
         # If the loop is already running (e.g., in an async environment),
         # use run_coroutine_threadsafe
@@ -577,3 +606,30 @@ def run_async_test(coroutine):
     else:
         # Otherwise, use run_until_complete
         return loop.run_until_complete(coroutine)
+
+
+@pytest.fixture
+def sample_session_data():
+    """Create sample session data for testing."""
+    return CreateBodyDoublingSchema(
+        user_id=UUID("11111111-1111-1111-1111-111111111111"),
+        host_id=UUID("11111111-1111-1111-1111-111111111111"),
+        session_type=SessionType.ONE_ON_ONE,
+        activity_type=ActivityType.WORK,
+        planned_duration=30,
+        description=None,
+        energy_level=None,
+        environment_data=None,
+    )
+
+
+@pytest.fixture
+def user_1_id():
+    """Create a test user ID."""
+    return UUID("11111111-1111-1111-1111-111111111111")
+
+
+@pytest.fixture
+def user_2_id():
+    """Create another test user ID."""
+    return UUID("22222222-2222-2222-2222-222222222222")

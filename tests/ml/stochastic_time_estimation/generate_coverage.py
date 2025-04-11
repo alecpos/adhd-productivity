@@ -36,32 +36,32 @@ def run_coverage_locally(generate_html, generate_xml):
     """Run coverage locally using pytest-cov."""
     project_root = get_project_root()
     os.chdir(project_root)
-    
+
     # Ensure PYTHONPATH includes project root
     env = os.environ.copy()
     env["PYTHONPATH"] = str(project_root)
-    
+
     # Base command
     cmd = [
-        "python", "-m", "pytest", 
-        "tests/ml/stochastic_time_estimation/", 
+        "python", "-m", "pytest",
+        "tests/ml/stochastic_time_estimation/",
         "--cov=app/ml/stochastic_time_estimation",
         "-v"
     ]
-    
+
     # Add report formats
     if generate_html:
         cmd.append("--cov-report=html")
     if generate_xml:
         cmd.append("--cov-report=xml")
-    
+
     # Always generate a terminal report
     cmd.append("--cov-report=term")
-    
+
     # Run the tests with coverage
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, env=env)
-    
+
     # Print report locations
     if result.returncode == 0:
         print("\nCoverage run successful!")
@@ -74,7 +74,7 @@ def run_coverage_locally(generate_html, generate_xml):
             print(f"XML report generated at: {xml_path}")
     else:
         print("\nCoverage run failed with exit code:", result.returncode)
-    
+
     return result.returncode
 
 
@@ -82,15 +82,15 @@ def run_coverage_in_docker(generate_html, generate_xml):
     """Run coverage in Docker container."""
     project_root = get_project_root()
     os.chdir(project_root)
-    
+
     # Build the Docker image if it doesn't exist
     subprocess.run([
-        "docker", "build", 
-        "-t", "adhd-calendar-ste-tests", 
-        "-f", "tests/ml/stochastic_time_estimation/Dockerfile.test", 
+        "docker", "build",
+        "-t", "adhd-calendar-ste-tests",
+        "-f", "tests/ml/stochastic_time_estimation/Dockerfile.test",
         "."
     ])
-    
+
     # Base command
     cmd = [
         "docker", "run", "--rm",
@@ -101,20 +101,20 @@ def run_coverage_in_docker(generate_html, generate_xml):
         "--cov=app/ml/stochastic_time_estimation",
         "-v"
     ]
-    
+
     # Add report formats
     if generate_html:
         cmd.append("--cov-report=html")
     if generate_xml:
         cmd.append("--cov-report=xml")
-    
+
     # Always generate a terminal report
     cmd.append("--cov-report=term")
-    
+
     # Run the tests with coverage
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd)
-    
+
     # Print report locations
     if result.returncode == 0:
         print("\nCoverage run successful!")
@@ -127,18 +127,18 @@ def run_coverage_in_docker(generate_html, generate_xml):
             print(f"XML report generated at: {xml_path}")
     else:
         print("\nCoverage run failed with exit code:", result.returncode)
-    
+
     return result.returncode
 
 
 def main():
     """Run the coverage generation script."""
     args = parse_arguments()
-    
+
     # Default to HTML if no format specified
     if not args.html and not args.xml:
         args.html = True
-    
+
     # Run tests with coverage
     if args.run_in_docker:
         return run_coverage_in_docker(args.html, args.xml)
@@ -147,4 +147,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

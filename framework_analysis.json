@@ -1,0 +1,29 @@
+{
+  "framework": "pydantic",
+  "project_path": ".",
+  "analysis_date": "2025-04-01T22:40:19.009498",
+  "summary": {
+    "files_analyzed": 477,
+    "pydantic_files": 113,
+    "adherence_score": 0.30973451327433615,
+    "issues_found": 7,
+    "v2_migration_issues": 12,
+    "anti_pattern_counts": {
+      "validation_always_true": 1,
+      "untyped_model": 6
+    },
+    "v2_migration_counts": {
+      "json_to_model_dump_json": 3,
+      "dict_to_model_dump": 3,
+      "validator_to_field_validator": 6
+    },
+    "modern_pattern_counts": {
+      "typed_fields": 104,
+      "annotations_imports": 98,
+      "model_export": 1,
+      "field_validators": 7
+    }
+  },
+  "debt_items_count": 3,
+  "debt_items": []
+}

@@ -26,7 +26,7 @@ const createTestStore = () => {
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const store = createTestStore();
-  
+
   return (
     <Provider store={store}>
       <SafeAreaProvider>
@@ -59,4 +59,4 @@ const customRender = (ui: React.ReactElement, options = {}) =>
 export * from '@testing-library/react-native';
 
 // override render method
-export { customRender as render }; 
+export { customRender as render };

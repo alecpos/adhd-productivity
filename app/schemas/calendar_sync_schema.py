@@ -22,7 +22,9 @@ class CalendarSyncSchema(BaseModel):
     source: SyncSource = Field(default=SyncSource.LOCAL)
     status: SyncStatus = Field(default=SyncStatus.PENDING)
     direction: SyncDirection = Field(default=SyncDirection.BIDIRECTIONAL)
-    conflict_resolution: ConflictResolutionStrategy = Field(default=ConflictResolutionStrategy.MANUAL)
+    conflict_resolution: ConflictResolutionStrategy = Field(
+        default=ConflictResolutionStrategy.MANUAL
+    )
     meta_data: Dict[str, Any] = Field(default_factory=dict)
 
 

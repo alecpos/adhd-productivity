@@ -79,13 +79,13 @@ const TaskListScreen = () => {
   return (
     <View>
       <Text>Task List</Text>
-      <Button 
-        title="View Task Detail" 
-        onPress={() => navigateToTaskDetail('task-123')} 
+      <Button
+        title="View Task Detail"
+        onPress={() => navigateToTaskDetail('task-123')}
       />
-      <Button 
-        title="Create New Task" 
-        onPress={navigateToCreateTask} 
+      <Button
+        title="Create New Task"
+        onPress={navigateToCreateTask}
       />
     </View>
   );
@@ -161,4 +161,4 @@ When extending the navigation:
 
 - [React Navigation Documentation](https://reactnavigation.org/docs/getting-started)
 - [Navigation Patterns](../docs/navigation_patterns.md)
-- [Deep Linking Guide](../docs/deep_linking.md) 
+- [Deep Linking Guide](../docs/deep_linking.md)

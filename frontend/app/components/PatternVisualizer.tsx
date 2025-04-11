@@ -22,7 +22,7 @@ export default function PatternVisualizer() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Learned Patterns</Text>
-      
+
       <View style={styles.statsContainer}>
         {Object.entries(categoryCounts).map(([category, count]) => (
           <View key={category} style={styles.statItem}>
@@ -139,4 +139,4 @@ const useStyles = makeStyles((theme) => ({
     color: theme.colors.text,
     marginLeft: theme.spacing.sm,
   },
-})); 
+}));

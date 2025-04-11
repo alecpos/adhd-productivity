@@ -7,7 +7,7 @@ interface ImageOptimizationOptions {
 }
 
 export const optimizeImage = async (
-  uri: string, 
+  uri: string,
   options: ImageOptimizationOptions = {}
 ) => {
     const {
@@ -27,4 +27,4 @@ export const optimizeImage = async (
         console.error('Error optimizing image:', error);
         return uri; // Return original URI if optimization fails
     }
-}; 
+};

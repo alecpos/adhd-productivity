@@ -188,7 +188,7 @@ def upgrade():
 
 ```python
 def upgrade():
-    op.alter_column('users', 'email', 
+    op.alter_column('users', 'email',
                     existing_type=sa.String(length=255),
                     type_=sa.String(length=320),
                     nullable=False)
@@ -227,7 +227,7 @@ def upgrade():
 For complex migrations, consider:
 
 1. **Split Into Multiple Migrations**: Break down complex changes into smaller, sequential migrations.
-2. **Data Migration Strategies**: 
+2. **Data Migration Strategies**:
    - For large tables, consider batching data migrations.
    - For sensitive operations, consider using temporary tables.
 3. **Testing**: Create test cases for complex migrations.
@@ -256,4 +256,4 @@ alembic stamp head
 
 - [SQLAlchemy Models](./sqlalchemy_models.md)
 - [Database Schema](./database_schema.md)
-- [Official Alembic Documentation](https://alembic.sqlalchemy.org/en/latest/) 
+- [Official Alembic Documentation](https://alembic.sqlalchemy.org/en/latest/)

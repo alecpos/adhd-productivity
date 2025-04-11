@@ -76,4 +76,4 @@ When working with enumerations:
 ## Related Documentation
 
 - [Enum Usage Patterns](../../docs/enum_usage_patterns.md)
-- [API Data Types](../../docs/api_data_types.md) 
+- [API Data Types](../../docs/api_data_types.md)

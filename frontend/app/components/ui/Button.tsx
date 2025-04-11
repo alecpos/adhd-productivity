@@ -19,7 +19,7 @@ interface ButtonProps extends Omit<RNEButtonProps, 'title' | 'type' | 'size'> {
   iconPosition?: 'left' | 'right';
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
+export const Button: React.FC<ButtonProps> = ({
   title,
   variant = 'primary',
   size = 'medium',
@@ -29,7 +29,7 @@ export const Button: React.FC<ButtonProps> = ({
   icon,
   iconPosition = 'left',
   disabled,
-  ...props 
+  ...props
 }) => {
   const { theme } = useTheme();
   const styles = useStyles();
@@ -78,8 +78,8 @@ export const Button: React.FC<ButtonProps> = ({
     if (!icon) return undefined;
     return React.cloneElement(icon, {
       size: size === 'small' ? 16 : size === 'medium' ? 20 : 24,
-      color: variant === 'outline' || variant === 'ghost' 
-        ? theme.colors.primary 
+      color: variant === 'outline' || variant === 'ghost'
+        ? theme.colors.primary
         : theme.colors.white,
       style: iconPosition === 'right' ? { marginLeft: 8 } : { marginRight: 8 }
     });
@@ -96,8 +96,8 @@ export const Button: React.FC<ButtonProps> = ({
       loading={isLoading}
       loadingProps={{
         size: size === 'small' ? 'small' : 'large',
-        color: variant === 'outline' || variant === 'ghost' 
-          ? theme.colors.primary 
+        color: variant === 'outline' || variant === 'ghost'
+          ? theme.colors.primary
           : theme.colors.white
       }}
       loadingStyle={styles.loadingStyle}
@@ -212,4 +212,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default Button; 
+export default Button;

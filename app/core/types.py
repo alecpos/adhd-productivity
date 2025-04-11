@@ -1,4 +1,5 @@
 """Common types used across the application."""
+
 from uuid import UUID
 
 from pydantic import Field
@@ -14,4 +15,5 @@ class UUIDSchema(BaseSchema):
 
 class NoneSchema(BaseSchema):
     """Schema for None type returns."""
-    pass 
+
+    pass

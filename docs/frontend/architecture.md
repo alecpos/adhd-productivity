@@ -206,4 +206,4 @@ The app uses Expo's build system for deployment:
 2. **Testing**: EAS Build for test builds
 3. **Production**: EAS Build for production builds
 4. **Updates**: EAS Update for over-the-air updates
-5. **Distribution**: App Store (iOS) and Google Play (Android) 
+5. **Distribution**: App Store (iOS) and Google Play (Android)

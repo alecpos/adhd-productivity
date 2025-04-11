@@ -318,4 +318,4 @@ Planned improvements to the ML system:
 - [TPR Models Documentation](./tpr_models.md)
 - [Time Estimation Documentation](./time_estimation.md)
 - [Forgetfulness Mitigation Documentation](./forgetfulness_mitigation.md)
-- [Hyperfold Architecture](./hyperfold_architecture.md) 
+- [Hyperfold Architecture](./hyperfold_architecture.md)

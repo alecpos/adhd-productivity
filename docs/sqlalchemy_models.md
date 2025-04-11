@@ -27,10 +27,10 @@ Base = declarative_base()
 
 class BaseModel(Base):
     __abstract__ = True
-    
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
+
     # Common methods for all models
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -61,7 +61,7 @@ class TaskPriority(enum.Enum):
 
 class Task(BaseModel):
     __tablename__ = "tasks"
-    
+
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String(255), nullable=False)
@@ -72,11 +72,11 @@ class Task(BaseModel):
     estimated_duration = Column(Integer, nullable=True)  # in minutes
     actual_duration = Column(Integer, nullable=True)  # in minutes
     tags = Column(JSON, default=list, nullable=False)
-    
+
     # Relationships
     user = relationship("User", back_populates="tasks")
     reminders = relationship("Reminder", back_populates="task", cascade="all, delete-orphan")
-    
+
     def __repr__(self):
         return f"<Task id={self.id} title='{self.title}' status={self.status}>"
 ```
@@ -286,4 +286,4 @@ session.commit()
 
 - [Database Schema Documentation](./database_schema.md)
 - [Alembic Migration Guide](./alembic_guide.md)
-- [SQLAlchemy Official Documentation](https://docs.sqlalchemy.org/en/14/) 
+- [SQLAlchemy Official Documentation](https://docs.sqlalchemy.org/en/14/)

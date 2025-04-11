@@ -7,7 +7,7 @@ from app.schemas.hyperfocus_schema import (
     HyperfocusSessionCreateSchema,
     HyperfocusSessionResponseSchema,
     HyperfocusSessionUpdate,
-    HyperfocusStats
+    HyperfocusStats,
 )
 from app.services.hyperfocus_service import HyperfocusService
 import logging
@@ -133,5 +133,6 @@ async def get_hyperfocus_statistics(
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 router = hyperfocus_router

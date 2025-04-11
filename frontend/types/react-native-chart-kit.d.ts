@@ -1,6 +1,6 @@
 declare module 'react-native-chart-kit' {
   import type { ViewStyle } from 'react-native';
-  
+
   interface ChartConfig {
     backgroundColor?: string;
     backgroundGradientFrom?: string;
@@ -42,4 +42,4 @@ declare module 'react-native-chart-kit' {
   }
 
   export class LineChart extends React.Component<LineChartProps> {}
-} 
+}

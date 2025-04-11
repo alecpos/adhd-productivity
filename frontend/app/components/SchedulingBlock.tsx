@@ -54,4 +54,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SchedulingBlock; 
+export default SchedulingBlock;

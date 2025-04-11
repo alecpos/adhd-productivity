@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+
 def create_valid_data(schema_class):
     """Create valid data for testing schema validation."""
     base_time = datetime.now()
-    
+
     # Common fields that should always be included
     always_include = {
         "email": "test@example.com",
@@ -32,7 +33,7 @@ def create_valid_data(schema_class):
         "start": "09:00",
         "end": "17:00",
         "start_time": base_time.isoformat(),
-        "end_time": (base_time + timedelta(hours=1)).isoformat()
+        "end_time": (base_time + timedelta(hours=1)).isoformat(),
     }
 
     # Response-specific fields
@@ -52,85 +53,96 @@ def create_valid_data(schema_class):
             "message": "Test message",
             "email": "test@example.com",
             "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(hours=1)).isoformat()
+            "end_time": (base_time + timedelta(hours=1)).isoformat(),
         }
     }
 
     # List fields
     list_fields = {
-        "sessions": [{
-            "id": str(uuid4()),
-            "created_at": base_time.isoformat(),
-            "updated_at": base_time.isoformat(),
-            "user_id": str(uuid4()),
-            "session_type": "one_on_one",
-            "activity_type": "study",
-            "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(hours=1)).isoformat(),
-            "success": True,
-            "message": "Test message",
-            "data": {"key": "value"}
-        }],
-        "timeline": [{
-            "id": 1,
-            "user_id": str(uuid4()),
-            "event_type": "task",
-            "due_date": base_time.isoformat(),
-            "title": "Test Event",
-            "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(hours=1)).isoformat()
-        }],
-        "blocks": [{
-            "id": str(uuid4()),
-            "user_id": str(uuid4()),
-            "title": "Test Block",
-            "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(minutes=25)).isoformat(),
-            "created_at": base_time.isoformat(),
-            "updated_at": base_time.isoformat()
-        }],
-        "events": [{
-            "id": str(uuid4()),
-            "user_id": str(uuid4()),
-            "title": "Test Event",
-            "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(hours=1)).isoformat(),
-            "created_at": base_time.isoformat(),
-            "updated_at": base_time.isoformat()
-        }],
-        "data": [{
-            "id": str(uuid4()),
-            "user_id": str(uuid4()),
-            "title": "Test Data",
-            "created_at": base_time.isoformat(),
-            "updated_at": base_time.isoformat(),
-            "name": "Test Name",
-            "amount": 100.0,
-            "active_period": "monthly",
-            "due_date": base_time.isoformat(),
-            "start_time": base_time.isoformat(),
-            "end_time": (base_time + timedelta(hours=1)).isoformat()
-        }]
+        "sessions": [
+            {
+                "id": str(uuid4()),
+                "created_at": base_time.isoformat(),
+                "updated_at": base_time.isoformat(),
+                "user_id": str(uuid4()),
+                "session_type": "one_on_one",
+                "activity_type": "study",
+                "start_time": base_time.isoformat(),
+                "end_time": (base_time + timedelta(hours=1)).isoformat(),
+                "success": True,
+                "message": "Test message",
+                "data": {"key": "value"},
+            }
+        ],
+        "timeline": [
+            {
+                "id": 1,
+                "user_id": str(uuid4()),
+                "event_type": "task",
+                "due_date": base_time.isoformat(),
+                "title": "Test Event",
+                "start_time": base_time.isoformat(),
+                "end_time": (base_time + timedelta(hours=1)).isoformat(),
+            }
+        ],
+        "blocks": [
+            {
+                "id": str(uuid4()),
+                "user_id": str(uuid4()),
+                "title": "Test Block",
+                "start_time": base_time.isoformat(),
+                "end_time": (base_time + timedelta(minutes=25)).isoformat(),
+                "created_at": base_time.isoformat(),
+                "updated_at": base_time.isoformat(),
+            }
+        ],
+        "events": [
+            {
+                "id": str(uuid4()),
+                "user_id": str(uuid4()),
+                "title": "Test Event",
+                "start_time": base_time.isoformat(),
+                "end_time": (base_time + timedelta(hours=1)).isoformat(),
+                "created_at": base_time.isoformat(),
+                "updated_at": base_time.isoformat(),
+            }
+        ],
+        "data": [
+            {
+                "id": str(uuid4()),
+                "user_id": str(uuid4()),
+                "title": "Test Data",
+                "created_at": base_time.isoformat(),
+                "updated_at": base_time.isoformat(),
+                "name": "Test Name",
+                "amount": 100.0,
+                "active_period": "monthly",
+                "due_date": base_time.isoformat(),
+                "start_time": base_time.isoformat(),
+                "end_time": (base_time + timedelta(hours=1)).isoformat(),
+            }
+        ],
     }
 
     # Time-based fields
     time_fields = {
-        "working_hours": {
-            "start": "09:00",
-            "end": "17:00"
-        },
-        "peak_hours": [{
-            "start_time": "09:00",
-            "end_time": "12:00",
-            "average_energy": 1.0,
-            "average_focus": 1.0
-        }],
-        "low_hours": [{
-            "start_time": "14:00",
-            "end_time": "16:00",
-            "average_energy": 0.5,
-            "average_focus": 0.5
-        }]
+        "working_hours": {"start": "09:00", "end": "17:00"},
+        "peak_hours": [
+            {
+                "start_time": "09:00",
+                "end_time": "12:00",
+                "average_energy": 1.0,
+                "average_focus": 1.0,
+            }
+        ],
+        "low_hours": [
+            {
+                "start_time": "14:00",
+                "end_time": "16:00",
+                "average_energy": 0.5,
+                "average_focus": 0.5,
+            }
+        ],
     }
 
     # User-related fields
@@ -140,7 +152,7 @@ def create_valid_data(schema_class):
             "email": "test@example.com",
             "username": "test_user",
             "created_at": base_time.isoformat(),
-            "updated_at": base_time.isoformat()
+            "updated_at": base_time.isoformat(),
         }
     }
 
@@ -148,27 +160,31 @@ def create_valid_data(schema_class):
     pattern_fields = {
         "patterns": {
             "daily_patterns": {},
-            "peak_hours": [{
-                "start_time": "09:00",
-                "end_time": "12:00",
-                "average_energy": 1.0,
-                "average_focus": 1.0
-            }],
-            "low_hours": [{
-                "start_time": "14:00",
-                "end_time": "16:00",
-                "average_energy": 0.5,
-                "average_focus": 0.5
-            }],
+            "peak_hours": [
+                {
+                    "start_time": "09:00",
+                    "end_time": "12:00",
+                    "average_energy": 1.0,
+                    "average_focus": 1.0,
+                }
+            ],
+            "low_hours": [
+                {
+                    "start_time": "14:00",
+                    "end_time": "16:00",
+                    "average_energy": 0.5,
+                    "average_focus": 0.5,
+                }
+            ],
             "environmental_impacts": ["noise", "lighting"],
-            "recommendations": ["test"]
+            "recommendations": ["test"],
         }
     }
 
     # Start with an empty valid_data dictionary
     valid_data = {}
     schema_name = schema_class.__name__.lower()
-    schema_fields = schema_class.model_fields if hasattr(schema_class, 'model_fields') else {}
+    schema_fields = schema_class.model_fields if hasattr(schema_class, "model_fields") else {}
 
     # Handle response schemas differently
     if "response" in schema_name:
@@ -182,7 +198,7 @@ def create_valid_data(schema_class):
             valid_data["total_count"] = 1
         elif "analytics" in schema_name or "insights" in schema_name:
             valid_data["data"] = response_fields["data"]
-    
+
     # Add fields based on schema name and fields
     for field_name, field in schema_fields.items():
         if field_name in always_include:
@@ -208,4 +224,4 @@ def create_valid_data(schema_class):
             elif field_name == "time_of_day":
                 valid_data[field_name] = "morning"
 
-    return valid_data 
+    return valid_data

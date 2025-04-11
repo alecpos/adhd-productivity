@@ -136,4 +136,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default Badge; 
+export default Badge;

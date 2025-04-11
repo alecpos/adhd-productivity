@@ -15,7 +15,7 @@ from app.schemas.mental_health_schema import (
     MentalHealthLogCreateSchema,
     MentalHealthLogUpdateSchema,
     MentalHealthStatsSchema,
-    MentalHealthTrendsSchema
+    MentalHealthTrendsSchema,
 )
 from app.services.mental_health_service import MentalHealthService
 from app.routes.base_routes import BaseRouter
@@ -23,7 +23,9 @@ from app.models.mental_health_model import MentalHealthLogModel
 from app.core.responses import APIResponse
 
 
-class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthService, MentalHealthLogCreateSchema]):
+class MentalHealthRouter(
+    BaseRouter[MentalHealthLogResponseSchema, MentalHealthService, MentalHealthLogCreateSchema]
+):
     """Router for mental health endpoints."""
 
     def __init__(self):
@@ -33,7 +35,7 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
             tags=["mental-health"],
             schema_class=MentalHealthLogResponseSchema,
             service_class=MentalHealthService,
-            model_class=MentalHealthLogModel
+            model_class=MentalHealthLogModel,
         )
         self._register_custom_routes()
 
@@ -42,8 +44,7 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
 
         @self.router.get("/logs", response_model=APIResponse[list[MentalHealthLogResponseSchema]])
         async def get_mental_health_logs(
-            current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            current_user: UserSchema = Depends(get_current_user), db: AsyncSession = Depends(get_db)
         ):
             """Get all mental health logs for a user."""
             try:
@@ -51,17 +52,19 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
                 logs = await service.get_user_logs(current_user.id)
                 return APIResponse(
                     data=[MentalHealthLogResponseSchema.from_orm(log) for log in logs],
-                    message="Mental health logs retrieved successfully"
+                    message="Mental health logs retrieved successfully",
                 )
             except Exception as e:
                 logger.error(f"Error getting mental health logs: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
         @self.router.post("/logs", response_model=APIResponse[MentalHealthLogResponseSchema])
         async def create_mental_health_log(
             log_data: MentalHealthLogCreateSchema,
             current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Create a new mental health log."""
             try:
@@ -70,16 +73,17 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
                 log = await service.create_log(**log_data.model_dump())
                 return APIResponse(
                     data=MentalHealthLogResponseSchema.from_orm(log),
-                    message="Mental health log created successfully"
+                    message="Mental health log created successfully",
                 )
             except Exception as e:
                 logger.error(f"Error creating mental health log: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
         @self.router.get("/stats", response_model=APIResponse[MentalHealthStatsSchema])
         async def get_mental_health_stats(
-            current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            current_user: UserSchema = Depends(get_current_user), db: AsyncSession = Depends(get_db)
         ):
             """Get mental health statistics for the current user."""
             try:
@@ -87,16 +91,17 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
                 stats = await service.get_user_stats(current_user.id)
                 return APIResponse(
                     data=MentalHealthStatsSchema(**stats),
-                    message="Mental health stats retrieved successfully"
+                    message="Mental health stats retrieved successfully",
                 )
             except Exception as e:
                 logger.error(f"Error getting mental health stats: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
         @self.router.get("/trends", response_model=APIResponse[MentalHealthTrendsSchema])
         async def get_mental_health_trends(
-            current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            current_user: UserSchema = Depends(get_current_user), db: AsyncSession = Depends(get_db)
         ):
             """Get mental health trends for the current user."""
             try:
@@ -104,11 +109,13 @@ class MentalHealthRouter(BaseRouter[MentalHealthLogResponseSchema, MentalHealthS
                 trends = await service.get_user_trends(current_user.id)
                 return APIResponse(
                     data=MentalHealthTrendsSchema(**trends),
-                    message="Mental health trends retrieved successfully"
+                    message="Mental health trends retrieved successfully",
                 )
             except Exception as e:
                 logger.error(f"Error getting mental health trends: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
 
 router = MentalHealthRouter().router

@@ -136,7 +136,7 @@ async def get_all(
 ```python
 class UserRouter(BaseRouter[UserSchema, UserService]):
     """Router for user-related operations."""
-    
+
     def __init__(self):
         super().__init__(
             prefix="/users",

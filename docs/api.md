@@ -235,4 +235,4 @@ const tasks = await client.tasks.list({ status: 'pending' });
 7. Implement proper security measures
 8. Use proper status codes
 9. Include comprehensive error messages
-10. Maintain backward compatibility 
+10. Maintain backward compatibility

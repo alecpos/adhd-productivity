@@ -24,7 +24,7 @@ export const TaskAnalysis: React.FC<TaskAnalysisProps> = ({ taskDescription, tas
         api.post('/nlp/analyze-task', { task_description: taskDescription }),
         api.post('/nlp/focus-strategies', { task_type: taskType })
       ]);
-      
+
       setAnalysis(analysisResult.data);
       setStrategies(strategiesResult.data);
     } catch (err) {
@@ -103,4 +103,4 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 8,
   },
-}); 
+});

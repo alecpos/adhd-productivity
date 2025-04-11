@@ -50,16 +50,16 @@ const useStyles = makeStyles((theme) => ({
   codeHighlightContainer: {
     borderRadius: 3,
     paddingHorizontal: 4,
-    backgroundColor: theme.mode === 'dark' 
-      ? 'rgba(255,255,255,0.05)' 
+    backgroundColor: theme.mode === 'dark'
+      ? 'rgba(255,255,255,0.05)'
       : 'rgba(0,0,0,0.05)',
   },
   getStartedText: {
     fontSize: 17,
     lineHeight: 24,
     textAlign: 'center',
-    color: theme.mode === 'dark' 
-      ? 'rgba(255,255,255,0.8)' 
+    color: theme.mode === 'dark'
+      ? 'rgba(255,255,255,0.8)'
       : 'rgba(0,0,0,0.8)',
   },
   helpContainer: {

@@ -76,4 +76,4 @@ When creating or modifying services:
 ## Documentation
 
 - [Services Architecture](../../docs/services_architecture.md)
-- [Integration Patterns](../../docs/integration_patterns.md) 
+- [Integration Patterns](../../docs/integration_patterns.md)

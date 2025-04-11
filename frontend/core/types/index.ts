@@ -32,4 +32,4 @@ export interface EnergyLevel {
     level: number;
     timestamp: Date;
     notes?: string;
-} 
+}

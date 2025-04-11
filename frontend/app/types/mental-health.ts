@@ -185,4 +185,4 @@ export default {
     getMoodLevelLabel,
     getStressLevelLabel,
     getAnxietyLevelLabel,
-}; 
+};

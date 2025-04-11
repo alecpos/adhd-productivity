@@ -11,10 +11,10 @@ interface MentalHealthLogFormProps {
   onSuccess?: () => void;
 }
 
-const MentalHealthLogForm: React.FC<MentalHealthLogFormProps> = ({ 
-  onSubmit, 
+const MentalHealthLogForm: React.FC<MentalHealthLogFormProps> = ({
+  onSubmit,
   quickMode = false,
-  onSuccess 
+  onSuccess
 }) => {
   const [formData, setFormData] = useState<Partial<CreateMentalHealthLog>>({
     moodScore: 3,
@@ -28,7 +28,7 @@ const MentalHealthLogForm: React.FC<MentalHealthLogFormProps> = ({
   const styles = useStyles();
 
   const isFormValid = () => {
-    const isValidScore = (score: number | undefined) => 
+    const isValidScore = (score: number | undefined) =>
       score !== undefined && score >= 0 && score <= 10;
 
     return (
@@ -161,4 +161,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default MentalHealthLogForm; 
+export default MentalHealthLogForm;

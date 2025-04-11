@@ -99,4 +99,4 @@ export const styles = StyleSheet.create({
   divider: {
     marginVertical: 16,
   },
-}); 
+});

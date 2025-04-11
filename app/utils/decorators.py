@@ -24,4 +24,3 @@ def handle_service_error(func: Callable[..., T]) -> Callable[..., T]:
             raise HTTPException(status_code=500, detail=f"Unexpected service error: {str(e)}")
 
     return wrapper
-

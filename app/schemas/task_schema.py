@@ -12,12 +12,12 @@ from app.schemas.shared_components_schema import (
     Break,
     EnvironmentalFactors,
     Interruption,
-    SessionAnalytics
+    SessionAnalytics,
 )
 from app.utils.validation import (
     BaseModelWithValidators,
     validate_dependent_fields,
-    validate_at_least_one_field_present
+    validate_at_least_one_field_present,
 )
 
 
@@ -31,29 +31,29 @@ class TaskSchema(BaseModelWithValidators):
     priority: BlockPriority = Field(default=BlockPriority.MEDIUM)
     status: TaskStatus = Field(default=TaskStatus.TODO)
     block_type: BlockType = Field(default=BlockType.TASK)
-    
+
     # Task requirements
     energy_requirement: Optional[int] = Field(None, ge=1, le=10)
     focus_requirement: Optional[int] = Field(None, ge=1, le=10)
     environmental_requirements: Optional[EnvironmentalFactors] = None
-    
+
     # Scheduling preferences
     preferred_time: Optional[datetime] = None
     is_flexible: bool = True
     buffer_before: Optional[int] = Field(None, ge=0)  # minutes
     buffer_after: Optional[int] = Field(None, ge=0)  # minutes
-    
+
     # Progress tracking
     progress: Optional[float] = Field(None, ge=0, le=1)
     completed_subtasks: Optional[List[str]] = None
     time_spent: Optional[int] = Field(None, ge=0)  # minutes
     completion_date: Optional[datetime] = None
-    
+
     # Performance tracking
     analytics: Optional[SessionAnalytics] = None
     breaks: Optional[List[Break]] = None
     interruptions: Optional[List[Interruption]] = None
-    
+
     # Additional metadata
     parent_task_id: Optional[UUID] = None
     subtask_ids: Optional[List[UUID]] = None
@@ -61,24 +61,17 @@ class TaskSchema(BaseModelWithValidators):
     tags: Optional[List[str]] = None
     location: Optional[str] = None
     meta_data: Optional[Dict[str, Any]] = None
-    
+
     # Validation: If status is "COMPLETED", completion_date should be present
     _validate_completion = validate_dependent_fields(
-        "status", 
-        ["completion_date"], 
-        check_value=TaskStatus.COMPLETED
+        "status", ["completion_date"], check_value=TaskStatus.COMPLETED
     )
-    
+
     # Validation: If breaks are specified, analytics should also be present
-    _validate_analytics = validate_dependent_fields(
-        "breaks", 
-        ["analytics"]
-    )
-    
+    _validate_analytics = validate_dependent_fields("breaks", ["analytics"])
+
     # Validation: Either preferred_time or is_flexible must be provided
-    _validate_scheduling = validate_at_least_one_field_present(
-        ["preferred_time", "is_flexible"]
-    )
+    _validate_scheduling = validate_at_least_one_field_present(["preferred_time", "is_flexible"])
 
 
 class TaskCreate(TaskSchema):
@@ -89,7 +82,7 @@ class TaskCreate(TaskSchema):
 
 class TaskUpdate(BaseModelWithValidators):
     """Schema for updating tasks.
-    
+
     Unlike TaskCreate, all fields are optional for updates.
     """
 
@@ -100,29 +93,29 @@ class TaskUpdate(BaseModelWithValidators):
     priority: Optional[BlockPriority] = None
     status: Optional[TaskStatus] = None
     block_type: Optional[BlockType] = None
-    
+
     # Task requirements
     energy_requirement: Optional[int] = Field(None, ge=1, le=10)
     focus_requirement: Optional[int] = Field(None, ge=1, le=10)
     environmental_requirements: Optional[EnvironmentalFactors] = None
-    
+
     # Scheduling preferences
     preferred_time: Optional[datetime] = None
     is_flexible: Optional[bool] = None
     buffer_before: Optional[int] = Field(None, ge=0)  # minutes
     buffer_after: Optional[int] = Field(None, ge=0)  # minutes
-    
+
     # Progress tracking
     progress: Optional[float] = Field(None, ge=0, le=1)
     completed_subtasks: Optional[List[str]] = None
     time_spent: Optional[int] = Field(None, ge=0)  # minutes
     completion_date: Optional[datetime] = None
-    
+
     # Performance tracking
     analytics: Optional[SessionAnalytics] = None
     breaks: Optional[List[Break]] = None
     interruptions: Optional[List[Interruption]] = None
-    
+
     # Additional metadata
     parent_task_id: Optional[UUID] = None
     subtask_ids: Optional[List[UUID]] = None
@@ -131,19 +124,14 @@ class TaskUpdate(BaseModelWithValidators):
     location: Optional[str] = None
     meta_data: Optional[Dict[str, Any]] = None
     calendar_event_id: Optional[UUID] = None
-    
+
     # Validation: If status is updated to "COMPLETED", completion_date should be present
     _validate_completion = validate_dependent_fields(
-        "status", 
-        ["completion_date"], 
-        check_value=TaskStatus.COMPLETED
+        "status", ["completion_date"], check_value=TaskStatus.COMPLETED
     )
-    
+
     # Validation: If breaks are specified, analytics should also be present
-    _validate_analytics = validate_dependent_fields(
-        "breaks", 
-        ["analytics"]
-    )
+    _validate_analytics = validate_dependent_fields("breaks", ["analytics"])
 
 
 class TaskResponse(TaskSchema):
@@ -191,5 +179,5 @@ __all__ = [
     "TaskUpdate",
     "TaskResponse",
     "TaskStatsSchema",
-    "TaskListResponse"
+    "TaskListResponse",
 ]

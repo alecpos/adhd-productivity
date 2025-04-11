@@ -205,4 +205,4 @@ The ADHD Calendar app relies on several native modules that don't have proper we
 2. **expo-file-system**: Created a mock implementation for web
 3. **Font loading**: Simplified to use system fonts on web
 
-For the best experience, we recommend using the mobile version of the app, but the web version provides a good way to view and interact with the components. 
+For the best experience, we recommend using the mobile version of the app, but the web version provides a good way to view and interact with the components.

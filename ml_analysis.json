@@ -1,0 +1,1560 @@
+[
+  {
+    "file_path": "app/tests/services/body_doubling/test_simple.py",
+    "cyclomatic_complexity": 2.5714285714285716,
+    "maintainability_index": 61.643906528777435,
+    "imports": {
+      "standard_library": [
+        "unittest.mock"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "calculate_trend",
+          "args": 1,
+          "decorators": [],
+          "complexity": 6,
+          "lines": 12,
+          "depth": 1,
+          "path": "calculate_trend"
+        },
+        {
+          "name": "test_calculate_trend_improving",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_improving"
+        },
+        {
+          "name": "test_calculate_trend_declining",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_declining"
+        },
+        {
+          "name": "test_calculate_trend_stable",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_stable"
+        },
+        {
+          "name": "test_calculate_trend_small_changes",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_small_changes"
+        },
+        {
+          "name": "test_calculate_trend_empty",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_empty"
+        },
+        {
+          "name": "test_calculate_trend_single_value",
+          "args": 0,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 1,
+          "path": "test_calculate_trend_single_value"
+        }
+      ],
+      "classes": [],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 53,
+          "end_line": 59,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 62,
+          "end_line": 67,
+          "depth": 3,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 69,
+    "timestamp": "2025-04-01T22:40:33.777538",
+    "technical_debt_scores": {
+      "complexity_score": 0.3673469387755102,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 0.78
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_analytics_direct.py",
+    "cyclomatic_complexity": 2.8947368421052633,
+    "maintainability_index": 54.51154598374295,
+    "imports": {
+      "standard_library": [
+        "unittest",
+        "unittest.mock.AsyncMock",
+        "uuid",
+        "datetime.datetime",
+        "typing.Dict"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 3,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockHTTPException.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockSessionAnalyticsSchema.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockSessionFeedbackSchema.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 2,
+          "path": "AnalyticsService.__init__"
+        },
+        {
+          "name": "_calculate_trend",
+          "args": 2,
+          "decorators": [],
+          "complexity": 6,
+          "lines": 12,
+          "depth": 2,
+          "path": "AnalyticsService._calculate_trend"
+        }
+      ],
+      "classes": [
+        {
+          "name": "MockHTTPException",
+          "methods": 1,
+          "bases": [
+            "Exception"
+          ],
+          "depth": 1,
+          "path": "MockHTTPException"
+        },
+        {
+          "name": "MockSessionStatus",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionStatus"
+        },
+        {
+          "name": "MockSessionType",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionType"
+        },
+        {
+          "name": "MockSessionAnalyticsSchema",
+          "methods": 1,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionAnalyticsSchema"
+        },
+        {
+          "name": "MockSessionFeedbackSchema",
+          "methods": 1,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionFeedbackSchema"
+        },
+        {
+          "name": "AnalyticsService",
+          "methods": 2,
+          "bases": [],
+          "depth": 1,
+          "path": "AnalyticsService"
+        },
+        {
+          "name": "TestAnalyticsService",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "TestAnalyticsService"
+        }
+      ],
+      "nested_depth": 10,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 117,
+          "path": "AnalyticsService._calculate_trend"
+        },
+        {
+          "type": "region",
+          "start_line": 208,
+          "end_line": 214,
+          "depth": 5,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 228,
+          "end_line": 234,
+          "depth": 5,
+          "lines": 7
+        }
+      ]
+    },
+    "lines_of_code": 245,
+    "timestamp": "2025-04-01T22:40:33.791778",
+    "technical_debt_scores": {
+      "complexity_score": 0.4135338345864662,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_analytics_service.py",
+    "cyclomatic_complexity": 4.928571428571429,
+    "maintainability_index": 41.68783443322878,
+    "imports": {
+      "standard_library": [
+        "datetime.datetime",
+        "uuid",
+        "unittest.mock.AsyncMock",
+        "pytest",
+        "fastapi.HTTPException",
+        "sqlalchemy.JSON",
+        "app.models.body_doubling_model.BodyDoublingSessionModel",
+        "app.models.enums_model.ActivityType",
+        "app.services.body_doubling.analytics_service.AnalyticsService"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "mock_db_session",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "mock_db_session"
+        },
+        {
+          "name": "mock_session_manager",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 11,
+          "depth": 1,
+          "path": "mock_session_manager"
+        },
+        {
+          "name": "sample_session",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 19,
+          "depth": 1,
+          "path": "sample_session"
+        },
+        {
+          "name": "all",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockScalars.all"
+        },
+        {
+          "name": "scalars",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalars"
+        },
+        {
+          "name": "all",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockScalars.all"
+        },
+        {
+          "name": "scalars",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalars"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "scalar_one_or_none",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalar_one_or_none"
+        },
+        {
+          "name": "all",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockScalars.all"
+        },
+        {
+          "name": "scalars",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalars"
+        },
+        {
+          "name": "all",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockScalars.all"
+        },
+        {
+          "name": "scalars",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 2,
+          "depth": 3,
+          "path": "MockResult.scalars"
+        }
+      ],
+      "classes": [
+        {
+          "name": "MockScalars",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockScalars"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockScalars",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockScalars"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockScalars",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockScalars"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        },
+        {
+          "name": "MockScalars",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockScalars"
+        },
+        {
+          "name": "MockResult",
+          "methods": 1,
+          "bases": [],
+          "depth": 2,
+          "path": "MockResult"
+        }
+      ],
+      "nested_depth": 12,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 49,
+          "end_line": 67,
+          "depth": 5,
+          "lines": 19
+        },
+        {
+          "type": "region",
+          "start_line": 100,
+          "end_line": 108,
+          "depth": 4,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 115,
+          "end_line": 133,
+          "depth": 4,
+          "lines": 19
+        },
+        {
+          "type": "region",
+          "start_line": 157,
+          "end_line": 165,
+          "depth": 4,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 233,
+          "end_line": 238,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 340,
+          "end_line": 348,
+          "depth": 4,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 355,
+          "end_line": 372,
+          "depth": 4,
+          "lines": 18
+        },
+        {
+          "type": "region",
+          "start_line": 394,
+          "end_line": 402,
+          "depth": 4,
+          "lines": 9
+        }
+      ]
+    },
+    "lines_of_code": 420,
+    "timestamp": "2025-04-01T22:40:34.428797",
+    "technical_debt_scores": {
+      "complexity_score": 0.7040816326530612,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/run_analytics_tests.py",
+    "cyclomatic_complexity": 3.0,
+    "maintainability_index": 53.93565224522577,
+    "imports": {
+      "standard_library": [
+        "os",
+        "sys",
+        "pytest",
+        "asyncio",
+        "unittest.mock.AsyncMock",
+        "uuid",
+        "datetime.datetime",
+        "typing.Dict",
+        "app.services.body_doubling.analytics_service.AnalyticsService"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 3,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 2,
+          "path": "HTTPException.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockSessionAnalyticsSchema.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockSessionFeedbackSchema.__init__"
+        },
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "MockBodyDoublingSessionModel.__init__"
+        },
+        {
+          "name": "mock_db_session",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "mock_db_session"
+        },
+        {
+          "name": "sample_session",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 6,
+          "depth": 1,
+          "path": "sample_session"
+        }
+      ],
+      "classes": [
+        {
+          "name": "HTTPException",
+          "methods": 1,
+          "bases": [
+            "Exception"
+          ],
+          "depth": 1,
+          "path": "HTTPException"
+        },
+        {
+          "name": "MockSessionStatus",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionStatus"
+        },
+        {
+          "name": "MockSessionType",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionType"
+        },
+        {
+          "name": "MockSessionAnalyticsSchema",
+          "methods": 1,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionAnalyticsSchema"
+        },
+        {
+          "name": "MockSessionFeedbackSchema",
+          "methods": 1,
+          "bases": [],
+          "depth": 1,
+          "path": "MockSessionFeedbackSchema"
+        },
+        {
+          "name": "MockBodyDoublingSessionModel",
+          "methods": 1,
+          "bases": [],
+          "depth": 1,
+          "path": "MockBodyDoublingSessionModel"
+        }
+      ],
+      "nested_depth": 13,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 91,
+          "end_line": 113,
+          "depth": 4,
+          "lines": 23
+        },
+        {
+          "type": "region",
+          "start_line": 156,
+          "end_line": 162,
+          "depth": 4,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 198,
+          "end_line": 204,
+          "depth": 4,
+          "lines": 7
+        }
+      ]
+    },
+    "lines_of_code": 211,
+    "timestamp": "2025-04-01T22:40:34.443923",
+    "technical_debt_scores": {
+      "complexity_score": 0.42857142857142855,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_session_manager.py",
+    "cyclomatic_complexity": 3.12,
+    "maintainability_index": 45.41729109817827,
+    "imports": {
+      "standard_library": [
+        "pytest",
+        "datetime.datetime",
+        "unittest.mock.AsyncMock",
+        "uuid.UUID",
+        "fastapi.HTTPException",
+        "sqlalchemy.ext.asyncio.AsyncSession",
+        "sqlalchemy.select",
+        "app.models.body_doubling_model.BodyDoublingSessionModel",
+        "app.models.enums_model.SessionStatus",
+        "app.schemas.body_doubling_schema.CreateBodyDoublingSchema",
+        "app.services.body_doubling.session_manager.SessionManager",
+        "app.services.body_doubling.body_doubling_types.SessionMetaData",
+        "app.utils.route_utils.validation_error"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 2,
+          "depth": 2,
+          "path": "ScalarsMock.__init__"
+        },
+        {
+          "name": "all",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 2,
+          "depth": 2,
+          "path": "ScalarsMock.all"
+        },
+        {
+          "name": "first",
+          "args": 1,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 2,
+          "depth": 2,
+          "path": "ScalarsMock.first"
+        },
+        {
+          "name": "mock_db",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "mock_db"
+        },
+        {
+          "name": "session_manager",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "session_manager"
+        },
+        {
+          "name": "sample_user_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_user_id"
+        },
+        {
+          "name": "sample_session_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_id"
+        },
+        {
+          "name": "sample_session_data",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_data"
+        },
+        {
+          "name": "sample_session",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session"
+        },
+        {
+          "name": "update_metadata",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 3,
+          "path": "TestSessionManager.update_metadata"
+        }
+      ],
+      "classes": [
+        {
+          "name": "ScalarsMock",
+          "methods": 3,
+          "bases": [],
+          "depth": 1,
+          "path": "ScalarsMock"
+        },
+        {
+          "name": "TestSessionManager",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "TestSessionManager"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 243,
+          "path": "TestSessionManager"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 364,
+          "path": "TestSessionManager.update_metadata"
+        },
+        {
+          "type": "region",
+          "start_line": 57,
+          "end_line": 68,
+          "depth": 3,
+          "lines": 12
+        },
+        {
+          "type": "region",
+          "start_line": 72,
+          "end_line": 91,
+          "depth": 3,
+          "lines": 20
+        },
+        {
+          "type": "region",
+          "start_line": 111,
+          "end_line": 118,
+          "depth": 6,
+          "lines": 8
+        },
+        {
+          "type": "region",
+          "start_line": 258,
+          "end_line": 263,
+          "depth": 5,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 464,
+    "timestamp": "2025-04-01T22:40:34.468441",
+    "technical_debt_scores": {
+      "complexity_score": 0.44571428571428573,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_integration.py",
+    "cyclomatic_complexity": 3.736842105263158,
+    "maintainability_index": 43.9408637292107,
+    "imports": {
+      "standard_library": [
+        "pytest",
+        "pytest_asyncio",
+        "datetime.datetime",
+        "uuid.UUID",
+        "fastapi.HTTPException",
+        "sqlalchemy.create_engine",
+        "sqlalchemy.ext.asyncio.AsyncSession",
+        "sqlalchemy.orm.sessionmaker",
+        "app.models.body_doubling_model.BodyDoublingSessionModel",
+        "app.models.enums_model.SessionStatus",
+        "app.schemas.body_doubling_schema.BodyDoublingSchema",
+        "app.services.body_doubling.analytics_service.AnalyticsService",
+        "app.services.body_doubling.body_doubling_service.BodyDoublingService",
+        "app.services.body_doubling.matching_engine.MatchingEngine",
+        "app.services.body_doubling.notification_service.NotificationService",
+        "app.services.body_doubling.session_manager.SessionManager",
+        "app.schemas.body_doubling_schema.CreateBodyDoublingSchema",
+        "app.models.enums_model.SessionStatus"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "user_1_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "user_1_id"
+        },
+        {
+          "name": "user_2_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "user_2_id"
+        },
+        {
+          "name": "sample_session_data",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_data"
+        },
+        {
+          "name": "group_session_data",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "group_session_data"
+        }
+      ],
+      "classes": [
+        {
+          "name": "TestIntegration",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "TestIntegration"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 71,
+          "end_line": 82,
+          "depth": 3,
+          "lines": 12
+        },
+        {
+          "type": "region",
+          "start_line": 86,
+          "end_line": 105,
+          "depth": 3,
+          "lines": 20
+        },
+        {
+          "type": "region",
+          "start_line": 134,
+          "end_line": 140,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 161,
+          "end_line": 166,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 169,
+          "end_line": 176,
+          "depth": 7,
+          "lines": 8
+        },
+        {
+          "type": "region",
+          "start_line": 206,
+          "end_line": 212,
+          "depth": 5,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 223,
+          "end_line": 229,
+          "depth": 4,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 238,
+          "end_line": 246,
+          "depth": 5,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 313,
+          "end_line": 319,
+          "depth": 4,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 324,
+          "end_line": 331,
+          "depth": 5,
+          "lines": 8
+        }
+      ]
+    },
+    "lines_of_code": 380,
+    "timestamp": "2025-04-01T22:40:34.490161",
+    "technical_debt_scores": {
+      "complexity_score": 0.5338345864661654,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_matching_engine.py",
+    "cyclomatic_complexity": 2.1538461538461537,
+    "maintainability_index": 47.36934871878527,
+    "imports": {
+      "standard_library": [
+        "pytest",
+        "datetime.datetime",
+        "unittest.mock.AsyncMock",
+        "uuid.UUID",
+        "fastapi.HTTPException",
+        "sqlalchemy.ext.asyncio.AsyncSession",
+        "app.models.body_doubling_model.BodyDoublingSessionModel",
+        "app.models.enums_model.SessionStatus",
+        "app.services.body_doubling.matching_engine.MatchingEngine",
+        "app.services.body_doubling.session_manager.SessionManager",
+        "sqlalchemy.Update",
+        "sqlalchemy.ext.asyncio.AsyncSession"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "mock_db",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "mock_db"
+        },
+        {
+          "name": "sample_user_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_user_id"
+        },
+        {
+          "name": "sample_match_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_match_id"
+        },
+        {
+          "name": "sample_session_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_id"
+        },
+        {
+          "name": "sample_request_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_request_id"
+        },
+        {
+          "name": "mock_session_manager",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 6,
+          "depth": 1,
+          "path": "mock_session_manager"
+        },
+        {
+          "name": "matching_engine",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "matching_engine"
+        },
+        {
+          "name": "sample_user_prefs",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_user_prefs"
+        },
+        {
+          "name": "sample_match_prefs",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_match_prefs"
+        },
+        {
+          "name": "sample_session",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session"
+        },
+        {
+          "name": "sample_match_session",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_match_session"
+        },
+        {
+          "name": "sample_match_criteria",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_match_criteria"
+        },
+        {
+          "name": "test_score_preferences_match",
+          "args": 4,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 5,
+          "depth": 2,
+          "path": "TestMatchingEngine.test_score_preferences_match"
+        },
+        {
+          "name": "test_score_preferences_match_empty",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 2,
+          "path": "TestMatchingEngine.test_score_preferences_match_empty"
+        },
+        {
+          "name": "test_score_history_compatibility",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 7,
+          "depth": 2,
+          "path": "TestMatchingEngine.test_score_history_compatibility"
+        },
+        {
+          "name": "test_score_history_compatibility_no_history",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 2,
+          "path": "TestMatchingEngine.test_score_history_compatibility_no_history"
+        },
+        {
+          "name": "test_calculate_match_score",
+          "args": 4,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 9,
+          "depth": 2,
+          "path": "TestMatchingEngine.test_calculate_match_score"
+        }
+      ],
+      "classes": [
+        {
+          "name": "TestMatchingEngine",
+          "methods": 5,
+          "bases": [],
+          "depth": 1,
+          "path": "TestMatchingEngine"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 312,
+          "path": "TestMatchingEngine"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 314,
+          "path": "TestMatchingEngine"
+        },
+        {
+          "type": "region",
+          "start_line": 48,
+          "end_line": 53,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 85,
+          "end_line": 102,
+          "depth": 3,
+          "lines": 18
+        },
+        {
+          "type": "region",
+          "start_line": 108,
+          "end_line": 125,
+          "depth": 3,
+          "lines": 18
+        },
+        {
+          "type": "region",
+          "start_line": 252,
+          "end_line": 257,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 295,
+          "end_line": 301,
+          "depth": 5,
+          "lines": 7
+        }
+      ]
+    },
+    "lines_of_code": 389,
+    "timestamp": "2025-04-01T22:40:34.511338",
+    "technical_debt_scores": {
+      "complexity_score": 0.30769230769230765,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "app/tests/services/body_doubling/test_body_doubling_service.py",
+    "cyclomatic_complexity": 1.64,
+    "maintainability_index": 51.65111489264271,
+    "imports": {
+      "standard_library": [
+        "pytest",
+        "datetime.datetime",
+        "unittest.mock.AsyncMock",
+        "uuid.UUID",
+        "fastapi.HTTPException",
+        "sqlalchemy.ext.asyncio.AsyncSession",
+        "app.models.body_doubling_model.BodyDoublingSessionModel",
+        "app.models.enums_model.SessionStatus",
+        "app.schemas.body_doubling_schema.BodyDoublingSchema",
+        "app.services.body_doubling.body_doubling_service.BodyDoublingService",
+        "app.services.body_doubling.analytics_service.AnalyticsService",
+        "app.services.body_doubling.matching_engine.MatchingEngine",
+        "app.services.body_doubling.notification_service.NotificationService",
+        "app.services.body_doubling.session_manager.SessionManager"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "mock_db",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "mock_db"
+        },
+        {
+          "name": "mock_session_manager",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 9,
+          "depth": 1,
+          "path": "mock_session_manager"
+        },
+        {
+          "name": "mock_matching_engine",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "mock_matching_engine"
+        },
+        {
+          "name": "mock_analytics_service",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "mock_analytics_service"
+        },
+        {
+          "name": "mock_notification_service",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 6,
+          "depth": 1,
+          "path": "mock_notification_service"
+        },
+        {
+          "name": "body_doubling_service",
+          "args": 5,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 1,
+          "path": "body_doubling_service"
+        },
+        {
+          "name": "sample_user_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_user_id"
+        },
+        {
+          "name": "sample_session_id",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_id"
+        },
+        {
+          "name": "sample_session_data",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session_data"
+        },
+        {
+          "name": "sample_session",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "sample_session"
+        }
+      ],
+      "classes": [
+        {
+          "name": "TestBodyDoublingService",
+          "methods": 0,
+          "bases": [],
+          "depth": 1,
+          "path": "TestBodyDoublingService"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 75,
+          "end_line": 80,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 97,
+          "end_line": 108,
+          "depth": 3,
+          "lines": 12
+        },
+        {
+          "type": "region",
+          "start_line": 112,
+          "end_line": 124,
+          "depth": 3,
+          "lines": 13
+        },
+        {
+          "type": "region",
+          "start_line": 324,
+          "end_line": 332,
+          "depth": 4,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 349,
+          "end_line": 358,
+          "depth": 5,
+          "lines": 10
+        },
+        {
+          "type": "region",
+          "start_line": 422,
+          "end_line": 430,
+          "depth": 5,
+          "lines": 9
+        }
+      ]
+    },
+    "lines_of_code": 451,
+    "timestamp": "2025-04-01T22:40:34.531150",
+    "technical_debt_scores": {
+      "complexity_score": 0.23428571428571426,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  }
+]

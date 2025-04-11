@@ -13,7 +13,8 @@ from app.models.time_block_model import TimeBlockModel
 from app.services.base_service import BaseService
 from app.utils.metrics import ServiceMetrics
 
-service_metrics = ServiceMetrics('optimizers')
+service_metrics = ServiceMetrics("optimizers")
+
 
 class BaseOptimizerService(BaseService, ABC):
     """Base class for schedule optimizers."""
@@ -24,7 +25,9 @@ class BaseOptimizerService(BaseService, ABC):
         self.metrics = service_metrics
 
     @abstractmethod
-    async def optimize_schedule(self, time_blocks: List[TimeBlockModel], user_preferences: Dict[str, Any]) -> List[TimeBlockModel]:
+    async def optimize_schedule(
+        self, time_blocks: List[TimeBlockModel], user_preferences: Dict[str, Any]
+    ) -> List[TimeBlockModel]:
         """Optimize the schedule based on specific criteria."""
 
     @abstractmethod
@@ -44,7 +47,13 @@ class BaseOptimizerService(BaseService, ABC):
                 return False
         return True
 
-    def _get_available_slots(self, start_time: datetime, end_time: datetime, duration: timedelta, existing_blocks: List[TimeBlockModel]) -> List[datetime]:
+    def _get_available_slots(
+        self,
+        start_time: datetime,
+        end_time: datetime,
+        duration: timedelta,
+        existing_blocks: List[TimeBlockModel],
+    ) -> List[datetime]:
         """Find available time slots between existing blocks."""
         available_slots = []
         current_time = start_time

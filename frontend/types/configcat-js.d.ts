@@ -23,4 +23,4 @@ declare module 'configcat-js' {
   ): IConfigCatClient;
 
   export function createConsoleLogger(level: number): any;
-} 
+}

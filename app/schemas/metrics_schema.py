@@ -11,6 +11,7 @@ from app.schemas.base_schema import BaseSchema
 
 class RouteMetricsSchema(BaseSchema):
     """Schema for route metrics."""
+
     route_id: UUID
     path: str
     method: str
@@ -29,6 +30,7 @@ class RouteMetricsSchema(BaseSchema):
 
 class RouteMetricsListSchema(BaseSchema):
     """Schema for list of route metrics."""
+
     metrics: List[RouteMetricsSchema]
     total_routes: int = Field(..., ge=0)
 
@@ -37,6 +39,7 @@ class RouteMetricsListSchema(BaseSchema):
 
 class RouteMetricsUpdateSchema(BaseSchema):
     """Schema for updating route metrics."""
+
     total_requests: Optional[int] = Field(None, ge=0)
     successful_requests: Optional[int] = Field(None, ge=0)
     failed_requests: Optional[int] = Field(None, ge=0)
@@ -47,4 +50,4 @@ class RouteMetricsUpdateSchema(BaseSchema):
     user_agents: Optional[Dict[str, int]] = None
     ip_addresses: Optional[Dict[str, int]] = None
 
-    model_config = ConfigDict(from_attributes=True) 
+    model_config = ConfigDict(from_attributes=True)

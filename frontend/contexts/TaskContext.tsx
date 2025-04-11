@@ -37,7 +37,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const handleError = (err: unknown, defaultMessage: string) => {
     let errorMessage = defaultMessage;
-    
+
     if (err instanceof Error) {
       errorMessage = err.message;
     } else if (err instanceof AxiosError && err.response?.data) {
@@ -46,7 +46,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         errorMessage = responseData.detail;
       }
     }
-    
+
     setError(errorMessage);
     Alert.alert('Error', errorMessage);
     throw err;
@@ -54,7 +54,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const fetchTasks = useCallback(async () => {
     if (!isAuthenticated || !user?.id) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -74,7 +74,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       Alert.alert('Error', message);
       throw new Error(message);
     }
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -93,12 +93,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const updateTask = async (taskId: string, taskData: Partial<Task>) => {
     if (!isAuthenticated) return;
-    
+
     setLoading(true);
     setError(null);
     try {
       const updatedTask = await taskService.updateTask(taskId, taskData);
-      setTasks(prev => prev.map(task => 
+      setTasks(prev => prev.map(task =>
         task.id === taskId ? updatedTask : task
       ));
       Alert.alert('Success', 'Task updated successfully');
@@ -111,7 +111,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const deleteTask = async (taskId: string) => {
     if (!isAuthenticated) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -127,12 +127,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const completeTask = async (taskId: string, completionNotes?: string) => {
     if (!isAuthenticated) return;
-    
+
     setLoading(true);
     setError(null);
     try {
       const completedTask = await taskService.completeTask(taskId, completionNotes);
-      setTasks(prev => prev.map(task => 
+      setTasks(prev => prev.map(task =>
         task.id === taskId ? completedTask : task
       ));
       await getTaskStats(); // Refresh statistics after completing a task
@@ -146,7 +146,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const getTaskStats = async () => {
     if (!isAuthenticated || !user?.id) return;
-    
+
     try {
       const stats = await taskService.getTaskStatistics();
       setStatistics(stats);

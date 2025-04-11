@@ -10,6 +10,7 @@ from app.schemas.voice_command_schema import (
     TaskCreationCommandSchema,
     ReminderCreationCommandSchema,
 )
+
 logger = logging.getLogger(__name__)
 voice_commands_router = APIRouter(prefix="/voice", tags=["Voice Commands"])
 

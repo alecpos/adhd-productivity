@@ -858,4 +858,4 @@ buffer = client.buffer_calculator.calculate_optimal_buffer(
 )
 
 print(f"Recommended buffer: {buffer.recommended_buffer_minutes} minutes")
-``` 
+```

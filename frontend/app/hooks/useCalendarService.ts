@@ -153,4 +153,4 @@ export function useCalendarService(): CalendarServiceHook {
         connectOutlook,
         sync
     };
-} 
+}

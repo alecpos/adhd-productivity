@@ -119,4 +119,4 @@ const useStyles = makeStyles((theme) => ({
   noPaddingCard: {
     padding: 0,
   },
-})); 
+}));

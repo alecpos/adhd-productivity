@@ -1,4 +1,4 @@
-import type { 
+import type {
   NotificationRequest,
   NotificationResponse,
   NotificationTriggerInput,
@@ -14,21 +14,21 @@ export interface NotificationsModuleType {
   getPermissionsAsync: () => Promise<{ status: 'granted' | 'undetermined' | 'denied' }>;
   requestPermissionsAsync: () => Promise<{ status: 'granted' | 'undetermined' | 'denied' }>;
   setNotificationChannelAsync: (
-    name: string, 
-    config: { 
-      name: string; 
-      importance: AndroidImportance; 
-      vibrationPattern: number[]; 
-      lightColor: string 
+    name: string,
+    config: {
+      name: string;
+      importance: AndroidImportance;
+      vibrationPattern: number[];
+      lightColor: string
     }
   ) => Promise<void>;
   setNotificationHandler: (
-    handler: { 
-      handleNotification: () => Promise<{ 
-        shouldShowAlert: boolean; 
-        shouldPlaySound: boolean; 
-        shouldSetBadge: boolean 
-      }> 
+    handler: {
+      handleNotification: () => Promise<{
+        shouldShowAlert: boolean;
+        shouldPlaySound: boolean;
+        shouldSetBadge: boolean
+      }>
     }
   ) => void;
   getExpoPushTokenAsync: (options: { projectId: string }) => Promise<{ data: string }>;
@@ -48,10 +48,10 @@ export function isNotificationSubscription(value: unknown): value is Notificatio
   );
 }
 
-export type { 
+export type {
   NotificationRequest,
   NotificationResponse,
   NotificationTriggerInput,
   Notification,
   AndroidImportance
-}; 
+};

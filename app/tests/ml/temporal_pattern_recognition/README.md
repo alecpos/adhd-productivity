@@ -118,4 +118,4 @@ The TPR tests are integrated into the CI pipeline with the following stages:
 
 1. **Training Performance**: Full model training tests are skipped in CI due to time constraints
 2. **Federated Learning Simulation**: Limited to 10 simulated clients due to resource constraints
-3. **Long-term Pattern Detection**: Tests for patterns spanning multiple months use synthetic data compression 
+3. **Long-term Pattern Detection**: Tests for patterns spanning multiple months use synthetic data compression

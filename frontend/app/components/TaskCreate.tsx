@@ -54,7 +54,7 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
   // Only fetch default calendar once when component mounts and when online
   useEffect(() => {
     let mounted = true;
-    
+
     const fetchDefaultCalendar = async () => {
       if (isOffline) {
         // Use a temporary ID when offline
@@ -75,7 +75,7 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
         }
       }
     };
-    
+
     if (user) {
       fetchDefaultCalendar();
     }
@@ -211,8 +211,8 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
 
     return (
       <>
-        <TouchableOpacity 
-          style={styles.dateButton} 
+        <TouchableOpacity
+          style={styles.dateButton}
           onPress={() => setShowStartPicker(true)}
         >
           <Text style={styles.dateButtonLabel}>Start Time</Text>
@@ -221,8 +221,8 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.dateButton} 
+        <TouchableOpacity
+          style={styles.dateButton}
           onPress={() => setShowEndPicker(true)}
         >
           <Text style={styles.dateButtonLabel}>End Time</Text>
@@ -268,7 +268,7 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text h4 style={styles.modalTitle}>Add Task</Text>
-          
+
           <Input
             label="Title"
             placeholder="Enter title"
@@ -276,7 +276,7 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
             onChangeText={setTitle}
             errorMessage={error && !title ? error : ''}
           />
-          
+
           <Input
             label="Description"
             placeholder="Enter description"
@@ -289,7 +289,7 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
 
           <View style={styles.dateSection}>
             <Text style={styles.sectionTitle}>Schedule</Text>
-            
+
             {renderDateTimePicker()}
 
             <View style={styles.recurrenceSection}>
@@ -300,9 +300,9 @@ export function TaskCreate({ visible, onClose, initialDate }: TaskCreateProps) {
                 style={styles.picker}
               >
                 {RECURRENCE_OPTIONS.map(option => (
-                  <Picker.Item 
-                    key={option.value} 
-                    label={option.label} 
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
                     value={option.value}
                   />
                 ))}
@@ -413,4 +413,4 @@ const useStyles = makeStyles((theme) => ({
     borderWidth: 1,
     marginTop: 4,
   },
-})); 
+}));

@@ -252,7 +252,7 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
 
   const triggerHaptic = useCallback((intensity: number) => {
     if (Platform.OS === 'web') return;
-    
+
     if (intensity > 0.8) {
       triggerImpactHeavy();
     } else if (intensity > 0.5) {
@@ -328,9 +328,9 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
         isInteracting.value = false;
         return;
       }
-      
+
       const targetOrientation = snapToNearestFace(rotateX.value, rotateY.value);
-      
+
       const springConfig = {
         damping: 15,
         stiffness: 300,
@@ -339,7 +339,7 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
         restSpeedThreshold: 0.01,
         velocity: 0,
       };
-      
+
       rotateX.value = withSpring(targetOrientation.x, springConfig);
       rotateY.value = withSpring(targetOrientation.y, springConfig);
     },
@@ -446,7 +446,7 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const deltaX = x - lastX.value;
     const deltaY = y - lastY.value;
 
@@ -461,17 +461,17 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const deltaX = x - lastX.value;
     const deltaY = y - lastY.value;
-    
+
     const velocityMultiplier = 5; // Increased for web
-    
+
     rotateX.value = withDecay({
       velocity: deltaY * velocityMultiplier,
       deceleration: 0.997,
     });
-    
+
     rotateY.value = withDecay({
       velocity: deltaX * velocityMultiplier,
       deceleration: 0.997,
@@ -480,7 +480,7 @@ export const FidgetCube: React.FC<FidgetCubeProps> = ({
 
   if (Platform.OS === 'web') {
     return (
-      <div 
+      <div
         style={{
           width: size * 1.5,
           height: size * 1.5,

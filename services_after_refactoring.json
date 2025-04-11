@@ -1,0 +1,273 @@
+[
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/services/__init__.py",
+    "cyclomatic_complexity": 0,
+    "maintainability_index": 100.0,
+    "imports": {
+      "standard_library": [],
+      "third_party": [
+        "app.ui.services.sync_service.SyncService",
+        "app.ui.services.sync_task_manager.SyncTaskManager"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [],
+      "classes": [],
+      "nested_depth": 3,
+      "refactoring_candidates": [],
+      "depth_hotspots": []
+    },
+    "lines_of_code": 15,
+    "timestamp": "2025-03-31T19:03:57.537690",
+    "technical_debt_scores": {
+      "complexity_score": 0.0,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.14285714285714285,
+      "structure_score": 0.8571428571428571,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 0.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/services/sync_service.py",
+    "cyclomatic_complexity": 2.125,
+    "maintainability_index": 79.17024293446171,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "datetime.datetime",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolIntegration",
+        "app.ui.services.sync_task_manager.SyncTaskManager"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 2,
+          "path": "SyncService.__init__"
+        },
+        {
+          "name": "_finalize_result",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 18,
+          "depth": 2,
+          "path": "SyncService._finalize_result"
+        }
+      ],
+      "classes": [
+        {
+          "name": "SyncService",
+          "methods": 2,
+          "bases": [],
+          "depth": 1,
+          "path": "SyncService"
+        }
+      ],
+      "nested_depth": 10,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 58,
+          "path": "SyncService"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 65,
+          "path": "SyncService"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 69,
+          "path": "SyncService"
+        },
+        {
+          "type": "region",
+          "start_line": 57,
+          "end_line": 62,
+          "depth": 8,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 90,
+          "end_line": 96,
+          "depth": 7,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 109,
+          "end_line": 115,
+          "depth": 7,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 131,
+          "end_line": 136,
+          "depth": 4,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 175,
+    "timestamp": "2025-03-31T19:03:57.544592",
+    "technical_debt_scores": {
+      "complexity_score": 0.30357142857142855,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.14285714285714285,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/services/sync_task_manager.py",
+    "cyclomatic_complexity": 3.0,
+    "maintainability_index": 65.0845677138156,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolIntegration"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "SyncTaskManager.__init__"
+        },
+        {
+          "name": "_identify_import_tasks",
+          "args": 3,
+          "decorators": [],
+          "complexity": 5,
+          "lines": 22,
+          "depth": 2,
+          "path": "SyncTaskManager._identify_import_tasks"
+        },
+        {
+          "name": "_identify_export_tasks",
+          "args": 3,
+          "decorators": [],
+          "complexity": 6,
+          "lines": 23,
+          "depth": 2,
+          "path": "SyncTaskManager._identify_export_tasks"
+        },
+        {
+          "name": "_handle_task_error",
+          "args": 3,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 10,
+          "depth": 2,
+          "path": "SyncTaskManager._handle_task_error"
+        }
+      ],
+      "classes": [
+        {
+          "name": "SyncTaskManager",
+          "methods": 4,
+          "bases": [],
+          "depth": 1,
+          "path": "SyncTaskManager"
+        }
+      ],
+      "nested_depth": 13,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 120,
+          "path": "SyncTaskManager._identify_import_tasks"
+        },
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 126,
+          "path": "SyncTaskManager._identify_import_tasks"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 152,
+          "path": "SyncTaskManager._identify_export_tasks"
+        },
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 158,
+          "path": "SyncTaskManager._identify_export_tasks"
+        },
+        {
+          "type": "region",
+          "start_line": 180,
+          "end_line": 185,
+          "depth": 6,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 205,
+          "end_line": 210,
+          "depth": 6,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 231,
+          "end_line": 236,
+          "depth": 6,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 256,
+          "end_line": 261,
+          "depth": 6,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 273,
+    "timestamp": "2025-03-31T19:03:57.555778",
+    "technical_debt_scores": {
+      "complexity_score": 0.42857142857142855,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.07142857142857142,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  }
+]

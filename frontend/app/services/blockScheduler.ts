@@ -70,7 +70,7 @@ const blockSchedulerService = {
     formatBlocksForCalendar(blocks: ScheduleBlock[]) {
         return blocks.map(block => ({
             id: block.type === 'focus' ? block.focus_event?.id : block.break_event?.id,
-            title: block.type === 'focus' 
+            title: block.type === 'focus'
                 ? `Focus Session${block.focus_event?.title ? `: ${block.focus_event.title}` : ''}`
                 : `${block.is_long_break ? 'Long Break' : 'Break'} Time`,
             start: new Date(block.start_time),
@@ -87,17 +87,17 @@ const blockSchedulerService = {
         const now = new Date();
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        
+
         // Reset to start of day
         tomorrow.setHours(0, 0, 0, 0);
-        
+
         const suggestedTimes = [];
         for (const hour of preferredHours) {
             const time = new Date(tomorrow);
             time.setHours(hour);
             suggestedTimes.push(time);
         }
-        
+
         return suggestedTimes;
     },
 
@@ -108,7 +108,7 @@ const blockSchedulerService = {
         existingEvents: any[]
     ): Promise<boolean> {
         const endTime = new Date(startTime.getTime() + duration * 60000);
-        
+
         return !existingEvents.some(event => {
             const eventStart = new Date(event.start);
             const eventEnd = new Date(event.end);
@@ -117,4 +117,4 @@ const blockSchedulerService = {
     }
 };
 
-export default blockSchedulerService; 
+export default blockSchedulerService;

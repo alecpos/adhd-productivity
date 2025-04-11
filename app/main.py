@@ -1,57 +1,61 @@
 """Main application module."""
 
-# Import all models first to ensure they are registered with SQLAlchemy
-from app.models.base_model import BaseModel
-from app.models.user_model import UserModel
-from app.models.contact_model import ContactModel
-from app.models.task_category_model import TaskCategoryModel
-from app.models.task_model import TaskModel
-from app.models.reminder_model import ReminderModel
-from app.models.calendar_model import CalendarModel
-from app.models.calendar_event_model import CalendarEventModel
-from app.models.calendar_sync_model import CalendarSyncModel
-from app.models.session_model import SessionModel
-from app.models.scheduling_model import Interruption, Break, WorkHours, ScheduleBlock, SchedulePreferences, EnergyPattern
+# Standard library imports
+import logging
+import sys
+from typing import Dict, Any, Optional
 
+# Third-party imports
+from fastapi import FastAPI, APIRouter, status
 from fastapi.exceptions import RequestValidationError
-from slowapi.errors import RateLimitExceeded
+from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
-from app.database import create_db_and_tables
-from app.routes import api_router as legacy_api_router  # Renamed to avoid conflict
-from app.api.api import api_router as new_api_router  # Import our new API router
-from app.schemas.base_schema import ErrorDetailSchema as ErrorDetail
-from app.utils.exceptions import AuthenticationError, ServiceError
-import logging
-import sys
-from fastapi import FastAPI, APIRouter
-from pydantic import ValidationError
-from typing import Dict, Any, Optional
-from fastapi import status
+# Local application imports - configuration
 from app.core.config import settings
-# Import the database module
+
+# Local application imports - database
 from app.database import create_db_and_tables
-from app.middleware.error_handler import setup_error_handling
+
+# Local application imports - routing
+from app.routes import api_router as legacy_api_router
+from app.api.api import api_router as new_api_router
 from app.routes.example_task_route import router as task_router
 
-logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
-    format=settings.LOG_FORMAT,
-)
-logging.getLogger("uvicorn").setLevel(logging.INFO)
-logging.getLogger("fastapi").setLevel(logging.INFO)
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-logger = logging.getLogger(__name__)
+# Local application imports - middleware
+from app.middleware.error_handler import setup_error_handling
+
+# Local application imports - schemas
+from app.schemas.base_schema import ErrorDetailSchema as ErrorDetail
+
+# Local application imports - utilities
+from app.utils.exceptions import AuthenticationError, ServiceError
+
+
+# Configure logging
+def configure_logging():
+    """Configure application logging."""
+    logging.basicConfig(
+        level=getattr(logging, settings.LOG_LEVEL),
+        format=settings.LOG_FORMAT,
+    )
+    logging.getLogger("uvicorn").setLevel(logging.INFO)
+    logging.getLogger("fastapi").setLevel(logging.INFO)
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+    return logging.getLogger(__name__)
+
+
+# Initialize logger
+logger = configure_logging()
 logger.setLevel(logging.DEBUG)
 
-# Define api_router as an instance of APIRouter
+# Create API router
 app_router = APIRouter()
 
-# Include both legacy and new API routers
-# Example: api_router.include_router(user_router)
 
 def create_error_response_dict(
     code: str, message: str, details: Optional[Dict[str, Any]] = None
@@ -63,20 +67,8 @@ def create_error_response_dict(
     }
 
 
-def create_app() -> FastAPI:
-    """
-    Factory function to create and configure the FastAPI app instance.
-    """
-    app = FastAPI(
-        title=settings.PROJECT_NAME,
-        description="API for ADHD Calendar backend with advanced ML features",
-        version=settings.APP_VERSION,
-        docs_url="/api/docs",
-        redoc_url="/api/redoc",
-        openapi_url="/api/openapi.json",
-    )
-
-    # Set CORS middleware
+def setup_cors(app: FastAPI) -> None:
+    """Configure CORS middleware for the application."""
     if settings.BACKEND_CORS_ORIGINS:
         app.add_middleware(
             CORSMiddleware,
@@ -85,39 +77,36 @@ def create_app() -> FastAPI:
             allow_methods=["*"],
             allow_headers=["*"],
         )
+        logger.info("CORS middleware configured")
 
+
+def setup_routers(app: FastAPI) -> None:
+    """Configure API routers for the application."""
+    # Add legacy router
     logger.info("Including the legacy api_router")
     app.include_router(legacy_api_router, prefix=settings.API_V1_STR)
-    
+
+    # Add new router
     logger.info("Including the new API router")
     app.include_router(new_api_router, prefix=settings.API_V1_STR)
 
-    # Include API routers - commented out as these don't exist in the current structure
-    # app.include_router(auth.router)
-    # app.include_router(users.router)
-    # app.include_router(tasks.router)
-    # app.include_router(calendar.router)
 
-    # Include new API routers for BioAuth and Hyperfold - commented out for testing
-    # if settings.BIOAUTH_ENABLED:
-    #     app.include_router(bioauth.router)
-    # app.include_router(hyperfold.router)
-
+def setup_middleware(app: FastAPI) -> None:
+    """Configure middleware for the application."""
     # Set up error handling middleware
     setup_error_handling(app)
 
-    @app.get("/")
-    async def root():
-        """
-        Root endpoint to provide a welcome message.
-        """
-        logger.info("Root endpoint accessed")
-        return {"message": "Welcome to the ADHD CalendarModelSchemaSchema API"}
+    # Add request logging middleware
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        logger.info(f"Request: {request.method} {request.url}")
+        response = await call_next(request)
+        logger.info(f"Response: Status {response.status_code}")
+        return response
 
-    @app.get("/api/health", tags=["health"])
-    async def health():
-        """Health check endpoint."""
-        return {"status": "ok"}
+
+def setup_exception_handlers(app: FastAPI) -> None:
+    """Configure exception handlers for the application."""
 
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
@@ -131,34 +120,70 @@ def create_app() -> FastAPI:
             },
         )
 
-    @app.middleware("http")
-    async def log_requests(request: Request, call_next):
-        logger.info(f"Request: {request.method} {request.url}")
-        response = await call_next(request)
-        logger.info(f"Response: Status {response.status_code}")
+
+def setup_endpoints(app: FastAPI) -> None:
+    """Configure basic endpoints for the application."""
+
+    @app.get("/")
+    async def root():
+        """Root endpoint to provide a welcome message."""
+        logger.info("Root endpoint accessed")
+        return {"message": "Welcome to the ADHD Calendar API"}
+
+    @app.get("/api/health", tags=["health"])
+    async def health():
+        """Health check endpoint."""
+        return {"status": "ok"}
+
+    @app.get("/health", tags=["Health"])
+    async def health_check():
+        """Health check endpoint."""
+        return {"status": "ok"}
+
+
+def setup_event_handlers(app: FastAPI) -> None:
+    """Configure event handlers for the application."""
 
     @app.on_event("startup")
     async def startup_event():
         logger.info("Starting up and initializing database schema")
         await create_db_and_tables()
-        # await init_db()  # This function doesn't exist
         logger.info("Database initialized")
 
     @app.on_event("shutdown")
     async def shutdown_event():
         logger.info("Shutting down FastAPI application")
 
+
+def create_app() -> FastAPI:
+    """
+    Factory function to create and configure the FastAPI app instance.
+    """
+    # Create FastAPI application
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        description="API for ADHD Calendar backend with advanced ML features",
+        version=settings.APP_VERSION,
+        docs_url="/api/docs",
+        redoc_url="/api/redoc",
+        openapi_url="/api/openapi.json",
+    )
+
+    # Setup application components
+    setup_cors(app)
+    setup_routers(app)
+    setup_middleware(app)
+    setup_exception_handlers(app)
+    setup_endpoints(app)
+    setup_event_handlers(app)
+
     return app
 
 
+# Create the application instance
 app = create_app()
 
 
 def get_app() -> FastAPI:
+    """Return the application instance for ASGI servers."""
     return app
-
-
-@app.get("/health", tags=["Health"])
-async def health_check():
-    """Health check endpoint."""
-    return {"status": "ok"}

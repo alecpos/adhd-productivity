@@ -34,7 +34,9 @@ class ReminderCreate(ReminderBase):
 
     user_id: UUID = Field(..., description="ID of the user creating the reminder")
     contact_id: Optional[UUID] = Field(None, description="Optional associated contact ID")
-    repeat_interval: Optional[str] = Field(None, description="How often to repeat (e.g., 'daily', 'weekly')")
+    repeat_interval: Optional[str] = Field(
+        None, description="How often to repeat (e.g., 'daily', 'weekly')"
+    )
 
 
 class ReminderUpdate(BaseModel):

@@ -26,7 +26,7 @@ export function useTaskOperations(): UseTaskOperationsResult {
     if (user?.id === undefined) {
       return;
     }
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -44,7 +44,7 @@ export function useTaskOperations(): UseTaskOperationsResult {
     if (user?.id === undefined) {
       throw new Error('User not authenticated');
     }
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -67,7 +67,7 @@ export function useTaskOperations(): UseTaskOperationsResult {
     setError(null);
     try {
       const updatedTask = await taskService.updateTask(taskId, taskData);
-      setTasks(prev => prev.map(task => 
+      setTasks(prev => prev.map(task =>
         task.id === taskId ? updatedTask : task
       ));
     } catch (err) {
@@ -99,7 +99,7 @@ export function useTaskOperations(): UseTaskOperationsResult {
     setError(null);
     try {
       const completedTask = await taskService.completeTask(taskId, completionNotes);
-      setTasks(prev => prev.map(task => 
+      setTasks(prev => prev.map(task =>
         task.id === taskId ? completedTask : task
       ));
     } catch (err) {
@@ -121,4 +121,4 @@ export function useTaskOperations(): UseTaskOperationsResult {
     deleteTask,
     completeTask,
   };
-} 
+}

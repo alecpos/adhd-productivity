@@ -180,11 +180,11 @@ describe('TaskService', () => {
 
   it('should fetch tasks', async () => {
     const mockTasks = [{ id: '1', title: 'Test Task' }];
-    
+
     (ApiService.get as jest.Mock).mockResolvedValue(mockTasks);
-    
+
     const tasks = await TaskService.getTasks();
-    
+
     expect(ApiService.get).toHaveBeenCalledWith('/tasks');
     expect(tasks).toEqual(mockTasks);
   });
@@ -207,4 +207,4 @@ When creating services:
 
 - [API Integration](../docs/api_integration.md)
 - [Error Handling](../docs/error_handling.md)
-- [Authentication Flow](../docs/authentication_flow.md) 
+- [Authentication Flow](../docs/authentication_flow.md)

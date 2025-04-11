@@ -12,7 +12,7 @@ from app.schemas.calendar_schema import (
     CalendarEventCreateSchema,
     CalendarEventUpdateSchema,
     CalendarEventResponseSchema,
-    CalendarEventListResponseSchema
+    CalendarEventListResponseSchema,
 )
 from app.services.calendar_service import CalendarService
 
@@ -33,16 +33,11 @@ async def create_calendar_event(
         calendar_service = CalendarService(db)
         created_event = await calendar_service.create_event(event, current_user.id)
         return CalendarEventResponseSchema(
-            success=True,
-            message="Calendar event created successfully",
-            data=created_event
+            success=True, message="Calendar event created successfully", data=created_event
         )
     except Exception as e:
         logger.error(f"Error creating calendar event: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/events", response_model=CalendarEventListResponseSchema)
@@ -57,16 +52,11 @@ async def list_calendar_events(
         calendar_service = CalendarService(db)
         events = await calendar_service.get_events(current_user.id, skip, limit)
         return CalendarEventListResponseSchema(
-            success=True,
-            message="Calendar events retrieved successfully",
-            data=events
+            success=True, message="Calendar events retrieved successfully", data=events
         )
     except Exception as e:
         logger.error(f"Error listing calendar events: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/events/{event_id}", response_model=CalendarEventResponseSchema)
@@ -81,22 +71,16 @@ async def get_calendar_event(
         event = await calendar_service.get_event(event_id, current_user.id)
         if not event:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Calendar event not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Calendar event not found"
             )
         return CalendarEventResponseSchema(
-            success=True,
-            message="Calendar event retrieved successfully",
-            data=event
+            success=True, message="Calendar event retrieved successfully", data=event
         )
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error retrieving calendar event: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.put("/events/{event_id}", response_model=CalendarEventResponseSchema)
@@ -112,22 +96,16 @@ async def update_calendar_event(
         updated_event = await calendar_service.update_event(event_id, event, current_user.id)
         if not updated_event:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Calendar event not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Calendar event not found"
             )
         return CalendarEventResponseSchema(
-            success=True,
-            message="Calendar event updated successfully",
-            data=updated_event
+            success=True, message="Calendar event updated successfully", data=updated_event
         )
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error updating calendar event: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -142,14 +120,10 @@ async def delete_calendar_event(
         deleted = await calendar_service.delete_event(event_id, current_user.id)
         if not deleted:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Calendar event not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Calendar event not found"
             )
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error deleting calendar event: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

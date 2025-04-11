@@ -92,14 +92,14 @@ interface ADHDCalendarDashboardProps {
 
 export const ADHDCalendarDashboard = ({ navigation }: ADHDCalendarDashboardProps) => {
   const [activeFilter, setActiveFilter] = useState<number | null>(null);
-  
+
   const screenWidth = Dimensions.get('window').width;
   const cardWidth = screenWidth < 500 ? screenWidth - 40 : (screenWidth - 60) / 2;
-  
-  const filteredCards = activeFilter 
-    ? featureCards.filter(card => card.epic === activeFilter) 
+
+  const filteredCards = activeFilter
+    ? featureCards.filter(card => card.epic === activeFilter)
     : featureCards;
-  
+
   const handleCardPress = (route: string) => {
     if (navigation) {
       navigation.navigate(route);
@@ -107,14 +107,14 @@ export const ADHDCalendarDashboard = ({ navigation }: ADHDCalendarDashboardProps
       console.log(`Navigate to: ${route}`);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>ADHD Calendar</Text>
         <Text style={styles.subtitle}>All your tools in one place</Text>
       </View>
-      
+
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
@@ -123,7 +123,7 @@ export const ADHDCalendarDashboard = ({ navigation }: ADHDCalendarDashboardProps
           >
             <Text style={[styles.filterText, activeFilter === null && styles.activeFilterText]}>All</Text>
           </TouchableOpacity>
-          
+
           {[1, 2, 3, 4, 5, 6].map(epicNumber => (
             <TouchableOpacity
               key={epicNumber}
@@ -137,7 +137,7 @@ export const ADHDCalendarDashboard = ({ navigation }: ADHDCalendarDashboardProps
           ))}
         </ScrollView>
       </View>
-      
+
       <ScrollView style={styles.cardContainer}>
         <View style={styles.cardGrid}>
           {filteredCards.map(card => (
@@ -156,15 +156,15 @@ export const ADHDCalendarDashboard = ({ navigation }: ADHDCalendarDashboardProps
                       size={24}
                     />
                   </View>
-                  
+
                   <View style={styles.epicBadge}>
                     <Text style={styles.epicText}>Epic {card.epic}</Text>
                   </View>
                 </View>
-                
+
                 <Text style={styles.cardTitle}>{card.title}</Text>
                 <Text style={styles.cardDescription}>{card.description}</Text>
-                
+
                 <View style={styles.cardFooter}>
                   <Text style={styles.openText}>Open</Text>
                   <Icon
@@ -288,4 +288,4 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginRight: 5,
   },
-}); 
+});

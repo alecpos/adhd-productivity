@@ -48,14 +48,14 @@ export const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      
-      <TouchableOpacity 
-        style={[styles.input, ...(error ? [styles.errorInput] : [])]} 
+
+      <TouchableOpacity
+        style={[styles.input, ...(error ? [styles.errorInput] : [])]}
         onPress={() => setShow(true)}
       >
         <Text style={styles.value}>{formatDisplayValue()}</Text>
-        <Icon 
-          name={mode === 'time' ? 'access-time' : 'calendar-today'} 
+        <Icon
+          name={mode === 'time' ? 'access-time' : 'calendar-today'}
           type="material"
           size={20}
           color={styles.icon.color}
@@ -113,4 +113,4 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.fontSize.xs,
     color: theme.colors.error,
   },
-})); 
+}));

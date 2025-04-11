@@ -1,0 +1,1166 @@
+{
+  "summary": {
+    "files_analyzed": 477,
+    "sqlalchemy_files": 159,
+    "adherence_score": 0.11163522012578617,
+    "issues_found": 7,
+    "anti_pattern_counts": {
+      "./app/tests/test_simple_models.py": 1,
+      "./app/tests/test_base_model.py": 1,
+      "./app/tests/test_models.py": 1,
+      "./app/tests/services/body_doubling/test_integration.py": 1,
+      "./app/services/commitment_detection_service.py": 1,
+      "./app/services/smart_reminder_service.py": 1,
+      "./app/services/task_service.py": 1
+    },
+    "modern_pattern_counts": {
+      "./app/database.py": 2,
+      "./app/database/__init__.py": 2,
+      "./app/database/base.py": 1,
+      "./app/core/database/database.py": 1,
+      "./app/core/security/security.py": 1,
+      "./app/tests/conftest.py": 2,
+      "./app/tests/services/body_doubling/test_integration.py": 2,
+      "./app/utils/security.py": 1,
+      "./app/utils/test_factory.py": 1,
+      "./app/models/subscription_model.py": 1,
+      "./app/models/health_model.py": 1,
+      "./app/models/contact_model.py": 1,
+      "./app/models/adhd_settings_model.py": 1,
+      "./app/models/interaction_model.py": 1,
+      "./app/models/interruption_model.py": 1,
+      "./app/models/calendar_model.py": 1,
+      "./app/models/break_model.py": 1,
+      "./app/models/mental_health_model.py": 1,
+      "./app/models/gamification_model.py": 1,
+      "./app/models/user_model.py": 1,
+      "./app/models/body_doubling_model.py": 1,
+      "./app/models/nlp_model.py": 1,
+      "./app/models/task_category_model.py": 1,
+      "./app/models/energy_model.py": 1,
+      "./app/models/session_model.py": 1,
+      "./app/models/base_model.py": 1,
+      "./app/models/scheduling_model.py": 1,
+      "./app/models/task_model.py": 1,
+      "./app/models/hyperfocus_model.py": 1,
+      "./app/models/mixins_model.py": 1,
+      "./app/models/calendar_event_model.py": 1,
+      "./app/models/pomodoro_model.py": 1,
+      "./app/models/shared_model.py": 1,
+      "./app/models/calendar_sync_model.py": 1,
+      "./app/models/time_block_model.py": 1,
+      "./app/models/voice_command_model.py": 1,
+      "./app/models/timeline_model.py": 1,
+      "./app/models/focus_model.py": 1,
+      "./app/models/reminder_model.py": 1,
+      "./app/models/mindfulness_model.py": 1,
+      "./app/models/login_attempt_model.py": 1,
+      "./app/ml/data_collection.py": 1,
+      "./app/ml/stochastic_time_estimation/time_buffer_calculator.py": 1,
+      "./app/ml/stochastic_time_estimation/contextual_stressor_detector.py": 1,
+      "./app/ml/stochastic_time_estimation/bayesian_duration_predictor.py": 1,
+      "./app/ml/stochastic_time_estimation/nlp_complexity_analyzer.py": 1,
+      "./app/api/dependencies.py": 1,
+      "./app/routes/finance_routes.py": 1,
+      "./app/services/auth_service.py": 1,
+      "./app/services/subscription_service.py": 1,
+      "./app/services/time_management_service.py": 1,
+      "./app/services/focus_service.py": 1,
+      "./app/services/task_analyzer_service.py": 1,
+      "./app/services/scheduling_service.py": 1,
+      "./app/services/task_service.py": 1,
+      "./app/services/pomodoro_service.py": 1,
+      "./app/services/nlp_service.py": 1,
+      "./app/services/hyperfocus_service.py": 1,
+      "./app/services/base_service.py": 1,
+      "./app/services/energy_service.py": 1,
+      "./app/services/schedule_optimizer_service.py": 1,
+      "./app/services/productivity_service.py": 1,
+      "./app/services/google_calendar_service.py": 1,
+      "./app/services/gamification_service.py": 1,
+      "./app/services/adhd_settings_service.py": 1,
+      "./app/services/body_doubling/session_manager.py": 1,
+      "./app/services/body_doubling/analytics_service.py": 1
+    }
+  },
+  "analyses": [
+    {
+      "file": "./app/auth.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/database.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        },
+        {
+          "pattern": "proper_session",
+          "title": "Proper Session Handling",
+          "description": "Session properly yielded and closed in finally block"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.5
+    },
+    {
+      "file": "./app/middleware/error_handler.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/database/__init__.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        },
+        {
+          "pattern": "proper_session",
+          "title": "Proper Session Handling",
+          "description": "Session properly yielded and closed in finally block"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.5
+    },
+    {
+      "file": "./app/database/base.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/core/database/database.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/core/security/auth.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/core/security/security.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/tests/conftest.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        },
+        {
+          "pattern": "proper_session",
+          "title": "Proper Session Handling",
+          "description": "Session properly yielded and closed in finally block"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.5
+    },
+    {
+      "file": "./app/tests/patched_test_services.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/test_services.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/factories.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/test_simple_models.py",
+      "anti_patterns": [
+        {
+          "pattern": "legacy_query",
+          "title": "Legacy Query API",
+          "description": "Using deprecated SQLAlchemy Query API instead of select()"
+        }
+      ],
+      "modern_patterns": [],
+      "has_issues": true,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/test_base_model.py",
+      "anti_patterns": [
+        {
+          "pattern": "legacy_query",
+          "title": "Legacy Query API",
+          "description": "Using deprecated SQLAlchemy Query API instead of select()"
+        }
+      ],
+      "modern_patterns": [],
+      "has_issues": true,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/test_models.py",
+      "anti_patterns": [
+        {
+          "pattern": "legacy_query",
+          "title": "Legacy Query API",
+          "description": "Using deprecated SQLAlchemy Query API instead of select()"
+        }
+      ],
+      "modern_patterns": [],
+      "has_issues": true,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/ml/stochastic_time_estimation/test_contextual_stressor_detector.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/services/body_doubling/test_analytics_service.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/services/body_doubling/test_session_manager.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/services/body_doubling/test_integration.py",
+      "anti_patterns": [
+        {
+          "pattern": "hardcoded_conn_string",
+          "title": "Hardcoded Connection String",
+          "description": "Database connection string hardcoded instead of using configuration"
+        }
+      ],
+      "modern_patterns": [
+        {
+          "pattern": "async_engine",
+          "title": "Async Engine",
+          "description": "Using SQLAlchemy async engine"
+        },
+        {
+          "pattern": "proper_session",
+          "title": "Proper Session Handling",
+          "description": "Session properly yielded and closed in finally block"
+        }
+      ],
+      "has_issues": true,
+      "modern_score": 0.5
+    },
+    {
+      "file": "./app/tests/services/body_doubling/test_matching_engine.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/tests/services/body_doubling/test_body_doubling_service.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/utils/security.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/utils/concurrency.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/utils/test_factory.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/utils/decorators.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/models/subscription_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/commitment_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/models/health_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/contact_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/adhd_settings_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/analytics_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/models/interaction_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/interruption_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/calendar_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/break_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/mental_health_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/gamification_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/user_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/body_doubling_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/nlp_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/task_category_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/energy_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/session_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/base_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/auth_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/models/scheduling_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/task_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/hyperfocus_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/mixins_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/calendar_event_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/pomodoro_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/shared_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/calendar_sync_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/time_block_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/voice_command_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/timeline_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/focus_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/declarative_base_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/models/reminder_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/mindfulness_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/models/login_attempt_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "typed_model",
+          "title": "Typed Model Attributes",
+          "description": "Using SQLAlchemy 2.0 typed attributes with Mapped[]"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/schemas/streak_schema.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/schemas/leaderboard_schema.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/ml/data_collection.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/ml/temporal_pattern_recognition.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/ml/stochastic_time_estimation/time_buffer_calculator.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/ml/stochastic_time_estimation/contextual_stressor_detector.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/ml/stochastic_time_estimation/bayesian_duration_predictor.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/ml/stochastic_time_estimation/nlp_complexity_analyzer.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/ml/tests/conftest.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/ml/models/focus_optimizer_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/ml/models/mental_health_optimizer_model.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/deps.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/dependencies.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "proper_session",
+          "title": "Proper Session Handling",
+          "description": "Session properly yielded and closed in finally block"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/api/endpoints/bioauth.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/endpoints/hyperfold.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/endpoints/commitment_detection.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/endpoints/gamification.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/api/endpoints/temporal_pattern_recognition.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/mental_health_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/focus_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/auth.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/gamification_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/scheduling_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/nlp_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/finance_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [
+        {
+          "pattern": "select_2_0",
+          "title": "Modern select() API",
+          "description": "Using SQLAlchemy 2.0 select() API"
+        }
+      ],
+      "has_issues": false,
+      "modern_score": 0.25
+    },
+    {
+      "file": "./app/routes/energy_mapping_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/time_management_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/pomodoro_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/adhd_settings_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/mindfulness_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/task_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/auth_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/timelines_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/body_doubling_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/subscriptions_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/analytics_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/hyperfocus_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/block_scheduler_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    },
+    {
+      "file": "./app/routes/voice_command_routes.py",
+      "anti_patterns": [],
+      "modern_patterns": [],
+      "has_issues": false,
+      "modern_score": 0
+    }
+  ],
+  "debt_items": [
+    {
+      "id": "bb3e2955-4e4c-4f08-8322-34991fcb6387",
+      "category": "Code Quality",
+      "title": "SQLAlchemy: Legacy Query API",
+      "description": "Using deprecated SQLAlchemy Query API instead of select(). Found in 6 files.",
+      "severity": "\ud83d\udfe1 Medium",
+      "status": "Open",
+      "created_at": "2025-04-01T18:40:02.419058",
+      "updated_at": "2025-04-01T18:40:02.419059",
+      "assigned_to": null,
+      "tags": [
+        "sqlalchemy",
+        "database",
+        "legacy_query"
+      ],
+      "impact_areas": [
+        "Maintainability",
+        "Performance"
+      ],
+      "resolution_plan": "Update code to follow SQLAlchemy best practices regarding legacy query api.",
+      "notes": "Detected by SQLAlchemy analyzer on 2025-04-01\n\nAffected files:\n- ./app/tests/test_simple_models.py\n- ./app/tests/test_base_model.py\n- ./app/tests/test_models.py\n- ./app/services/commitment_detection_service.py\n- ./app/services/smart_reminder_service.py\n- ./app/services/task_service.py\n"
+    },
+    {
+      "id": "431441e3-3050-431c-8383-98ad7acecc26",
+      "category": "Code Quality",
+      "title": "SQLAlchemy: Hardcoded Connection String",
+      "description": "Database connection string hardcoded instead of using configuration. Found in 1 files.",
+      "severity": "\ud83d\udfe1 Medium",
+      "status": "Open",
+      "created_at": "2025-04-01T18:40:02.419163",
+      "updated_at": "2025-04-01T18:40:02.419163",
+      "assigned_to": null,
+      "tags": [
+        "sqlalchemy",
+        "database",
+        "hardcoded_conn_string"
+      ],
+      "impact_areas": [
+        "Maintainability",
+        "Performance"
+      ],
+      "resolution_plan": "Update code to follow SQLAlchemy best practices regarding hardcoded connection string.",
+      "notes": "Detected by SQLAlchemy analyzer on 2025-04-01\n\nAffected files:\n- ./app/tests/services/body_doubling/test_integration.py\n"
+    }
+  ]
+}

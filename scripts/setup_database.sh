@@ -16,4 +16,4 @@ createuser -s postgres || true
 # Create database if it doesn't exist
 createdb -O postgres adhd_calendar || true
 
-echo "Database setup complete!" 
+echo "Database setup complete!"

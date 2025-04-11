@@ -1,0 +1,255 @@
+Summary,Issue Type,Description,Priority,Labels,Epic Link,Issue ID,Parent,Assignee,Reporter
+Epic 1: Code Structure Improvements,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 1: Code Structure Improvements",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-1,,alec@apintegrations.com,alec@apintegrations.com
+Reduce excessive nesting depth in database.py,Story,"The current database.py file has a nested depth of 10 (recommended max is 4). Refactor the code by extracting functions and simplifying nested conditionals.
+
+Acceptance Criteria:
+- Reduce nesting depth to maximum of 4 levels
+- Extract helper functions for error handling
+- Maintain all existing functionality
+- Add comprehensive tests for the refactored code
+
+References: IEEE Software Engineering Standards, Code Quality Metrics",Medium,"TechnicalDebt,Refactoring",Epic 1: Code Structure Improvements,TECHDEBT-TASK-1,TECHDEBT-1,alec@apintegrations.com,alec@apintegrations.com
+Refactor main.py to reduce complexity and nesting,Story,"The main.py file has a nested depth of 11 and a dependency score of 1.0 (worst possible). Refactor to improve structure and reduce coupling.
+
+Acceptance Criteria:
+- Reduce nesting depth to maximum of 4 levels
+- Decrease dependency score to below 0.5
+- Maintain all existing functionality
+- Document the refactoring approach
+
+References: IEEE Software Engineering Standards",Medium,"TechnicalDebt,Refactoring",Epic 1: Code Structure Improvements,TECHDEBT-TASK-2,TECHDEBT-1,alec@apintegrations.com,alec@apintegrations.com
+Improve UI component structure in app/ui directory,Story,"UI components in the app/ui directory have nested depths of 12-14, making them difficult to maintain and test. Refactor to improve structure.
+
+Acceptance Criteria:
+- Reduce nesting depth to maximum of 5 levels
+- Break complex components into smaller, more focused ones
+- Create unit tests for refactored components
+- Document the new component architecture
+
+References: Code Quality Metrics (nesting depth < 4 levels)",Medium,"TechnicalDebt,Refactoring",Epic 1: Code Structure Improvements,TECHDEBT-TASK-3,TECHDEBT-1,alec@apintegrations.com,alec@apintegrations.com
+Simplify recursive functions in ML models,Story,"Several ML models have high nesting depths and complex recursive functions. Refactor to improve readability and maintainability.
+
+Acceptance Criteria:
+- Reduce function complexity in ML models
+- Apply functional programming principles where appropriate
+- Document the algorithm changes
+- Maintain or improve model performance
+
+References: IEEE Software Engineering Standards, Cognitive Complexity < 15",Medium,"TechnicalDebt,Refactoring",Epic 1: Code Structure Improvements,TECHDEBT-TASK-4,TECHDEBT-1,alec@apintegrations.com,alec@apintegrations.com
+Epic 2: Task State Machine Improvements,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 2: Task State Machine Improvements",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-2,,alec@apintegrations.com,alec@apintegrations.com
+Complete TaskModel state transition improvements,Story,"Building on recent updates to the TaskState enum and TaskModel, complete the state machine implementation with comprehensive validation and documentation.
+
+Acceptance Criteria:
+- Implement and test all valid state transitions
+- Add proper validation for each transition
+- Update timestamp handling for state changes
+- Create comprehensive documentation
+- Add unit tests for all transition scenarios
+
+References: TaskModel is listed as high priority (🟠) in the debt tracker",Medium,"TechnicalDebt,Refactoring",Epic 2: Task State Machine Improvements,TECHDEBT-TASK-5,TECHDEBT-2,alec@apintegrations.com,alec@apintegrations.com
+Implement TaskState visualization for documentation,Story,"Create a visual representation of the TaskState state machine to improve understanding and documentation of valid transitions.
+
+Acceptance Criteria:
+- Generate state diagram showing all states and transitions
+- Include the diagram in project documentation
+- Document any potential future states
+- Ensure alignment with implementation
+
+References: Documentation Standards (80% coverage target)",Medium,"TechnicalDebt,Refactoring",Epic 2: Task State Machine Improvements,TECHDEBT-TASK-6,TECHDEBT-2,alec@apintegrations.com,alec@apintegrations.com
+Refactor task-related services to use new state machine,Story,"Update all services that interact with TaskModel to properly use the new state machine and transition validation.
+
+Acceptance Criteria:
+- Update TaskService to use TaskState enum
+- Ensure SchedulingService handles task states correctly
+- Add appropriate error handling for invalid transitions
+- Write integration tests for task state transitions
+
+References: 'TaskModel' in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 2: Task State Machine Improvements,TECHDEBT-TASK-7,TECHDEBT-2,alec@apintegrations.com,alec@apintegrations.com
+Epic 3: ML Model Performance Optimization,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 3: ML Model Performance Optimization",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-3,,alec@apintegrations.com,alec@apintegrations.com
+Optimize BayesianDurationPredictor prediction algorithm,Story,"The BayesianDurationPredictor has slow prediction times according to technical debt tracker. Optimize the algorithm to improve performance.
+
+Acceptance Criteria:
+- Reduce prediction time by at least 50%
+- Implement caching for similar predictions
+- Optimize feature engineering steps
+- Maintain prediction accuracy within 5% of original
+- Document optimization approach
+
+References: ML Models section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 3: ML Model Performance Optimization,TECHDEBT-TASK-8,TECHDEBT-3,alec@apintegrations.com,alec@apintegrations.com
+Reduce memory consumption in ContextualStressorDetector,Story,"The ContextualStressorDetector has high memory usage according to the technical debt tracker. Optimize to reduce memory footprint.
+
+Acceptance Criteria:
+- Reduce memory usage by at least 40%
+- Implement more efficient data structures
+- Optimize model architecture
+- Maintain or improve detection accuracy
+- Document memory optimization approach
+
+References: ML Models section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 3: ML Model Performance Optimization,TECHDEBT-TASK-9,TECHDEBT-3,alec@apintegrations.com,alec@apintegrations.com
+Simplify TimeBufferCalculator logic,Story,"The TimeBufferCalculator has complex buffer logic according to technical debt tracker. Simplify to improve maintainability and performance.
+
+Acceptance Criteria:
+- Reduce function complexity metrics
+- Document algorithm improvements
+- Create comprehensive tests
+- Maintain buffer calculation accuracy
+
+References: ML Models section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 3: ML Model Performance Optimization,TECHDEBT-TASK-10,TECHDEBT-3,alec@apintegrations.com,alec@apintegrations.com
+Epic 4: Test Improvements,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 4: Test Improvements",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-4,,alec@apintegrations.com,alec@apintegrations.com
+Refactor test_models.py to reduce complexity,Story,"The test_models.py file has a cyclomatic complexity of 15.4 and very low maintainability (0.11). Refactor to improve readability and maintainability.
+
+Acceptance Criteria:
+- Break down into smaller, focused test files
+- Reduce cyclomatic complexity to < 5.0
+- Improve maintainability index to > 60
+- Maintain or improve test coverage
+- Document test organization
+
+References: Testing section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 4: Test Improvements,TECHDEBT-TASK-11,TECHDEBT-4,alec@apintegrations.com,alec@apintegrations.com
+Refactor test_schemas.py to reduce complexity,Story,"The test_schemas.py file has a complexity of 6.07 and low maintainability (0.14). Refactor to improve readability and maintainability.
+
+Acceptance Criteria:
+- Break down into smaller, focused test files
+- Reduce cyclomatic complexity to < 4.0
+- Improve maintainability index to > 60
+- Use test fixtures to reduce duplication
+- Document test organization
+
+References: Testing section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 4: Test Improvements,TECHDEBT-TASK-12,TECHDEBT-4,alec@apintegrations.com,alec@apintegrations.com
+Fix flaky API tests,Story,"Integration tests for APIs are flaky according to technical debt tracker. Identify and fix race conditions or other issues.
+
+Acceptance Criteria:
+- Identify sources of test flakiness
+- Implement more robust test assertions
+- Add appropriate test timeouts and retries
+- Document testing best practices
+- Achieve 95% consistent test runs
+
+References: Testing section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 4: Test Improvements,TECHDEBT-TASK-13,TECHDEBT-4,alec@apintegrations.com,alec@apintegrations.com
+Implement load testing for critical endpoints,Story,"Missing load testing is listed as a high priority issue in the technical debt tracker. Implement comprehensive load tests for critical API endpoints.
+
+Acceptance Criteria:
+- Set up load testing infrastructure
+- Develop test scenarios for critical endpoints
+- Establish performance baselines
+- Document performance requirements
+- Integrate load tests into CI pipeline
+
+References: Testing section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 4: Test Improvements,TECHDEBT-TASK-14,TECHDEBT-4,alec@apintegrations.com,alec@apintegrations.com
+Epic 5: API Performance and Security,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 5: API Performance and Security",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-5,,alec@apintegrations.com,alec@apintegrations.com
+Optimize API response times,Story,"Current API response time is 350ms (target: <200ms) according to technical debt metrics. Optimize to improve performance.
+
+Acceptance Criteria:
+- Identify slow endpoints through profiling
+- Optimize database queries
+- Implement caching for frequent queries
+- Reduce response time to < 200ms
+- Document optimization approach
+
+References: Performance Debt section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 5: API Performance and Security,TECHDEBT-TASK-15,TECHDEBT-5,alec@apintegrations.com,alec@apintegrations.com
+Add missing security headers,Story,"Missing security headers is listed as a high priority issue in the Infrastructure section. Implement appropriate headers to improve security.
+
+Acceptance Criteria:
+- Add Content-Security-Policy headers
+- Add X-XSS-Protection headers
+- Add X-Content-Type-Options headers
+- Add Strict-Transport-Security headers
+- Document security header implementation
+
+References: Infrastructure section in Technical Debt Tracker, OWASP Guidelines",Medium,"TechnicalDebt,Refactoring",Epic 5: API Performance and Security,TECHDEBT-TASK-16,TECHDEBT-5,alec@apintegrations.com,alec@apintegrations.com
+Implement rate limiting for API endpoints,Story,"Missing rate limiting is listed as a medium priority issue for calendar events. Implement rate limiting for all API endpoints.
+
+Acceptance Criteria:
+- Add rate limiting middleware
+- Configure appropriate limits per endpoint
+- Add proper rate limit headers
+- Document rate limiting policy
+- Test with high-volume requests
+
+References: API Routes section in Technical Debt Tracker, OWASP Guidelines",Medium,"TechnicalDebt,Refactoring",Epic 5: API Performance and Security,TECHDEBT-TASK-17,TECHDEBT-5,alec@apintegrations.com,alec@apintegrations.com
+Epic 6: Model Evolution and Documentation,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 6: Model Evolution and Documentation",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-6,,alec@apintegrations.com,alec@apintegrations.com
+Document ML model architectures,Story,"Missing model architecture docs is listed as a high priority issue. Create comprehensive documentation for all ML models.
+
+Acceptance Criteria:
+- Document architecture of BayesianDurationPredictor
+- Document architecture of NLPComplexityAnalyzer
+- Document architecture of ContextualStressorDetector
+- Document architecture of TimeBufferCalculator
+- Include diagrams and implementation details
+
+References: Documentation section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 6: Model Evolution and Documentation,TECHDEBT-TASK-18,TECHDEBT-6,alec@apintegrations.com,alec@apintegrations.com
+Address model purpose drift in TaskModel,Story,"The TaskModel has drifted from its original purpose according to the Model Evolution section. Evaluate and refactor to align with core needs.
+
+Acceptance Criteria:
+- Analyze current TaskModel usage
+- Identify core vs. extended functionality
+- Propose refactoring to split responsibilities
+- Document model purpose and evolution
+- Create migration plan if needed
+
+References: Model Evolution section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 6: Model Evolution and Documentation,TECHDEBT-TASK-19,TECHDEBT-6,alec@apintegrations.com,alec@apintegrations.com
+Address redundancy between TaskModel and CalendarEventModel,Story,"CalendarEventModel has redundant fields with TaskModel according to technical debt tracker. Refactor to reduce duplication.
+
+Acceptance Criteria:
+- Identify shared fields and functionality
+- Create a common base model or abstraction
+- Update data access patterns
+- Write migration scripts if needed
+- Document the new model relationship
+
+References: Database Models section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 6: Model Evolution and Documentation,TECHDEBT-TASK-20,TECHDEBT-6,alec@apintegrations.com,alec@apintegrations.com
+Update API documentation,Story,"Outdated endpoint documentation is listed as a medium priority issue. Update all API documentation to reflect current functionality.
+
+Acceptance Criteria:
+- Update docs for task-related endpoints
+- Update docs for calendar-related endpoints
+- Update docs for ML-related endpoints
+- Include examples and response formats
+- Implement automatic API documentation generation
+
+References: Documentation section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 6: Model Evolution and Documentation,TECHDEBT-TASK-21,TECHDEBT-6,alec@apintegrations.com,alec@apintegrations.com
+Epic 7: Monitoring and Logging,Epic,"Technical debt reduction focused on improving code quality, performance, and maintainability based on analysis results.
+
+Epic 7: Monitoring and Logging",High,"TechnicalDebt,Refactoring,CodeQuality",,TECHDEBT-7,,alec@apintegrations.com,alec@apintegrations.com
+Implement comprehensive logging,Story,"Insufficient logging is listed as a high priority issue in the Infrastructure section. Implement robust logging across the application.
+
+Acceptance Criteria:
+- Define logging standards and levels
+- Implement structured logging
+- Add context to all log messages
+- Ensure proper error logging
+- Document logging approach
+
+References: Infrastructure section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 7: Monitoring and Logging,TECHDEBT-TASK-22,TECHDEBT-7,alec@apintegrations.com,alec@apintegrations.com
+Set up performance monitoring,Story,"Implement monitoring for API response times, database query times, and overall system health.
+
+Acceptance Criteria:
+- Set up monitoring for API endpoints
+- Set up monitoring for database queries
+- Set up monitoring for ML model performance
+- Create dashboards for key metrics
+- Configure alerts for performance degradation
+
+References: Performance Debt section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 7: Monitoring and Logging,TECHDEBT-TASK-23,TECHDEBT-7,alec@apintegrations.com,alec@apintegrations.com
+Implement automated technical debt tracking,Story,"Set up tools to automatically track technical debt metrics and update the tracker.
+
+Acceptance Criteria:
+- Integrate code quality tools into CI pipeline
+- Generate reports for technical debt metrics
+- Automate updates to technical debt tracker
+- Create dashboards for technical debt trends
+- Document the technical debt tracking process
+
+References: Automation & Tools section in Technical Debt Tracker",Medium,"TechnicalDebt,Refactoring",Epic 7: Monitoring and Logging,TECHDEBT-TASK-24,TECHDEBT-7,alec@apintegrations.com,alec@apintegrations.com

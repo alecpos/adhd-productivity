@@ -30,7 +30,7 @@ export default function MentalHealthTracker() {
   return (
     <View>
       <Text h4>Mental Health Tracking</Text>
-      <MentalHealthLogForm 
+      <MentalHealthLogForm
         onSubmit={handleSubmit}
         quickMode={true}
         onSuccess={() => {}}
@@ -38,4 +38,4 @@ export default function MentalHealthTracker() {
       <MentalHealthInsights userId={user?.id || ''} />
     </View>
   );
-} 
+}

@@ -165,7 +165,7 @@ class CircadianDQNModel:
         self.energy_predictor = EnergyPredictionClient()
         self.target_model = self._build_model()  # Target network for stability
         self.update_target_network()
-        
+
     def _build_model(self):
         model = Sequential()
         model.add(Dense(64, input_dim=self.state_dim, activation='relu'))
@@ -173,28 +173,28 @@ class CircadianDQNModel:
         model.add(Dense(self.action_dim, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.config.learning_rate))
         return model
-        
+
     def create_state_with_circadian_features(self, tasks, time_slots, current_schedule):
         """Creates a state representation including circadian features"""
         base_state = self._create_base_state(tasks, time_slots, current_schedule)
         energy_levels = self.energy_predictor.get_levels(self.user_id, time_slots)
         circadian_features = self._extract_circadian_features(energy_levels)
         return np.concatenate([base_state, circadian_features])
-        
+
     def calculate_circadian_reward(self, task, time_slot):
         """Calculates reward component based on circadian alignment"""
         energy_level = self.energy_predictor.get_level(self.user_id, time_slot)
         task_demand = self._get_task_cognitive_demand(task)
         alignment_score = self._calculate_alignment(energy_level, task_demand)
         return self.config.circadian_weight * alignment_score
-        
+
     def combine_rewards(self, circadian_reward, standard_reward):
         """Combines circadian and standard rewards"""
-        total_reward = (circadian_reward + 
+        total_reward = (circadian_reward +
                        self.config.priority_weight * standard_reward.priority_component +
                        self.config.deadline_weight * standard_reward.deadline_component)
         return total_reward
-        
+
     def update_with_feedback(self, task_id, time_slot, completion_rate, satisfaction):
         """Updates model based on task completion feedback"""
         # Implementation details for incorporating feedback
@@ -223,35 +223,35 @@ class CircadianRhythmModel:
         self.base_parameters = self._load_base_parameters()
         self.user_parameters = self._load_user_parameters()
         self.harmonic_components = self._initialize_harmonic_components()
-        
+
     def predict_energy_levels(self, timestamp):
         """Predicts energy level at a specific timestamp"""
         base_prediction = self._get_base_prediction(timestamp)
         user_adjustment = self._get_user_adjustment(timestamp)
         context_adjustment = self._get_context_adjustment(timestamp)
-        
+
         return {
             'energy_level': base_prediction.energy + user_adjustment.energy + context_adjustment.energy,
             'focus_capacity': base_prediction.focus + user_adjustment.focus + context_adjustment.focus,
             'creative_capacity': base_prediction.creative + user_adjustment.creative + context_adjustment.creative,
             'executive_function_capacity': base_prediction.ef + user_adjustment.ef + context_adjustment.ef
         }
-        
+
     def generate_energy_curve(self, date, resolution_minutes=60):
         """Generates a complete energy curve for a day"""
         timestamps = self._generate_timestamps(date, resolution_minutes)
         predictions = [self.predict_energy_levels(ts) for ts in timestamps]
         return list(zip(timestamps, predictions))
-        
+
     def detect_optimal_windows(self, date, capacity_type, threshold=0.7):
         """Identifies optimal time windows for a specific capacity type"""
         energy_curve = self.generate_energy_curve(date)
         windows = []
         current_window = None
-        
+
         for timestamp, prediction in energy_curve:
             capacity = prediction[capacity_type]
-            
+
             if capacity >= threshold and current_window is None:
                 current_window = {'start': timestamp, 'capacity': capacity}
             elif capacity < threshold and current_window is not None:
@@ -260,10 +260,10 @@ class CircadianRhythmModel:
                     current_window['start'], current_window['end'], capacity_type)
                 windows.append(current_window)
                 current_window = None
-                
+
         return windows
-        
+
     def update_with_reported_level(self, timestamp, reported_levels):
         """Updates model with user-reported energy levels"""
         # Implementation for incorporating user feedback
-``` 
+```

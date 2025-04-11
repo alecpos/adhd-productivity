@@ -59,4 +59,4 @@ export default {
   dismissAllNotificationsAsync,
   getLastNotificationResponseAsync,
   getPresentedNotificationsAsync,
-}; 
+};

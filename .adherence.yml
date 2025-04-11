@@ -1,0 +1,79 @@
+technical_debt:
+  exclude_dirs:
+  - venv
+  - venv-tf
+  - .venv
+  - .git
+  - __pycache__
+  - migrations
+  - node_modules
+  - dist
+  - build
+  - ml/saved_models
+  - tests/htmlcov
+  - alembic/versions
+  - docs/ml_reasoning_templates
+  exclude_files:
+  - '*.min.js'
+  - '*.pyc'
+  - '*.pyo'
+  - '*.pyd'
+  - '*conftest.py'
+  - '*__init__.py'
+  output:
+    format: json
+    include_metrics: true
+    include_source: false
+  rules:
+  - name: Maximum function length
+    pattern: '*.py'
+    max_lines: 50
+    severity: medium
+  - name: Too many imports
+    pattern: '*.py'
+    max_imports: 15
+    severity: medium
+  - name: Maximum nested depth
+    pattern: '*.py'
+    max_nested_depth: 4
+    severity: high
+  - name: Maximum class methods
+    pattern: 'app/models/*.py'
+    max_methods: 15
+    severity: medium
+  - name: Maximum parameters
+    pattern: '*.py'
+    max_parameters: 6
+    severity: medium
+  thresholds:
+    complexity:
+      low: 0.3
+      medium: 0.5
+      high: 0.7
+    maintainability:
+      low: 0.3
+      medium: 0.5
+      high: 0.7
+    dependencies:
+      low: 0.3
+      medium: 0.5
+      high: 0.7
+    structure:
+      low: 0.4
+      medium: 0.6
+      high: 0.8
+  # Custom settings for ADHD Calendar Backend
+  adhd_calendar_settings:
+    # ML code can be more complex due to the nature of machine learning
+    ml_thresholds:
+      complexity:
+        low: 0.4
+        medium: 0.6
+        high: 0.8
+
+    # Priority refactoring areas
+    priority_modules:
+      - app/services/body_doubling_service.py
+      - app/utils/knowledge_graph.py
+      - app/models/task_model.py
+      - app/tests/test_models.py

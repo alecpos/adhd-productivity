@@ -12,9 +12,9 @@ export const useTaskMetrics = (tasks: Task[]) => {
 
     const urgentTasks = tasks.filter(task => (task.urgency || 0) >= 8).length;
     const highImpactTasks = tasks.filter(task => (task.impact || 0) >= 8).length;
-    
+
     const averageEffort = tasks.reduce((sum, task) => sum + (task.effort || 0), 0) / totalTasks || 0;
-    
+
     const overdueTasks = tasks.filter(task => {
       if (!task.due_date) return false;
       const dueDate = new Date(task.due_date);
@@ -62,4 +62,4 @@ export const useTaskMetrics = (tasks: Task[]) => {
     getTaskEfficiencyScore,
     getTaskPriority,
   };
-}; 
+};

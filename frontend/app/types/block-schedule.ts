@@ -29,4 +29,4 @@ export interface SchedulingSuggestion {
     availableBlocks: TimeBlock[];
     decisionTree: SchedulingDecision[];
     confidence: number;
-} 
+}

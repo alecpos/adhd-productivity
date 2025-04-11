@@ -7,7 +7,7 @@ import { LineChart } from 'react-native-chart-kit';
 export function Analytics() {
   const { theme } = useTheme();
   const styles = useStyles();
-  
+
   // Example data - replace with actual data from your backend
   const mentalHealthData = {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],

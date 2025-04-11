@@ -38,7 +38,7 @@ export default function EditTaskScreen() {
       Alert.alert("Error", "User is not logged in.");
       return;
     }
-  
+
     try {
       await axios.put(`http://localhost:8000/tasks/${id}`, {
         ...task,

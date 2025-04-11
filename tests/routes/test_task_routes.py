@@ -63,7 +63,7 @@ def mock_stats(mock_user_id):
         "task_distribution": {status.value: 2 for status in TaskStatus},
         "priority_distribution": {priority.value: 3 for priority in BlockPriority},
         "optimal_completion_times": [
-            {"hour": 9, "count": 3}, 
+            {"hour": 9, "count": 3},
             {"hour": 14, "count": 5}
         ],
         "common_interruptions": [
@@ -96,7 +96,7 @@ def test_client(task_service_mock):
     # Patch the get_current_user dependency
     with patch("app.routes.task_routes.get_current_user") as mock_current_user:
         mock_current_user.return_value = MagicMock(id=UUID("11111111-1111-1111-1111-111111111111"))
-        
+
         # Create the test client
         app = create_application()
         client = TestClient(app)
@@ -144,10 +144,10 @@ def test_get_user_tasks(test_client, mock_auth_headers, task_service_mock, mock_
     mock_tasks = [mock_task for _ in range(5)]
     task_service_mock.get_user_tasks_paginated.return_value = (mock_tasks, len(mock_tasks))
     task_service_mock.get_task_statistics.return_value = {}
-    
+
     # Act
     response = test_client.get("/api/v1/tasks", headers=mock_auth_headers)
-    
+
     # Assert
     items = assert_paginated_response(response, 1, 20, 5)
     assert len(items) == 5
@@ -159,10 +159,10 @@ def test_get_task(test_client, mock_auth_headers, task_service_mock, mock_task, 
     """Test getting a specific task."""
     # Arrange
     task_service_mock.get_task.return_value = mock_task
-    
+
     # Act
     response = test_client.get(f"/api/v1/tasks/{mock_task_id}", headers=mock_auth_headers)
-    
+
     # Assert
     task = assert_successful_response(response)
     assert task["id"] == mock_task_id
@@ -173,10 +173,10 @@ def test_get_nonexistent_task(test_client, mock_auth_headers, task_service_mock,
     """Test getting a task that doesn't exist."""
     # Arrange
     task_service_mock.get_task.return_value = None
-    
+
     # Act
     response = test_client.get(f"/api/v1/tasks/{mock_task_id}", headers=mock_auth_headers)
-    
+
     # Assert
     error = assert_error_response(response, 404, "not_found")
     assert f"task with ID {mock_task_id}" in error["message"]
@@ -195,10 +195,10 @@ def test_create_task(test_client, mock_auth_headers, task_service_mock, mock_tas
         "is_flexible": True
     }
     task_service_mock.create_task.return_value = mock_task
-    
+
     # Act
     response = test_client.post("/api/v1/tasks", json=task_data, headers=mock_auth_headers)
-    
+
     # Assert
     task = assert_successful_response(response, 201)
     assert task["title"] == mock_task["title"]
@@ -216,10 +216,10 @@ def test_update_task(test_client, mock_auth_headers, task_service_mock, mock_tas
     }
     task_service_mock.get_task.return_value = mock_task
     task_service_mock.update_task.return_value = {**mock_task, **update_data}
-    
+
     # Act
     response = test_client.put(f"/api/v1/tasks/{mock_task_id}", json=update_data, headers=mock_auth_headers)
-    
+
     # Assert
     task = assert_successful_response(response)
     assert task["id"] == mock_task_id
@@ -232,10 +232,10 @@ def test_delete_task(test_client, mock_auth_headers, task_service_mock, mock_tas
     """Test deleting a task."""
     # Arrange
     task_service_mock.get_task.return_value = mock_task
-    
+
     # Act
     response = test_client.delete(f"/api/v1/tasks/{mock_task_id}", headers=mock_auth_headers)
-    
+
     # Assert
     assert response.status_code == 204
     assert not response.content  # No content for 204 response
@@ -250,10 +250,10 @@ def test_complete_task(test_client, mock_auth_headers, task_service_mock, mock_t
     completed_task = {**mock_task, "status": TaskStatus.COMPLETED.value}
     task_service_mock.get_task.return_value = mock_task
     task_service_mock.complete_task.return_value = completed_task
-    
+
     # Act
     response = test_client.post(f"/api/v1/tasks/{mock_task_id}/complete", headers=mock_auth_headers)
-    
+
     # Assert
     task = assert_successful_response(response)
     assert task["id"] == mock_task_id
@@ -267,14 +267,14 @@ def test_get_task_statistics(test_client, mock_auth_headers, task_service_mock, 
     """Test getting task statistics."""
     # Arrange
     task_service_mock.get_task_statistics.return_value = mock_stats
-    
+
     # Act
     response = test_client.get("/api/v1/tasks/statistics", headers=mock_auth_headers)
-    
+
     # Assert
     stats = assert_successful_response(response)
     assert stats["total_tasks"] == mock_stats["total_tasks"]
     assert stats["completed_tasks"] == mock_stats["completed_tasks"]
     assert stats["completion_rate"] == mock_stats["completion_rate"]
     # Verify service was called with correct parameters
-    task_service_mock.get_task_statistics.assert_called_once() 
+    task_service_mock.get_task_statistics.assert_called_once()

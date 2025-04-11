@@ -1,6 +1,6 @@
 """Authentication routes."""
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +8,7 @@ from app.core.responses import APIResponse
 from app.core.security import get_current_user
 from app.database import get_db
 from app.models.user_model import User, UserCreate, UserResponse
+from app.schemas.auth_schema import LoginRequest, TokenRefresh, TokenResponse, ResetPasswordRequest
 from app.schemas.auth_schema import LoginRequest, TokenRefresh, TokenResponse
 from app.schemas.user_schema import UserCreateSchema, UserResponseSchema
 from app.services.auth_service import AuthService
@@ -34,8 +35,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @auth_router.post("/token")
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     """Login to get access token."""
     auth_service = AuthService(db)

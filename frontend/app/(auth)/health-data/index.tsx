@@ -30,7 +30,7 @@ export default function HealthDataScreen() {
 
   const handleAddData = async () => {
     if (!user?.id) return;
-    
+
     // Example of adding new health data
     const newData = {
       id: Date.now().toString(),
@@ -77,7 +77,7 @@ export default function HealthDataScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text h3 style={styles.title}>Health Data</Text>
-      
+
       {healthData ? (
         <Card containerStyle={styles.card}>
           <Card.Title>Latest Health Records</Card.Title>
@@ -179,4 +179,4 @@ const useStyles = makeStyles((theme) => ({
     color: theme.colors.grey2,
     lineHeight: theme.fontSize.lg,
   },
-})); 
+}));

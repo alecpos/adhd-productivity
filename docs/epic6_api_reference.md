@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 6 API Reference
 
-**Version**: 1.0  
-**Last Updated**: 2025-03-15  
+**Version**: 1.0
+**Last Updated**: 2025-03-15
 **Target Audience**: Developers integrating with UX components
 
 ## Overview

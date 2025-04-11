@@ -176,4 +176,4 @@ The test suite is continuously enhanced with:
 3. Updated performance benchmarks
 4. Additional integration scenarios
 
-To contribute to the test suite, follow the guidelines in `CONTRIBUTING.md`. 
+To contribute to the test suite, follow the guidelines in `CONTRIBUTING.md`.

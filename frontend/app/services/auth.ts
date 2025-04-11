@@ -109,4 +109,4 @@ export const refreshToken = async (refresh_token: string): Promise<AuthResponse>
     }
     throw new AppError('An unexpected error occurred during token refresh', 'UNKNOWN_ERROR');
   }
-}; 
+};

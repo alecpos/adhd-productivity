@@ -1,0 +1,1644 @@
+[
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_error_handler.py",
+    "cyclomatic_complexity": 1.8125,
+    "maintainability_index": 64.56412655988781,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "traceback",
+        "json",
+        "typing.Dict"
+      ],
+      "third_party": [],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 9,
+          "depth": 2,
+          "path": "JiraErrorHandler.__init__"
+        },
+        {
+          "name": "handle_error",
+          "args": 4,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 15,
+          "depth": 2,
+          "path": "JiraErrorHandler.handle_error"
+        },
+        {
+          "name": "_classify_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 19,
+          "depth": 2,
+          "path": "JiraErrorHandler._classify_error"
+        },
+        {
+          "name": "_is_timeout_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraErrorHandler._is_timeout_error"
+        },
+        {
+          "name": "_is_connection_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraErrorHandler._is_connection_error"
+        },
+        {
+          "name": "_is_json_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraErrorHandler._is_json_error"
+        },
+        {
+          "name": "_is_validation_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraErrorHandler._is_validation_error"
+        },
+        {
+          "name": "_handle_http_error",
+          "args": 3,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 24,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_http_error"
+        },
+        {
+          "name": "_handle_connection_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 16,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_connection_error"
+        },
+        {
+          "name": "_handle_timeout_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 10,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_timeout_error"
+        },
+        {
+          "name": "_handle_json_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 10,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_json_error"
+        },
+        {
+          "name": "_handle_validation_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 9,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_validation_error"
+        },
+        {
+          "name": "_handle_generic_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 9,
+          "depth": 2,
+          "path": "JiraErrorHandler._handle_generic_error"
+        },
+        {
+          "name": "get_error_stats",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 8,
+          "depth": 2,
+          "path": "JiraErrorHandler.get_error_stats"
+        },
+        {
+          "name": "reset_stats",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 2,
+          "path": "JiraErrorHandler.reset_stats"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraErrorHandler",
+          "methods": 15,
+          "bases": [],
+          "depth": 1,
+          "path": "JiraErrorHandler"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [
+        {
+          "type": "class",
+          "name": "JiraErrorHandler",
+          "path": "JiraErrorHandler",
+          "issue": "too_many_methods",
+          "methods": 15,
+          "line": 15
+        }
+      ],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 83,
+          "path": "JiraErrorHandler._classify_error"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 158,
+          "path": "JiraErrorHandler._handle_connection_error"
+        },
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 160,
+          "path": "JiraErrorHandler._handle_connection_error"
+        },
+        {
+          "type": "region",
+          "start_line": 25,
+          "end_line": 36,
+          "depth": 6,
+          "lines": 12
+        },
+        {
+          "type": "region",
+          "start_line": 155,
+          "end_line": 161,
+          "depth": 7,
+          "lines": 7
+        }
+      ]
+    },
+    "lines_of_code": 217,
+    "timestamp": "2025-03-31T18:58:10.892106",
+    "technical_debt_scores": {
+      "complexity_score": 0.25892857142857145,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.0,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.75,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_task_mapper.py",
+    "cyclomatic_complexity": 1.8181818181818181,
+    "maintainability_index": 76.0197805146964,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "typing.Any"
+      ],
+      "third_party": [
+        "app.core.integrations.external_task.ExternalTask",
+        "app.ui.integrations.jira_field_mappers.StatusMapper"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 10,
+          "depth": 2,
+          "path": "JiraTaskMapper.__init__"
+        },
+        {
+          "name": "jira_to_external_task",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 15,
+          "depth": 2,
+          "path": "JiraTaskMapper.jira_to_external_task"
+        },
+        {
+          "name": "external_task_to_jira",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 19,
+          "depth": 2,
+          "path": "JiraTaskMapper.external_task_to_jira"
+        },
+        {
+          "name": "_create_base_jira_fields",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraTaskMapper._create_base_jira_fields"
+        },
+        {
+          "name": "_add_status_field_if_needed",
+          "args": 3,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 6,
+          "depth": 2,
+          "path": "JiraTaskMapper._add_status_field_if_needed"
+        },
+        {
+          "name": "_add_priority_field_if_needed",
+          "args": 3,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 6,
+          "depth": 2,
+          "path": "JiraTaskMapper._add_priority_field_if_needed"
+        },
+        {
+          "name": "_add_date_fields",
+          "args": 3,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 2,
+          "path": "JiraTaskMapper._add_date_fields"
+        },
+        {
+          "name": "map_multiple_issues",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 12,
+          "depth": 2,
+          "path": "JiraTaskMapper.map_multiple_issues"
+        },
+        {
+          "name": "update_custom_field_mappings",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 8,
+          "depth": 2,
+          "path": "JiraTaskMapper.update_custom_field_mappings"
+        },
+        {
+          "name": "get_custom_field_mappings",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 8,
+          "depth": 2,
+          "path": "JiraTaskMapper.get_custom_field_mappings"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraTaskMapper",
+          "methods": 10,
+          "bases": [],
+          "depth": 1,
+          "path": "JiraTaskMapper"
+        }
+      ],
+      "nested_depth": 10,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 118,
+          "path": "JiraTaskMapper._add_status_field_if_needed"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 126,
+          "path": "JiraTaskMapper._add_priority_field_if_needed"
+        },
+        {
+          "type": "region",
+          "start_line": 52,
+          "end_line": 67,
+          "depth": 5,
+          "lines": 16
+        },
+        {
+          "type": "region",
+          "start_line": 106,
+          "end_line": 111,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 122,
+          "end_line": 127,
+          "depth": 3,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 163,
+    "timestamp": "2025-03-31T18:58:10.929316",
+    "technical_debt_scores": {
+      "complexity_score": 0.2597402597402597,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.14285714285714285,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/resilient_jira_api_client.py",
+    "cyclomatic_complexity": 3.3333333333333335,
+    "maintainability_index": 60.38678630173623,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "asyncio",
+        "datetime.datetime",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolConfig",
+        "app.ui.integrations.jira_authenticator.JiraAuthenticator",
+        "app.ui.integrations.jira_error_handler.JiraErrorHandler",
+        "app.ui.integrations.jira_api_client.JiraApiClient"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 7,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 22,
+          "depth": 2,
+          "path": "ResilientJiraApiClient.__init__"
+        },
+        {
+          "name": "_should_retry",
+          "args": 3,
+          "decorators": [],
+          "complexity": 5,
+          "lines": 14,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._should_retry"
+        },
+        {
+          "name": "_is_connection_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 4,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._is_connection_error"
+        },
+        {
+          "name": "_is_rate_limit_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 6,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._is_rate_limit_error"
+        },
+        {
+          "name": "_is_server_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 6,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._is_server_error"
+        },
+        {
+          "name": "_is_timeout_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 4,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._is_timeout_error"
+        },
+        {
+          "name": "_is_circuit_open",
+          "args": 1,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 15,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._is_circuit_open"
+        },
+        {
+          "name": "_increment_circuit_breaker",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 9,
+          "depth": 2,
+          "path": "ResilientJiraApiClient._increment_circuit_breaker"
+        },
+        {
+          "name": "get_health_metrics",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 8,
+          "depth": 2,
+          "path": "ResilientJiraApiClient.get_health_metrics"
+        }
+      ],
+      "classes": [
+        {
+          "name": "ResilientJiraApiClient",
+          "methods": 9,
+          "bases": [
+            "JiraApiClient"
+          ],
+          "depth": 1,
+          "path": "ResilientJiraApiClient"
+        }
+      ],
+      "nested_depth": 12,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 6,
+          "line": 119,
+          "path": "ResilientJiraApiClient"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 236,
+          "path": "ResilientJiraApiClient"
+        },
+        {
+          "type": "region",
+          "start_line": 44,
+          "end_line": 51,
+          "depth": 5,
+          "lines": 8
+        },
+        {
+          "type": "region",
+          "start_line": 158,
+          "end_line": 164,
+          "depth": 4,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 247,
+          "end_line": 252,
+          "depth": 4,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 253,
+    "timestamp": "2025-03-31T18:58:10.960437",
+    "technical_debt_scores": {
+      "complexity_score": 0.4761904761904762,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.2857142857142857,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_field_mappers.py",
+    "cyclomatic_complexity": 2.391304347826087,
+    "maintainability_index": 62.89921415569269,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "datetime.datetime",
+        "typing.Any"
+      ],
+      "third_party": [
+        "app.core.integrations.external_task.ExternalTask"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "jira_to_external",
+          "args": 2,
+          "decorators": [
+            "classmethod"
+          ],
+          "complexity": 2,
+          "lines": 14,
+          "depth": 2,
+          "path": "StatusMapper.jira_to_external"
+        },
+        {
+          "name": "external_to_jira",
+          "args": 2,
+          "decorators": [
+            "classmethod"
+          ],
+          "complexity": 1,
+          "lines": 12,
+          "depth": 2,
+          "path": "StatusMapper.external_to_jira"
+        },
+        {
+          "name": "jira_to_external",
+          "args": 2,
+          "decorators": [
+            "classmethod"
+          ],
+          "complexity": 2,
+          "lines": 14,
+          "depth": 2,
+          "path": "PriorityMapper.jira_to_external"
+        },
+        {
+          "name": "external_to_jira",
+          "args": 2,
+          "decorators": [
+            "classmethod"
+          ],
+          "complexity": 1,
+          "lines": 12,
+          "depth": 2,
+          "path": "PriorityMapper.external_to_jira"
+        },
+        {
+          "name": "parse_jira_date",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 4,
+          "lines": 21,
+          "depth": 2,
+          "path": "DateFormatter.parse_jira_date"
+        },
+        {
+          "name": "format_date_for_jira",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 3,
+          "lines": 18,
+          "depth": 2,
+          "path": "DateFormatter.format_date_for_jira"
+        },
+        {
+          "name": "extract_status",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 2,
+          "lines": 6,
+          "depth": 2,
+          "path": "FieldExtractor.extract_status"
+        },
+        {
+          "name": "extract_priority",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 2,
+          "lines": 6,
+          "depth": 2,
+          "path": "FieldExtractor.extract_priority"
+        },
+        {
+          "name": "extract_assignee",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 3,
+          "lines": 7,
+          "depth": 2,
+          "path": "FieldExtractor.extract_assignee"
+        },
+        {
+          "name": "extract_project_key",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 2,
+          "lines": 5,
+          "depth": 2,
+          "path": "FieldExtractor.extract_project_key"
+        },
+        {
+          "name": "extract_project_name",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 2,
+          "lines": 5,
+          "depth": 2,
+          "path": "FieldExtractor.extract_project_name"
+        },
+        {
+          "name": "get_issue_url",
+          "args": 1,
+          "decorators": [
+            "staticmethod"
+          ],
+          "complexity": 3,
+          "lines": 9,
+          "depth": 2,
+          "path": "FieldExtractor.get_issue_url"
+        },
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 9,
+          "depth": 2,
+          "path": "CustomFieldMapper.__init__"
+        },
+        {
+          "name": "map_jira_to_adhd",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 15,
+          "depth": 2,
+          "path": "CustomFieldMapper.map_jira_to_adhd"
+        },
+        {
+          "name": "map_adhd_to_jira",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 15,
+          "depth": 2,
+          "path": "CustomFieldMapper.map_adhd_to_jira"
+        },
+        {
+          "name": "update_mappings",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 9,
+          "depth": 2,
+          "path": "CustomFieldMapper.update_mappings"
+        },
+        {
+          "name": "get_mappings",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 8,
+          "depth": 2,
+          "path": "CustomFieldMapper.get_mappings"
+        },
+        {
+          "name": "clear_mappings",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 2,
+          "path": "CustomFieldMapper.clear_mappings"
+        }
+      ],
+      "classes": [
+        {
+          "name": "StatusMapper",
+          "methods": 2,
+          "bases": [],
+          "depth": 1,
+          "path": "StatusMapper"
+        },
+        {
+          "name": "PriorityMapper",
+          "methods": 2,
+          "bases": [],
+          "depth": 1,
+          "path": "PriorityMapper"
+        },
+        {
+          "name": "DateFormatter",
+          "methods": 2,
+          "bases": [],
+          "depth": 1,
+          "path": "DateFormatter"
+        },
+        {
+          "name": "FieldExtractor",
+          "methods": 6,
+          "bases": [],
+          "depth": 1,
+          "path": "FieldExtractor"
+        },
+        {
+          "name": "CustomFieldMapper",
+          "methods": 6,
+          "bases": [],
+          "depth": 1,
+          "path": "CustomFieldMapper"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 141,
+          "path": "DateFormatter.parse_jira_date"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 250,
+          "path": "CustomFieldMapper.map_jira_to_adhd"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 268,
+          "path": "CustomFieldMapper.map_adhd_to_jira"
+        },
+        {
+          "type": "region",
+          "start_line": 20,
+          "end_line": 29,
+          "depth": 3,
+          "lines": 10
+        },
+        {
+          "type": "region",
+          "start_line": 74,
+          "end_line": 79,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 83,
+          "end_line": 88,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 175,
+          "end_line": 180,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 182,
+          "end_line": 187,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 189,
+          "end_line": 195,
+          "depth": 3,
+          "lines": 7
+        }
+      ]
+    },
+    "lines_of_code": 295,
+    "timestamp": "2025-03-31T18:58:10.977397",
+    "technical_debt_scores": {
+      "complexity_score": 0.3416149068322981,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.07142857142857142,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/__init__.py",
+    "cyclomatic_complexity": 0,
+    "maintainability_index": 100.0,
+    "imports": {
+      "standard_library": [],
+      "third_party": [
+        "app.ui.integrations.jira_integration.JiraIntegration",
+        "app.ui.integrations.jira_authenticator.JiraAuthenticator",
+        "app.ui.integrations.jira_task_mapper.JiraTaskMapper",
+        "app.ui.integrations.jira_query_builder.JiraQueryBuilder",
+        "app.ui.integrations.jira_api_client.JiraApiClient",
+        "app.ui.integrations.resilient_jira_api_client.ResilientJiraApiClient",
+        "app.ui.integrations.jira_error_handler.JiraErrorHandler",
+        "app.ui.integrations.jira_field_mappers.StatusMapper"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [],
+      "classes": [],
+      "nested_depth": 3,
+      "refactoring_candidates": [],
+      "depth_hotspots": []
+    },
+    "lines_of_code": 33,
+    "timestamp": "2025-03-31T18:58:10.981139",
+    "technical_debt_scores": {
+      "complexity_score": 0.0,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.5714285714285714,
+      "structure_score": 0.8571428571428571,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 0.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_integration.py",
+    "cyclomatic_complexity": 2.3636363636363638,
+    "maintainability_index": 71.18886126099005,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "traceback",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolIntegration",
+        "app.ui.integrations.jira_authenticator.JiraAuthenticator",
+        "app.ui.integrations.jira_task_mapper.JiraTaskMapper",
+        "app.ui.integrations.jira_query_builder.JiraQueryBuilder",
+        "app.ui.integrations.resilient_jira_api_client.ResilientJiraApiClient",
+        "app.ui.integrations.jira_error_handler.JiraErrorHandler"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 13,
+          "depth": 2,
+          "path": "JiraIntegration.__init__"
+        },
+        {
+          "name": "_create_external_task_from_result",
+          "args": 3,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 15,
+          "depth": 2,
+          "path": "JiraIntegration._create_external_task_from_result"
+        },
+        {
+          "name": "get_health_metrics",
+          "args": 1,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 8,
+          "depth": 2,
+          "path": "JiraIntegration.get_health_metrics"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraIntegration",
+          "methods": 3,
+          "bases": [
+            "ProjectToolIntegration"
+          ],
+          "depth": 1,
+          "path": "JiraIntegration"
+        }
+      ],
+      "nested_depth": 12,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 92,
+          "path": "JiraIntegration"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 180,
+          "path": "JiraIntegration"
+        },
+        {
+          "type": "region",
+          "start_line": 38,
+          "end_line": 43,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 145,
+          "end_line": 151,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 160,
+          "end_line": 166,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 204,
+          "end_line": 217,
+          "depth": 5,
+          "lines": 14
+        },
+        {
+          "type": "region",
+          "start_line": 227,
+          "end_line": 232,
+          "depth": 4,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 234,
+    "timestamp": "2025-03-31T18:58:10.994523",
+    "technical_debt_scores": {
+      "complexity_score": 0.33766233766233766,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.42857142857142855,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_api_client.py",
+    "cyclomatic_complexity": 2.2857142857142856,
+    "maintainability_index": 64.17953943475216,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "traceback",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolConfig",
+        "app.ui.integrations.jira_authenticator.JiraAuthenticator",
+        "app.ui.integrations.jira_error_handler.JiraErrorHandler"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 3,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 11,
+          "depth": 2,
+          "path": "JiraApiClient.__init__"
+        },
+        {
+          "name": "_get_mock_response",
+          "args": 2,
+          "decorators": [],
+          "complexity": 8,
+          "lines": 24,
+          "depth": 2,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "name": "_create_mock_resource",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraApiClient._create_mock_resource"
+        },
+        {
+          "name": "_update_mock_resource",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 5,
+          "depth": 2,
+          "path": "JiraApiClient._update_mock_resource"
+        },
+        {
+          "name": "_get_mock_issues",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraApiClient._get_mock_issues"
+        },
+        {
+          "name": "_get_mock_projects",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 3,
+          "depth": 2,
+          "path": "JiraApiClient._get_mock_projects"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraApiClient",
+          "methods": 6,
+          "bases": [],
+          "depth": 1,
+          "path": "JiraApiClient"
+        }
+      ],
+      "nested_depth": 11,
+      "refactoring_candidates": [
+        {
+          "type": "function",
+          "name": "_get_mock_response",
+          "path": "JiraApiClient._get_mock_response",
+          "issue": "high_complexity",
+          "complexity": 8,
+          "lines": 24,
+          "line": 191
+        }
+      ],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 70,
+          "path": "JiraApiClient"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 206,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 208,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "type": "If",
+          "depth": 6,
+          "line": 210,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 212,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "type": "If",
+          "depth": 5,
+          "line": 214,
+          "path": "JiraApiClient._get_mock_response"
+        },
+        {
+          "type": "region",
+          "start_line": 46,
+          "end_line": 52,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 66,
+          "end_line": 74,
+          "depth": 3,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 88,
+          "end_line": 93,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 108,
+          "end_line": 113,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 127,
+          "end_line": 133,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 144,
+          "end_line": 149,
+          "depth": 3,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 177,
+          "end_line": 182,
+          "depth": 4,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 205,
+          "end_line": 215,
+          "depth": 5,
+          "lines": 11
+        },
+        {
+          "type": "region",
+          "start_line": 230,
+          "end_line": 246,
+          "depth": 6,
+          "lines": 17
+        }
+      ]
+    },
+    "lines_of_code": 256,
+    "timestamp": "2025-03-31T18:58:11.007654",
+    "technical_debt_scores": {
+      "complexity_score": 0.32653061224489793,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.21428571428571427,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.5333333333333333,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_query_builder.py",
+    "cyclomatic_complexity": 2.375,
+    "maintainability_index": 71.86210915403167,
+    "imports": {
+      "standard_library": [
+        "logging",
+        "typing.List",
+        "datetime.datetime"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolConfig"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "build_jql_query",
+          "args": 2,
+          "decorators": [],
+          "complexity": 5,
+          "lines": 24,
+          "depth": 2,
+          "path": "JiraQueryBuilder.build_jql_query"
+        },
+        {
+          "name": "_build_project_clause",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 14,
+          "depth": 2,
+          "path": "JiraQueryBuilder._build_project_clause"
+        },
+        {
+          "name": "_build_label_clause",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 14,
+          "depth": 2,
+          "path": "JiraQueryBuilder._build_label_clause"
+        },
+        {
+          "name": "_build_updated_clause",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 12,
+          "depth": 2,
+          "path": "JiraQueryBuilder._build_updated_clause"
+        },
+        {
+          "name": "_add_ordering",
+          "args": 2,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 14,
+          "depth": 2,
+          "path": "JiraQueryBuilder._add_ordering"
+        },
+        {
+          "name": "build_single_issue_query",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 11,
+          "depth": 2,
+          "path": "JiraQueryBuilder.build_single_issue_query"
+        },
+        {
+          "name": "build_status_change_query",
+          "args": 4,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 14,
+          "depth": 2,
+          "path": "JiraQueryBuilder.build_status_change_query"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraQueryBuilder",
+          "methods": 7,
+          "bases": [],
+          "depth": 1,
+          "path": "JiraQueryBuilder"
+        }
+      ],
+      "nested_depth": 9,
+      "refactoring_candidates": [],
+      "depth_hotspots": []
+    },
+    "lines_of_code": 146,
+    "timestamp": "2025-03-31T18:58:11.015847",
+    "technical_debt_scores": {
+      "complexity_score": 0.3392857142857143,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.07142857142857142,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 0.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/jira_authenticator.py",
+    "cyclomatic_complexity": 2.8125,
+    "maintainability_index": 57.05406206508999,
+    "imports": {
+      "standard_library": [
+        "base64",
+        "logging",
+        "time",
+        "typing.Dict"
+      ],
+      "third_party": [
+        "app.core.integrations.project_tool_config.ProjectToolConfig"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "__init__",
+          "args": 2,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 13,
+          "depth": 2,
+          "path": "JiraAuthenticator.__init__"
+        },
+        {
+          "name": "_authenticate_basic",
+          "args": 1,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 12,
+          "depth": 2,
+          "path": "JiraAuthenticator._authenticate_basic"
+        },
+        {
+          "name": "_authenticate_token",
+          "args": 1,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 12,
+          "depth": 2,
+          "path": "JiraAuthenticator._authenticate_token"
+        },
+        {
+          "name": "_set_auth_credentials",
+          "args": 4,
+          "decorators": [],
+          "complexity": 2,
+          "lines": 22,
+          "depth": 2,
+          "path": "JiraAuthenticator._set_auth_credentials"
+        },
+        {
+          "name": "get_auth_headers",
+          "args": 1,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 15,
+          "depth": 2,
+          "path": "JiraAuthenticator.get_auth_headers"
+        },
+        {
+          "name": "_get_auth_header_value",
+          "args": 1,
+          "decorators": [],
+          "complexity": 4,
+          "lines": 15,
+          "depth": 2,
+          "path": "JiraAuthenticator._get_auth_header_value"
+        },
+        {
+          "name": "_is_token_valid",
+          "args": 1,
+          "decorators": [],
+          "complexity": 5,
+          "lines": 16,
+          "depth": 2,
+          "path": "JiraAuthenticator._is_token_valid"
+        },
+        {
+          "name": "invalidate_token",
+          "args": 1,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 9,
+          "depth": 2,
+          "path": "JiraAuthenticator.invalidate_token"
+        },
+        {
+          "name": "handle_auth_error",
+          "args": 2,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 20,
+          "depth": 2,
+          "path": "JiraAuthenticator.handle_auth_error"
+        },
+        {
+          "name": "get_status",
+          "args": 1,
+          "decorators": [],
+          "complexity": 5,
+          "lines": 11,
+          "depth": 2,
+          "path": "JiraAuthenticator.get_status"
+        },
+        {
+          "name": "get_health_metrics",
+          "args": 1,
+          "decorators": [],
+          "complexity": 3,
+          "lines": 8,
+          "depth": 2,
+          "path": "JiraAuthenticator.get_health_metrics"
+        }
+      ],
+      "classes": [
+        {
+          "name": "JiraAuthenticator",
+          "methods": 11,
+          "bases": [],
+          "depth": 1,
+          "path": "JiraAuthenticator"
+        }
+      ],
+      "nested_depth": 12,
+      "refactoring_candidates": [
+        {
+          "type": "class",
+          "name": "JiraAuthenticator",
+          "path": "JiraAuthenticator",
+          "issue": "too_many_methods",
+          "methods": 11,
+          "line": 18
+        }
+      ],
+      "depth_hotspots": [
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 80,
+          "path": "JiraAuthenticator"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 189,
+          "path": "JiraAuthenticator._get_auth_header_value"
+        },
+        {
+          "type": "If",
+          "depth": 4,
+          "line": 255,
+          "path": "JiraAuthenticator.handle_auth_error"
+        },
+        {
+          "type": "region",
+          "start_line": 33,
+          "end_line": 38,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 83,
+          "end_line": 88,
+          "depth": 7,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 133,
+          "end_line": 142,
+          "depth": 3,
+          "lines": 10
+        },
+        {
+          "type": "region",
+          "start_line": 250,
+          "end_line": 258,
+          "depth": 5,
+          "lines": 9
+        },
+        {
+          "type": "region",
+          "start_line": 273,
+          "end_line": 280,
+          "depth": 4,
+          "lines": 8
+        }
+      ]
+    },
+    "lines_of_code": 295,
+    "timestamp": "2025-03-31T18:58:11.030934",
+    "technical_debt_scores": {
+      "complexity_score": 0.4017857142857143,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.07142857142857142,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.55,
+      "nesting_score": 1.0
+    }
+  },
+  {
+    "file_path": "/Users/alecposner/Documents/adhd_calendar_backend/app/ui/integrations/tests/test_jira_integration.py",
+    "cyclomatic_complexity": 3.7,
+    "maintainability_index": 57.24617744218074,
+    "imports": {
+      "standard_library": [
+        "pytest",
+        "asyncio",
+        "datetime.datetime",
+        "unittest.mock.Mock"
+      ],
+      "third_party": [
+        "app.ui.project_management_integration.ProjectToolConfig",
+        "app.ui.integrations.jira_integration.JiraIntegration"
+      ],
+      "local": []
+    },
+    "structure": {
+      "functions": [
+        {
+          "name": "jira_config",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "jira_config"
+        },
+        {
+          "name": "mock_jira_issue",
+          "args": 0,
+          "decorators": [],
+          "complexity": 1,
+          "lines": 4,
+          "depth": 1,
+          "path": "mock_jira_issue"
+        }
+      ],
+      "classes": [],
+      "nested_depth": 8,
+      "refactoring_candidates": [],
+      "depth_hotspots": [
+        {
+          "type": "region",
+          "start_line": 98,
+          "end_line": 105,
+          "depth": 5,
+          "lines": 8
+        },
+        {
+          "type": "region",
+          "start_line": 114,
+          "end_line": 120,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 134,
+          "end_line": 139,
+          "depth": 5,
+          "lines": 6
+        },
+        {
+          "type": "region",
+          "start_line": 148,
+          "end_line": 154,
+          "depth": 3,
+          "lines": 7
+        },
+        {
+          "type": "region",
+          "start_line": 168,
+          "end_line": 173,
+          "depth": 5,
+          "lines": 6
+        }
+      ]
+    },
+    "lines_of_code": 237,
+    "timestamp": "2025-03-31T18:58:11.192220",
+    "technical_debt_scores": {
+      "complexity_score": 0.5285714285714286,
+      "maintainability_score": 0.0,
+      "dependency_score": 0.14285714285714285,
+      "structure_score": 1.0,
+      "function_complexity_score": 0.0,
+      "class_design_score": 0.0,
+      "nesting_score": 1.0
+    }
+  }
+]

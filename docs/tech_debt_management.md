@@ -359,4 +359,4 @@ We plan to enhance the technical debt management system with:
 - Automated detection of common ML-specific debt patterns
 - Team-level debt ownership and accountability
 - Technical debt budgeting and quotas
-- Advanced impact analysis tools 
+- Advanced impact analysis tools

@@ -5,9 +5,9 @@ import { Platform } from 'react-native';
 
 import api from './api';
 
-import type { 
-    CalendarEvent, 
-    Reminder, 
+import type {
+    CalendarEvent,
+    Reminder,
     CalendarSettings,
     TimeBlock,
     ScheduleStats,
@@ -172,11 +172,11 @@ class CalendarService {
     ): Promise<CalendarEvent[]> {
         try {
             const response = await api.get<CalendarEvent[]>('/calendar/events', {
-                params: { 
+                params: {
                     user_id: userId,
                     start_date: startDate?.toISOString(),
                     end_date: endDate?.toISOString(),
-                    include_external: includeExternal 
+                    include_external: includeExternal
                 }
             });
             return response.data;
@@ -316,7 +316,7 @@ class CalendarService {
     // Block Scheduling
     async scheduleBlocks(userId: string, blocks: TimeBlock[]): Promise<void> {
         try {
-            await api.post('/calendar/schedule-blocks', { 
+            await api.post('/calendar/schedule-blocks', {
                 user_id: userId,
                 blocks: blocks.map(block => ({
                     ...block,
@@ -419,4 +419,4 @@ class CalendarService {
 }
 
 export const calendarService = CalendarService.getInstance();
-export default CalendarService; 
+export default CalendarService;

@@ -79,7 +79,7 @@ class TimeBlockListResponse(BaseModel):
 
 class TimePreferences(BaseModel):
     """Schema for user time management preferences."""
-    
+
     user_id: UUID
     preferred_start_time: Optional[datetime] = None
     preferred_end_time: Optional[datetime] = None
@@ -92,14 +92,18 @@ class TimePreferences(BaseModel):
     @classmethod
     def validate_preferred_end_time(cls, v: Optional[datetime], info: Any) -> Optional[datetime]:
         """Validate preferred end time is after preferred start time if both are provided."""
-        if v is not None and info.data.get("preferred_start_time") and v <= info.data["preferred_start_time"]:
+        if (
+            v is not None
+            and info.data.get("preferred_start_time")
+            and v <= info.data["preferred_start_time"]
+        ):
             raise ValueError("Preferred end time must be after preferred start time")
         return v
 
 
 class TimeAnalytics(BaseModel):
     """Schema for analyzing time block usage."""
-    
+
     user_id: UUID
     total_blocks: int
     total_time_spent: timedelta
@@ -108,7 +112,7 @@ class TimeAnalytics(BaseModel):
     priority_distribution: Dict[str, int] = Field(default_factory=dict)
     active_days: List[str] = Field(default_factory=list)  # List of active days in a week
     productivity_score: Optional[float] = None
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

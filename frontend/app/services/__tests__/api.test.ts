@@ -83,4 +83,4 @@ describe('API Client', () => {
     expect(api.defaults.headers.Authorization).toBe('Bearer test-token');
     expect(response.data.success).toBe(true);
   });
-}); 
+});

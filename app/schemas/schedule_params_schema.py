@@ -89,4 +89,4 @@ class ScheduleParams(BaseModel):
     constraints: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
-        arbitrary_types_allowed = True 
+        arbitrary_types_allowed = True

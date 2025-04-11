@@ -1,6 +1,5 @@
 """API dependencies module."""
 
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal

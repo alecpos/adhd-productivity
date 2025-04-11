@@ -203,19 +203,19 @@ if not optimal_focus_times:
     print("No optimal focus times found in the next 24 hours")
 else:
     best_focus_time = optimal_focus_times[0]
-    
+
     # Step 2: Get current stressors using Epic 2
     current_stressors = time_engine.detect_stressors(
         user_id=user_id,
         include_wearable_data=True
     )
-    
+
     # Step 3: Check commitments during that time using Epic 3
     conflicting_commitments = forget.get_commitments(
         user_id=user_id,
         time_range=(best_focus_time.start, best_focus_time.end)
     )
-    
+
     if conflicting_commitments:
         print(f"Found {len(conflicting_commitments)} conflicting commitments")
         # Reschedule or handle conflicts
@@ -229,19 +229,19 @@ else:
             stressor_level=current_stressors.level,
             do_not_disturb=True,
             buffer_time_minutes=time_engine.calculate_buffer(
-                user_id=user_id, 
-                from_activity="regular", 
+                user_id=user_id,
+                from_activity="regular",
                 to_activity="deep_focus"
             ).minutes
         )
-        
+
         # Step 5: Epic 3 defers non-urgent notifications
         forget.defer_notifications(
             user_id=user_id,
             time_range=(session.start_time, session.end_time),
             min_priority=8
         )
-        
+
         print(f"Focus session created: {session.start_time} to {session.end_time}")
         print(f"Non-urgent notifications deferred during this period")
 ```
@@ -334,52 +334,52 @@ class ADHDCalendarClient:
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         })
-    
+
     # Epic 1 (TPR) Methods
     def get_productivity_patterns(self, user_id):
         return self.session.get(f"{self.base_url}/productivity-patterns/{user_id}").json()
-    
+
     def get_optimal_times(self, user_id, task_type, days_ahead=1):
         return self.session.get(
             f"{self.base_url}/productivity-patterns/{user_id}/optimal-times",
             params={"task_type": task_type, "days_ahead": days_ahead}
         ).json()
-    
+
     # Epic 2 (Time Estimation) Methods
     def estimate_task_duration(self, user_id, task_description, task_type=None):
         return self.session.post(
             f"{self.base_url}/time-estimation/{user_id}/estimate",
             json={"description": task_description, "task_type": task_type}
         ).json()
-    
+
     def get_buffer_recommendation(self, user_id, from_task_type, to_task_type):
         return self.session.get(
             f"{self.base_url}/time-estimation/{user_id}/buffer",
             params={"from_type": from_task_type, "to_type": to_task_type}
         ).json()
-    
+
     # Epic 3 (Forgetfulness) Methods
     def detect_commitments(self, user_id, text):
         return self.session.post(
             f"{self.base_url}/commitments/{user_id}/detect",
             json={"text": text}
         ).json()
-    
+
     def create_smart_reminder(self, user_id, commitment_id, triggers=None):
         return self.session.post(
             f"{self.base_url}/reminders/{user_id}",
             json={"commitment_id": commitment_id, "triggers": triggers or []}
         ).json()
-    
+
     # Cross-Epic Integration Methods
     def create_optimized_task(self, user_id, task_description, task_type=None, due_by=None):
         """Creates a task with optimized scheduling using all three epics."""
         # Step 1: Estimate duration (Epic 2)
         duration_estimate = self.estimate_task_duration(user_id, task_description, task_type)
-        
+
         # Step 2: Find optimal time (Epic 1)
         optimal_times = self.get_optimal_times(user_id, task_type or "default")
-        
+
         # Step 3: Select best time before due date if specified
         if due_by and optimal_times:
             selected_time = next(
@@ -391,7 +391,7 @@ class ADHDCalendarClient:
         else:
             # Fallback if no optimal times found
             selected_time = {"start_time": datetime.datetime.now().isoformat()}
-        
+
         # Step 4: Create commitment (Epic 3)
         commitment = self.session.post(
             f"{self.base_url}/commitments/{user_id}",
@@ -402,14 +402,14 @@ class ADHDCalendarClient:
                 "task_type": task_type
             }
         ).json()
-        
+
         # Step 5: Create smart reminder (Epic 3)
         reminder = self.create_smart_reminder(
-            user_id, 
+            user_id,
             commitment["id"],
             triggers=["time:1_hour_before", "energy:medium_high"]
         )
-        
+
         return {
             "commitment": commitment,
             "reminder": reminder,
@@ -427,22 +427,22 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
     """Syncs ADHD Calendar with Google Calendar using all three epics."""
     # Set up Google Calendar API
     google_calendar = GoogleCalendarAPI(google_credentials)
-    
+
     # Step 1: Get upcoming Google Calendar events
     upcoming_events = google_calendar.get_upcoming_events(max_results=20)
-    
+
     # Step 2: Process each event through all three epics
     for event in upcoming_events:
         # Skip events that are already processed (check for custom property)
         if event.get('extendedProperties', {}).get('private', {}).get('adhd_calendar_processed'):
             continue
-            
+
         # Step 3: Analyze event complexity (Epic 2)
         complexity = adhd_calendar_client.estimate_task_duration(
-            user_id, 
+            user_id,
             f"{event['summary']} - {event.get('description', '')}"
         )
-        
+
         # Step 4: Check for scheduling optimizations (Epic 1)
         if not event.get('extendedProperties', {}).get('private', {}).get('adhd_calendar_locked'):
             optimal_times = adhd_calendar_client.get_optimal_times(
@@ -450,7 +450,7 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
                 "meeting" if "meeting" in event['summary'].lower() else "appointment",
                 days_ahead=7
             )
-            
+
             # Suggest schedule optimization if better time found
             start_time = parser.parse(event['start']['dateTime'])
             for optimal_time in optimal_times:
@@ -462,7 +462,7 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
                     print(f"Suggested reschedule: {event['summary']} to {optimal_start}")
                     # Could implement automatic rescheduling here
                     break
-        
+
         # Step 5: Create commitment in ADHD Calendar (Epic 3)
         commitment = adhd_calendar_client.session.post(
             f"{adhd_calendar_client.base_url}/commitments/{user_id}",
@@ -475,14 +475,14 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
                 "external_id": event['id']
             }
         ).json()
-        
+
         # Step 6: Calculate buffer times (Epic 2)
         buffer = adhd_calendar_client.get_buffer_recommendation(
-            user_id, 
-            "previous_activity", 
+            user_id,
+            "previous_activity",
             "meeting" if "meeting" in event['summary'].lower() else "appointment"
         )
-        
+
         # Step 7: Create smart reminder with appropriate timing (Epic 3)
         reminder = adhd_calendar_client.create_smart_reminder(
             user_id,
@@ -493,7 +493,7 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
                 "preparation_needed:true"
             ]
         )
-        
+
         # Step 8: Mark event as processed in Google Calendar
         google_calendar.update_event_properties(
             event['id'],
@@ -504,7 +504,7 @@ def sync_with_google_calendar(user_id, google_credentials, adhd_calendar_client)
                 'adhd_calendar_buffer_minutes': str(buffer['minutes'])
             }
         )
-    
+
     return {
         "events_processed": len(upcoming_events),
         "commitments_created": len(upcoming_events)
@@ -525,35 +525,35 @@ def analyze_mental_health_indicators(user_id, start_date, end_date, client):
         f"{client.base_url}/productivity-patterns/{user_id}/analysis",
         params={"start_date": start_date, "end_date": end_date}
     ).json()
-    
+
     time_estimation_data = client.session.get(
         f"{client.base_url}/time-estimation/{user_id}/history",
         params={"start_date": start_date, "end_date": end_date}
     ).json()
-    
+
     commitment_data = client.session.get(
         f"{client.base_url}/commitments/{user_id}/completion",
         params={"start_date": start_date, "end_date": end_date}
     ).json()
-    
+
     # Extract mental health indicators
     indicators = {
         # From Epic 1
         "productivity_variance": productivity_data["productivity_variance"],
         "energy_instability": productivity_data["energy_instability"],
         "circadian_disruption": productivity_data["circadian_disruption"],
-        
+
         # From Epic 2
         "time_blindness_score": time_estimation_data["time_blindness_score"],
         "stressor_frequency": time_estimation_data["stressor_frequency"],
         "context_sensitivity": time_estimation_data["context_sensitivity"],
-        
+
         # From Epic 3
         "commitment_completion_rate": commitment_data["completion_rate"],
         "forgotten_commitments_rate": commitment_data["forgotten_rate"],
         "reminder_effectiveness": commitment_data["reminder_effectiveness"]
     }
-    
+
     # Calculate composite scores
     indicators["overall_functioning"] = (
         indicators["productivity_variance"] * 0.2 +
@@ -561,13 +561,13 @@ def analyze_mental_health_indicators(user_id, start_date, end_date, client):
         (1 - indicators["time_blindness_score"]) * 0.2 +
         (1 - indicators["forgotten_commitments_rate"]) * 0.3
     )
-    
+
     indicators["stress_level"] = (
         indicators["stressor_frequency"] * 0.4 +
         indicators["energy_instability"] * 0.3 +
         indicators["circadian_disruption"] * 0.3
     )
-    
+
     return indicators
 ```
 
@@ -585,21 +585,21 @@ def train_cross_epic_model(user_id, trainer_service):
         "focus_duration_history",
         "task_completion_timestamps"
     ]
-    
+
     epic2_features = [
         "estimation_accuracy_history",
         "task_complexity_scores",
         "stressor_presence_history",
         "buffer_effectiveness"
     ]
-    
+
     epic3_features = [
         "commitment_types",
         "reminder_response_times",
         "forgotten_commitment_characteristics",
         "completion_success_rate"
     ]
-    
+
     # Gather training data from all epics
     training_data = trainer_service.gather_cross_epic_data(
         user_id=user_id,
@@ -608,14 +608,14 @@ def train_cross_epic_model(user_id, trainer_service):
         epic3_features=epic3_features,
         days=90  # Use last 90 days of data
     )
-    
+
     # Define target variables
     targets = [
         "optimal_scheduling_time",     # Epic 1 target
         "realistic_duration",          # Epic 2 target
         "effective_reminder_timing"    # Epic 3 target
     ]
-    
+
     # Train unified model
     model = trainer_service.train_unified_model(
         user_id=user_id,
@@ -628,14 +628,14 @@ def train_cross_epic_model(user_id, trainer_service):
             "n_estimators": 100
         }
     )
-    
+
     # Deploy model for user
     model_id = trainer_service.deploy_model(
         user_id=user_id,
         model=model,
         version_name="unified-adhd-assistant-v1"
     )
-    
+
     return {
         "model_id": model_id,
         "features_used": len(epic1_features) + len(epic2_features) + len(epic3_features),
@@ -679,7 +679,7 @@ def batch_process_new_tasks(user_id, task_list, services):
     complexity_results = services.time_engine.batch_analyze_complexity(
         [task["description"] for task in task_list]
     )
-    
+
     # Step 2: Get optimal times for all task types (Epic 1)
     unique_task_types = set(task.get("type", "default") for task in task_list)
     optimal_times = {}
@@ -689,13 +689,13 @@ def batch_process_new_tasks(user_id, task_list, services):
             task_category=task_type,
             days_ahead=7
         )
-    
+
     # Step 3: Batch create commitments (Epic 3)
     commitments = []
     for i, task in enumerate(task_list):
         task_type = task.get("type", "default")
         best_time = optimal_times[task_type][0] if optimal_times[task_type] else None
-        
+
         commitments.append({
             "description": task["description"],
             "scheduled_time": best_time["start_time"] if best_time else None,
@@ -703,9 +703,9 @@ def batch_process_new_tasks(user_id, task_list, services):
             "complexity_score": complexity_results[i]["score"],
             "task_type": task_type
         })
-    
+
     created_commitments = services.forget.batch_create_commitments(user_id, commitments)
-    
+
     # Step 4: Batch create reminders (Epic 3)
     reminder_configs = []
     for commitment in created_commitments:
@@ -713,9 +713,9 @@ def batch_process_new_tasks(user_id, task_list, services):
             "commitment_id": commitment["id"],
             "triggers": ["time:1_hour_before", "energy:appropriate"]
         })
-    
+
     created_reminders = services.forget.batch_create_reminders(user_id, reminder_configs)
-    
+
     return {
         "tasks_processed": len(task_list),
         "commitments_created": len(created_commitments),
@@ -733,15 +733,15 @@ async def async_optimize_day(user_id, date, services):
     energy_forecast_future = asyncio.create_task(
         services.tpr.async_get_daily_energy_forecast(user_id, date)
     )
-    
+
     commitments_future = asyncio.create_task(
         services.forget.async_get_commitments(user_id, date)
     )
-    
+
     # Wait for both to complete
     energy_forecast = await energy_forecast_future
     commitments = await commitments_future
-    
+
     # Process commitments through Epic 2
     duration_futures = []
     for commitment in commitments:
@@ -750,15 +750,15 @@ async def async_optimize_day(user_id, date, services):
                 user_id, commitment.description, commitment_id=commitment.id
             )
         )
-    
+
     # Wait for all duration estimates
     duration_estimates = await asyncio.gather(*duration_futures)
-    
+
     # Update commitments with duration estimates
     for i, commitment in enumerate(commitments):
         commitment.estimated_duration = duration_estimates[i].mean_minutes
         commitment.buffer_time = duration_estimates[i].buffer_minutes
-    
+
     # Generate schedule
     schedule = await services.planner.async_generate_optimized_schedule(
         user_id=user_id,
@@ -766,7 +766,7 @@ async def async_optimize_day(user_id, date, services):
         commitments=commitments,
         energy_forecast=energy_forecast
     )
-    
+
     return schedule
 ```
 
@@ -778,7 +778,7 @@ Common cross-epic integration issues and solutions:
 
 **Problem**: Inconsistent data between epics (e.g., completion status mismatch)
 
-**Solution**: 
+**Solution**:
 ```python
 def reconcile_cross_epic_data(user_id, services):
     """Reconcile data inconsistencies between epics."""
@@ -786,7 +786,7 @@ def reconcile_cross_epic_data(user_id, services):
     tpr_data = services.tpr.get_user_data(user_id)
     time_data = services.time_engine.get_user_data(user_id)
     forget_data = services.forget.get_user_data(user_id)
-    
+
     # Check for task completion inconsistencies
     for task_id in tpr_data["completed_tasks"]:
         if task_id in forget_data["commitments"]:
@@ -798,7 +798,7 @@ def reconcile_cross_epic_data(user_id, services):
                     completion_time=tpr_data["completed_tasks"][task_id]["completion_time"]
                 )
                 print(f"Fixed commitment status for {task_id}")
-    
+
     # Check for duration inconsistencies
     for task_id in time_data["task_durations"]:
         if task_id in forget_data["commitments"]:
@@ -810,9 +810,9 @@ def reconcile_cross_epic_data(user_id, services):
                     actual_duration=time_data["task_durations"][task_id]["actual"]
                 )
                 print(f"Fixed duration for {task_id}")
-    
+
     # Add other reconciliation checks as needed
-    
+
     return {
         "inconsistencies_fixed": {
             "status": len(tpr_data["completed_tasks"]),
@@ -830,23 +830,23 @@ def reconcile_cross_epic_data(user_id, services):
 def ensure_operation_order(operation_id, services):
     """Ensure operations across epics happen in correct order."""
     operation = services.operation_manager.get_operation(operation_id)
-    
+
     # Check prerequisites
     for prerequisite in operation["prerequisites"]:
         prereq_status = services.operation_manager.get_operation_status(prerequisite)
         if prereq_status != "completed":
             # Wait for prerequisite to complete
             services.operation_manager.wait_for_operation(prerequisite, timeout_seconds=30)
-    
+
     # Execute operation
     result = services.operation_manager.execute_operation(operation_id)
-    
+
     # Update dependent operations
     for dependent in operation["dependents"]:
         services.operation_manager.update_prerequisite_status(
             dependent, operation_id, "completed"
         )
-    
+
     return result
 ```
 
@@ -860,10 +860,10 @@ def optimize_cross_epic_performance(user_id, services):
     """Identify and address cross-epic performance bottlenecks."""
     # Run performance analysis
     performance = services.performance_analyzer.analyze_operations(user_id, days=7)
-    
+
     bottlenecks = performance["bottlenecks"]
     optimizations = []
-    
+
     for bottleneck in bottlenecks:
         if bottleneck["type"] == "excessive_db_queries":
             # Implement caching for this operation
@@ -872,21 +872,21 @@ def optimize_cross_epic_performance(user_id, services):
                 expiration_seconds=bottleneck["recommended_cache_time"]
             )
             optimizations.append(f"Added caching for {bottleneck['operation']}")
-            
+
         elif bottleneck["type"] == "sequential_operations":
             # Convert to parallel processing
             services.operation_manager.mark_as_parallelizable(
                 operations=bottleneck["operations"]
             )
             optimizations.append(f"Parallelized {len(bottleneck['operations'])} operations")
-            
+
         elif bottleneck["type"] == "excessive_computation":
             # Implement lazy loading
             services.feature_manager.enable_lazy_loading(
                 feature=bottleneck["feature"]
             )
             optimizations.append(f"Enabled lazy loading for {bottleneck['feature']}")
-    
+
     return {
         "bottlenecks_found": len(bottlenecks),
         "optimizations_applied": optimizations
@@ -895,4 +895,4 @@ def optimize_cross_epic_performance(user_id, services):
 
 ---
 
-This guide provides a comprehensive framework for integrating all three epics of the ADHD Calendar ML system. By understanding the integration patterns, common use cases, and performance considerations, you can create powerful, unified solutions that leverage the full capabilities of the system to support ADHD/neurodiverse users. 
+This guide provides a comprehensive framework for integrating all three epics of the ADHD Calendar ML system. By understanding the integration patterns, common use cases, and performance considerations, you can create powerful, unified solutions that leverage the full capabilities of the system to support ADHD/neurodiverse users.

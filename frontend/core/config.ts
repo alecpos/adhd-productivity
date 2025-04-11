@@ -44,4 +44,3 @@ export const API_ENDPOINTS = {
     AVAILABLE_SLOTS: (userId: string) => `/api/calendar/available-slots/${userId}`
   }
 } as const;
-

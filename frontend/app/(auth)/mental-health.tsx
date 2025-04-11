@@ -48,13 +48,13 @@ export default function MentalHealthScreen() {
                 {error && (
                     <Text style={styles.error}>{error}</Text>
                 )}
-                <MentalHealthLogForm 
+                <MentalHealthLogForm
                     onSubmit={handleLogSubmit}
                     onSuccess={() => setError(null)}
                 />
-                <MentalHealthInsights 
+                <MentalHealthInsights
                     userId={user.id}
-                    key={refreshKey} 
+                    key={refreshKey}
                 />
             </View>
         </ScrollView>
@@ -75,4 +75,4 @@ const styles = StyleSheet.create({
         color: 'red',
         marginBottom: 10,
     }
-}); 
+});

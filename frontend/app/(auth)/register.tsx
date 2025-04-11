@@ -12,7 +12,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const { theme } = useTheme();
-  
+
   const { register, loading, error } = useAuth();
 
   const handleRegister = async () => {
@@ -25,9 +25,9 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
-      
+
       {error && <Text style={styles.error}>{error}</Text>}
-      
+
       <TextInput
         style={[styles.input, { borderColor: theme.colors.grey3 }]}
         placeholder="Email"
@@ -36,7 +36,7 @@ export default function RegisterScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <TextInput
         style={[styles.input, { borderColor: theme.colors.grey3 }]}
         placeholder="Username"
@@ -44,7 +44,7 @@ export default function RegisterScreen() {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      
+
       <TextInput
         style={[styles.input, { borderColor: theme.colors.grey3 }]}
         placeholder="Password"
@@ -52,14 +52,14 @@ export default function RegisterScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      
+
       <TextInput
         style={[styles.input, { borderColor: theme.colors.grey3 }]}
         placeholder="Full Name"
         value={fullName}
         onChangeText={setFullName}
       />
-      
+
       <AnimatedButton
         title={loading ? "Registering..." : "Register"}
         onPress={handleRegister}
@@ -105,4 +105,4 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
-}); 
+});

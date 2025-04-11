@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 6 Integration Guide
 
-**Version**: 1.0  
-**Last Updated**: 2025-03-15  
+**Version**: 1.0
+**Last Updated**: 2025-03-15
 **Target Audience**: Developers integrating with ADHD Calendar UX components
 
 ## Overview
@@ -83,10 +83,10 @@ const adhd = require('adhd-calendar-sdk');
 async function getUserMotivationProfile(userId) {
   const client = new adhd.GamificationClient(apiKey);
   const profile = await client.getUserMotivationProfile(userId);
-  
+
   console.log(`Primary motivators: ${profile.primary_motivators.join(', ')}`);
   console.log(`Effective mechanics: ${profile.effective_mechanics.join(', ')}`);
-  
+
   return profile;
 }
 ```
@@ -98,10 +98,10 @@ from adhd_calendar import GamificationClient
 def get_user_motivation_profile(user_id):
     client = GamificationClient(api_key)
     profile = client.get_user_motivation_profile(user_id)
-    
+
     print(f"Primary motivators: {', '.join(profile.primary_motivators)}")
     print(f"Effective mechanics: {', '.join(profile.effective_mechanics)}")
-    
+
     return profile
 ```
 
@@ -114,7 +114,7 @@ To update specific aspects of a motivation profile:
 async function updateUserMotivationProfile(userId, updates) {
   const client = new adhd.GamificationClient(apiKey);
   const updatedProfile = await client.updateUserMotivationProfile(userId, updates);
-  
+
   return updatedProfile;
 }
 
@@ -136,7 +136,7 @@ To get recommended gamification actions for a specific context:
 async function getRecommendedActions(userId, context, count = 2) {
   const client = new adhd.GamificationClient(apiKey);
   const actions = await client.getGamificationActions(userId, context, count);
-  
+
   return actions;
 }
 
@@ -170,14 +170,14 @@ Example UI implementation for a streak mechanic:
 // React component example
 function StreakDisplay({ streak, milestones }) {
   const nextMilestone = milestones.find(m => m > streak) || streak + 5;
-  
+
   return (
     <div className="streak-container">
       <div className="streak-count">{streak}</div>
       <div className="streak-label">Day Streak</div>
       <div className="streak-progress">
-        <div 
-          className="streak-bar" 
+        <div
+          className="streak-bar"
           style={{ width: `${(streak % nextMilestone) / nextMilestone * 100}%` }}
         />
       </div>
@@ -196,7 +196,7 @@ To report user engagement with gamification actions:
 async function trackActionEffectiveness(userId, actionId, metrics) {
   const client = new adhd.GamificationClient(apiKey);
   const result = await client.trackEffectiveness(userId, actionId, metrics);
-  
+
   return result;
 }
 
@@ -215,34 +215,34 @@ For web integrations, we provide pre-built UI components for common gamification
 
 ```javascript
 // React component library example
-import { 
-  StreakCounter, 
-  BadgeDisplay, 
+import {
+  StreakCounter,
+  BadgeDisplay,
   ProgressBar,
-  AchievementPopup 
+  AchievementPopup
 } from 'adhd-gamification-react';
 
 function MyApp() {
   return (
     <div className="app">
       <StreakCounter userId="user123" theme="minimal" />
-      
-      <BadgeDisplay 
-        userId="user123" 
-        category="focus" 
-        layout="grid" 
+
+      <BadgeDisplay
+        userId="user123"
+        category="focus"
+        layout="grid"
       />
-      
-      <ProgressBar 
-        value={75} 
-        target={100} 
-        label="Daily Goal" 
-        style="segmented" 
+
+      <ProgressBar
+        value={75}
+        target={100}
+        label="Daily Goal"
+        style="segmented"
       />
-      
-      <AchievementPopup 
-        onAchievement={handleAchievement} 
-        position="bottom-right" 
+
+      <AchievementPopup
+        onAchievement={handleAchievement}
+        position="bottom-right"
       />
     </div>
   );
@@ -268,9 +268,9 @@ If your application needs to leverage ADHD Calendar's connections with existing 
 async function syncExternalTasks(userId, toolId) {
   const client = new adhd.ProjectToolsClient(apiKey);
   const result = await client.syncTasks(userId, toolId);
-  
+
   console.log(`Synced ${result.tasks_added} new tasks and updated ${result.tasks_updated} tasks`);
-  
+
   return result;
 }
 
@@ -278,7 +278,7 @@ async function syncExternalTasks(userId, toolId) {
 async function getExternalTasks(userId, toolId, filters = {}) {
   const client = new adhd.ProjectToolsClient(apiKey);
   const tasks = await client.getTasks(userId, toolId, filters);
-  
+
   return tasks;
 }
 ```
@@ -301,33 +301,33 @@ class MyCustomToolConnector extends adhd.ProjectManagementIntegration {
     this.apiUrl = config.apiUrl;
     this.apiKey = config.apiKey;
   }
-  
+
   async authenticate(credentials) {
     // Implement authentication with your tool
     // Return true if successful, false otherwise
   }
-  
+
   async fetchTasks(since = null) {
     // Fetch tasks from your system
     // Transform them to ExternalTask format
     return transformedTasks;
   }
-  
+
   async createTask(taskData) {
     // Create a task in your system
     // Return the created task in ExternalTask format
   }
-  
+
   async updateTask(externalId, taskData) {
     // Update a task in your system
     // Return the updated task in ExternalTask format
   }
-  
+
   async deleteTask(externalId) {
     // Delete a task in your system
     // Return true if successful, false otherwise
   }
-  
+
   async getProjects() {
     // Return list of available projects
   }
@@ -359,7 +359,7 @@ To access a user's accessibility preferences:
 async function getUserAccessibilityPreferences(userId) {
   const client = new adhd.AccessibilityClient(apiKey);
   const preferences = await client.getUserPreferences(userId);
-  
+
   return preferences;
 }
 ```
@@ -373,7 +373,7 @@ To generate custom CSS based on accessibility preferences:
 async function getAccessibilityCSS(userId, context = 'default') {
   const client = new adhd.AccessibilityClient(apiKey);
   const css = await client.getThemeCSS(userId, context);
-  
+
   // Inject the CSS into your application
   const styleElement = document.createElement('style');
   styleElement.textContent = css;
@@ -387,17 +387,17 @@ To add focus assistance features to your application:
 
 ```javascript
 // JavaScript SDK Example
-import { 
-  FocusHighlighter, 
-  ReadingGuide, 
-  DistractionReducer 
+import {
+  FocusHighlighter,
+  ReadingGuide,
+  DistractionReducer
 } from 'adhd-accessibility-sdk';
 
 // Initialize components with user preferences
 async function initAccessibilityComponents(userId) {
   const client = new adhd.AccessibilityClient(apiKey);
   const preferences = await client.getUserPreferences(userId);
-  
+
   // Initialize focus highlighter
   if (preferences.highlight_focus) {
     const highlighter = new FocusHighlighter({
@@ -407,7 +407,7 @@ async function initAccessibilityComponents(userId) {
     });
     highlighter.attach();
   }
-  
+
   // Initialize reading guide
   if (preferences.reading_guide) {
     const guide = new ReadingGuide({
@@ -417,7 +417,7 @@ async function initAccessibilityComponents(userId) {
     });
     guide.attach('article, .content, p');
   }
-  
+
   // Initialize distraction reducer
   if (preferences.reduce_distractions) {
     const reducer = new DistractionReducer({
@@ -438,13 +438,13 @@ To validate your application against ADHD accessibility guidelines:
 async function testAccessibilityCompliance(pageUrl) {
   const client = new adhd.AccessibilityClient(apiKey);
   const report = await client.testAccessibility(pageUrl);
-  
+
   console.log(`Overall compliance: ${report.overall_compliance}`);
-  
+
   report.issues.forEach(issue => {
     console.log(`${issue.severity}: ${issue.message} at ${issue.element}`);
   });
-  
+
   return report;
 }
 ```
@@ -472,7 +472,7 @@ function initiateCalendarAuth(provider) {
     redirectUri: 'https://your-app.com/calendar/callback',
     scope: 'read_write'
   });
-  
+
   // Redirect the user to the authentication URL
   window.location.href = authUrl;
 }
@@ -483,7 +483,7 @@ async function handleCalendarAuthCallback(code) {
   const result = await client.completeAuth(code, {
     redirectUri: 'https://your-app.com/calendar/callback'
   });
-  
+
   return result.calendarId;
 }
 ```
@@ -501,9 +501,9 @@ async function syncCalendarEvents(userId, calendarId) {
     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     fullSync: false
   });
-  
+
   console.log(`Synced ${result.events_added} new events and updated ${result.events_updated} events`);
-  
+
   return result;
 }
 ```
@@ -517,21 +517,21 @@ To create and manage calendar events:
 async function createCalendarEvent(userId, calendarId, eventData) {
   const client = new adhd.CalendarClient(apiKey);
   const event = await client.createEvent(userId, calendarId, eventData);
-  
+
   return event;
 }
 
 async function updateCalendarEvent(userId, calendarId, eventId, eventData) {
   const client = new adhd.CalendarClient(apiKey);
   const event = await client.updateEvent(userId, calendarId, eventId, eventData);
-  
+
   return event;
 }
 
 async function deleteCalendarEvent(userId, calendarId, eventId) {
   const client = new adhd.CalendarClient(apiKey);
   const result = await client.deleteEvent(userId, calendarId, eventId);
-  
+
   return result.success;
 }
 ```
@@ -542,19 +542,19 @@ For web applications, we provide pre-built calendar UI components:
 
 ```jsx
 // React component example
-import { 
-  CalendarView, 
-  EventDetails, 
-  EventCreator 
+import {
+  CalendarView,
+  EventDetails,
+  EventCreator
 } from 'adhd-calendar-react';
 
 function MyCalendarApp({ userId }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
-  
+
   return (
     <div className="calendar-container">
-      <CalendarView 
+      <CalendarView
         userId={userId}
         date={selectedDate}
         onDateChange={setSelectedDate}
@@ -562,17 +562,17 @@ function MyCalendarApp({ userId }) {
         view="week"
         calendars={['google-work', 'apple-personal']}
       />
-      
+
       {selectedEvent && (
-        <EventDetails 
+        <EventDetails
           userId={userId}
           event={selectedEvent}
           onEdit={handleEditEvent}
           onDelete={handleDeleteEvent}
         />
       )}
-      
-      <EventCreator 
+
+      <EventCreator
         userId={userId}
         date={selectedDate}
         defaultDuration={60}
@@ -632,33 +632,33 @@ function getAuthUrl() {
 async function handleCallback(code, state) {
   // Verify state to prevent CSRF attacks
   verifyState(state);
-  
+
   // Exchange the code for tokens
   const tokens = await oauthClient.getTokens(code);
-  
+
   // Initialize the API client with the access token
   const client = new adhd.Client({
     accessToken: tokens.access_token
   });
-  
+
   // Store the refresh token securely
   securelyStoreRefreshToken(tokens.refresh_token);
-  
+
   return client;
 }
 
 // Refresh the access token when it expires
 async function refreshAccessToken(refreshToken) {
   const tokens = await oauthClient.refreshTokens(refreshToken);
-  
+
   // Update the client with the new access token
   client.setAccessToken(tokens.access_token);
-  
+
   // Store the new refresh token if provided
   if (tokens.refresh_token) {
     securelyStoreRefreshToken(tokens.refresh_token);
   }
-  
+
   return client;
 }
 ```

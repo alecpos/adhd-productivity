@@ -32,4 +32,4 @@ ENV PYTHONPATH=/app
 ENTRYPOINT ["pytest"]
 
 # Default command runs all STE tests with verbose output
-CMD ["tests/ml/stochastic_time_estimation/", "-v"] 
+CMD ["tests/ml/stochastic_time_estimation/", "-v"]

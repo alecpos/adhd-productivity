@@ -43,10 +43,10 @@ const COMPONENTS = {
 // Main App that doesn't use Expo Router
 export default function SimpleTestApp() {
   const [activeComponent, setActiveComponent] = useState<keyof typeof COMPONENTS>('Dashboard');
-  
+
   // Render the currently selected component
   const ActiveComponent = COMPONENTS[activeComponent];
-  
+
   return (
     <ThemeProvider theme={theme}>
       <SafeAreaView style={styles.container}>
@@ -54,7 +54,7 @@ export default function SimpleTestApp() {
           <Text style={styles.headerTitle}>ADHD Calendar</Text>
           <Text style={styles.headerSubtitle}>Component Testing</Text>
         </View>
-        
+
         <ScrollView horizontal style={styles.navigation} showsHorizontalScrollIndicator={false}>
           {Object.keys(COMPONENTS).map((componentName) => (
             <TouchableOpacity
@@ -65,7 +65,7 @@ export default function SimpleTestApp() {
               ]}
               onPress={() => setActiveComponent(componentName as keyof typeof COMPONENTS)}
             >
-              <Text 
+              <Text
                 style={[
                   styles.navButtonText,
                   componentName === activeComponent && styles.activeNavButtonText
@@ -76,11 +76,11 @@ export default function SimpleTestApp() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-        
+
         <ScrollView style={styles.componentContainer}>
           <ActiveComponent />
         </ScrollView>
-        
+
         <View style={styles.footer}>
           <Button
             title="Back to Dashboard"
@@ -147,4 +147,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     alignItems: 'center',
   },
-}); 
+});

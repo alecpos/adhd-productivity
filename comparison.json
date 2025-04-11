@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "baseline_file": "baseline.json",
+    "current_file": "current.json",
+    "common_files": 366,
+    "new_files": 0,
+    "removed_files": 0,
+    "improved_files": 0,
+    "regressed_files": 0,
+    "unchanged_files": 366,
+    "baseline_avg_scores": {
+      "complexity": 0.38996373343228014,
+      "maintainability": 0.023909234286428046,
+      "dependencies": 0.0,
+      "structure": 0.9596994535519126
+    },
+    "current_avg_scores": {
+      "complexity": 0.38996373343228014,
+      "maintainability": 0.023909234286428046,
+      "dependencies": 0.0,
+      "structure": 0.9596994535519126
+    },
+    "avg_score_changes": {
+      "complexity": 0.0,
+      "maintainability": 0.0,
+      "dependencies": 0.0,
+      "structure": 0.0
+    }
+  },
+  "improved_files": [],
+  "regressed_files": [],
+  "unchanged_files": [],
+  "new_files": [],
+  "removed_files": []
+}

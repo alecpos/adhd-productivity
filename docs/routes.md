@@ -163,7 +163,7 @@ Document routes with OpenAPI:
 async def documented_route():
     """
     This route is documented.
-    
+
     Returns:
         ResponseSchema: The response data
     """
@@ -324,4 +324,4 @@ async def status_check():
         "database": "connected",
         "cache": "available"
     }
-``` 
+```

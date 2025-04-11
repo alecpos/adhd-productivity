@@ -46,5 +46,3 @@ declare module '@rneui/themed' {
       text?: string; // Extend the Colors interface to include text
     }
   }
-  
-

@@ -6,13 +6,13 @@ from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union
 from pydantic import BaseModel
 
 
-T = TypeVar('T')
-CallableT = TypeVar('CallableT', bound=Callable)
+T = TypeVar("T")
+CallableT = TypeVar("CallableT", bound=Callable)
 
 
 class ValidationError(Exception):
     """Custom validation error."""
-    
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
@@ -50,10 +50,7 @@ class DateRangeRule(ValidationRule):
     end_field: str
 
     def __init__(self, start_field: str, end_field: str, error_message: str):
-        super().__init__(
-            field_name=f"{start_field},{end_field}",
-            error_message=error_message
-        )
+        super().__init__(field_name=f"{start_field},{end_field}", error_message=error_message)
         self.start_field = start_field
         self.end_field = end_field
 
@@ -78,15 +75,11 @@ class UniqueFieldRule(ValidationRule):
 
 
 def create_validation_rule(
-    field_name: str,
-    validation_func: Callable[[Any], bool],
-    error_message: str
+    field_name: str, validation_func: Callable[[Any], bool], error_message: str
 ) -> ValidationRule:
     """Factory function to create custom validation rules."""
     return ValidationRule(
-        field_name=field_name,
-        validation_func=validation_func,
-        error_message=error_message
+        field_name=field_name, validation_func=validation_func, error_message=error_message
     )
 
 

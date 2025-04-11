@@ -25,7 +25,10 @@ SCOPES = [
     "https://www.googleapis.com/auth/calendar.events",  # Full access to events
 ]
 
-class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema, EventCreateSchema]):
+
+class GoogleCalendarService(
+    BaseService[CalendarEventModel, EventResponseSchema, EventCreateSchema]
+):
     """Service for Google Calendar integration."""
 
     def __init__(self, db_session: AsyncSession):
@@ -41,7 +44,7 @@ class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema,
             # The file token.json stores the user's access and refresh tokens
             if os.path.exists(settings.GOOGLE_TOKEN_PATH):
                 creds = Credentials.from_authorized_user_file(settings.GOOGLE_TOKEN_PATH, SCOPES)
-            
+
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
                 if creds and creds.expired and creds.refresh_token:
@@ -94,9 +97,9 @@ class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema,
                     "end_time": event["end"].get("dateTime", event["end"].get("date")),
                     "location": event.get("location", ""),
                     "external_id": event["id"],
-                    "source": "google_calendar"
+                    "source": "google_calendar",
                 }
-                
+
                 # Check if event already exists
                 existing = await self.get_by_external_id(event["id"])
                 if existing:
@@ -118,11 +121,8 @@ class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema,
         try:
             if not self.service:
                 self._initialize_client()
-            
-            event = self.service.events().insert(
-                calendarId='primary',
-                body=event_data
-            ).execute()
+
+            event = self.service.events().insert(calendarId="primary", body=event_data).execute()
             return event
         except HttpError as error:
             raise IntegrationError(f"Failed to create Google Calendar event: {str(error)}")
@@ -132,12 +132,12 @@ class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema,
         try:
             if not self.service:
                 self._initialize_client()
-            
-            event = self.service.events().update(
-                calendarId='primary',
-                eventId=event_id,
-                body=event_data
-            ).execute()
+
+            event = (
+                self.service.events()
+                .update(calendarId="primary", eventId=event_id, body=event_data)
+                .execute()
+            )
             return event
         except HttpError as error:
             raise IntegrationError(f"Failed to update Google Calendar event: {str(error)}")
@@ -147,11 +147,8 @@ class GoogleCalendarService(BaseService[CalendarEventModel, EventResponseSchema,
         try:
             if not self.service:
                 self._initialize_client()
-            
-            self.service.events().delete(
-                calendarId='primary',
-                eventId=event_id
-            ).execute()
+
+            self.service.events().delete(calendarId="primary", eventId=event_id).execute()
             return True
         except HttpError as error:
-            raise IntegrationError(f"Failed to delete Google Calendar event: {str(error)}") 
+            raise IntegrationError(f"Failed to delete Google Calendar event: {str(error)}")

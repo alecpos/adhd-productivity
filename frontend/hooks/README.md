@@ -60,14 +60,14 @@ import { useTasks } from '../hooks';
 import { TaskList, Spinner, ErrorDisplay } from '../components';
 
 const TaskScreen = () => {
-  const { 
-    tasks, 
-    loading, 
-    error, 
-    fetchTasks, 
-    addTask, 
-    updateTask, 
-    deleteTask 
+  const {
+    tasks,
+    loading,
+    error,
+    fetchTasks,
+    addTask,
+    updateTask,
+    deleteTask
   } = useTasks();
 
   if (loading) return <Spinner />;
@@ -75,8 +75,8 @@ const TaskScreen = () => {
 
   return (
     <View>
-      <TaskList 
-        tasks={tasks} 
+      <TaskList
+        tasks={tasks}
         onUpdate={updateTask}
         onDelete={deleteTask}
       />
@@ -99,11 +99,11 @@ import { useTasks } from '../hooks';
 describe('useTasks', () => {
   test('should fetch tasks on mount', async () => {
     const { result, waitForNextUpdate } = renderHook(() => useTasks());
-    
+
     expect(result.current.loading).toBe(true);
-    
+
     await waitForNextUpdate();
-    
+
     expect(result.current.loading).toBe(false);
     expect(result.current.tasks).toHaveLength(3);
   });
@@ -126,4 +126,4 @@ When creating new hooks:
 
 - [React Hooks Documentation](https://reactjs.org/docs/hooks-intro.html)
 - [Custom Hooks Guide](../docs/custom_hooks.md)
-- [Data Fetching Patterns](../docs/data_fetching.md) 
+- [Data Fetching Patterns](../docs/data_fetching.md)

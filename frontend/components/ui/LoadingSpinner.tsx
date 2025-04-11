@@ -7,7 +7,7 @@ interface LoadingSpinnerProps {
   color?: string;
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'large',
   color = '#007AFF'
 }) => {
@@ -25,4 +25,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-}); 
+});

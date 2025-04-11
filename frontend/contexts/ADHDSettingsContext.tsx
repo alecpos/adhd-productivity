@@ -91,18 +91,18 @@ interface ADHDSettingsContextType {
   metrics: ADHDMetrics | null;
   loading: boolean;
   error: string | null;
-  
+
   // Profile Management
   updateProfile: (updates: Partial<ADHDProfile>) => Promise<void>;
   getMetrics: (startDate: Date, endDate: Date) => Promise<void>;
-  
+
   // Tracking Functions
   logDistraction: (type: string, duration: number, impact: number, context?: string) => Promise<void>;
   logMedicationEffect: (effectiveness: number, sideEffects?: string[], notes?: string) => Promise<void>;
   logEnergyLevel: (level: number, activity: string) => Promise<void>;
   logFocusSession: (duration: number, quality: number, environment: Record<string, any>) => Promise<void>;
   logExecutiveFunction: (metrics: Partial<ADHDMetrics['executiveFunctionMetrics']>) => Promise<void>;
-  
+
   // Analysis Functions
   getRecommendations: () => Promise<{
     scheduling: string[];
@@ -110,7 +110,7 @@ interface ADHDSettingsContextType {
     strategies: string[];
     accommodations: string[];
   }>;
-  
+
   analyzePatterns: () => Promise<{
     productivity: { time: string; score: number }[];
     distractions: { trigger: string; frequency: number }[];
@@ -118,7 +118,7 @@ interface ADHDSettingsContextType {
     energyFlow: { time: string; level: number; activity: string }[];
     focusQuality: { time: string; duration: number; quality: number }[];
   }>;
-  
+
   // Planning Functions
   generateDailyPlan: (date: Date) => Promise<{
     medicationTiming: string[];
@@ -128,7 +128,7 @@ interface ADHDSettingsContextType {
     energyForecast: { time: string; level: number }[];
     contingencyPlans: { trigger: string; action: string }[];
   }>;
-  
+
   // Calibration Functions
   calibrateSettings: () => Promise<{
     suggestedUpdates: Partial<ADHDProfile>;
@@ -411,4 +411,4 @@ export const useADHDSettings = () => {
     throw new Error('useADHDSettings must be used within an ADHDSettingsProvider');
   }
   return context;
-}; 
+};

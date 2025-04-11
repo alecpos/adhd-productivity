@@ -13,7 +13,7 @@ from app.schemas.user_schema import UserSchema, User
 from app.schemas.nlp_schema import (
     NLPParserResponseSchema,
     NLPParserRequestSchema,
-    NLPAnalysisSchema
+    NLPAnalysisSchema,
 )
 from app.schemas.task_schema import TaskCreate
 from app.services.nlp_service import NLPService
@@ -34,7 +34,7 @@ class NLPParserRouter(BaseRouter[NLPParserResponseSchema, NLPService, NLPModel])
             tags=["nlp"],
             schema_class=NLPParserResponseSchema,
             service_class=NLPService,
-            model_class=NLPModel
+            model_class=NLPModel,
         )
         self._register_custom_routes()
 
@@ -45,37 +45,35 @@ class NLPParserRouter(BaseRouter[NLPParserResponseSchema, NLPService, NLPModel])
         async def parse_text(
             request: NLPParserRequestSchema,
             current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Parse and analyze text using NLP."""
             try:
                 service = self.service_class(db)
                 result = await service.parse_text(request.text, current_user.id)
-                return APIResponse(
-                    data=result,
-                    message="Text parsed successfully"
-                )
+                return APIResponse(data=result, message="Text parsed successfully")
             except Exception as e:
                 logger.error(f"Error parsing text: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
         @self.router.get("/analysis/{text_id}", response_model=APIResponse[NLPAnalysisSchema])
         async def get_analysis(
             text_id: UUID,
             current_user: UserSchema = Depends(get_current_user),
-            db: AsyncSession = Depends(get_db)
+            db: AsyncSession = Depends(get_db),
         ):
             """Get detailed NLP analysis for a previously parsed text."""
             try:
                 service = self.service_class(db)
                 analysis = await service.get_analysis(text_id, current_user.id)
-                return APIResponse(
-                    data=analysis,
-                    message="Analysis retrieved successfully"
-                )
+                return APIResponse(data=analysis, message="Analysis retrieved successfully")
             except Exception as e:
                 logger.error(f"Error retrieving analysis: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+                )
 
 
 logger = logging.getLogger(__name__)

@@ -31,7 +31,7 @@ interface TaskCardProps {
 
 **Usage Example**:
 ```jsx
-<TaskCard 
+<TaskCard
     task={taskObject}
     onComplete={handleTaskComplete}
     onDelete={handleTaskDelete}
@@ -152,4 +152,4 @@ When creating or modifying components:
 
 - [UI/UX Guidelines](./ui_guidelines.md)
 - [Theme Configuration](./theme.md)
-- [Accessibility Features](./accessibility.md) 
+- [Accessibility Features](./accessibility.md)

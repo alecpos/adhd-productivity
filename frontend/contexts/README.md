@@ -248,4 +248,4 @@ When creating new contexts:
 
 - [React Context API](https://reactjs.org/docs/context.html)
 - [State Management Guide](../docs/state_management.md)
-- [Context Design Patterns](../docs/context_patterns.md) 
+- [Context Design Patterns](../docs/context_patterns.md)

@@ -9,7 +9,7 @@ declare module '@rneui/themed' {
     surface: string;
     border: string;
   }
-  
+
   export interface Theme {
     fontSize: {
       xs: number;
@@ -163,4 +163,4 @@ export const useAppTheme = (): Theme => {
 };
 
 // Type-safe theme access
-export type AppTheme = typeof theme; 
+export type AppTheme = typeof theme;

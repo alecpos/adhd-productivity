@@ -25,4 +25,4 @@ export interface ApiErrorResponse {
   message: string;
   code: AuthErrorCode;
   statusCode: number;
-} 
+}

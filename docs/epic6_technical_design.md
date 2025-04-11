@@ -153,7 +153,7 @@ class ProjectToolConfig(BaseModel):
     sync_frequency: int = 60  # minutes
     two_way_sync: bool = True
     last_sync: Optional[datetime] = None
-    
+
 class ExternalTask(BaseModel):
     external_id: str
     title: str
@@ -178,27 +178,27 @@ class ProjectManagementIntegration(ABC):
     async def authenticate(self, credentials: Dict[str, Any]) -> bool:
         """Authenticate with the external tool"""
         pass
-        
+
     @abstractmethod
     async def fetch_tasks(self, since: Optional[datetime] = None) -> List[ExternalTask]:
         """Fetch tasks from the external tool"""
         pass
-        
+
     @abstractmethod
     async def create_task(self, task_data: Dict[str, Any]) -> ExternalTask:
         """Create a new task in the external tool"""
         pass
-        
+
     @abstractmethod
     async def update_task(self, external_id: str, task_data: Dict[str, Any]) -> ExternalTask:
         """Update an existing task in the external tool"""
         pass
-        
+
     @abstractmethod
     async def delete_task(self, external_id: str) -> bool:
         """Delete a task in the external tool"""
         pass
-        
+
     @abstractmethod
     async def get_projects(self) -> List[Dict[str, Any]]:
         """Get available projects from the external tool"""
@@ -213,9 +213,9 @@ class ProjectManagementIntegration(ABC):
 ┌───────────────────────────┐      ┌────────────────────────────┐
 │  AccessibilityService     │◄─────┤ AccessibilityPreferences   │
 └─────────────┬─────────────┘      └────────────────────────────┘
-              │                                   
-              │                                   
-              ▼                                   
+              │
+              │
+              ▼
 ┌───────────────────────────┐      ┌────────────────────────────┐
 │ UIAdaptationStrategy      │◄─────┤ ColorScheme                │
 └───────────────────────────┘      └────────────────────────────┘
@@ -321,27 +321,27 @@ class CalendarIntegration(ABC):
     async def authenticate(self, auth_code: str = None, refresh_token: str = None) -> bool:
         """Authenticate with the calendar service"""
         pass
-        
+
     @abstractmethod
     async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[ExternalEvent]:
         """Fetch events from the calendar"""
         pass
-        
+
     @abstractmethod
     async def create_event(self, event_data: Dict[str, Any]) -> ExternalEvent:
         """Create a new event in the calendar"""
         pass
-        
+
     @abstractmethod
     async def update_event(self, external_id: str, event_data: Dict[str, Any]) -> ExternalEvent:
         """Update an existing event in the calendar"""
         pass
-        
+
     @abstractmethod
     async def delete_event(self, external_id: str) -> bool:
         """Delete an event from the calendar"""
         pass
-        
+
     @abstractmethod
     async def get_calendars(self) -> List[Dict[str, Any]]:
         """Get available calendars from the service"""
@@ -579,4 +579,4 @@ Each component includes detailed integration tests:
 - WCAG 2.2 Guidelines: https://www.w3.org/TR/WCAG22/
 - Google Calendar API: https://developers.google.com/calendar
 - Jira REST API: https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/
-- Gamification Framework Research: https://doi.org/10.1016/j.chb.2020.106595 
+- Gamification Framework Research: https://doi.org/10.1016/j.chb.2020.106595

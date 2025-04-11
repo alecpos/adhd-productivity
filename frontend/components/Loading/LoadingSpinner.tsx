@@ -9,10 +9,10 @@ interface LoadingSpinnerProps {
   size?: 'small' | 'large';
 }
 
-export function LoadingSpinner({ 
-  fullScreen = false, 
-  text = 'Loading...', 
-  size = 'large' 
+export function LoadingSpinner({
+  fullScreen = false,
+  text = 'Loading...',
+  size = 'large'
 }: LoadingSpinnerProps) {
   const { theme } = useTheme();
 
@@ -48,4 +48,4 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
   },
-}); 
+});

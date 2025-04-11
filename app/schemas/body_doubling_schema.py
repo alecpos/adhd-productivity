@@ -19,6 +19,7 @@ from app.schemas.base_schema import BaseSchema, TimestampedSchema
 
 class EnvironmentDataSchema(BaseSchema):
     """Environment data schema."""
+
     noise_level: Optional[int] = Field(None, ge=1, le=10)
     lighting: Optional[int] = Field(None, ge=1, le=10)
     temperature: Optional[float] = None
@@ -31,6 +32,7 @@ class EnvironmentDataSchema(BaseSchema):
 
 class InteractionSchema(BaseSchema):
     """Interaction schema."""
+
     time: datetime
     type: InteractionType
     content: str = Field(..., min_length=1, max_length=500)
@@ -42,6 +44,7 @@ class InteractionSchema(BaseSchema):
 
 class BreakSchema(BaseSchema):
     """Break schema."""
+
     start_time: datetime
     duration: int = Field(..., description="Duration in minutes", ge=1)
     type: str = Field(..., min_length=1, max_length=50)
@@ -52,6 +55,7 @@ class BreakSchema(BaseSchema):
 
 class MilestoneSchema(BaseSchema):
     """Milestone schema."""
+
     time: datetime
     description: str = Field(..., min_length=1, max_length=200)
     completed: bool = False
@@ -62,6 +66,7 @@ class MilestoneSchema(BaseSchema):
 
 class ProgressUpdateSchema(BaseSchema):
     """Progress update schema."""
+
     time: datetime
     progress: float = Field(..., ge=0, le=1)
     notes: Optional[str] = Field(None, max_length=500)
@@ -71,17 +76,21 @@ class ProgressUpdateSchema(BaseSchema):
 
 class SessionFeedbackSchema(BaseSchema):
     """Schema for session feedback."""
-    feedback_points: List[Dict[str, Any]]
+
     session_id: UUID
     user_id: UUID
-    average_focus_level: float = Field(..., ge=0, le=10)
-    final_rating: Optional[Dict[str, Any]] = None
+    feedback_points: List[Dict[str, Any]]
+    average_focus_level: float
+    average_productivity: float
+    average_distraction_level: float
+    final_rating: Optional[float] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class GroupSessionSchema(BaseSchema):
     """Information about a group session."""
+
     session_id: UUID
     host_id: UUID
     topic: Optional[str] = Field(None, max_length=200)
@@ -101,29 +110,32 @@ class GroupSessionSchema(BaseSchema):
 
 class SessionAnalyticsSchema(BaseSchema):
     """Analytics for body doubling sessions."""
-    total_sessions: int = Field(..., ge=0)
-    total_focus_time: int = Field(..., ge=0)
-    average_productivity: float = Field(..., ge=0, le=10)
-    productivity_trend: str
-    distraction_trend: str
-    completion_rate: float = Field(..., ge=0, le=1)
-    most_productive_times: List[int]
+
+    user_id: UUID
+    total_sessions: int
+    total_duration: int  # in minutes
+    completion_rate: float
+    most_productive_times: List[str]
     preferred_activity_types: List[ActivityType]
     preferred_session_types: List[SessionType]
-    session_stats: Dict[str, int]
-    average_duration: float = Field(..., ge=0)
-    average_focus_rating: float = Field(..., ge=0, le=10)
-    average_productivity_rating: float = Field(..., ge=0, le=10)
+    average_focus_rating: float
+    average_productivity_rating: float
+    average_session_duration: int  # in minutes
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class CreateBodyDoublingSchema(BaseSchema):
     """Schema for creating a body doubling session."""
-    host_user_id: UUID
+
+    user_id: UUID
+    host_id: UUID
     session_type: SessionType
     activity_type: ActivityType
     planned_duration: int = Field(..., description="Duration in minutes", ge=15, le=240)
+    max_participants: int = Field(
+        default=2, description="Maximum number of participants", ge=2, le=10
+    )
     description: Optional[str] = Field(None, max_length=500)
     energy_level: Optional[EnergyLevel] = None
     environment_data: Optional[EnvironmentDataSchema] = None
@@ -133,8 +145,9 @@ class CreateBodyDoublingSchema(BaseSchema):
 
 class BodyDoublingSchema(TimestampedSchema):
     """Schema for body doubling session."""
+
     id: UUID
-    host_user_id: UUID
+    host_id: UUID
     session_type: SessionType
     activity_type: ActivityType
     status: SessionStatus
@@ -154,6 +167,7 @@ class BodyDoublingSchema(TimestampedSchema):
 
 class BodyDoublingResponseSchema(BaseSchema):
     """Schema for body doubling response."""
+
     success: bool
     message: str
     data: BodyDoublingSchema
@@ -163,6 +177,7 @@ class BodyDoublingResponseSchema(BaseSchema):
 
 class UpdateBodyDoublingSchema(BaseSchema):
     """Schema for updating a body doubling session."""
+
     session_type: Optional[SessionType] = None
     status: Optional[SessionStatus] = None
     activity_type: Optional[ActivityType] = None
@@ -183,6 +198,7 @@ class UpdateBodyDoublingSchema(BaseSchema):
 
 class BodyDoublingListSchema(BaseSchema):
     """Schema for list of body doubling sessions."""
+
     sessions: List[BodyDoublingResponseSchema]
 
     model_config = ConfigDict(from_attributes=True)
@@ -190,6 +206,7 @@ class BodyDoublingListSchema(BaseSchema):
 
 class BodyDoublingStatsSchema(BaseSchema):
     """Schema for body doubling statistics."""
+
     total_sessions: int = Field(..., ge=0)
     total_duration: int = Field(..., ge=0)
     average_duration: float = Field(..., ge=0)
@@ -199,6 +216,7 @@ class BodyDoublingStatsSchema(BaseSchema):
 
 class BodyDoublingTrendsSchema(BaseSchema):
     """Schema for body doubling trends."""
+
     weekly_sessions: int = Field(..., ge=0)
     monthly_sessions: int = Field(..., ge=0)
     completion_rate: float = Field(..., ge=0, le=1)
@@ -221,5 +239,5 @@ __all__ = [
     "BodyDoublingResponseSchema",
     "BodyDoublingListSchema",
     "BodyDoublingStatsSchema",
-    "BodyDoublingTrendsSchema"
+    "BodyDoublingTrendsSchema",
 ]

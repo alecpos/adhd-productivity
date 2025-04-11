@@ -330,4 +330,4 @@ The TPR system integrates with various tools to enhance functionality:
 - **Coaching Integration**: Tools for ADHD coaches to collaborate with clients using the app
 - **Healthcare Provider Materials**: Resources designed for therapists and physicians
 
-For immediate assistance, contact support@adhdcalendar.com or use the in-app help button. 
+For immediate assistance, contact support@adhdcalendar.com or use the in-app help button.

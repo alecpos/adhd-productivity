@@ -1,5 +1,8 @@
-
-
+import spacy
+import re
+from typing import List, Dict, Optional
+from datetime import timedelta
+import subprocess
 
 from .time_utils import parse_datetime
 
@@ -21,126 +24,104 @@ def extract_time_expressions(text: str) -> List[Dict]:
     for ent in doc.ents:
         if ent.label_ in ["TIME", "DATE"]:
             time_entities.append(
-                {"text": ent.text, "type": ent.label_, "start": ent.start_char, "end": ent.end_char}
+                {
+                    "text": ent.text,
+                    "label": ent.label_,
+                    "start": ent.start_char,
+                    "end": ent.end_char,
+                }
             )
 
+    return time_entities
 
 
 def parse_duration(text: str) -> Optional[timedelta]:
-    """Parse duration expressions like '30 minutes', '2 hours', etc."""
-    patterns = {
-        r"(\d+)\s*(hour|hr|h)s?": lambda x: timedelta(hours=int(x)),
-        r"(\d+)\s*(minute|min|m)s?": lambda x: timedelta(minutes=int(x)),
-        r"(\d+)\s*(day|d)s?": lambda x: timedelta(days=int(x)),
-        r"(\d+)\s*(week|wk|w)s?": lambda x: timedelta(weeks=int(x)),
-    }
-
-    text = text.lower()
-    for pattern, converter in patterns.items():
-        match = re.search(pattern, text)
-        if match:
-            return converter(match.group(1))
-
+    """Parse duration expressions from text."""
+    doc = nlp(text)
+    for token in doc:
+        if token.like_num and token.dep_ == "nummod":
+            number = float(token.text)
+            if token.nbor().text.lower() in ["hour", "hours"]:
+                return timedelta(hours=number)
+            elif token.nbor().text.lower() in ["minute", "minutes"]:
+                return timedelta(minutes=number)
+            elif token.nbor().text.lower() in ["day", "days"]:
+                return timedelta(days=number)
+    return None
 
 
 def extract_task_metadata(text: str) -> Dict:
-    """Extract task-related metadata from text."""
+    """Extract metadata from task description."""
     doc = nlp(text)
-    metadata = {"priority": None, "category": None, "duration": None, "deadline": None}
+    metadata = {"priority": "medium", "category": "uncategorized", "estimated_duration": None}
 
-    # Priority keywords
-    priority_words = {
-        "high": ["urgent", "important", "critical", "asap", "high priority"],
-        "medium": ["moderate", "normal", "medium priority"],
-        "low": ["low priority", "whenever", "not urgent"],
-    }
+    # Extract priority
+    for token in doc:
+        if token.text.lower() in ["urgent", "important", "critical"]:
+            metadata["priority"] = "high"
+        elif token.text.lower() in ["low", "optional"]:
+            metadata["priority"] = "low"
 
-    text_lower = text.lower()
-
-    # Check priority
-    for priority, words in priority_words.items():
-        if any(word in text_lower for word in words):
-            metadata["priority"] = priority
+    # Extract category
+    for ent in doc.ents:
+        if ent.label_ == "ORG":
+            metadata["category"] = ent.text.lower()
 
     # Extract duration
     duration = parse_duration(text)
     if duration:
-        metadata["duration"] = duration
+        metadata["estimated_duration"] = duration.total_seconds() / 3600  # Convert to hours
 
-    # Extract deadline if present
-    time_expressions = extract_time_expressions(text)
-    if time_expressions:
-        for expr in time_expressions:
-            if "by" in text_lower or "due" in text_lower:
-                parsed_date = parse_datetime(expr["text"])
-                if parsed_date:
-                    metadata["deadline"] = parsed_date
-
+    return metadata
 
 
 def get_task_suggestions(task_history: List[Dict]) -> List[Dict]:
-    """Generate task suggestions based on historical tasks."""
-    # Implement task suggestion logic based on patterns in task history
+    """Get task suggestions based on history."""
     suggestions = []
-
     if not task_history:
-    pass
+        return suggestions
 
     # Group tasks by category
-    categories = {}
+    category_tasks = {}
     for task in task_history:
         category = task.get("category", "uncategorized")
-        if category not in categories:
-            categories[category] = []
-        categories[category].append(task)
+        if category not in category_tasks:
+            category_tasks[category] = []
+        category_tasks[category].append(task)
 
-    # Generate suggestions based on frequency and patterns
-    for category, tasks in categories.items():
-        if len(tasks) >= 3:  # Only suggest if we have enough history
-            avg_duration = sum(
-                (
-                    t.get("duration", timedelta(0)).total_seconds()
-                    if t.get("duration")
-                )
-            ) / len(tasks)
+    # Generate suggestions for each category
+    for category, tasks in category_tasks.items():
+        if len(tasks) >= 3:  # Only suggest if we have enough data
+            avg_duration = sum(t.get("duration", 0) for t in tasks) / len(tasks)
+            common_time = max(
+                set(t.get("time_of_day", "") for t in tasks), key=lambda x: list(tasks).count(x)
+            )
 
             suggestions.append(
                 {
                     "category": category,
-                    "suggested_duration": timedelta(seconds=avg_duration),
-                    "confidence": min(len(tasks) / 10, 1.0),  # Scale with history
-                    "based_on": len(tasks),
+                    "suggested_duration": avg_duration,
+                    "preferred_time": common_time,
+                    "confidence": min(len(tasks) / 10, 1.0),  # Confidence based on sample size
                 }
             )
 
-    return sorted(suggestions, key=lambda x: x["confidence"], reverse=True)
+    return suggestions
 
 
 def extract_event_category(text: str) -> Optional[str]:
-    """
-    Extract the event category from text using basic keyword matching.
-
-    Args:
-        text (str): The text to analyze
-
-    Returns:
-        Optional[str]: The detected category or None if no category is found
-    """
-    # Convert to lowercase for case-insensitive matching
-    text = text.lower()
-
-    # Define category keywords
+    """Extract event category from text."""
+    doc = nlp(text)
     categories = {
-        "meeting": ["meeting", "conference", "sync", "discussion", "call"],
-        "task": ["task", "todo", "to-do", "assignment", "project"],
-        "appointment": ["appointment", "doctor", "dentist", "checkup"],
-        "social": ["lunch", "dinner", "coffee", "meetup", "party", "social"],
-        "exercise": ["gym", "workout", "exercise", "training", "sport"],
-        "focus": ["focus", "study", "work", "concentration", "deep work"],
+        "meeting": ["meeting", "call", "conference"],
+        "task": ["task", "todo", "work"],
+        "reminder": ["reminder", "alert", "notification"],
     }
 
-    # Check each category's keywords
     for category, keywords in categories.items():
-        if any(keyword in text for keyword in keywords):
-    pass
+        if any(keyword in text.lower() for keyword in keywords):
+            return category
+        else:
+            continue
 
+    return None

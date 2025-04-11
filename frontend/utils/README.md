@@ -222,4 +222,4 @@ When adding or modifying utilities:
 
 - [Utility Functions Guide](../docs/utility_functions.md)
 - [Date and Time Handling](../docs/date_time_handling.md)
-- [Custom Hooks](../docs/custom_hooks.md) 
+- [Custom Hooks](../docs/custom_hooks.md)

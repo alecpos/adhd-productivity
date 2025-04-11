@@ -6,8 +6,10 @@ from pydantic import BaseModel, ConfigDict
 
 from app.models.enums_model import InteractionType, InteractionOutcome
 
+
 class InteractionBaseSchema(BaseModel):
     """Base schema for interactions."""
+
     interaction_type: InteractionType
     outcome: InteractionOutcome = InteractionOutcome.NEUTRAL
     notes: Optional[str] = None
@@ -19,11 +21,13 @@ class InteractionBaseSchema(BaseModel):
 
 class InteractionCreateSchema(InteractionBaseSchema):
     """Schema for creating interactions."""
+
     pass
 
 
 class InteractionResponseSchema(InteractionBaseSchema):
     """Schema for interaction responses."""
+
     id: int
     user_id: int
     contact_id: int

@@ -1,11 +1,17 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.gamification_schema import BadgeResponseSchema, AchievementResponseSchema, LeaderboardResponseSchema, PointsResponseSchema
+from app.schemas.gamification_schema import (
+    BadgeResponseSchema,
+    AchievementResponseSchema,
+    LeaderboardResponseSchema,
+    PointsResponseSchema,
+)
 from app.database import get_db
 from app.models.user_model import User
 from app.services.gamification_service import GamificationService
 from app.services.auth_service import get_current_user
 from fastapi import APIRouter, Depends
 from typing import List
+
 router = APIRouter(prefix="/api/gamification", tags=["gamification"])
 
 

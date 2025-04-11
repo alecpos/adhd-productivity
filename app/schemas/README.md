@@ -75,7 +75,7 @@ class TaskBase(BaseModel):
     due_date: Optional[datetime] = None
     estimated_duration: Optional[int] = Field(None, ge=1, description="Duration in minutes")
     priority: str = Field("medium", regex="^(low|medium|high|urgent)$")
-    
+
     @validator("title")
     def title_must_not_be_empty(cls, v):
         if not v.strip():
@@ -99,7 +99,7 @@ class TaskResponse(TaskBase):
     updated_at: datetime
     is_completed: bool
     user_id: UUID
-    
+
     class Config:
         orm_mode = True
 ```
@@ -138,4 +138,4 @@ When creating or modifying schemas:
 
 - [Pydantic Documentation](https://docs.pydantic.dev/)
 - [API Schema Design](../../docs/api_schema_design.md)
-- [Validation Patterns](../../docs/validation_patterns.md) 
+- [Validation Patterns](../../docs/validation_patterns.md)

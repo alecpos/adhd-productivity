@@ -143,10 +143,10 @@ describe('CalendarManagement', () => {
         <CalendarManagement />
       </Provider>
     );
-    
+
     const addButton = getByTestId('add-task-button');
     fireEvent.press(addButton);
-    
+
     expect(getByTestId('task-input-modal')).toBeTruthy();
   });
 
@@ -156,19 +156,19 @@ describe('CalendarManagement', () => {
         <CalendarManagement />
       </Provider>
     );
-    
+
     // Open modal
     fireEvent.press(getByTestId('add-task-button'));
-    
+
     // Fill form
     fireEvent.changeText(getByPlaceholderText('Task Title'), 'Test Task');
     fireEvent.changeText(getByPlaceholderText('Description'), 'Test Description');
-    
+
     // Submit form
     await act(async () => {
       fireEvent.press(getByTestId('submit-task-button'));
     });
-    
+
     // Verify task was added to store
     const state = store.getState();
     expect(state.tasks.tasks).toContainEqual(
@@ -201,27 +201,27 @@ describe('CalendarManagement', () => {
       reminders: [],
       userId: 'test-user'
     };
-    
+
     store = createTestStore();
     store.dispatch({ type: 'tasks/addTask', payload: initialTask });
-    
+
     const { getByTestId, getByPlaceholderText } = render(
       <Provider store={store}>
         <CalendarManagement />
       </Provider>
     );
-    
+
     // Open edit modal
     fireEvent.press(getByTestId(`edit-task-${initialTask.id}`));
-    
+
     // Update form
     fireEvent.changeText(getByPlaceholderText('Task Title'), 'Updated Task');
-    
+
     // Submit form
     await act(async () => {
       fireEvent.press(getByTestId('submit-task-button'));
     });
-    
+
     // Verify task was updated in store
     const state = store.getState();
     expect(state.tasks.tasks).toContainEqual(
@@ -254,21 +254,21 @@ describe('CalendarManagement', () => {
       reminders: [],
       userId: 'test-user'
     };
-    
+
     store = createTestStore();
     store.dispatch({ type: 'tasks/addTask', payload: taskToDelete });
-    
+
     const { getByTestId } = render(
       <Provider store={store}>
         <CalendarManagement />
       </Provider>
     );
-    
+
     // Delete task
     await act(async () => {
       fireEvent.press(getByTestId(`delete-task-${taskToDelete.id}`));
     });
-    
+
     // Verify task was removed from store
     const state = store.getState();
     expect(state.tasks.tasks).not.toContainEqual(

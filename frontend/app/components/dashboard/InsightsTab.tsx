@@ -21,7 +21,7 @@ export default function InsightsTab() {
       </View>
 
       <View style={styles.section}>
-        <GamificationDashboard 
+        <GamificationDashboard
           streaks={{
             current_streak: 0,
             highest_streak: 0,
@@ -52,4 +52,4 @@ const useStyles = makeStyles((theme) => ({
     shadowRadius: 3.84,
     elevation: 5,
   },
-})); 
+}));

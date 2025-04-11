@@ -216,13 +216,13 @@ class UserCreate(BaseModelWithValidators):
     password: str
     birth_date: Optional[datetime] = None
     phone_number: Optional[str] = None
-    
+
     # Validators will be automatically added for:
     # - email (email format)
     # - password (strength)
     # - birth_date (past date)
     # - phone_number (format)
-    
+
     # Additional custom validators can be added:
     _validate_dependent = validate_dependent_fields("birth_date", ["phone_number"])
 ```
@@ -247,7 +247,7 @@ router = APIRouter(
 
 ```python
 @router.get(
-    "/user/{user_id}", 
+    "/user/{user_id}",
     response_model=TaskListResponse,
     summary="Get User Tasks",
     description="Retrieve all tasks for a specific user",
@@ -276,10 +276,10 @@ Args:
     user_id: The user ID
     current_user: The authenticated user
     pagination: Pagination parameters
-    
+
 Returns:
     A paginated list of tasks
-    
+
 Raises:
     403: If the current user doesn't have permission to view the tasks
     404: If the user is not found
@@ -342,4 +342,4 @@ app.include_router(task_router, prefix="/api/v1")
 - **Reduced Boilerplate:** Common patterns are encapsulated in reusable functions
 - **Better Developer Experience:** Documentation is generated automatically
 - **Improved Client Experience:** Clients can rely on consistent behavior
-- **Easier Maintenance:** Changes to response format or error handling can be made in one place 
+- **Easier Maintenance:** Changes to response format or error handling can be made in one place

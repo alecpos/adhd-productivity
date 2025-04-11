@@ -251,4 +251,4 @@ Example error response:
 3. **Response Times**
    - Typical response: 200-500ms
    - Complex schedules: up to 2s
-   - Cached patterns when possible 
+   - Cached patterns when possible

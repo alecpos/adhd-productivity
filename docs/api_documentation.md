@@ -408,4 +408,4 @@ The API is versioned using URL prefixes (e.g., `/api/v1`). When breaking changes
 
 - [API Design Guidelines](./api_design_guidelines.md)
 - [Authentication Flow](./authentication_flow.md)
-- [Error Handling Guide](./error_handling_guide.md) 
+- [Error Handling Guide](./error_handling_guide.md)

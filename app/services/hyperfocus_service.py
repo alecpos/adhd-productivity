@@ -1,4 +1,5 @@
 """Service for managing hyperfocus sessions."""
+
 import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
@@ -17,7 +18,9 @@ from app.services.base_service import BaseService
 logger = logging.getLogger(__name__)
 
 
-class HyperfocusService(BaseService[HyperfocusSchema, HyperfocusSessionResponseSchema, HyperfocusSessionCreate]):
+class HyperfocusService(
+    BaseService[HyperfocusSchema, HyperfocusSessionResponseSchema, HyperfocusSessionCreate]
+):
     """Service for managing hyperfocus sessions."""
 
     def __init__(self, db: AsyncSession):
@@ -81,9 +84,7 @@ class HyperfocusService(BaseService[HyperfocusSchema, HyperfocusSessionResponseS
 
     async def get_user_sessions(self, user_id: UUID) -> List[HyperfocusSchema]:
         """Get all hyperfocus sessions for a user."""
-        query = select(HyperfocusSchema).where(
-            HyperfocusSchema.user_id == user_id
-        )
+        query = select(HyperfocusSchema).where(HyperfocusSchema.user_id == user_id)
         result = await self.db.execute(query)
         return list(result.scalars().all())
 

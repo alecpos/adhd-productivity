@@ -6,11 +6,11 @@ import { Stack } from 'expo-router';
 export default function ExplainableAIScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: 'AI Explanations',
           headerShown: true
-        }} 
+        }}
       />
       <ExplainableAI />
     </SafeAreaView>
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-}); 
+});

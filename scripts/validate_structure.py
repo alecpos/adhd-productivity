@@ -26,7 +26,7 @@ class CodebaseValidator:
 
     def __init__(self):
         self.errors: List[ValidationError] = []
-        self.excluded_dirs = ['deprecated']
+        self.excluded_dirs = ["deprecated"]
 
     def _should_skip_path(self, path: str) -> bool:
         """Check if path should be skipped."""

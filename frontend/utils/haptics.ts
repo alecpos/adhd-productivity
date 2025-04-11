@@ -62,4 +62,4 @@ export default {
   triggerImpactHeavy,
   triggerNotification,
   triggerSelection
-}; 
+};

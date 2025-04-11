@@ -54,4 +54,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     alignItems: 'center',
   },
-}); 
+});

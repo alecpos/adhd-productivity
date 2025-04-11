@@ -1,4 +1,5 @@
 """Subscription schemas."""
+
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import UUID
@@ -7,6 +8,8 @@ from pydantic import Field, validator
 from app.schemas.schema_validation_schema import ValidationRule, RequiredFieldRule
 from app.core.responses import APIResponse
 from app.schemas.base_schema import BaseSchema, TimestampedSchema
+
+
 class SubscriptionSchema(BaseSchema):
     """Base schema for subscription management with comprehensive validation."""
 
@@ -130,29 +133,28 @@ validation_rules = [
     RequiredFieldRule(field_name="amount", error_message="SubscriptionSchema amount is required"),
     RequiredFieldRule(field_name="due_date", error_message="Due date is required"),
     ValidationRule(
-        field_name="amount",
-        validator=lambda v: v >= 0,
-        error_message="Amount must be non-negative"
+        field_name="amount", validator=lambda v: v >= 0, error_message="Amount must be non-negative"
     ),
     ValidationRule(
         field_name="billing_cycle",
-        validator=lambda v: v.lower() in ["monthly", "quarterly", "semi-annual", "annual", "custom"],
-        error_message="Invalid billing cycle"
+        validator=lambda v: v.lower()
+        in ["monthly", "quarterly", "semi-annual", "annual", "custom"],
+        error_message="Invalid billing cycle",
     ),
     ValidationRule(
         field_name="status",
         validator=lambda v: v.lower() in ["active", "pending", "cancelled", "expired", "suspended"],
-        error_message="Invalid subscription status"
+        error_message="Invalid subscription status",
     ),
     ValidationRule(
         field_name="name",
         validator=lambda v: 1 <= len(v) <= 100,
-        error_message="Name must be between 1 and 100 characters"
+        error_message="Name must be between 1 and 100 characters",
     ),
     ValidationRule(
         field_name="description",
         validator=lambda v: not v or len(v) <= 500,
-        error_message="Description cannot exceed 500 characters"
+        error_message="Description cannot exceed 500 characters",
     ),
 ]
 __all__ = [

@@ -161,4 +161,4 @@ describe('ADHDDashboard', () => {
     const energyValue = getByText('5');
     expect(energyValue).toBeTruthy();
   });
-}); 
+});

@@ -88,8 +88,8 @@ export default function CalendarView() {
     fetchEvents().finally(() => setLoading(false));
   }, [fetchEvents]);
 
-  const filteredEvents = useMemo(() => 
-    events.filter(event => 
+  const filteredEvents = useMemo(() =>
+    events.filter(event =>
       format(new Date(event.start_time), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
     ),
     [events, selectedDate]
@@ -216,4 +216,4 @@ const styles = {
     color: '#666',
     padding: 20,
   },
-} as const; 
+} as const;

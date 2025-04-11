@@ -1,6 +1,6 @@
-
-
-from dateutil.rrule import DAILY, MONTHLY, WEEKLY, YEARLY, rrule
+from datetime import datetime, timedelta
+from typing import List, Dict, Any
+from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 
 
 def get_recurring_dates(
@@ -43,11 +43,13 @@ def get_next_available_slot(
     while True:
         end_time = current_time + timedelta(minutes=duration)
         conflicts = [
+            event
+            for event in existing_events
             if (event["start_time"] < end_time and event["end_time"] > current_time)
         ]
 
         if not conflicts:
-    pass
+            return current_time
 
         # Move to the end of the latest conflicting event
         current_time = max(event["end_time"] for event in conflicts)

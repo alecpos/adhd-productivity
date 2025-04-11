@@ -51,4 +51,4 @@ export const theme = {
     lg: 16,
     xl: 24,
   },
-}; 
+};

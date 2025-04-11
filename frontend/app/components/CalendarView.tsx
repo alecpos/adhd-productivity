@@ -73,7 +73,7 @@ export default function CalendarView(): ReactElement {
   }, [user?.id, calendarService, selectedDate]);
 
   const filteredEvents = useMemo(() => {
-    return events.filter(event => 
+    return events.filter(event =>
       format(new Date(event.startDate), 'yyyy-MM-dd') === selectedDate
     );
   }, [events, selectedDate]);
@@ -302,4 +302,4 @@ const styles = {
     color: '#666',
     marginTop: 20,
   },
-} as const; 
+} as const;

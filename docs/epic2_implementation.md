@@ -685,4 +685,4 @@ alembic revision -m "description_of_change"
 | Explainable Predictions | Natural language explanations, confidence visualization | Weeks 22-25 | Planned |
 | Social Context Awareness | Meeting impact, collaboration factors | Weeks 23-26 | Planned |
 | Proactive Recommendations | Preventative stressor management | Weeks 24-27 | Planned |
-| Personalized Optimization | Individual ADHD presentation adaptation | Weeks 25-28 | Planned | 
+| Personalized Optimization | Individual ADHD presentation adaptation | Weeks 25-28 | Planned |

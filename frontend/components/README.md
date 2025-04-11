@@ -124,4 +124,4 @@ When creating new components:
 
 - [Design System Guide](../docs/design_system.md)
 - [Component Development](../docs/component_development.md)
-- [Accessibility Guidelines](../docs/accessibility.md) 
+- [Accessibility Guidelines](../docs/accessibility.md)

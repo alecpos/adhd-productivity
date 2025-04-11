@@ -212,7 +212,7 @@ const energyData = {
   datasets: [
     {
       data: [30, 80, 65, 75, 55, 40],
-      color: (opacity = 1) => `rgba(71, 136, 218, ${opacity})`, 
+      color: (opacity = 1) => `rgba(71, 136, 218, ${opacity})`,
       strokeWidth: 2
     }
   ]
@@ -231,15 +231,15 @@ export const ScheduleOptimizer = () => {
     rebalanceThreshold: 0.7
   });
   const [showSettings, setShowSettings] = useState(false);
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
-  
+
   // Toggle between original and optimized schedule
   const toggleOptimization = () => {
     setIsOptimized(prev => !prev);
     setSchedule(isOptimized ? originalSchedule : optimizedSchedule);
   };
-  
+
   // Get color for task category
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -250,7 +250,7 @@ export const ScheduleOptimizer = () => {
       default: return '#888888';
     }
   };
-  
+
   // Get color for energy level
   const getEnergyColor = (level: string) => {
     switch (level) {
@@ -260,7 +260,7 @@ export const ScheduleOptimizer = () => {
       default: return '#888888';
     }
   };
-  
+
   // Get color for priority
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -270,12 +270,12 @@ export const ScheduleOptimizer = () => {
       default: return '#888888';
     }
   };
-  
+
   // Update settings
   const updateSetting = (key: keyof OptimizerSettings, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
-  
+
   // Chart configuration
   const chartConfig = {
     backgroundGradientFrom: "#ffffff",
@@ -292,7 +292,7 @@ export const ScheduleOptimizer = () => {
       stroke: "#4782DA"
     }
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <Card containerStyle={styles.card}>
@@ -300,7 +300,7 @@ export const ScheduleOptimizer = () => {
         <Text style={styles.subtitle}>
           Dynamically rebalance your schedule based on energy levels, priorities, and optimal focus times.
         </Text>
-        
+
         <Button
           title={isOptimized ? "View Original Schedule" : "Optimize Schedule"}
           onPress={toggleOptimization}
@@ -314,7 +314,7 @@ export const ScheduleOptimizer = () => {
           }}
           iconPosition="right"
         />
-        
+
         {isOptimized && (
           <View style={styles.optimizationStats}>
             <View style={styles.statItem}>
@@ -331,7 +331,7 @@ export const ScheduleOptimizer = () => {
             </View>
           </View>
         )}
-        
+
         <Button
           title="Optimizer Settings"
           type="outline"
@@ -346,7 +346,7 @@ export const ScheduleOptimizer = () => {
           }}
           iconPosition="right"
         />
-        
+
         {showSettings && (
           <View style={styles.settingsContainer}>
             <View style={styles.settingRow}>
@@ -359,7 +359,7 @@ export const ScheduleOptimizer = () => {
                 titleStyle={styles.toggleButtonText}
               />
             </View>
-            
+
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Include focus blocks</Text>
               <Button
@@ -370,7 +370,7 @@ export const ScheduleOptimizer = () => {
                 titleStyle={styles.toggleButtonText}
               />
             </View>
-            
+
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Add smart breaks</Text>
               <Button
@@ -381,7 +381,7 @@ export const ScheduleOptimizer = () => {
                 titleStyle={styles.toggleButtonText}
               />
             </View>
-            
+
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Break frequency: {settings.breakFrequency} minutes</Text>
             </View>
@@ -397,7 +397,7 @@ export const ScheduleOptimizer = () => {
               maximumTrackTintColor="#e0e0e0"
               style={styles.slider}
             />
-            
+
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Respect task priorities</Text>
               <Button
@@ -408,7 +408,7 @@ export const ScheduleOptimizer = () => {
                 titleStyle={styles.toggleButtonText}
               />
             </View>
-            
+
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Rebalance threshold: {settings.rebalanceThreshold.toFixed(1)}</Text>
             </View>
@@ -427,7 +427,7 @@ export const ScheduleOptimizer = () => {
           </View>
         )}
       </Card>
-      
+
       <Card containerStyle={styles.card}>
         <View style={styles.energyChartHeader}>
           <Text style={styles.energyChartTitle}>Your Energy Pattern</Text>
@@ -443,7 +443,7 @@ export const ScheduleOptimizer = () => {
             buttonStyle={styles.chartToggleButton}
           />
         </View>
-        
+
         {showEnergyChart && (
           <LineChart
             data={energyData}
@@ -455,10 +455,10 @@ export const ScheduleOptimizer = () => {
           />
         )}
       </Card>
-      
+
       <Card containerStyle={styles.card}>
         <Card.Title>{isOptimized ? "Optimized Schedule" : "Current Schedule"}</Card.Title>
-        
+
         {schedule.map((block, index) => (
           <View key={block.id} style={styles.scheduleBlock}>
             <View style={styles.timeContainer}>
@@ -466,7 +466,7 @@ export const ScheduleOptimizer = () => {
               <View style={styles.timeLine} />
               <Text style={styles.timeText}>{block.endTime}</Text>
             </View>
-            
+
             <View style={[
               styles.blockContent,
               block.isBreak && styles.breakBlock
@@ -492,7 +492,7 @@ export const ScheduleOptimizer = () => {
                     />
                   </View>
                 </View>
-                
+
                 {isOptimized && block.isOptimal && (
                   <Icon
                     name="check-circle"
@@ -502,14 +502,14 @@ export const ScheduleOptimizer = () => {
                   />
                 )}
               </View>
-              
+
               {isOptimized && index > 0 && block.id !== originalSchedule[index - 1]?.id && !block.isBreak && (
                 <View style={styles.changeIndicator}>
                   <Icon name="arrow-upward" type="material" color="#4782DA" size={16} />
                   <Text style={styles.changeText}>Moved from later in day</Text>
                 </View>
               )}
-              
+
               {isOptimized && block.isBreak && (
                 <View style={styles.changeIndicator}>
                   <Icon name="plus-circle" type="material-community" color="#47DA96" size={16} />
@@ -701,4 +701,4 @@ const styles = StyleSheet.create({
     color: '#4782DA',
     marginLeft: 5,
   },
-}); 
+});

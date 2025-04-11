@@ -65,4 +65,4 @@ export const useAccessibilityPreferences = (): AccessibilityPreferences => {
     screenReaderEnabled,
     fontScale,
   };
-}; 
+};

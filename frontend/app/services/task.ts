@@ -91,4 +91,4 @@ export class TaskService {
       throw new AppError('Failed to complete task', (error as Error).message);
     }
   }
-} 
+}

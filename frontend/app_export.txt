@@ -167,8 +167,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-        {/* 
-          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native. 
+        {/*
+          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.
           However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
         */}
         <ScrollViewStyleReset />
@@ -622,7 +622,7 @@ export default function CreateTaskScreen() {
   if (!user) {
     throw new Error("User is null, but this shouldn't happen in authenticated routes.");
   }
-  
+
   const handleCreateTask = async () => {
     if (!title || !description || !dueDate) {
       setError('All fields are required!');
@@ -739,7 +739,7 @@ export default function EditTaskScreen() {
       Alert.alert("Error", "User is not logged in.");
       return;
     }
-  
+
     try {
       await axios.put(`http://localhost:8000/tasks/${id}`, {
         ...task,
@@ -956,5 +956,3 @@ const styles = StyleSheet.create({
   button: { marginTop: 10 },
   streakText: { marginTop: 20, fontStyle: "italic", textAlign: "center" },
 });
-
-

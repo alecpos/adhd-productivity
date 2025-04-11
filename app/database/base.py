@@ -1,26 +1,48 @@
-"""Import all models here to ensure they are registered before relationships are established.
+"""Base module for database operations."""
 
-This module imports all SQLAlchemy models in the correct order to ensure that all table
-definitions are complete before relationships between tables are established.
-This prevents "table not found" errors when SQLAlchemy tries to create foreign key
-references during model initialization.
-"""
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-# Import base model class first
-from app.models.base_model import BaseModel
-from app.database.base_class import Base  # Base is now BaseModel
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# Import models in dependency order - user model should come first since many models depend on it
-from app.models.user_model import UserModel
-from app.models.contact_model import ContactModel  # Add contact model before models that depend on it
-from app.models.calendar_model import CalendarModel
-from app.models.calendar_event_model import CalendarEventModel
-from app.models.calendar_sync_model import CalendarSyncModel
-from app.models.task_category_model import TaskCategoryModel
-from app.models.task_model import TaskModel
-from app.models.session_model import SessionModel  # Add session model before scheduling model
-from app.models.scheduling_model import Interruption, Break, WorkHours, ScheduleBlock, SchedulePreferences, EnergyPattern  # Add scheduling models
-from app.models.reminder_model import ReminderModel  # Add reminder model after models it depends on
-from app.models.interaction_model import Interaction, InteractionStats  # Add interaction model which depends on session model
-# Import other models that depend on user model
-# Add more imports as needed
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
+# Create the SQLAlchemy base
+Base = declarative_base()
+
+# Import models after Base is created
+# Instead of importing specific models here that might cause circular imports,
+# we'll leave it to the engine initialization code to ensure models are loaded
+# when needed.
+
+
+# Create async engine
+def create_engine():
+    """Create SQLAlchemy engine with settings."""
+    engine = create_async_engine(
+        settings.SQLALCHEMY_DATABASE_URI,
+        echo=settings.DB_ECHO,
+        pool_pre_ping=True,
+        pool_size=settings.DB_POOL_SIZE,
+        max_overflow=settings.DB_MAX_OVERFLOW,
+    )
+    return engine
+
+
+# Define session
+def create_session_factory(engine):
+    """Create session factory."""
+    session_factory = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+    return session_factory

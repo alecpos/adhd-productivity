@@ -210,16 +210,16 @@ import { useTheme } from '../theme';
 
 const MyComponent = () => {
   const theme = useTheme();
-  
+
   return (
     <View style={styles.container}>
       <Text style={[styles.text, { color: theme.colors.text.primary }]}>
         Themed Text
       </Text>
-      <View 
+      <View
         style={[
-          styles.card, 
-          { 
+          styles.card,
+          {
             backgroundColor: theme.colors.background.card,
             padding: theme.spacing.md
           }
@@ -259,15 +259,15 @@ import { ThemeProvider } from './theme';
 
 const App = () => {
   const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
-  
+
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       setColorScheme(colorScheme);
     });
-    
+
     return () => subscription.remove();
   }, []);
-  
+
   return (
     <ThemeProvider theme={colorScheme === 'dark' ? 'dark' : 'light'}>
       {/* App content */}
@@ -292,4 +292,4 @@ When working with the theme:
 - [Design System](../docs/design_system.md)
 - [Styling Guide](../docs/styling_guide.md)
 - [Accessibility](../docs/accessibility.md)
-- [Component Theming](../docs/component_theming.md) 
+- [Component Theming](../docs/component_theming.md)

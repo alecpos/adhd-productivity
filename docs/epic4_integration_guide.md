@@ -220,10 +220,10 @@ tasks = get_user_tasks(user_id)
 for task in tasks:
     # Add cognitive profile to tasks
     task.cognitive_profile = cognitive_profiler.categorize_task(task)
-    
+
     # Predict realistic durations with uncertainty
     task.duration_prediction = duration_predictor.predict_duration(task)
-    
+
     # Calculate time buffer
     task.time_buffer = buffer_calculator.calculate_buffer(
         task.duration_prediction.mean,
@@ -262,14 +262,14 @@ import { ProgressMonitor } from 'components/Progress/ProgressMonitor';
 // Display user's energy curve
 const EnergyPatternView = () => {
   const [energyData, setEnergyData] = useState([]);
-  
+
   useEffect(() => {
     // Fetch energy data from API
     api.getEnergyPattern(userId).then(data => {
       setEnergyData(data);
     });
   }, [userId]);
-  
+
   return <CircadianChart data={energyData} />;
 };
 
@@ -277,16 +277,16 @@ const EnergyPatternView = () => {
 const ScheduleOptimizer = () => {
   const [originalSchedule, setOriginalSchedule] = useState([]);
   const [optimizedSchedule, setOptimizedSchedule] = useState([]);
-  
+
   const handleOptimize = async () => {
     const result = await api.optimizeSchedule(userId, selectedDate);
     setOptimizedSchedule(result.optimizedSchedule);
   };
-  
+
   return (
     <>
-      <ScheduleComparisonView 
-        original={originalSchedule} 
+      <ScheduleComparisonView
+        original={originalSchedule}
         optimized={optimizedSchedule}
       />
       <Button onPress={handleOptimize}>Optimize Schedule</Button>
@@ -312,7 +312,7 @@ def test_schedule_optimization_workflow():
     # Set up test user and tasks
     user_id = create_test_user()
     tasks = create_test_tasks()
-    
+
     # Run optimization
     tpr_service = TemporalPatternRecognitionService()
     result = tpr_service.optimize_schedule_with_circadian(
@@ -321,18 +321,18 @@ def test_schedule_optimization_workflow():
         start_date=today,
         end_date=today + timedelta(days=1)
     )
-    
+
     # Verify results
     assert len(result.schedule) == len(tasks), "All tasks should be scheduled"
-    
+
     # Check energy alignment
     energy_model = CircadianRhythmModel()
     energy_levels = energy_model.predict_energy_levels(user_id, today)
-    
+
     for task_block in result.schedule:
         hour = task_block.start_time.hour
         task = next(t for t in tasks if t.id == task_block.task_id)
-        
+
         if task.focus_required > 7:  # High focus task
             assert energy_levels[hour] > 6, "High focus tasks should be in high energy periods"
 ```

@@ -13,7 +13,7 @@ from app.schemas.shared_components_schema import (
     Break,
     EnvironmentalFactors,
     Interruption,
-    SessionAnalytics
+    SessionAnalytics,
 )
 
 

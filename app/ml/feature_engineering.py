@@ -24,7 +24,9 @@ class FeatureEngineer:
         tasks_df = pd.DataFrame(user_data["tasks"])
 
         # Prepare features for each data type
-        mental_health_features, mental_health_targets = self._prepare_mental_health_features(mental_health_df)
+        mental_health_features, mental_health_targets = self._prepare_mental_health_features(
+            mental_health_df
+        )
         energy_features, energy_targets = self._prepare_energy_features(energy_df)
         task_features, task_targets = self._prepare_task_features(tasks_df)
 
@@ -39,7 +41,7 @@ class FeatureEngineer:
             "energy": energy_targets,
             "tasks": task_targets,
         }
-        
+
         return features, targets
 
     def _prepare_mental_health_features(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
@@ -72,7 +74,7 @@ class FeatureEngineer:
 
         # Use mood score as target
         targets = df["mood_score"].values
-        
+
         return features, targets
 
     def _prepare_energy_features(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
@@ -94,7 +96,7 @@ class FeatureEngineer:
 
         # Use energy level as target
         targets = df["energy_level"].values
-        
+
         return features, targets
 
     def _prepare_task_features(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
@@ -124,7 +126,7 @@ class FeatureEngineer:
 
         # Use task completion status as target (1 for completed, 0 for not completed)
         targets = (df["status"] == "completed").astype(int).values
-        
+
         return features, targets
 
     def _extract_time_features(self, timestamps: pd.Series) -> np.ndarray:
@@ -177,7 +179,7 @@ class FeatureEngineer:
                 for j, activity in enumerate(all_activities):
                     if activity in activities:
                         activity_features[i, j] = 1
-                        
+
         return activity_features
 
     def _encode_categorical(self, column: pd.Series) -> np.ndarray:

@@ -32,9 +32,9 @@ export default function FidgetTab() {
           onPress={toggleFidget}
         />
       </View>
-      
+
       {currentFidget === 'cube' ? (
-        <FidgetCube 
+        <FidgetCube
           size={200}
           primaryColor="#4A90E2"
           secondaryColor="#2E5C8A"
@@ -43,7 +43,7 @@ export default function FidgetTab() {
           }}
         />
       ) : (
-        <FidgetSpinner 
+        <FidgetSpinner
           size={200}
           primaryColor="#4A90E2"
           secondaryColor="#2E5C8A"

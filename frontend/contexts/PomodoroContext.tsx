@@ -43,7 +43,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
 
   const fetchSessions = useCallback(async () => {
     if (!user?.id) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -61,7 +61,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     if (!user?.id) {
       throw new Error('User not authenticated');
     }
-    
+
     setError(null);
     try {
       const newSession = await PomodoroService.startSession(sessionData);
@@ -78,7 +78,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const updatedSession = await PomodoroService.endSession(sessionId);
-      setSessions(prev => prev.map(session => 
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? updatedSession : session
       ));
       setCurrentSession(null);
@@ -94,7 +94,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const updatedSession = await PomodoroService.pauseSession(sessionId);
-      setSessions(prev => prev.map(session => 
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? updatedSession : session
       ));
       if (currentSession?.id === sessionId) {
@@ -111,7 +111,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const updatedSession = await PomodoroService.resumeSession(sessionId);
-      setSessions(prev => prev.map(session => 
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? updatedSession : session
       ));
       if (currentSession?.id === sessionId) {
@@ -126,7 +126,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
 
   const getSessionStats = async () => {
     if (!user?.id) return;
-    
+
     try {
       const sessionStats = await PomodoroService.getSessionStats();
       setStats(sessionStats);
@@ -139,7 +139,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const updatedSession = await PomodoroService.updateSession(sessionId, data);
-      setSessions(prev => prev.map(session => 
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? updatedSession : session
       ));
       if (currentSession?.id === sessionId) {
@@ -180,4 +180,4 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
       {children}
     </PomodoroContext.Provider>
   );
-} 
+}

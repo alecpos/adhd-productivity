@@ -18,7 +18,7 @@ import("configcat-js").then(configcat => {
     console.warn('ConfigCat SDK key is not set. Feature flags will default to false.');
     return;
   }
-  
+
   try {
     // Use specific polling mode parameters that are valid for web
     configCatClient = configcat.getClient(sdkKey, {
@@ -59,7 +59,7 @@ export function getFeatureFlagSync(key: string, defaultValue: boolean = false): 
 
   // Return default value immediately
   const value = defaultValue;
-  
+
   // Fetch the actual value asynchronously for next render
   configCatClient.getValueAsync(key, defaultValue)
     .then((actualValue: boolean) => {
@@ -71,7 +71,7 @@ export function getFeatureFlagSync(key: string, defaultValue: boolean = false): 
     .catch((error: unknown) => {
       console.warn(`Error getting feature flag ${key}:`, error);
     });
-  
+
   return value;
 }
 
@@ -88,4 +88,4 @@ export async function getConfigCatClient() {
     });
   }
   return configCatClient;
-} 
+}

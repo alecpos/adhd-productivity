@@ -123,4 +123,4 @@ The migration system is integrated with the application through:
 - [Alembic Documentation](https://alembic.sqlalchemy.org/)
 - [Database Schema](../docs/database_schema.md)
 - [SQLAlchemy Models](../docs/sqlalchemy_models.md)
-- [Migration Guide](../docs/migration_guide.md) 
+- [Migration Guide](../docs/migration_guide.md)

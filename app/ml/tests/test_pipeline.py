@@ -73,12 +73,12 @@ async def test_data_preprocessing():
             "user_id": str(uuid4()),
             "mood": 4,
             "anxiety_level": 2,
-            "focus_level": 3, 
+            "focus_level": 3,
             "energy_level": 4,
             "stress_level": 3,
             "sleep_quality": 7,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -89,10 +89,10 @@ async def test_data_preprocessing():
             "stress_level": 4,
             "sleep_quality": 6,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
-    
+
     energy_data = [
         {
             "user_id": str(uuid4()),
@@ -100,7 +100,7 @@ async def test_data_preprocessing():
             "focus_level": 5,
             "time_of_day": "morning",
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -108,10 +108,10 @@ async def test_data_preprocessing():
             "focus_level": 3,
             "time_of_day": "evening",
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
-    
+
     task_data = [
         {
             "user_id": str(uuid4()),
@@ -122,7 +122,7 @@ async def test_data_preprocessing():
             "actual_duration": 50,
             "focus_level": 4,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -133,18 +133,18 @@ async def test_data_preprocessing():
             "actual_duration": 0,
             "focus_level": 0,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
-    
+
     # Create preprocessor with sample data
     preprocessor = DataPreprocessor(
         mental_health_data=mental_health_data,
         energy_data=energy_data,
-        task_data=task_data, 
-        calendar_data=[]
+        task_data=task_data,
+        calendar_data=[],
     )
-    
+
     # Test preprocessing - if the data format doesn't match exactly, at least check that methods run
     features_df = None
     try:
@@ -153,16 +153,16 @@ async def test_data_preprocessing():
         # If the preprocessor's exact format isn't matched, it might raise an exception
         # For test purposes, we'll just ensure the methods themselves don't crash
         pass
-    
+
     # Test specific feature preparation methods
     mh_features, mh_targets = preprocessor.prepare_mental_health_features(mental_health_data)
     assert len(mh_features) > 0
     assert len(mh_targets) > 0
-    
+
     energy_features, energy_targets = preprocessor.prepare_energy_features(energy_data)
     assert len(energy_features) > 0
     assert len(energy_targets) > 0
-    
+
     task_features, task_targets = preprocessor.prepare_task_features(task_data)
     assert len(task_features) > 0
     assert len(task_targets) > 0
@@ -189,18 +189,12 @@ async def test_model_creation():
 
     # Test multi-task model
     multi_task_model = model_factory.create_multi_task_model(
-        input_shape=(25,),
-        num_tasks=3,
-        hidden_layers=[64, 32],
-        task_specific_layers=[16, 8]
+        input_shape=(25,), num_tasks=3, hidden_layers=[64, 32], task_specific_layers=[16, 8]
     )
     assert isinstance(multi_task_model, tf.keras.Model)
 
     # Test sequence model
-    sequence_model = model_factory.create_sequence_model(
-        input_shape=(14, 5),
-        output_dim=1
-    )
+    sequence_model = model_factory.create_sequence_model(input_shape=(14, 5), output_dim=1)
     assert isinstance(sequence_model, tf.keras.Model)
 
     print("Model creation tests passed successfully!")

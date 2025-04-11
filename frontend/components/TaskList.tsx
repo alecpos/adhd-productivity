@@ -40,7 +40,7 @@ export function TaskList({ filter = '', sortField = 'due_date', sortDirection = 
       // Handle special filter values
       if (filter === 'Completed') return task.completed;
       if (filter === 'Pending') return !task.completed;
-      
+
       // Handle search text
       if (filter && typeof filter === 'string') {
         const searchLower = filter.toLowerCase();
@@ -48,18 +48,18 @@ export function TaskList({ filter = '', sortField = 'due_date', sortDirection = 
         const descriptionMatch = task?.description?.toLowerCase().includes(searchLower) || false;
         return titleMatch || descriptionMatch;
       }
-      
+
       return true;
     });
 
     // Sort tasks
     return [...filteredTasks].sort((a, b) => {
       if (sortField === 'title') {
-        return sortDirection === 'asc' 
+        return sortDirection === 'asc'
           ? (a.title || '').localeCompare(b.title || '')
           : (b.title || '').localeCompare(a.title || '');
       }
-      
+
       if (sortField === 'due_date') {
         if (!a.due_date) return sortDirection === 'asc' ? 1 : -1;
         if (!b.due_date) return sortDirection === 'asc' ? -1 : 1;
@@ -67,7 +67,7 @@ export function TaskList({ filter = '', sortField = 'due_date', sortDirection = 
           ? new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
           : new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
       }
-      
+
       if (sortField === 'priority') {
         const priorityOrder: Record<TaskPriority, number> = {
           [TaskPriority.LOW]: 0,
@@ -79,7 +79,7 @@ export function TaskList({ filter = '', sortField = 'due_date', sortDirection = 
         const bPriority = priorityOrder[b.priority || TaskPriority.LOW];
         return sortDirection === 'asc' ? aPriority - bPriority : bPriority - aPriority;
       }
-      
+
       return 0;
     });
   }, [tasks, filter, sortField, sortDirection]);

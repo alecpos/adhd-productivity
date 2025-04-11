@@ -12,10 +12,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.middleware.error_handler import setup_error_handling
 from app.routes.example_task_route import router as task_router
 
+
 def create_application() -> FastAPI:
     """
     Create and configure the FastAPI application.
-    
+
     Returns:
         The configured FastAPI application
     """
@@ -28,7 +29,7 @@ def create_application() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
     )
-    
+
     # Set up CORS
     app.add_middleware(
         CORSMiddleware,
@@ -37,18 +38,18 @@ def create_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     # Set up error handling middleware
     setup_error_handling(app)
-    
+
     # Include routes with prefix
     app.include_router(task_router, prefix="/api/v1")
-    
+
     # Add a simple health check endpoint
     @app.get("/health", tags=["Health"])
     async def health_check():
         return {"status": "ok"}
-    
+
     return app
 
 
@@ -72,4 +73,4 @@ uvicorn app:app --reload
 3. Access the API docs at:
 
 http://localhost:8000/api/docs
-""" 
+"""

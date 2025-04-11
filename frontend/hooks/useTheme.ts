@@ -56,4 +56,4 @@ export const useTheme = (): Theme => {
     colors,
     isDark,
   };
-}; 
+};

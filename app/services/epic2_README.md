@@ -396,7 +396,7 @@ Recommended Prometheus alerting rules:
   ```bash
   # View recent errors
   kubectl logs -l app=bayesian-predictor --tail=100 | grep ERROR
-  
+
   # Check specific user issues
   kubectl logs -l app=bayesian-predictor --tail=1000 | grep "user_id=123456"
   ```
@@ -523,4 +523,4 @@ Full API documentation is available at:
 - [Interpreting Duration Predictions](docs/user/duration_predictions.md)
 - [Understanding Task Complexity](docs/user/task_complexity.md)
 - [Managing Stressors for Better Focus](docs/user/managing_stressors.md)
-- [Optimizing Task Transitions](docs/user/task_transitions.md) 
+- [Optimizing Task Transitions](docs/user/task_transitions.md)

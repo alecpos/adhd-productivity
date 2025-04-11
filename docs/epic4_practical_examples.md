@@ -9,16 +9,16 @@ The following graph shows a typical user's energy curve with different cognitive
 
 ```
 Energy Level
-10 |                                           
-   |                   ⋰•⋰                     
- 8 |            ⋰•⋰    •  •                    
-   |           •   •  •    •  ⋰•⋰              
- 6 |          •     ••      ••   •             
-   |    ⋰•⋰  •      Focus    •   •   ⋰•⋰      
- 4 |   •   ••                 •   •⋰•   •     
-   |  •    •                   •••     ••     
- 2 | •    •  Creative           Executive     
-   |•    •                                     
+10 |
+   |                   ⋰•⋰
+ 8 |            ⋰•⋰    •  •
+   |           •   •  •    •  ⋰•⋰
+ 6 |          •     ••      ••   •
+   |    ⋰•⋰  •      Focus    •   •   ⋰•⋰
+ 4 |   •   ••                 •   •⋰•   •
+   |  •    •                   •••     ••
+ 2 | •    •  Creative           Executive
+   |•    •
  0 +-------------------------------------------
     00:00  06:00  12:00  18:00  00:00
                  Time of Day
@@ -103,7 +103,7 @@ Time       | Task                    | Energy Alignment       | Notes
 
 **User Profile:**
 - ADHD developer with peak focus from 8-11 PM
-- Morning executive function strength (9-11 AM) 
+- Morning executive function strength (9-11 AM)
 - Creative energy biphasic (11 AM-1 PM and 6-8 PM)
 
 **Tasks to Schedule:**
@@ -215,7 +215,7 @@ sequenceDiagram
     participant CircadianModelService
     participant TaskProfileService
     participant OptimizationEngine
-    
+
     User->>ClientApp: Request schedule optimization
     ClientApp->>APIGateway: POST /scheduling/circadian-optimize
     APIGateway->>SchedulingService: Forward request
@@ -254,7 +254,7 @@ When a user has limited energy data:
 function getEnergyPredictionsWithFallbacks(userId, date) {
   // Step 1: Try user-specific predictions
   const userDataPoints = await getUserDataPointCount(userId);
-  
+
   if (userDataPoints >= MINIMUM_DATA_POINTS) {
     try {
       return await getPersonalizedEnergyPredictions(userId, date);
@@ -263,7 +263,7 @@ function getEnergyPredictionsWithFallbacks(userId, date) {
       // Fall through to fallbacks
     }
   }
-  
+
   // Step 2: Try demographic-based predictions
   const demographicInfo = await getUserDemographics(userId);
   if (demographicInfo) {
@@ -274,7 +274,7 @@ function getEnergyPredictionsWithFallbacks(userId, date) {
       // Fall through to final fallback
     }
   }
-  
+
   // Step 3: Use population defaults with confidence indicator
   const defaultPredictions = await getDefaultEnergyPredictions(date);
   return {
@@ -292,7 +292,7 @@ Evaluating whether an optimization needs manual review:
 ```typescript
 function assessOptimizationQuality(optimization) {
   const flags = [];
-  
+
   // Check if high-focus tasks are in low-focus periods
   const highFocusTasks = optimization.tasks.filter(t => t.focus_required > 7);
   for (const task of highFocusTasks) {
@@ -306,22 +306,22 @@ function assessOptimizationQuality(optimization) {
       });
     }
   }
-  
+
   // Check for task clustering (too many tasks in short period)
   const hourlyTaskCount = countTasksByHour(optimization.schedule);
   const overloadedHours = Object.entries(hourlyTaskCount)
     .filter(([hour, count]) => count > 3)
     .map(([hour, count]) => ({ hour, count }));
-    
+
   if (overloadedHours.length > 0) {
     flags.push({
       type: 'TASK_OVERLOAD',
       overloaded_hours: overloadedHours
     });
   }
-  
+
   // Add more quality checks as needed
-  
+
   return {
     flags,
     needs_review: flags.length > 0,
@@ -408,7 +408,7 @@ class CircadianOptimizationService {
       return await this.fullOptimization(request);
     } catch (error) {
       logger.warn(`Full optimization failed: ${error.message}`);
-      
+
       if (options.allowFallbacks) {
         try {
           // Try simplified optimization
@@ -416,13 +416,13 @@ class CircadianOptimizationService {
           return await this.simplifiedOptimization(request);
         } catch (secondError) {
           logger.warn(`Simplified optimization failed: ${secondError.message}`);
-          
+
           // Last resort - basic priority-based scheduling
           logger.info('Falling back to basic scheduling');
           return await this.basicPriorityScheduling(request);
         }
       }
-      
+
       // If no fallbacks allowed or all fallbacks failed
       throw new OptimizationError('Schedule optimization failed', { cause: error });
     }
@@ -455,7 +455,7 @@ class CircadianOptimizationService {
    - Test groups: No optimization vs. Basic optimization vs. Circadian optimization
    - Duration: 4 weeks minimum
    - Key metric: Task completion rates
-   
+
 2. **User Interviews**:
    - Conduct monthly interviews with 5-8 users
    - Focus on pain points and unexpected benefits
@@ -464,4 +464,4 @@ class CircadianOptimizationService {
 3. **Longitudinal Analysis**:
    - Track individual user improvement over 60/90/180 days
    - Measure convergence of model predictions with reported energy
-   - Analyze productivity trend lines across user cohorts 
+   - Analyze productivity trend lines across user cohorts

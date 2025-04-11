@@ -8,6 +8,7 @@ from app.services.logging_service import LoggingService
 
 class Container(containers.DeclarativeContainer):
     """Application container."""
+
     config = providers.Singleton(ConfigService)
     database = providers.Singleton(DatabaseService, db_url=config.provided.database_url_with_args)
     logging = providers.Factory(LoggingService, service_name=config.provided.APP_NAME)

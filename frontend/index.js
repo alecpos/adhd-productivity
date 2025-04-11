@@ -12,4 +12,4 @@ if (Platform.OS === 'web' && Constants.expoConfig?.extra?.useSimpleWebApp) {
   App = require('expo-router/entry');
 }
 
-registerRootComponent(App); 
+registerRootComponent(App);

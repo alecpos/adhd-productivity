@@ -207,28 +207,28 @@ The implementation will follow these patterns:
 
 ```python
 # 1. Standardized route definition
-@router.get("/{resource_id}", response_model=ResourceResponse, 
+@router.get("/{resource_id}", response_model=ResourceResponse,
             responses=error_responses(404, 403))
 async def get_resource(
-    resource_id: UUID, 
+    resource_id: UUID,
     current_user: User = Depends(get_current_user)
 ) -> ResourceResponse:
     """
     Get a resource by ID.
-    
+
     Args:
         resource_id: The unique identifier of the resource
         current_user: The authenticated user
-        
+
     Returns:
         The resource details
-        
+
     Raises:
         404: Resource not found
         403: User does not have permission to access this resource
     """
     # Implementation
-    
+
 # 2. Standardized error handling
 try:
     resource = await resource_service.get_resource(resource_id)
@@ -255,7 +255,7 @@ except PermissionError as e:
     )
 
 # 3. Standardized validation
-@router.post("/", response_model=ResourceResponse, 
+@router.post("/", response_model=ResourceResponse,
              responses=error_responses(400, 401))
 async def create_resource(
     resource: ResourceCreate,
@@ -309,4 +309,4 @@ The implementation will be considered successful when:
 - [Error Handling Guide](./error_handling_guide.md)
 - [Error Handling Implementation Progress](./error_handling_implementation_progress.md)
 - [API Documentation](./api_documentation.md)
-- [Authentication Flow](./authentication_flow.md) 
+- [Authentication Flow](./authentication_flow.md)

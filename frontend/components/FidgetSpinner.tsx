@@ -130,24 +130,24 @@ export const FidgetSpinner: React.FC<FidgetSpinnerProps> = ({
     onActive: (event, context) => {
       const currentAngle = calculateAngle(event.x, event.y, size / 2, size / 2);
       let deltaAngle = currentAngle - lastAngle.value;
-      
+
       if (deltaAngle > 180) deltaAngle -= 360;
       if (deltaAngle < -180) deltaAngle += 360;
 
       rotation.value = context.lastRotation + (deltaAngle * SENSITIVITY);
       velocity.value = deltaAngle * SENSITIVITY; // Reduced sensitivity
-      
+
       if (Math.abs(velocity.value) > 200) {
         runOnJS(triggerHaptic)(Math.abs(velocity.value));
       }
-      
+
       lastAngle.value = currentAngle;
     },
     onEnd: (event) => {
       isSpinning.value = true;
       lastTime.value = Date.now();
       requestAnimationFrame(updateSpinnerPhysics);
-      
+
       if (onSpinComplete) {
         runOnJS(onSpinComplete)(Math.abs(velocity.value));
       }
@@ -156,7 +156,7 @@ export const FidgetSpinner: React.FC<FidgetSpinnerProps> = ({
 
   const triggerHaptic = (speed: number) => {
     if (Platform.OS === 'web') return;
-    
+
     if (speed > 800) {
       triggerImpactHeavy();
     } else if (speed > 400) {
@@ -186,7 +186,7 @@ export const FidgetSpinner: React.FC<FidgetSpinnerProps> = ({
 
   if (Platform.OS === 'web') {
     return (
-      <View 
+      <View
         style={[styles.container, { touchAction: 'none' } as any]}
         onStartShouldSetResponder={() => true}
         onMoveShouldSetResponder={() => true}
@@ -208,7 +208,7 @@ export const FidgetSpinner: React.FC<FidgetSpinnerProps> = ({
           const y = e.nativeEvent.pageY - rect.top;
           const currentAngle = calculateAngle(x, y, size / 2, size / 2);
           let deltaAngle = currentAngle - lastAngle.value;
-          
+
           if (deltaAngle > 180) deltaAngle -= 360;
           if (deltaAngle < -180) deltaAngle += 360;
 

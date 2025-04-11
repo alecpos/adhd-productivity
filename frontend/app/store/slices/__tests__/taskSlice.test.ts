@@ -108,4 +108,4 @@ describe('taskSlice', () => {
     const actual = taskReducer(initialState, setError(errorMessage));
     expect(actual.error).toBe(errorMessage);
   });
-}); 
+});

@@ -335,7 +335,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         user_id: user.id,
         ...metrics
       });
-      setEvents(prev => prev.map(event => 
+      setEvents(prev => prev.map(event =>
         event.id === eventId ? { ...event, focusMetrics: response.data.focusMetrics } : event
       ));
       setError(null);
@@ -390,7 +390,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         user_id: user.id,
         ...updates
       });
-      setSequences(prev => prev.map(seq => 
+      setSequences(prev => prev.map(seq =>
         seq.id === id ? response.data.sequence : seq
       ));
       setError(null);
@@ -425,8 +425,8 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         user_id: user.id,
         dependency
       });
-      setEvents(prev => prev.map(event => 
-        event.id === taskId 
+      setEvents(prev => prev.map(event =>
+        event.id === taskId
           ? { ...event, dependencies: response.data.dependencies }
           : event
       ));
@@ -445,7 +445,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await axios.delete(`http://localhost:8000/timeline/events/${taskId}/dependencies/${dependencyTaskId}`, {
         params: { user_id: user.id }
       });
-      setEvents(prev => prev.map(event => 
+      setEvents(prev => prev.map(event =>
         event.id === taskId ? {
           ...event,
           dependencies: event.dependencies?.filter(d => d.taskId !== dependencyTaskId)
@@ -512,7 +512,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const response = await axios.post<TaskSequenceResponse>(`http://localhost:8000/timeline/sequences/${sequenceId}/optimize`, {
         user_id: user.id
       });
-      setSequences(prev => prev.map(seq => 
+      setSequences(prev => prev.map(seq =>
         seq.id === sequenceId ? response.data.sequence : seq
       ));
       setError(null);
@@ -531,7 +531,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         user_id: user.id,
         order: newOrder
       });
-      setSequences(prev => prev.map(seq => 
+      setSequences(prev => prev.map(seq =>
         seq.id === sequenceId ? response.data.sequence : seq
       ));
       setError(null);
@@ -642,4 +642,4 @@ export const useTimeline = (): TimelineContextType => {
     throw new Error('useTimeline must be used within a TimelineProvider');
   }
   return context;
-}; 
+};

@@ -40,4 +40,4 @@ declare module 'expo-router' {
 
   export type StaticRoutes = string;
   export type RelativePathString = string;
-} 
+}

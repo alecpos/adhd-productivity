@@ -10,4 +10,4 @@ export interface User {
         provider?: 'google' | 'apple' | 'outlook';
         settings?: Record<string, any>;
     };
-} 
+}

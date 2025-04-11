@@ -411,4 +411,4 @@ Have ideas for improvement? We'd love to hear them:
 1. Go to **Settings > Support > Feature Request**
 2. Describe your idea and how it would help you
 3. Vote on existing feature requests
-4. Track the status of your requests in the Support portal 
+4. Track the status of your requests in the Support portal

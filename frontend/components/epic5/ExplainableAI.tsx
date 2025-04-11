@@ -29,30 +29,30 @@ const mockExplanation: ModelExplanation = {
   confidence: 0.87,
   prediction: "High Productivity Time Block",
   featureImportances: [
-    { 
-      feature: "Time of day", 
-      importance: 0.32, 
-      description: "Morning hours (9-11 AM) are historically your most productive time." 
+    {
+      feature: "Time of day",
+      importance: 0.32,
+      description: "Morning hours (9-11 AM) are historically your most productive time."
     },
-    { 
-      feature: "Previous sleep duration", 
-      importance: 0.27, 
-      description: "You slept 7.5 hours last night, which is optimal for your productivity." 
+    {
+      feature: "Previous sleep duration",
+      importance: 0.27,
+      description: "You slept 7.5 hours last night, which is optimal for your productivity."
     },
-    { 
-      feature: "Task complexity", 
-      importance: 0.18, 
-      description: "Current task has medium complexity based on your description." 
+    {
+      feature: "Task complexity",
+      importance: 0.18,
+      description: "Current task has medium complexity based on your description."
     },
-    { 
-      feature: "Environment", 
-      importance: 0.12, 
-      description: "Your current location (home office) has fewer distractions." 
+    {
+      feature: "Environment",
+      importance: 0.12,
+      description: "Your current location (home office) has fewer distractions."
     },
-    { 
-      feature: "Recent break time", 
-      importance: 0.11, 
-      description: "You took a 15-minute break 30 minutes ago." 
+    {
+      feature: "Recent break time",
+      importance: 0.11,
+      description: "You took a 15-minute break 30 minutes ago."
     }
   ],
   counterfactuals: [
@@ -72,30 +72,30 @@ const mockSchedulingExplanation: ModelExplanation = {
   confidence: 0.82,
   prediction: "Optimal task placement at 10:00 AM",
   featureImportances: [
-    { 
-      feature: "Historical performance", 
-      importance: 0.35, 
-      description: "You complete similar tasks 28% faster in the morning." 
+    {
+      feature: "Historical performance",
+      importance: 0.35,
+      description: "You complete similar tasks 28% faster in the morning."
     },
-    { 
-      feature: "Energy pattern", 
-      importance: 0.25, 
-      description: "Your energy level peaks around 10 AM based on past data." 
+    {
+      feature: "Energy pattern",
+      importance: 0.25,
+      description: "Your energy level peaks around 10 AM based on past data."
     },
-    { 
-      feature: "Task priority", 
-      importance: 0.20, 
-      description: "This is a high-priority task that benefits from high focus." 
+    {
+      feature: "Task priority",
+      importance: 0.20,
+      description: "This is a high-priority task that benefits from high focus."
     },
-    { 
-      feature: "Context switching", 
-      importance: 0.12, 
-      description: "Previous task is related, minimizing context switching." 
+    {
+      feature: "Context switching",
+      importance: 0.12,
+      description: "Previous task is related, minimizing context switching."
     },
-    { 
-      feature: "Break timing", 
-      importance: 0.08, 
-      description: "Scheduled after a short break for optimal focus." 
+    {
+      feature: "Break timing",
+      importance: 0.08,
+      description: "Scheduled after a short break for optimal focus."
     }
   ],
   counterfactuals: [
@@ -115,13 +115,13 @@ export const ExplainableAI = () => {
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [detailLevel, setDetailLevel] = useState<'simple' | 'detailed'>('simple');
   const [selectedFeature, setSelectedFeature] = useState<FeatureImportance | null>(null);
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
-  
-  const explanation = activeExplanation === 'productivity' 
-    ? mockExplanation 
+
+  const explanation = activeExplanation === 'productivity'
+    ? mockExplanation
     : mockSchedulingExplanation;
-  
+
   // Chart configuration
   const chartConfig = {
     backgroundGradientFrom: "#ffffff",
@@ -134,27 +134,27 @@ export const ExplainableAI = () => {
     },
     barPercentage: 0.7,
   };
-  
+
   // Format feature importance data for the chart
   const getFeatureImportanceData = () => {
     const labels = explanation.featureImportances.map(f => f.feature);
     const data = explanation.featureImportances.map(f => f.importance * 100);
-    
+
     return {
       labels,
       datasets: [{ data }]
     };
   };
-  
+
   const handleFeaturePress = (feature: FeatureImportance) => {
     setSelectedFeature(feature);
     setIsBottomSheetVisible(true);
   };
-  
+
   const toggleDetailLevel = () => {
     setDetailLevel(detailLevel === 'simple' ? 'detailed' : 'simple');
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <Card containerStyle={styles.card}>
@@ -162,7 +162,7 @@ export const ExplainableAI = () => {
         <Text style={styles.subtitle}>
           Understanding how our AI makes decisions in a transparent way.
         </Text>
-        
+
         <View style={styles.toggleContainer}>
           <Button
             title="Productivity Prediction"
@@ -186,7 +186,7 @@ export const ExplainableAI = () => {
           />
         </View>
       </Card>
-      
+
       <Card containerStyle={styles.card}>
         <View style={styles.predictionHeader}>
           <View>
@@ -198,9 +198,9 @@ export const ExplainableAI = () => {
             <Text style={styles.confidenceLabel}>Confidence</Text>
           </View>
         </View>
-        
+
         <Divider style={styles.divider} />
-        
+
         <View style={styles.detailLevelContainer}>
           <Text style={styles.sectionTitle}>Explanation</Text>
           <Button
@@ -218,14 +218,14 @@ export const ExplainableAI = () => {
             iconRight
           />
         </View>
-        
+
         {detailLevel === 'simple' ? (
           <Text style={styles.simplifiedExplanation}>
-            This {activeExplanation === 'productivity' ? 'productivity prediction' : 'schedule optimization'} is 
-            primarily based on {explanation.featureImportances[0].feature.toLowerCase()} and 
-            {explanation.featureImportances[1].feature.toLowerCase()}. 
-            {explanation.featureImportances[0].description} 
-            {activeExplanation === 'productivity' 
+            This {activeExplanation === 'productivity' ? 'productivity prediction' : 'schedule optimization'} is
+            primarily based on {explanation.featureImportances[0].feature.toLowerCase()} and
+            {explanation.featureImportances[1].feature.toLowerCase()}.
+            {explanation.featureImportances[0].description}
+            {activeExplanation === 'productivity'
               ? "\n\nThe model analyzed your historical productivity patterns and current context to make this prediction."
               : "\n\nThe model analyzed your task characteristics and optimal scheduling patterns to make this recommendation."}
           </Text>
@@ -234,7 +234,7 @@ export const ExplainableAI = () => {
             <Text style={styles.detailedIntro}>
               The {explanation.modelName} model considered these factors (in order of importance):
             </Text>
-            
+
             <BarChart
               data={getFeatureImportanceData()}
               width={screenWidth}
@@ -246,12 +246,12 @@ export const ExplainableAI = () => {
               withHorizontalLabels={false}
               segments={5}
             />
-            
+
             <Text style={styles.tapHint}>Tap on any feature for more details</Text>
-            
+
             {explanation.featureImportances.map((feature, index) => (
-              <TouchableOpacity 
-                key={index} 
+              <TouchableOpacity
+                key={index}
                 style={styles.featureItem}
                 onPress={() => handleFeaturePress(feature)}
               >
@@ -265,9 +265,9 @@ export const ExplainableAI = () => {
                 <View style={[styles.importanceBar, { width: `${feature.importance * 100}%` }]} />
               </TouchableOpacity>
             ))}
-            
+
             <Divider style={styles.divider} />
-            
+
             <Text style={styles.counterfactualTitle}>What would change the prediction?</Text>
             {explanation.counterfactuals.map((counterfactual, index) => (
               <View key={index} style={styles.counterfactualItem}>
@@ -281,9 +281,9 @@ export const ExplainableAI = () => {
                 <Text style={styles.counterfactualText}>{counterfactual}</Text>
               </View>
             ))}
-            
+
             <Divider style={styles.divider} />
-            
+
             <View style={styles.datasetContainer}>
               <Text style={styles.datasetTitle}>About the Model</Text>
               <Text style={styles.datasetText}>
@@ -295,7 +295,7 @@ export const ExplainableAI = () => {
           </>
         )}
       </Card>
-      
+
       <BottomSheet
         isVisible={isBottomSheetVisible}
         onBackdropPress={() => setIsBottomSheetVisible(false)}
@@ -307,15 +307,15 @@ export const ExplainableAI = () => {
               Importance: {Math.round(selectedFeature.importance * 100)}%
             </Text>
             <Text style={styles.bottomSheetDescription}>{selectedFeature.description}</Text>
-            
+
             <Text style={styles.bottomSheetExplanation}>
-              {selectedFeature.feature === 'Time of day' 
+              {selectedFeature.feature === 'Time of day'
                 ? "This feature analyzes historical patterns of your productivity at different times of day. It compares your current time with these patterns to determine if it's likely to be a high-productivity period for you."
                 : selectedFeature.feature === 'Energy pattern'
                 ? "This feature uses your self-reported energy levels and biometric data (if available) to determine your current energy state. It compares this with the energy typically required for the task type."
                 : "This feature considers the specific characteristics of the task and compares them with your historical performance on similar tasks. It helps the model understand if the current context is favorable for this task type."}
             </Text>
-            
+
             <Button
               title="Close"
               onPress={() => setIsBottomSheetVisible(false)}
@@ -540,4 +540,4 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
   },
-}); 
+});

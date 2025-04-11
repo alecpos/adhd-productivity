@@ -15,4 +15,4 @@ export function View(props: ViewProps) {
   return <RNView {...props} />;
 }
 
-export { useTheme } from '@rneui/themed'; 
+export { useTheme } from '@rneui/themed';

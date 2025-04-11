@@ -82,48 +82,48 @@ export const CommitmentTracker = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogText, setDialogText] = useState('');
   const [showRelated, setShowRelated] = useState<string | null>(null);
-  
+
   useEffect(() => {
     // Filter commitments based on selected status and search query
     let filtered = commitments;
-    
+
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(item => item.status === selectedStatus);
     }
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.text.toLowerCase().includes(query) ||
         (item.source && item.source.toLowerCase().includes(query))
       );
     }
-    
+
     setFilteredCommitments(filtered);
   }, [commitments, selectedStatus, searchQuery]);
-  
+
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
   };
-  
+
   const handleComplete = (id: string) => {
-    setCommitments(prevCommitments => 
-      prevCommitments.map(item => 
+    setCommitments(prevCommitments =>
+      prevCommitments.map(item =>
         item.id === id ? { ...item, status: 'completed' } : item
       )
     );
   };
-  
+
   const handleDelete = (id: string) => {
     Alert.alert(
       'Delete Commitment',
       'Are you sure you want to delete this commitment?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
+        {
+          text: 'Delete',
           onPress: () => {
-            setCommitments(prevCommitments => 
+            setCommitments(prevCommitments =>
               prevCommitments.filter(item => item.id !== id)
             );
           },
@@ -132,10 +132,10 @@ export const CommitmentTracker = () => {
       ]
     );
   };
-  
+
   const handleAddCommitment = () => {
     if (!dialogText.trim()) return;
-    
+
     // Simulate AI analysis of commitment text
     setTimeout(() => {
       const newCommitment: Commitment = {
@@ -149,18 +149,18 @@ export const CommitmentTracker = () => {
         relatedCommitments: [],
         created: new Date().toISOString()
       };
-      
+
       setCommitments(prev => [newCommitment, ...prev]);
       setDialogText('');
       setShowDialog(false);
     }, 500);
   };
-  
+
   const getRelatedCommitments = (commitmentId: string) => {
     const relatedIds = commitments.find(c => c.id === commitmentId)?.relatedCommitments || [];
     return commitments.filter(c => relatedIds.includes(c.id));
   };
-  
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'No date';
     try {
@@ -169,7 +169,7 @@ export const CommitmentTracker = () => {
       return 'Invalid date';
     }
   };
-  
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return '#DA4747';
@@ -178,7 +178,7 @@ export const CommitmentTracker = () => {
       default: return '#888888';
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -190,7 +190,7 @@ export const CommitmentTracker = () => {
           onChangeText={setSearchQuery}
         />
       </View>
-      
+
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <Chip
@@ -223,7 +223,7 @@ export const CommitmentTracker = () => {
           />
         </ScrollView>
       </View>
-      
+
       <ScrollView style={styles.scrollContainer}>
         {filteredCommitments.length === 0 ? (
           <View style={styles.emptyState}>
@@ -250,14 +250,14 @@ export const CommitmentTracker = () => {
                     />
                   )}
                 </View>
-                
+
                 <Text style={styles.commitmentText}>{commitment.text}</Text>
-                
+
                 <View style={styles.dateContainer}>
                   <Icon name="clock-outline" type="material-community" size={16} color="#666666" />
                   <Text style={styles.dateText}>Due: {formatDate(commitment.dueDate)}</Text>
                 </View>
-                
+
                 <View style={styles.cardFooter}>
                   {commitment.relatedCommitments.length > 0 && (
                     <Button
@@ -275,12 +275,12 @@ export const CommitmentTracker = () => {
                       onPress={() => setShowRelated(showRelated === commitment.id ? null : commitment.id)}
                     />
                   )}
-                  
+
                   <TouchableOpacity onPress={() => handleDelete(commitment.id)}>
                     <Icon name="trash-can-outline" type="material-community" size={20} color="#DA4747" />
                   </TouchableOpacity>
                 </View>
-                
+
                 {showRelated === commitment.id && (
                   <View style={styles.relatedContainer}>
                     <Text style={styles.relatedTitle}>Related Commitments:</Text>
@@ -297,14 +297,14 @@ export const CommitmentTracker = () => {
           ))
         )}
       </ScrollView>
-      
+
       <FAB
         icon={{ name: 'plus', type: 'material-community', color: 'white' }}
         placement="right"
         color="#4782DA"
         onPress={() => setShowDialog(true)}
       />
-      
+
       <Overlay
         isVisible={showDialog}
         onBackdropPress={() => setShowDialog(false)}
@@ -503,4 +503,4 @@ const styles = StyleSheet.create({
   dialogButton: {
     width: '48%',
   },
-}); 
+});

@@ -28,4 +28,4 @@ API endpoints are registered in the main FastAPI application in `app/main.py`. T
 
 - [API Documentation](../../docs/api_documentation.md)
 - [Authentication Guide](../../docs/authentication.md)
-- [API Integration Examples](../../docs/api_integration_examples.md) 
+- [API Integration Examples](../../docs/api_integration_examples.md)

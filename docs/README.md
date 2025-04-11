@@ -127,4 +127,4 @@ Visit `http://localhost:8000` to view the documentation.
 ## Related Resources
 
 - [Main Project README](../README.md)
-- [Implementation Summaries](../EPIC1_Implementation_Summary.md) 
+- [Implementation Summaries](../EPIC1_Implementation_Summary.md)

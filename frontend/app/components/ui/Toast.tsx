@@ -178,4 +178,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default Toast; 
+export default Toast;

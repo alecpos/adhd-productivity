@@ -24,13 +24,13 @@ from app.utils.route_utils import (
 def test_error_responses_specific_codes():
     """Test error_responses function with specific codes."""
     responses = error_responses(400, 404)
-    
+
     # Check that only the specified error codes are included
     assert 400 in responses
     assert 404 in responses
     assert 401 not in responses
     assert 500 not in responses
-    
+
     # Check structure of response descriptions
     assert "description" in responses[400]
     assert "model" in responses[400]
@@ -40,7 +40,7 @@ def test_error_responses_specific_codes():
 def test_error_responses_no_codes():
     """Test error_responses function with no codes."""
     responses = error_responses()
-    
+
     # Check that common error codes are included
     assert 400 in responses
     assert 401 in responses
@@ -56,10 +56,10 @@ def test_pagination_params():
     """Test pagination_params function."""
     # This is a bit tricky to test since it's a dependency function
     # Let's check that it has the expected signature
-    
+
     # Get the signature details
     dependency = pagination_params
-    
+
     # Verify the default values for page and page_size
     deps = {}
     for param in dependency.__defaults__:
@@ -68,10 +68,10 @@ def test_pagination_params():
                 deps["page"] = param.default
             elif param.description == "Number of items per page":
                 deps["page_size"] = param.default
-    
+
     assert deps.get("page") == 1
     assert deps.get("page_size") == 20
-    
+
     # Verify the function returns a dict with the expected keys
     # This is a simplification since we can't directly call the function
     # as it's intended to be used as a FastAPI dependency
@@ -85,14 +85,14 @@ def test_id_path_param():
     """Test id_path_param function."""
     # Create an id_path_param function for a 'user' resource
     user_id_param = id_path_param("user")
-    
+
     # Get the parameter details
     param = None
     for param_value in user_id_param.__defaults__:
         if isinstance(param_value, Path):
             param = param_value
             break
-    
+
     # Check the description and type
     assert param is not None
     assert "user" in param.description
@@ -102,7 +102,7 @@ def test_validate_resource_access_owner():
     """Test validate_resource_access function for resource owner."""
     resource_owner_id = uuid4()
     current_user_id = resource_owner_id
-    
+
     # Should not raise an exception for the resource owner
     validate_resource_access(resource_owner_id, current_user_id)
 
@@ -112,7 +112,7 @@ def test_validate_resource_access_admin():
     resource_owner_id = uuid4()
     current_user_id = uuid4()  # Different user
     is_admin = True
-    
+
     # Should not raise an exception for an admin
     validate_resource_access(resource_owner_id, current_user_id, is_admin)
 
@@ -122,11 +122,11 @@ def test_validate_resource_access_unauthorized():
     resource_owner_id = uuid4()
     current_user_id = uuid4()  # Different user
     is_admin = False
-    
+
     # Should raise a HTTPException for an unauthorized user
     with pytest.raises(HTTPException) as excinfo:
         validate_resource_access(resource_owner_id, current_user_id, is_admin)
-    
+
     # Check the exception details
     assert excinfo.value.status_code == status.HTTP_403_FORBIDDEN
     assert "FORBIDDEN" in str(excinfo.value.detail)
@@ -135,9 +135,9 @@ def test_validate_resource_access_unauthorized():
 def test_rate_limit_error():
     """Test rate_limit_error function."""
     retry_after = 60
-    
+
     exception = rate_limit_error(retry_after)
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_429_TOO_MANY_REQUESTS
     assert "RATE_LIMIT_EXCEEDED" in str(exception.detail)
@@ -150,9 +150,9 @@ def test_not_found_error():
     """Test not_found_error function."""
     resource_type = "User"
     resource_id = uuid4()
-    
+
     exception = not_found_error(resource_type, resource_id)
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_404_NOT_FOUND
     assert "NOT_FOUND" in str(exception.detail)
@@ -163,9 +163,9 @@ def test_not_found_error():
 def test_forbidden_error():
     """Test forbidden_error function."""
     message = "Custom forbidden message"
-    
+
     exception = forbidden_error(message)
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_403_FORBIDDEN
     assert "FORBIDDEN" in str(exception.detail)
@@ -175,7 +175,7 @@ def test_forbidden_error():
 def test_forbidden_error_default_message():
     """Test forbidden_error function with default message."""
     exception = forbidden_error()
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_403_FORBIDDEN
     assert "FORBIDDEN" in str(exception.detail)
@@ -185,9 +185,9 @@ def test_forbidden_error_default_message():
 def test_validation_error():
     """Test validation_error function."""
     errors = {"field1": ["Error 1"], "field2": ["Error 2"]}
-    
+
     exception = validation_error(errors)
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_400_BAD_REQUEST
     assert "VALIDATION_ERROR" in str(exception.detail)
@@ -203,10 +203,10 @@ def test_validation_error():
 def test_conflict_error():
     """Test conflict_error function."""
     message = "Resource already exists"
-    
+
     exception = conflict_error(message)
-    
+
     # Check the exception details
     assert exception.status_code == status.HTTP_409_CONFLICT
     assert "RESOURCE_CONFLICT" in str(exception.detail)
-    assert message in str(exception.detail) 
+    assert message in str(exception.detail)

@@ -336,8 +336,8 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, 
-        settings.SECRET_KEY, 
+        to_encode,
+        settings.SECRET_KEY,
         algorithm=settings.ALGORITHM
     )
     return encoded_jwt
@@ -350,8 +350,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(
-            token, 
-            settings.SECRET_KEY, 
+            token,
+            settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM]
         )
         user_id: str = payload.get("sub")
@@ -359,7 +359,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     user = get_user(user_id)
     if user is None:
         raise credentials_exception
@@ -378,47 +378,47 @@ export class AuthService {
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
   private tokenExpiration: Date | null = null;
-  
+
   private constructor() {
     // Load tokens from secure storage if available
     this.loadTokens();
   }
-  
+
   static getInstance(): AuthService {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
     }
     return AuthService.instance;
   }
-  
+
   async login(email: string, password: string): Promise<void> {
     try {
       const response = await axios.post('/api/v1/auth/login', {
         email,
         password
       });
-      
+
       this.setTokens(
         response.data.access_token,
         response.data.refresh_token
       );
-      
+
       return response.data.user;
     } catch (error) {
       throw new Error('Authentication failed');
     }
   }
-  
+
   async refreshAccessToken(): Promise<void> {
     if (!this.refreshToken) {
       throw new Error('No refresh token available');
     }
-    
+
     try {
       const response = await axios.post('/api/v1/auth/refresh', {
         refresh_token: this.refreshToken
       });
-      
+
       this.setTokens(
         response.data.access_token,
         response.data.refresh_token || this.refreshToken
@@ -428,26 +428,26 @@ export class AuthService {
       throw new Error('Token refresh failed');
     }
   }
-  
+
   getAuthHeader(): { Authorization: string } | undefined {
     if (!this.accessToken) {
       return undefined;
     }
-    
+
     // Check if token is about to expire and refresh if needed
     if (this.tokenExpiration && this.tokenExpiration.getTime() - Date.now() < 60000) {
       this.refreshAccessToken();
     }
-    
+
     return {
       Authorization: `Bearer ${this.accessToken}`
     };
   }
-  
+
   isAuthenticated(): boolean {
     return !!this.accessToken && !!this.tokenExpiration && this.tokenExpiration > new Date();
   }
-  
+
   logout(): void {
     // Call logout API to invalidate refresh token
     if (this.accessToken) {
@@ -457,37 +457,37 @@ export class AuthService {
         // Ignore errors during logout
       });
     }
-    
+
     this.accessToken = null;
     this.refreshToken = null;
     this.tokenExpiration = null;
     // Clear tokens from secure storage
     this.clearTokens();
   }
-  
+
   private setTokens(accessToken: string, refreshToken: string): void {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    
+
     // Decode the token to get expiration
     const decoded = jwtDecode(accessToken);
     if (decoded.exp) {
       this.tokenExpiration = new Date(decoded.exp * 1000);
     }
-    
+
     // Save tokens to secure storage
     this.saveTokens();
   }
-  
+
   // Methods for secure storage of tokens
   private saveTokens(): void {
     // Implementation depends on platform (browser, React Native, etc.)
   }
-  
+
   private loadTokens(): void {
     // Implementation depends on platform
   }
-  
+
   private clearTokens(): void {
     // Implementation depends on platform
   }
@@ -498,4 +498,4 @@ export class AuthService {
 
 - [API Documentation](./api_documentation.md)
 - [Error Handling Guide](./error_handling_guide.md)
-- [Security Best Practices](./security_best_practices.md) 
+- [Security Best Practices](./security_best_practices.md)

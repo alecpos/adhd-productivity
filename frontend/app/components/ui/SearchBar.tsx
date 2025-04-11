@@ -62,7 +62,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           />
         }
         clearIcon={
-          showClear && query 
+          showClear && query
             ? {
                 type: 'material',
                 name: 'close',
@@ -96,4 +96,4 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.fontSize.md,
     color: theme.colors.grey1,
   },
-})); 
+}));

@@ -8,7 +8,7 @@ configfile: pytest.ini
 testpaths: app/tests
 plugins: cov-6.0.0, hypothesis-6.127.6, time-machine-2.16.0, asyncio-0.25.3, anyio-4.8.0, benchmark-5.1.0
 asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function
-collecting ... 
+collecting ...
 ----------------------------- live log collection ------------------------------
 2025-03-05 12:15:25 [ WARNING] Could not load en_core_web_md. Using en_core_web_sm instead. (nlp_complexity_analyzer.py:37)
 collected 787 items
@@ -20,7 +20,7 @@ collected 787 items
         <Package stochastic_time_estimation>
           <Module test_bayesian_duration_predictor.py>
             Tests for the Bayesian Duration Predictor
-            
+
             This module contains unit and integration tests for the BayesianDurationPredictor
             class that implements Bayesian inference for task duration prediction.
             <Class TestBayesianDurationPredictor>
@@ -51,7 +51,7 @@ collected 787 items
                 Test saving and loading the model.
           <Module test_contextual_stressor_detector.py>
             Tests for the Contextual Stressor Detector module.
-            
+
             This module contains unit and integration tests for the ContextualStressorDetector
             class that detects stress levels from health metrics and wearable data.
             <Class TestContextualStressorDetector>
@@ -84,7 +84,7 @@ collected 787 items
                 Test saving and loading model parameters.
           <Module test_integration.py>
             Integration Tests for Stochastic Time Estimation Engine
-            
+
             This module contains integration tests that verify the different components
             of the stochastic time estimation engine work together correctly.
             <Class TestStochasticTimeEstimationIntegration>
@@ -139,7 +139,7 @@ collected 787 items
                 Test saving and loading the model.
           <Module test_stochastic_time_estimation_engine.py>
             Tests for the Stochastic Time Estimation Engine
-            
+
             This module contains unit and integration tests for the StochasticTimeEstimationEngine
             class that integrates various predictive components to estimate task durations
             with uncertainty quantification.
@@ -163,7 +163,7 @@ collected 787 items
                 Test saving and loading the entire engine state.
           <Module test_time_buffer_calculator.py>
             Tests for the Time Buffer Calculator
-            
+
             This module contains unit and integration tests for the TimeBufferCalculator
             class that calculates buffer times between tasks.
             <Class TestTimeBufferCalculator>

@@ -398,7 +398,7 @@ groups:
       severity: critical
     annotations:
       summary: "TPR service {{ $labels.job }} is down"
-      
+
   - alert: TPRHighErrorRate
     expr: rate(tpr_request_errors_total[5m]) / rate(tpr_requests_total[5m]) > 0.05
     for: 10m
@@ -406,7 +406,7 @@ groups:
       severity: warning
     annotations:
       summary: "High error rate on {{ $labels.service }} ({{ $labels.endpoint }})"
-      
+
   - alert: TPRModelUpdateFailure
     expr: time() - tpr_model_last_update_timestamp > 86400
     for: 1h
@@ -558,4 +558,4 @@ pytest app/tests/ml/temporal_pattern_recognition/performance/ --benchmark
 - **Integration Guide**: `docs/integration/tpr_integration.md`
   - Guide for integrating with TPR services
 - **Model Documentation**: `app/services/ml/model_docs/`
-  - Detailed documentation for each ML model 
+  - Detailed documentation for each ML model

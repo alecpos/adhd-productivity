@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 5 Code Reference
 
-**Version**: 1.0  
-**Last Updated**: 2025-06-15  
+**Version**: 1.0
+**Last Updated**: 2025-06-15
 **Target Audience**: Developers and maintainers
 
 ## Overview
@@ -37,11 +37,11 @@ Base class for generating explanations using SHAP values.
 ```python
 class SHAPExplainer:
     """Base class for SHAP-based model explanations."""
-    
+
     def __init__(self, model, feature_names=None, output_names=None, feature_perturbation='interventional'):
         """
         Initialize a SHAP explainer.
-        
+
         Args:
             model: The model to explain
             feature_names: Names of input features
@@ -53,59 +53,59 @@ class SHAPExplainer:
         self.output_names = output_names
         self.feature_perturbation = feature_perturbation
         self._init_shap_explainer()
-    
+
     def _init_shap_explainer(self):
         """Initialize the appropriate SHAP explainer based on model type."""
         # Implementation details...
-    
+
     def explain(self, input_data, prediction=None):
         """
         Generate an explanation for a prediction.
-        
+
         Args:
             input_data: Input features for the prediction
             prediction: Optional prediction result
-            
+
         Returns:
             RecommendationExplanation object
         """
         # Implementation details...
-    
+
     def _generate_shap_values(self, input_data):
         """
         Generate SHAP values for the input data.
-        
+
         Args:
             input_data: Input features
-            
+
         Returns:
             SHAP values and expected values
         """
         # Implementation details...
-    
+
     def _create_text_explanation(self, shap_values, input_data, prediction):
         """
         Create human-readable text explanation.
-        
+
         Args:
             shap_values: SHAP values
             input_data: Input features
             prediction: Model prediction
-            
+
         Returns:
             Text explanation
         """
         # Implementation details...
-    
+
     def _create_visual_explanation(self, shap_values, input_data, prediction):
         """
         Create visual explanation as base64 encoded image.
-        
+
         Args:
             shap_values: SHAP values
             input_data: Input features
             prediction: Model prediction
-            
+
         Returns:
             Base64 encoded image
         """
@@ -119,16 +119,16 @@ Specialized SHAP explainer for productivity models.
 ```python
 class ProductivitySHAPExplainer(SHAPExplainer):
     """SHAP explainer for productivity models."""
-    
+
     def explain_window(self, start_time, end_time, productivity_score):
         """
         Explain productivity score for a time window.
-        
+
         Args:
             start_time: Start of the window
             end_time: End of the window
             productivity_score: Predicted productivity score
-            
+
         Returns:
             RecommendationExplanation object
         """
@@ -142,15 +142,15 @@ Specialized SHAP explainer for duration prediction models.
 ```python
 class DurationSHAPExplainer(SHAPExplainer):
     """SHAP explainer for duration prediction models."""
-    
+
     def explain_estimate(self, task_id, duration_minutes):
         """
         Explain duration estimate for a task.
-        
+
         Args:
             task_id: ID of the task
             duration_minutes: Estimated duration in minutes
-            
+
         Returns:
             RecommendationExplanation object
         """
@@ -164,15 +164,15 @@ Specialized SHAP explainer for attention management models.
 ```python
 class AttentionSHAPExplainer(SHAPExplainer):
     """SHAP explainer for attention management models."""
-    
+
     def explain_recommendation(self, attention_state, recommendation):
         """
         Explain an attention management recommendation.
-        
+
         Args:
             attention_state: Current attention state
             recommendation: Recommended action
-            
+
         Returns:
             RecommendationExplanation object
         """
@@ -186,11 +186,11 @@ Data class for storing explanation results.
 ```python
 class RecommendationExplanation:
     """Container for model explanation results."""
-    
+
     def __init__(self, text, visual=None, feature_importances=None, confidence=None):
         """
         Initialize explanation container.
-        
+
         Args:
             text: Human-readable text explanation
             visual: Base64 encoded visualization
@@ -202,7 +202,7 @@ class RecommendationExplanation:
         self.feature_importances = feature_importances or {}
         self.confidence = confidence
         self.top_features = self._extract_top_features()
-    
+
     def _extract_top_features(self, limit=5):
         """Extract the top N most important features."""
         # Implementation details...
@@ -216,12 +216,12 @@ Factory function to create the appropriate explainer.
 def create_explainer(model_type, model_instance, **kwargs):
     """
     Create an appropriate SHAP explainer for the model type.
-    
+
     Args:
         model_type: Type of model ('productivity', 'duration', 'attention')
         model_instance: The model to explain
         **kwargs: Additional arguments for the explainer
-        
+
     Returns:
         SHAPExplainer instance of the appropriate type
     """
@@ -237,66 +237,66 @@ Service for applying adversarial debiasing to model predictions.
 ```python
 class DebiasingService:
     """Service for mitigating bias in model predictions."""
-    
+
     def __init__(self):
         """Initialize the debiasing service."""
         self.debiasing_models = {}
         self.debiasing_strength = 1.0
-    
+
     def mitigate_bias(self, prediction, protected_attributes, debiasing_strength=None):
         """
         Apply debiasing to a model prediction.
-        
+
         Args:
             prediction: Original model prediction
             protected_attributes: User's protected attributes
             debiasing_strength: Optional override for debiasing strength
-            
+
         Returns:
             Debiased prediction
         """
         # Implementation details...
-    
+
     def train_debiasing_model(self, training_data, protected_attributes):
         """
         Train a new debiasing model.
-        
+
         Args:
             training_data: Training examples
             protected_attributes: Attributes to protect
         """
         # Implementation details...
-    
+
     def debias_reminder(self, reminder_data, user_attributes):
         """
         Apply debiasing to reminder data.
-        
+
         Args:
             reminder_data: Original reminder
             user_attributes: User's attributes
-            
+
         Returns:
             Debiased reminder
         """
         # Implementation details...
-    
+
     def debias_schedule_suggestion(self, suggestion, user_attributes):
         """
         Apply debiasing to schedule suggestion.
-        
+
         Args:
             suggestion: Original suggestion
             user_attributes: User's attributes
-            
+
         Returns:
             Debiased suggestion
         """
         # Implementation details...
-    
+
     def set_debiasing_strength(self, strength):
         """
         Set the overall debiasing strength.
-        
+
         Args:
             strength: Debiasing strength (0.0-1.0)
         """
@@ -310,22 +310,22 @@ Neural network-based debiasing model.
 ```python
 class AdversarialDebiaser:
     """Neural network model for adversarial debiasing."""
-    
+
     def __init__(self, input_dim, output_dim, protected_dim):
         """
         Initialize the adversarial debiaser.
-        
+
         Args:
             input_dim: Dimension of input features
             output_dim: Dimension of output predictions
             protected_dim: Dimension of protected attributes
         """
         # Implementation details...
-    
+
     def train(self, X, y, protected_attributes, epochs=10, batch_size=32):
         """
         Train the debiaser.
-        
+
         Args:
             X: Input features
             y: Target values
@@ -334,16 +334,16 @@ class AdversarialDebiaser:
             batch_size: Training batch size
         """
         # Implementation details...
-    
+
     def debias(self, input_features, protected_attributes, debiasing_strength=1.0):
         """
         Apply debiasing to input features.
-        
+
         Args:
             input_features: Original features
             protected_attributes: Protected attribute values
             debiasing_strength: Strength of debiasing
-            
+
         Returns:
             Debiased prediction
         """
@@ -358,7 +358,7 @@ Get the singleton instance of the debiasing service.
 def get_debiasing_service():
     """
     Get the singleton instance of the debiasing service.
-    
+
     Returns:
         DebiasingService instance
     """
@@ -377,11 +377,11 @@ Abstract base class for fallback protocols.
 ```python
 class FallbackProtocol(ABC):
     """Abstract base class for fallback protocols."""
-    
+
     def __init__(self, protocol_id, confidence_threshold):
         """
         Initialize a fallback protocol.
-        
+
         Args:
             protocol_id: Unique identifier for the protocol
             confidence_threshold: Confidence threshold for triggering fallback
@@ -389,39 +389,39 @@ class FallbackProtocol(ABC):
         self.protocol_id = protocol_id
         self.confidence_threshold = confidence_threshold
         self.telemetry_data = []
-    
+
     @abstractmethod
     def should_fallback(self, confidence):
         """
         Determine if fallback should be triggered.
-        
+
         Args:
             confidence: Confidence score (0-1)
-            
+
         Returns:
             Boolean indicating if fallback should be triggered
         """
         pass
-    
+
     @abstractmethod
     def apply_fallback(self, prediction, confidence, context=None):
         """
         Apply the fallback protocol to a prediction.
-        
+
         Args:
             prediction: Original prediction
             confidence: Confidence score
             context: Optional context information
-            
+
         Returns:
             Processed prediction with fallback applied
         """
         pass
-    
+
     def log_fallback_event(self, confidence, action, context=None):
         """
         Log a fallback event for telemetry.
-        
+
         Args:
             confidence: Confidence score
             action: Fallback action taken
@@ -437,11 +437,11 @@ Simple fallback protocol with a single threshold.
 ```python
 class BinaryFallbackProtocol(FallbackProtocol):
     """Simple binary fallback protocol."""
-    
+
     def __init__(self, protocol_id, confidence_threshold, default_value):
         """
         Initialize a binary fallback protocol.
-        
+
         Args:
             protocol_id: Unique identifier for the protocol
             confidence_threshold: Confidence threshold
@@ -449,20 +449,20 @@ class BinaryFallbackProtocol(FallbackProtocol):
         """
         super().__init__(protocol_id, confidence_threshold)
         self.default_value = default_value
-    
+
     def should_fallback(self, confidence):
         """Check if confidence is below the threshold."""
         return confidence < self.confidence_threshold
-    
+
     def apply_fallback(self, prediction, confidence, context=None):
         """
         Apply binary fallback.
-        
+
         Args:
             prediction: Original prediction
             confidence: Confidence score
             context: Optional context information
-            
+
         Returns:
             Original prediction or default value based on confidence
         """
@@ -476,11 +476,11 @@ Multi-stage fallback protocol with progressive actions.
 ```python
 class ProgressiveFallbackProtocol(FallbackProtocol):
     """Progressive fallback with multiple stages based on confidence levels."""
-    
+
     def __init__(self, protocol_id, confidence_threshold, fallback_stages):
         """
         Initialize a progressive fallback protocol.
-        
+
         Args:
             protocol_id: Unique identifier for the protocol
             confidence_threshold: Main confidence threshold
@@ -488,20 +488,20 @@ class ProgressiveFallbackProtocol(FallbackProtocol):
         """
         super().__init__(protocol_id, confidence_threshold)
         self.fallback_stages = sorted(fallback_stages, key=lambda x: x['threshold'])
-    
+
     def should_fallback(self, confidence):
         """Check if confidence is below any threshold."""
         return confidence < self.confidence_threshold
-    
+
     def apply_fallback(self, prediction, confidence, context=None):
         """
         Apply progressive fallback based on confidence level.
-        
+
         Args:
             prediction: Original prediction
             confidence: Confidence score
             context: Optional context information
-            
+
         Returns:
             Processed prediction with appropriate fallback action
         """
@@ -515,31 +515,31 @@ Manager for registering and applying fallback protocols.
 ```python
 class FallbackManager:
     """Manager for fallback protocols."""
-    
+
     def __init__(self):
         """Initialize the fallback manager."""
         self.protocols = {}
-    
+
     def register_protocol(self, model_id, protocol):
         """
         Register a fallback protocol for a model.
-        
+
         Args:
             model_id: Identifier for the model
             protocol: FallbackProtocol instance
         """
         self.protocols[model_id] = protocol
-    
+
     def apply_protocol(self, model_id, prediction, confidence, context=None):
         """
         Apply the registered protocol for a model.
-        
+
         Args:
             model_id: Identifier for the model
             prediction: The model's prediction
             confidence: Confidence score
             context: Optional context information
-            
+
         Returns:
             Result with fallback action and processed prediction
         """
@@ -554,7 +554,7 @@ Get the singleton instance of the fallback manager.
 def get_fallback_manager():
     """
     Get the singleton instance of the fallback manager.
-    
+
     Returns:
         FallbackManager instance
     """
@@ -572,12 +572,12 @@ Create a configured progressive fallback protocol.
 def create_progressive_fallback(protocol_id, confidence_threshold, fallback_stages):
     """
     Create a progressive fallback protocol.
-    
+
     Args:
         protocol_id: Identifier for the protocol
         confidence_threshold: Main confidence threshold
         fallback_stages: List of stage configurations
-        
+
     Returns:
         ProgressiveFallbackProtocol instance
     """
@@ -597,11 +597,11 @@ Service for auditing models for fairness and bias.
 ```python
 class BiasAuditor:
     """Service for auditing models for fairness and bias."""
-    
+
     def __init__(self, db=None):
         """
         Initialize the bias auditor.
-        
+
         Args:
             db: Optional database connection
         """
@@ -613,84 +613,84 @@ class BiasAuditor:
             "equal_opportunity": 0.9,
             "equalized_odds": 0.85
         }
-    
+
     def schedule_audit(self, model_id, frequency, metrics, protected_attributes):
         """
         Schedule a regular bias audit for a model.
-        
+
         Args:
             model_id: Identifier for the model to audit
             frequency: Audit frequency ('daily', 'weekly', 'monthly')
             metrics: List of fairness metrics to calculate
             protected_attributes: List of protected attributes
-            
+
         Returns:
             Audit job ID
         """
         # Implementation details...
-    
+
     def audit_predictions(self, predictions, outcomes, protected_attributes, metrics=None):
         """
         Perform an immediate bias audit on predictions.
-        
+
         Args:
             predictions: List of model predictions
             outcomes: List of actual outcomes
             protected_attributes: Protected attribute values
             metrics: Optional list of fairness metrics
-            
+
         Returns:
             BiasAuditReport object
         """
         # Implementation details...
-    
+
     def generate_report(self, audit_id):
         """
         Generate a report for a completed audit.
-        
+
         Args:
             audit_id: ID of the audit
-            
+
         Returns:
             BiasAuditReport object
         """
         # Implementation details...
-    
+
     def _calculate_fairness_metrics(self, predictions, outcomes, protected_attributes, metrics):
         """
         Calculate fairness metrics.
-        
+
         Args:
             predictions: List of model predictions
             outcomes: List of actual outcomes
             protected_attributes: Protected attribute values
             metrics: List of fairness metrics
-            
+
         Returns:
             Dictionary of metric scores
         """
         # Implementation details...
-    
+
     def _detect_violations(self, metric_scores):
         """
         Detect fairness violations based on thresholds.
-        
+
         Args:
             metric_scores: Dictionary of metric scores
-            
+
         Returns:
             List of violations
         """
         # Implementation details...
-    
+
     def _generate_recommendations(self, violations, protected_attributes):
         """
         Generate recommendations to address violations.
-        
+
         Args:
             violations: List of violations
             protected_attributes: Protected attribute values
-            
+
         Returns:
             List of recommendations
         """
@@ -704,11 +704,11 @@ Container for bias audit results.
 ```python
 class BiasAuditReport:
     """Container for bias audit results."""
-    
+
     def __init__(self, audit_id, model_id, fairness_scores, violations, recommendations, protected_attributes, data_summary):
         """
         Initialize a bias audit report.
-        
+
         Args:
             audit_id: Unique identifier for the audit
             model_id: Identifier for the audited model
@@ -726,15 +726,15 @@ class BiasAuditReport:
         self.recommendations = recommendations
         self.protected_attributes = protected_attributes
         self.data_summary = data_summary
-    
+
     def to_dict(self):
         """Convert report to dictionary format."""
         # Implementation details...
-    
+
     def to_html(self):
         """Generate HTML representation of the report."""
         # Implementation details...
-    
+
     def to_markdown(self):
         """Generate Markdown representation of the report."""
         # Implementation details...
@@ -748,10 +748,10 @@ Get the singleton instance of the bias auditor.
 def get_bias_auditor(db=None):
     """
     Get the singleton instance of the bias auditor.
-    
+
     Args:
         db: Optional database connection
-        
+
     Returns:
         BiasAuditor instance
     """
@@ -771,12 +771,12 @@ Functions for creating visualizations for explanations.
 def create_feature_importance_plot(feature_names, importance_values, top_n=10):
     """
     Create a feature importance bar plot.
-    
+
     Args:
         feature_names: List of feature names
         importance_values: List of importance values
         top_n: Number of top features to include
-        
+
     Returns:
         Base64 encoded image
     """
@@ -785,13 +785,13 @@ def create_feature_importance_plot(feature_names, importance_values, top_n=10):
 def create_waterfall_plot(shap_values, features, prediction, expected_value):
     """
     Create a SHAP waterfall plot.
-    
+
     Args:
         shap_values: SHAP values
         features: Feature values
         prediction: Model prediction
         expected_value: Expected/baseline value
-        
+
     Returns:
         Base64 encoded image
     """
@@ -800,12 +800,12 @@ def create_waterfall_plot(shap_values, features, prediction, expected_value):
 def create_force_plot(shap_values, features, feature_names):
     """
     Create a SHAP force plot.
-    
+
     Args:
         shap_values: SHAP values
         features: Feature values
         feature_names: Feature names
-        
+
     Returns:
         Base64 encoded image
     """
@@ -820,11 +820,11 @@ Functions for calculating fairness metrics.
 def calculate_disparate_impact(predictions, protected_attribute):
     """
     Calculate disparate impact ratio.
-    
+
     Args:
         predictions: Binary predictions
         protected_attribute: Protected attribute values
-        
+
     Returns:
         Disparate impact ratio
     """
@@ -833,11 +833,11 @@ def calculate_disparate_impact(predictions, protected_attribute):
 def calculate_demographic_parity(predictions, protected_attribute):
     """
     Calculate demographic parity difference.
-    
+
     Args:
         predictions: Binary predictions
         protected_attribute: Protected attribute values
-        
+
     Returns:
         Demographic parity difference
     """
@@ -846,12 +846,12 @@ def calculate_demographic_parity(predictions, protected_attribute):
 def calculate_equal_opportunity(predictions, outcomes, protected_attribute):
     """
     Calculate equal opportunity difference.
-    
+
     Args:
         predictions: Binary predictions
         outcomes: Actual outcomes
         protected_attribute: Protected attribute values
-        
+
     Returns:
         Equal opportunity difference
     """
@@ -860,12 +860,12 @@ def calculate_equal_opportunity(predictions, outcomes, protected_attribute):
 def calculate_equalized_odds(predictions, outcomes, protected_attribute):
     """
     Calculate equalized odds difference.
-    
+
     Args:
         predictions: Binary predictions
         outcomes: Actual outcomes
         protected_attribute: Protected attribute values
-        
+
     Returns:
         Equalized odds difference
     """
@@ -880,10 +880,10 @@ Functions for preprocessing data for fairness operations.
 def preprocess_protected_attributes(user_attributes):
     """
     Preprocess user attributes for fairness operations.
-    
+
     Args:
         user_attributes: User attribute dictionary
-        
+
     Returns:
         Processed attributes
     """
@@ -892,11 +892,11 @@ def preprocess_protected_attributes(user_attributes):
 def normalize_prediction_format(prediction, model_type):
     """
     Normalize prediction format for debiasing.
-    
+
     Args:
         prediction: Model prediction
         model_type: Type of model
-        
+
     Returns:
         Normalized prediction
     """
@@ -905,12 +905,12 @@ def normalize_prediction_format(prediction, model_type):
 def prepare_audit_data(predictions, outcomes, protected_attributes):
     """
     Prepare data for bias auditing.
-    
+
     Args:
         predictions: List of predictions
         outcomes: List of outcomes
         protected_attributes: Protected attribute values
-        
+
     Returns:
         Prepared data structure
     """
@@ -1079,4 +1079,4 @@ CREATE TABLE scheduled_audits (
 
 ---
 
-© 2025 ADHD Calendar - Comprehensive code reference for Epic 5 
+© 2025 ADHD Calendar - Comprehensive code reference for Epic 5

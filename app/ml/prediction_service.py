@@ -1,5 +1,8 @@
 from .preprocessing import DataPreprocessor
 from .training import ModelTrainer
+from typing import Dict, List, Any
+from app.ml.ensemble_learning import EnsembleLearner
+from app.ml.visualization import InsightVisualizer
 
 
 class PredictionService:
@@ -9,6 +12,8 @@ class PredictionService:
         self.preprocessor = DataPreprocessor()
         self.trainer = ModelTrainer()
         self.models = {}
+        self.ensemble = EnsembleLearner()
+        self.visualizer = InsightVisualizer()
         self._load_models()
 
     def _load_models(self):
@@ -213,187 +218,39 @@ class PredictionService:
         if task_data.get("difficulty_rating", 5) > 7:
             recommendations.append("Consider seeking help or resources to reduce task complexity")
 
-    def _generate_comprehensive_insights(
-        mood_pred: float,
-        energy_pred: float,
-        task_completion_pred: float,
-        current_state: Optional[Dict] = None,
+    async def _generate_comprehensive_insights(
+        self, predictions: Dict[str, Any], user_id: str
     ) -> Dict[str, Any]:
         """
-        Generate comprehensive insights based on predictions.
+        Generate comprehensive insights from predictions.
+
+        Args:
+            predictions: Dictionary containing prediction results
+            user_id: ID of the user for whom insights are being generated
+
+        Returns:
+            Dictionary containing comprehensive insights
         """
+        # Generate insights based on predictions
         insights = {
-            "overall_state": self._assess_overall_state(),
-            "mood_analysis": {
-                "prediction": mood_pred,
-                "trend": (
-                    "improving"
-                    if current_state and mood_pred > current_state.get("mood_score", 0)
-                    else "declining"
-                ),
-                "factors": self._identify_mood_factors(current_state) if current_state else [],
-            },
-            "energy_analysis": {
-                "prediction": energy_pred,
-                "optimal_task_types": self._suggest_task_types(energy_pred),
-                "recommended_breaks": self._calculate_break_recommendations(energy_pred),
-            },
-            "productivity_potential": {
-                "score": task_completion_pred,
-                "limiting_factors": self._identify_limiting_factors(),
-                "optimization_suggestions": self._generate_optimization_suggestions(),
-            },
+            "user_id": user_id,
+            "productivity_score": predictions.get("ensemble_score", 0.0),
+            "component_scores": predictions.get("component_predictions", {}),
+            "feature_importance": predictions.get("feature_importance", {}),
+            "recommendations": self._generate_recommendations(predictions),
         }
 
-    def _assess_overall_state(
-        self, mood_pred: float, energy_pred: float, task_completion_pred: float
-    ) -> str:
-        """
-        Assess overall state based on predictions.
-        """
-        average_score = (mood_pred + energy_pred + task_completion_pred * 10) / 3
+        return insights
 
-        if average_score >= 7.5:
-            return "optimal"
-        elif average_score >= 6:
-            return "good"
-        elif average_score >= 4:
-            return "moderate"
-        else:
-            return "challenging"
-
-    def _identify_mood_factors(self, current_state: Dict) -> List[str]:
-        """
-        Identify factors affecting mood.
-        """
-        factors = []
-
-        if current_state.get("stress_level", 0) > 6:
-            factors.append("high stress levels")
-        if current_state.get("sleep_quality", 0) < 6:
-            factors.append("poor sleep quality")
-        if current_state.get("anxiety_level", 0) > 6:
-            factors.append("elevated anxiety")
-
-    def _suggest_task_types(self, energy_pred: float) -> List[str]:
-        """
-        Suggest appropriate task types based on predicted energy.
-        """
-        if energy_pred >= 7:
-            return ["high-focus tasks", "complex problem-solving", "creative work"]
-        elif energy_pred >= 5:
-            return ["moderate-focus tasks", "routine work", "administrative tasks"]
-        else:
-            return ["low-energy tasks", "planning", "organization"]
-
-    def _calculate_break_recommendations(self, energy_pred: float) -> Dict[str, Any]:
-        """
-        Calculate break recommendations based on energy prediction.
-        """
-        if energy_pred < 4:
-            return {
-                "frequency": "every 25 minutes",
-                "duration": "10-15 minutes",
-                "type": "active breaks",
-            }
-        elif energy_pred < 7:
-            return {
-                "frequency": "every 45 minutes",
-                "duration": "5-10 minutes",
-                "type": "mixed breaks",
-            }
-        else:
-            return {
-                "frequency": "every 60 minutes",
-                "duration": "5 minutes",
-                "type": "quick breaks",
-            }
-
-    def _identify_limiting_factors(
-        self, mood_pred: float, energy_pred: float, task_completion_pred: float
-    ) -> List[str]:
-        """
-        Identify factors limiting productivity.
-        """
-        factors = []
-
-        if mood_pred < 5:
-            factors.append("low mood")
-        if energy_pred < 5:
-            factors.append("low energy")
-        if task_completion_pred < 0.4:
-            factors.append("task complexity or overwhelm")
-
-    def _generate_optimization_suggestions(
-        self, mood_pred: float, energy_pred: float, task_completion_pred: float
-    ) -> List[str]:
-        """
-        Generate suggestions for optimization.
-        """
-        suggestions = []
-
-        if mood_pred < 5:
-            suggestions.extend(
-                [
-                    "Take a short walk or get some fresh air",
-                    "Practice a quick mindfulness exercise",
-                    "Connect with a supportive person",
-                ]
-            )
-
-        if energy_pred < 5:
-            suggestions.extend(
-                [
-                    "Take a power nap (15-20 minutes)",
-                    "Have a healthy snack",
-                    "Do some light stretching or exercise",
-                ]
-            )
-
-        if task_completion_pred < 0.4:
-            suggestions.extend(
-                [
-                    "Break down tasks into smaller, manageable pieces",
-                    "Start with the easiest subtask",
-                    "Set a timer for focused work sessions",
-                ]
-            )
-
-    def _generate_recommendations(self, insights: Dict[str, Any]) -> List[str]:
-        """
-        Generate actionable recommendations based on insights.
-        """
+    def _generate_recommendations(self, predictions: Dict[str, Any]) -> List[str]:
+        """Generate recommendations based on predictions."""
         recommendations = []
 
-        # Add recommendations based on overall state
-        if insights["overall_state"] == "challenging":
-            recommendations.extend(
-                [
-                    "Consider taking a break to recharge",
-                    "Focus on self-care activities",
-                    "Adjust your schedule to match your energy levels",
-                ]
-            )
+        # Add recommendations based on component scores
+        component_scores = predictions.get("component_predictions", {})
+        if component_scores.get("mood", 0.0) < 0.5:
+            recommendations.append("Consider taking a short break to improve mood")
+        if component_scores.get("energy", 0.0) < 0.5:
+            recommendations.append("Try a quick physical activity to boost energy")
 
-        # Add mood-based recommendations
-        if insights["mood_analysis"]["trend"] == "declining":
-            recommendations.extend(
-                [
-                    "Schedule a mood-boosting activity",
-                    "Practice stress-reduction techniques",
-                    "Consider talking to a supportive person",
-                ]
-            )
-
-        # Add energy-based recommendations
-        recommendations.extend(
-            [
-                f"Focus on {task_type}"
-                for task_type in insights["energy_analysis"]["optimal_task_types"][:2]
-            ]
-        )
-
-        # Add productivity recommendations
-        recommendations.extend(insights["productivity_potential"]["optimization_suggestions"])
-
-        return recommendations[:5]  # Return top 5 recommendations
+        return recommendations

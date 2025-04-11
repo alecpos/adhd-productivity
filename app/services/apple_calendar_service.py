@@ -12,4 +12,4 @@ class AppleCalendarService(BaseService[CalendarEventModel, EventResponseSchema, 
     def __init__(self, db_session: AsyncSession):
         """Initialize Apple Calendar service."""
         super().__init__(db_session, CalendarEventModel, EventResponseSchema)
-        # TODO: Add Apple Calendar API client initialization 
+        # TODO: Add Apple Calendar API client initialization

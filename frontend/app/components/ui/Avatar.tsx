@@ -76,4 +76,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default Avatar; 
+export default Avatar;
