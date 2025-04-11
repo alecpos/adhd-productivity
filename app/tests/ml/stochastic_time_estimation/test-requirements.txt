@@ -28,6 +28,6 @@ pandas==2.0.0
 xarray==2022.6.0
 
 # Utilities
-tqdm==4.65.0
+tqdm==4.66.3
 filelock==3.12.0
 h5py==3.8.0 
