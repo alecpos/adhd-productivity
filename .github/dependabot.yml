@@ -5,10 +5,12 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    reviewers:
+      - "alecpos"
     assignees:
       - "alecpos"
     commit-message:
-      prefix: "deps"
+      prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
@@ -22,25 +24,32 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    reviewers:
+      - "alecpos"
     assignees:
       - "alecpos"
     commit-message:
-      prefix: "deps"
+      prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "javascript"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
+    reviewers:
+      - "alecpos"
     assignees:
       - "alecpos"
     commit-message:
-      prefix: "ci"
+      prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
-      - "github_actions" 
+      - "github-actions" 
