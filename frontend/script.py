@@ -1,3 +1,4 @@
+import os
 
 
 def export_and_combine_folder_contents():
@@ -19,6 +20,8 @@ def export_and_combine_folder_contents():
 
     # Filter out files, keep only directories, excluding specified directories
     folders = [
+        item
+        for item in items
         if os.path.isdir(os.path.join(current_dir, item)) and item not in exclude_dirs
     ]
 

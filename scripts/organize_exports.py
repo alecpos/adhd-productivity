@@ -1,11 +1,8 @@
 """Script to organize and export files by functional grouping and features."""
 
 
-
-
 class ExportError(Exception):
     """Custom exception for export errors."""
-
 
 
 def setup_logging():
@@ -27,7 +24,6 @@ def safe_file_operation(func):
         except Exception as e:
             logging.error(f"Error in {func.__name__}: {str(e)}")
             raise ExportError(f"Failed to execute {func.__name__}: {str(e)}")
-
 
 
 def get_file_type_config():
@@ -85,7 +81,6 @@ def load_config() -> Dict[str, Any]:
             config[config_key] = os.environ[key]
 
 
-
 @safe_file_operation
 def analyze_dependencies(file_path: str) -> List[str]:
     """Analyze file dependencies based on imports and requires."""
@@ -116,20 +111,23 @@ def detect_circular_dependencies(files: Dict[str, List[str]]) -> List[Tuple[str,
         if node in path:
             cycle = path[path.index(node) :]
             circular_deps.append(tuple(cycle))
+            return True
         if node in visited:
+            return False
 
         visited.add(node)
         path.append(node)
 
         for neighbor in dependency_graph.get(node, []):
             if dfs(neighbor):
+                return True
 
         path.pop()
+        return False
 
     for node in dependency_graph:
         if node not in visited:
             dfs(node)
-
 
 
 def check_theme_alignment(file_path: str) -> Dict[str, Any]:
@@ -176,7 +174,6 @@ def check_code_quality(file_path: str) -> Dict[str, Any]:
     if file_path.endswith((".ts", ".tsx", ".js", ".jsx")):
         theme_alignment = check_theme_alignment(file_path)
         metrics["theme_alignment"].extend(theme_alignment["alignment_issues"])
-
 
 
 def generate_documentation(categories: Dict[str, List[str]], features: Dict[str, List[str]]):
@@ -276,9 +273,11 @@ def group_files_by_category(start_path: str = "app") -> Dict[str, List[str]]:
     for root, _, files in os.walk(start_path):
         # Skip node_modules directory
         if "node_modules" in root:
+            continue
 
         for file in files:
             if not file.endswith((".py", ".ts", ".tsx")) or file.startswith("__"):
+                continue
 
             file_path = os.path.join(root, file)
 
@@ -338,7 +337,6 @@ def group_files_by_category(start_path: str = "app") -> Dict[str, List[str]]:
                 categories["LOCALIZATION"].append(file_path)
             elif "core" in root or root == start_path:
                 categories["CORE"].append(file_path)
-
 
 
 def group_files_by_feature(start_path: str = "app") -> Dict[str, List[str]]:
@@ -432,9 +430,11 @@ def group_files_by_feature(start_path: str = "app") -> Dict[str, List[str]]:
     for root, _, files in os.walk(start_path):
         # Skip node_modules directory
         if "node_modules" in root:
+            continue
 
         for file in files:
             if not file.endswith((".py", ".ts", ".tsx")) or file.startswith("__"):
+                continue
 
             file_path = os.path.join(root, file)
             try:
@@ -450,19 +450,17 @@ def group_files_by_feature(start_path: str = "app") -> Dict[str, List[str]]:
                     dir_matched = True
 
             if dir_matched:
+                continue
 
             # Then try to match by keywords
             matched = False
             for feature, patterns in keywords.items():
-                if any(
-                    pattern in file_path.lower() or pattern in file_content.lower()
-                ):
+                if any(pattern in file_path.lower() or pattern in file_content.lower()):
                     features[feature].append(file_path)
                     matched = True
 
             if not matched:
                 features["CORE"].append(file_path)
-
 
 
 def create_consolidated_file(files: List[str], output_path: str, category: str):

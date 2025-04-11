@@ -1,9 +1,7 @@
-
-
-
 def escape_html(text: str) -> str:
     """Escape HTML-like syntax in text."""
     if not text:
+        return text
     return text.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
 
 
