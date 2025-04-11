@@ -1,0 +1,48 @@
+{
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimitNone",
+    ":semanticCommits"
+  ],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "groupName": "types packages"
+    }
+  ],
+  "python": {
+    "enabled": true,
+    "packageRules": [
+      {
+        "matchPackagePatterns": ["^django"],
+        "groupName": "django packages"
+      },
+      {
+        "matchPackagePatterns": ["^flask"],
+        "groupName": "flask packages"
+      }
+    ]
+  },
+  "schedule": ["every weekend"],
+  "timezone": "America/New_York",
+  "prBodyColumns": [
+    "Package",
+    "Change",
+    "Age",
+    "Adoption",
+    "Passing"
+  ]
+} 
