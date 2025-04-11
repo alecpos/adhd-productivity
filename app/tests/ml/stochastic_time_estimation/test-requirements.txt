@@ -15,7 +15,7 @@ scipy==1.8.0
 scikit-learn==1.0.2
 
 # Deep learning 
-tensorflow==2.12.0  # Last version with fewer compatibility issues
+tensorflow==2.12.1  # Last version with fewer compatibility issues
 keras==2.12.0
 
 # NLP Libraries
