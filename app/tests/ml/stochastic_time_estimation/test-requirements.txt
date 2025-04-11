@@ -12,7 +12,7 @@ numpy==1.22.1  # Specific version required for compatibility with pymc3
 scipy==1.8.0
 
 # Machine learning
-scikit-learn==1.0.2
+scikit-learn==1.5.1
 
 # Deep learning 
 tensorflow==2.12.0  # Last version with fewer compatibility issues
