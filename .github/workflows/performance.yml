@@ -65,7 +65,7 @@ jobs:
         locust -f tests/load_test.py --headless -u 100 -r 10 -t 1m --csv=load_test_results
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: load-test-results
         path: load_test_results*
@@ -111,7 +111,7 @@ jobs:
         pytest tests/benchmarks/ --benchmark-only --benchmark-json=benchmark_results.json
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
         path: benchmark_results.json
