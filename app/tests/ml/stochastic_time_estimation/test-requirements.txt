@@ -8,7 +8,7 @@ pytest-asyncio==0.25.3
 # Bayesian modeling
 pymc3==3.11.4
 theano-pymc==1.1.2
-numpy==1.22.1  # Specific version required for compatibility with pymc3
+numpy==2.0.2  # Specific version required for compatibility with pymc3
 scipy==1.8.0
 
 # Machine learning
