@@ -8,7 +8,7 @@ pytest-mock==3.10.0
 numpy==1.19.5  # Compatible with PyMC3
 scipy==1.7.3
 pandas==1.3.5
-scikit-learn==1.0.2
+scikit-learn==1.5.1
 pymc3==3.11.5
 theano-pymc==1.1.2
 arviz==0.12.1
