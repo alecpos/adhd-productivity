@@ -29,8 +29,6 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run tests with coverage
-        env:
-          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest --cov=./ --cov-report=xml
 
@@ -47,4 +45,4 @@ jobs:
             -Dsonar.test.inclusions=tests/**
             -Dsonar.exclusions=**/__pycache__/**,**/tests/**,**/venv/**,**/node_modules/**
             -Dsonar.python.xunit.reportPath=tests/results.xml
-            -Dsonar.python.pylint.reportPath=pylint-report.txt 
+            -Dsonar.python.pylint.reportPath=pylint-report.txt
