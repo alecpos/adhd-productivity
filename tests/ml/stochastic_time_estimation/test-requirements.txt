@@ -14,7 +14,7 @@ theano-pymc==1.1.2
 arviz==0.12.1
 
 # NLP dependencies
-nltk==3.8.1
+nltk==3.9.1
 transformers==4.25.1
 spacy==3.5.3
 tensorboard==2.11.2
