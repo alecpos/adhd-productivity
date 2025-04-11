@@ -1,4 +1,63 @@
-# ADHD Calendar ML Project
+# ADHD Calendar Backend Refactoring
+
+This repository contains the backend for the ADHD Calendar application, with recent refactoring improvements.
+
+## Refactoring Summary
+
+| Component | Metric | Before | After | Improvement |
+|-----------|--------|--------|-------|-------------|
+| SyncService | Complexity | 1.00 | 0.24 | 76% |
+| SyncService | Nesting | 1.00 | 0.67 | 33% |
+| JiraTaskMapper | Complexity | 3.58 | 1.82 | 49% |
+| JiraAuthenticator | Complexity | 2.81 | 2.40 | 15% |
+
+## Key Improvements
+
+1. **Sync Service**: Transformed function-based approach to service-oriented architecture
+   - Separated concerns into `SyncService` and `SyncTaskManager` classes
+   - Improved error handling and reporting
+   - Optimized task comparison from O(n²) to O(n)
+
+2. **Jira Integration**: Improved component design and separation of concerns
+   - Enhanced authentication workflows
+   - Better task field mapping logic
+
+## Technical Debt Analysis
+
+A comprehensive technical debt analysis has been conducted on the codebase:
+
+- **Overall Codebase**: 86% of files have severe structural debt
+- **Next Target**: Body Doubling Service (see [Refactoring Plan](docs/analysis/body_doubling_refactoring_plan.md))
+- **Full Report**: [Technical Debt Analysis](docs/analysis/summary.md)
+
+## Documentation
+
+- **Refactoring**
+  - [Sync Service Improvements](docs/refactoring/sync_service_improvements.md)
+  - [Jira Integration Improvements](docs/refactoring/jira_integration_improvements.md)
+  - [Next Steps](docs/refactoring/next_steps.md)
+  - [Architecture Diagram](docs/refactoring/images/before_after_diagram.txt)
+
+- **Analysis**
+  - [Technical Debt Summary](docs/analysis/summary.md)
+  - [Body Doubling Refactoring Plan](docs/analysis/body_doubling_refactoring_plan.md)
+
+## Development
+
+```bash
+# Setup
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+
+# Tests
+pytest
+
+# Technical Debt Analysis
+debt analyze-code
+```
+
+## ADHD Calendar ML Project
 
 ## Project Overview
 
