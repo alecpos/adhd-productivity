@@ -18,7 +18,7 @@ nltk==3.8.1
 transformers==4.25.1
 spacy==3.5.3
 tensorboard==2.11.2
-tensorflow==2.11.0  # For embedding layers
+tensorflow==2.12.1  # For embedding layers
 tensorflow-hub==0.13.0
 
 # Database and ORM
