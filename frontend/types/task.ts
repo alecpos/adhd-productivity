@@ -1,10 +1,8 @@
 export enum TaskStatus {
   TODO = 'todo',
-  PENDING = 'pending',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
-  MISSED = 'missed',
   BLOCKED = 'blocked'
 }
 
@@ -50,6 +48,8 @@ export interface Task {
   meta_data?: Record<string, unknown>;
   /** Optional category/tag for the task */
   category?: string;
+  /** List of valid next states for the task */
+  next_states: TaskStatus[];
 }
 
 export interface TaskStats {

@@ -1,0 +1,69 @@
+{
+  "method_name": "weekly_resampling",
+  "source_file": "app/ml/stochastic_time_estimation/time_buffer_calculator.py",
+  "parameters": [],
+  "docstring": "Resample historical task transition data to weekly frequency with rolling averages.\n        \n        This method analyzes historical transition times between tasks and resamples the data\n        to weekly frequency, calculating rolling averages and other useful statistics to identify\n        patterns in task switching efficiency over time.\n        \n        Args:\n            user_id: ID of the user whose data will be analyzed\n            lookback_days: Number of days to look back for historical data\n            rolling_window_days: Size of the rolling window for averages (in days)\n            include_weekends: Whether to include weekend data in the analysis\n            \n        Returns:\n            Dictionary containing:\n            - weekly_transitions: Weekly resampled transition data\n            - weekly_stats: Statistics for each week\n            - rolling_averages: Rolling average transitions\n            - patterns: Identified weekly patterns",
+  "source_code_length": 156,
+  "dependencies": [
+    "pandas",
+    "numpy",
+    "datetime",
+    "logging"
+  ],
+  "sample_data_analysis": {
+    "weekly_pattern": [
+      {
+        "day_name": "Friday",
+        "count": 13,
+        "mean": 18.384615384615383,
+        "std": 5.500582719713454,
+        "min": 11,
+        "max": 28
+      },
+      {
+        "day_name": "Monday",
+        "count": 15,
+        "mean": 17.2,
+        "std": 7.042726744663604,
+        "min": 8,
+        "max": 29
+      },
+      {
+        "day_name": "Thursday",
+        "count": 15,
+        "mean": 17.066666666666666,
+        "std": 7.986297789398564,
+        "min": 5,
+        "max": 29
+      },
+      {
+        "day_name": "Tuesday",
+        "count": 18,
+        "mean": 21.11111111111111,
+        "std": 8.40790166792621,
+        "min": 5,
+        "max": 29
+      },
+      {
+        "day_name": "Wednesday",
+        "count": 14,
+        "mean": 16.785714285714285,
+        "std": 9.42320026831136,
+        "min": 5,
+        "max": 29
+      }
+    ],
+    "time_of_day_pattern": {
+      "Night": NaN,
+      "Morning": 18.02777777777778,
+      "Afternoon": 18.435897435897434,
+      "Evening": NaN
+    },
+    "data_points": 75,
+    "date_range": {
+      "start": "2025-03-04T12:10:39.770439",
+      "end": "2025-04-02T12:10:39.770439"
+    }
+  },
+  "timestamp": "2025-04-02T20:10:39.791678"
+}

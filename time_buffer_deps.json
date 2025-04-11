@@ -1,0 +1,162 @@
+{
+  "file": "/Users/alecposner/Documents/adhd_calendar_backend/app/ml/stochastic_time_estimation/time_buffer_calculator.py",
+  "dependencies": [
+    {
+      "name": "numpy",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "pandas",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "typing",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "datetime",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "logging",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "json",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "sqlalchemy.ext.asyncio",
+      "location": "/Users/alecposner/Documents/adhd_calendar_backend/venv/lib/python3.11/site-packages/sqlalchemy/ext/asyncio/__init__.py",
+      "source": "site-packages",
+      "exports": [],
+      "functions": [
+        "async_engine_from_config",
+        "async_object_session",
+        "async_session",
+        "close_all_sessions",
+        "create_async_engine",
+        "create_async_pool_from_url"
+      ],
+      "classes": [
+        "AsyncAttrs",
+        "AsyncConnection",
+        "AsyncEngine",
+        "AsyncMappingResult",
+        "AsyncResult",
+        "AsyncScalarResult",
+        "AsyncSession",
+        "AsyncSessionTransaction",
+        "AsyncTransaction",
+        "AsyncTupleResult",
+        "async_scoped_session",
+        "async_sessionmaker"
+      ]
+    },
+    {
+      "name": "engine",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "result",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "scoping",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "session",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "sqlalchemy",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "enum",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "math",
+      "location": null,
+      "source": "unknown",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "app.models.task_model",
+      "location": "/Users/alecposner/Documents/adhd_calendar_backend/app/models/task_model.py",
+      "source": "local",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "app.models.user_model",
+      "location": "/Users/alecposner/Documents/adhd_calendar_backend/app/models/user_model.py",
+      "source": "local",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    },
+    {
+      "name": "app.ml.models",
+      "location": "/Users/alecposner/Documents/adhd_calendar_backend/app/ml/models/__init__.py",
+      "source": "local",
+      "exports": [],
+      "functions": [],
+      "classes": []
+    }
+  ],
+  "timestamp": 1743634645.670916
+}

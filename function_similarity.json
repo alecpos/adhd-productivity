@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "total_functions": 5,
+    "similar_pairs": 1,
+    "similarity_threshold": 0.7,
+    "min_lines": 5,
+    "exact_duplicates": 0,
+    "fuzzy_matches": 1,
+    "debt_items_created": 1
+  },
+  "similar_pairs": [
+    {
+      "function1": {
+        "name": "calculate_trend",
+        "file": "app/tests/services/body_doubling/test_simple.py",
+        "line": 5,
+        "lines": 12
+      },
+      "function2": {
+        "name": "_calculate_trend",
+        "file": "app/tests/services/body_doubling/test_analytics_direct.py",
+        "line": 106,
+        "lines": 12
+      },
+      "similarity": 0.9306698002350177
+    }
+  ]
+}
