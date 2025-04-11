@@ -16,7 +16,7 @@ scikit-learn==1.0.2
 
 # Deep learning 
 tensorflow==2.12.0  # Last version with fewer compatibility issues
-keras==2.12.0
+keras==3.9.0
 
 # NLP Libraries
 nltk==3.9.1
