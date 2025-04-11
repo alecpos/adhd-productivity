@@ -141,8 +141,8 @@ jobs:
       run: |
         coverage report --fail-under=80
 
-  codeql-analysis:
-    needs: pre-commit
+  security:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -168,31 +168,10 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
 
-  docker:
-    needs: [test, codeql-analysis]
-    runs-on: ubuntu-latest
+    - name: Build Docker image
+      run: docker build -t adhd-calendar-backend .
 
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}-${{ env.CACHE_VERSION }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-${{ github.sha }}-
-          ${{ runner.os }}-buildx-
-
-    - name: Build and test Docker image
-      run: |
-        docker build -t adhd-calendar-backend .
-        docker run --rm adhd-calendar-backend pytest
-
-    - name: Scan Docker image for vulnerabilities
+    - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'adhd-calendar-backend:latest'
@@ -202,10 +181,56 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
 
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+  sonarcloud:
+    needs: security
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+        cache-dependency-path: '**/requirements.txt'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=./ --cov-report=xml
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.sources=app
+          -Dsonar.tests=tests
+          -Dsonar.test.inclusions=tests/**
+          -Dsonar.exclusions=**/__pycache__/**,**/tests/**,**/venv/**,**/node_modules/**
+          -Dsonar.python.xunit.reportPath=tests/results.xml
+          -Dsonar.python.pylint.reportPath=pylint-report.txt
+
   database:
     needs: test
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
 
@@ -215,11 +240,6 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: '**/requirements.txt'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
 
     - name: Run database migrations
       env:
@@ -236,9 +256,8 @@ jobs:
 
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
-    needs: [docker, database]
+    needs: [sonarcloud, database]
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
 
