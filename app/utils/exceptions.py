@@ -40,7 +40,7 @@ class ResourceNotFoundError(BaseAPIException):
         resource: Optional[str] = None,
         resource_id: Optional[Any] = None,
         message: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize the exception.
@@ -82,12 +82,7 @@ class ValidationCustomError(BaseAPIException):
     error_code: str = "validation_error"
     default_message: str = "Invalid request parameters."
 
-    def __init__(
-        self,
-        errors: Dict[str, List[str]],
-        message: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, errors: Dict[str, List[str]], message: Optional[str] = None, **kwargs):
         """
         Initialize the exception.
 
@@ -125,12 +120,7 @@ class RateLimitError(BaseAPIException):
     error_code: str = "rate_limit_exceeded"
     default_message: str = "Rate limit exceeded. Please try again later."
 
-    def __init__(
-        self,
-        retry_after: int,
-        message: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, retry_after: int, message: Optional[str] = None, **kwargs):
         """
         Initialize the exception.
 

@@ -42,8 +42,8 @@ class SessionManager:
                 "participants": [str(session_data.user_id)],
                 "join_requests": [],
                 "preferences": {},
-                "feedback": []
-            }
+                "feedback": [],
+            },
         )
 
         self.db.add(session)
@@ -59,12 +59,16 @@ class SessionManager:
 
     async def get_active_session(self, user_id: UUID) -> Optional[BodyDoublingSessionModel]:
         """Get the active session for a user."""
-        query = select(BodyDoublingSessionModel).where(
-            and_(
-                BodyDoublingSessionModel.user_id == user_id,
-                BodyDoublingSessionModel.status == SessionStatus.ACTIVE,
+        query = (
+            select(BodyDoublingSessionModel)
+            .where(
+                and_(
+                    BodyDoublingSessionModel.user_id == user_id,
+                    BodyDoublingSessionModel.status == SessionStatus.ACTIVE,
+                )
             )
-        ).order_by(desc(BodyDoublingSessionModel.created_at))
+            .order_by(desc(BodyDoublingSessionModel.created_at))
+        )
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
@@ -76,7 +80,9 @@ class SessionManager:
 
     async def get_active_sessions(self) -> List[BodyDoublingSessionModel]:
         """Get all active sessions."""
-        query = select(BodyDoublingSessionModel).where(BodyDoublingSessionModel.status == SessionStatus.ACTIVE)
+        query = select(BodyDoublingSessionModel).where(
+            BodyDoublingSessionModel.status == SessionStatus.ACTIVE
+        )
         result = await self.db.execute(query)
         return list(result.scalars().all())
 
@@ -106,9 +112,11 @@ class SessionManager:
 
             # Update the session's metadata in the database
             # Update the meta_data field
-            meta_data_update = update(BodyDoublingSessionModel).where(
-                BodyDoublingSessionModel.id == session_id
-            ).values(meta_data=updated_meta_data)
+            meta_data_update = (
+                update(BodyDoublingSessionModel)
+                .where(BodyDoublingSessionModel.id == session_id)
+                .values(meta_data=updated_meta_data)
+            )
 
             await self.db.execute(meta_data_update)
             await self.db.commit()
@@ -146,11 +154,10 @@ class SessionManager:
         from sqlalchemy import update
 
         # Update the status and meta_data fields
-        session_update = update(BodyDoublingSessionModel).where(
-            BodyDoublingSessionModel.id == session_id
-        ).values(
-            status=new_status,
-            meta_data=updated_meta_data
+        session_update = (
+            update(BodyDoublingSessionModel)
+            .where(BodyDoublingSessionModel.id == session_id)
+            .values(status=new_status, meta_data=updated_meta_data)
         )
 
         await self.db.execute(session_update)
@@ -173,9 +180,11 @@ class SessionManager:
         from sqlalchemy import update
 
         # Update the status field
-        status_update = update(BodyDoublingSessionModel).where(
-            BodyDoublingSessionModel.id == session_id
-        ).values(status=SessionStatus.COMPLETED)
+        status_update = (
+            update(BodyDoublingSessionModel)
+            .where(BodyDoublingSessionModel.id == session_id)
+            .values(status=SessionStatus.COMPLETED)
+        )
 
         await self.db.execute(status_update)
         await self.db.commit()
@@ -184,7 +193,9 @@ class SessionManager:
         await self.db.refresh(session)
         return session
 
-    async def update_preferences(self, session_id: UUID, preferences: Dict[str, Any]) -> BodyDoublingSessionModel:
+    async def update_preferences(
+        self, session_id: UUID, preferences: Dict[str, Any]
+    ) -> BodyDoublingSessionModel:
         """Update session preferences."""
         session = await self.get_session_by_id(session_id)
         if not session:
@@ -214,9 +225,11 @@ class SessionManager:
         from sqlalchemy import update
 
         # Update the meta_data field
-        meta_data_update = update(BodyDoublingSessionModel).where(
-            BodyDoublingSessionModel.id == session_id
-        ).values(meta_data=updated_meta_data)
+        meta_data_update = (
+            update(BodyDoublingSessionModel)
+            .where(BodyDoublingSessionModel.id == session_id)
+            .values(meta_data=updated_meta_data)
+        )
 
         await self.db.execute(meta_data_update)
         await self.db.commit()

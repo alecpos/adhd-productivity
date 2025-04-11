@@ -33,7 +33,7 @@ class JiraErrorHandler:
             "timeout": 0,
             "parsing": 0,
             "validation": 0,
-            "other": 0
+            "other": 0,
         }
 
     def handle_error(self, message: str, exception: Exception, reraise: bool = False) -> None:
@@ -76,7 +76,7 @@ class JiraErrorHandler:
             (self._is_timeout_error, "timeout", self._handle_timeout_error),
             (self._is_connection_error, "network", self._handle_connection_error),
             (self._is_json_error, "parsing", self._handle_json_error),
-            (self._is_validation_error, "validation", self._handle_validation_error)
+            (self._is_validation_error, "validation", self._handle_validation_error),
         ]
 
         for checker, category, handler in error_type_map:
@@ -120,7 +120,7 @@ class JiraErrorHandler:
             401: ("Authentication failed. Please check credentials.", "authentication"),
             403: ("Permission denied. User lacks necessary permissions.", "permission"),
             404: ("Resource not found. Please check IDs and paths.", "not_found"),
-            429: ("Rate limit exceeded. Implementing backoff and retry logic.", "rate_limit")
+            429: ("Rate limit exceeded. Implementing backoff and retry logic.", "rate_limit"),
         }
 
         # Handle specific status codes

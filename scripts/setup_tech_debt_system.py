@@ -29,12 +29,16 @@ except ImportError:
 def create_directories() -> None:
     """Create necessary directories for the tech debt system."""
     # Directory for tech debt reports
-    reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports", "tech_debt")
+    reports_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports", "tech_debt"
+    )
     os.makedirs(reports_dir, exist_ok=True)
     print(f"Created directory: {reports_dir}")
 
     # Directory for git hooks
-    git_hooks_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".git", "hooks")
+    git_hooks_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".git", "hooks"
+    )
     os.makedirs(git_hooks_dir, exist_ok=True)
     print(f"Created directory: {git_hooks_dir}")
 
@@ -44,13 +48,14 @@ def install_git_hooks() -> None:
     # Source pre-commit hook
     source_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "scripts", "git_hooks", "pre-commit"
+        "scripts",
+        "git_hooks",
+        "pre-commit",
     )
 
     # Destination pre-commit hook
     dest_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        ".git", "hooks", "pre-commit"
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".git", "hooks", "pre-commit"
     )
 
     # Make sure the source file exists
@@ -87,10 +92,11 @@ def scan_for_tech_debt(auto_add: bool = False) -> None:
             sys.executable,
             os.path.join(
                 os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                "scripts", "tech_debt_cli.py"
+                "scripts",
+                "tech_debt_cli.py",
             ),
             "scan",
-            "--auto-add" if auto_add else ""
+            "--auto-add" if auto_add else "",
         ]
         cmd = [c for c in cmd if c]  # Remove empty strings
 
@@ -112,7 +118,9 @@ def generate_initial_report() -> None:
         # Path to report
         report_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "reports", "tech_debt", f"initial_report_{get_timestamp()}.md"
+            "reports",
+            "tech_debt",
+            f"initial_report_{get_timestamp()}.md",
         )
 
         # Run tech_debt_cli.py report
@@ -120,10 +128,12 @@ def generate_initial_report() -> None:
             sys.executable,
             os.path.join(
                 os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                "scripts", "tech_debt_cli.py"
+                "scripts",
+                "tech_debt_cli.py",
             ),
             "report",
-            "--output", report_path
+            "--output",
+            report_path,
         ]
 
         print("Generating initial technical debt report...")
@@ -140,16 +150,23 @@ def generate_initial_report() -> None:
 def get_timestamp() -> str:
     """Get a timestamp string for filenames."""
     from datetime import datetime
+
     return datetime.now().strftime("%Y%m%d%H%M%S")
 
 
 def main() -> None:
     """Main entry point for the setup script."""
-    parser = argparse.ArgumentParser(description="Setup script for the technical debt management system")
+    parser = argparse.ArgumentParser(
+        description="Setup script for the technical debt management system"
+    )
     parser.add_argument("--no-git-hooks", action="store_true", help="Skip git hook installation")
-    parser.add_argument("--auto-add", action="store_true", help="Automatically add found tech debt items")
+    parser.add_argument(
+        "--auto-add", action="store_true", help="Automatically add found tech debt items"
+    )
     parser.add_argument("--no-scan", action="store_true", help="Skip scanning for tech debt")
-    parser.add_argument("--no-report", action="store_true", help="Skip generating an initial report")
+    parser.add_argument(
+        "--no-report", action="store_true", help="Skip generating an initial report"
+    )
 
     args = parser.parse_args()
 
@@ -169,7 +186,9 @@ def main() -> None:
     print("Setup complete! You can now use the technical debt management system.")
     print("")
     print("Quick start:")
-    print("  - Add new tech debt item: python scripts/tech_debt_cli.py add --title \"...\" --description \"...\"")
+    print(
+        '  - Add new tech debt item: python scripts/tech_debt_cli.py add --title "..." --description "..."'
+    )
     print("  - List tech debt items: python scripts/tech_debt_cli.py list")
     print("  - Generate a report: python scripts/tech_debt_cli.py report")
     print("  - View metrics: python scripts/tech_debt_cli.py metrics")

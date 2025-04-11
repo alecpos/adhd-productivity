@@ -29,36 +29,30 @@ def error_responses(*status_codes: int) -> Dict[int, Dict[str, Any]]:
     error_descriptions = {
         status.HTTP_400_BAD_REQUEST: {
             "description": "Bad Request - Invalid input data",
-            "model": dict  # Using dict as a placeholder for ErrorResponse
+            "model": dict,  # Using dict as a placeholder for ErrorResponse
         },
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Unauthorized - Authentication required",
-            "model": dict
+            "model": dict,
         },
         status.HTTP_403_FORBIDDEN: {
             "description": "Forbidden - Insufficient permissions",
-            "model": dict
+            "model": dict,
         },
-        status.HTTP_404_NOT_FOUND: {
-            "description": "Not Found - Resource not found",
-            "model": dict
-        },
-        status.HTTP_409_CONFLICT: {
-            "description": "Conflict - Resource conflict",
-            "model": dict
-        },
+        status.HTTP_404_NOT_FOUND: {"description": "Not Found - Resource not found", "model": dict},
+        status.HTTP_409_CONFLICT: {"description": "Conflict - Resource conflict", "model": dict},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Unprocessable Entity - Validation error",
-            "model": dict
+            "model": dict,
         },
         status.HTTP_429_TOO_MANY_REQUESTS: {
             "description": "Too Many Requests - Rate limit exceeded",
-            "model": dict
+            "model": dict,
         },
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "description": "Internal Server Error - Unexpected server error",
-            "model": dict
-        }
+            "model": dict,
+        },
     }
 
     # If no specific codes are provided, include all
@@ -176,7 +170,9 @@ def not_found_error(resource_type: str, resource_id: Any) -> HTTPException:
     )
 
 
-def forbidden_error(message: str = "You do not have permission to perform this action") -> HTTPException:
+def forbidden_error(
+    message: str = "You do not have permission to perform this action",
+) -> HTTPException:
     """
     Create a forbidden error.
 

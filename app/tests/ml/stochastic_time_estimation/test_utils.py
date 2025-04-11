@@ -46,14 +46,14 @@ class MockResultProxy:
 
         # Populate results based on statement
         # This is a simplified implementation
-        if hasattr(statement, 'whereclause'):
-            if 'TaskModel' in str(statement):
+        if hasattr(statement, "whereclause"):
+            if "TaskModel" in str(statement):
                 for task_id, task in self.db.tasks.items():
                     self._result.append((task,))
-            elif 'UserModel' in str(statement):
+            elif "UserModel" in str(statement):
                 for user_id, user in self.db.users.items():
                     self._result.append((user,))
-            elif 'HealthMetrics' in str(statement):
+            elif "HealthMetrics" in str(statement):
                 for metric_id, metric in self.db.health_metrics.items():
                     self._result.append((metric,))
 
@@ -97,12 +97,12 @@ def create_mock_task(
     hour_of_day=None,
     location="home",
     tools_required=None,  # Named consistently with the test errors
-    tools_needed=None,    # Keep original for backward compatibility
+    tools_needed=None,  # Keep original for backward compatibility
     is_collaborative=False,
     focus_type="analytical",
     complexity=None,
     stress_factors=None,
-    base_duration=None
+    base_duration=None,
 ):
     """Create a mock task with the given properties."""
     if task_id is None:
@@ -123,11 +123,7 @@ def create_mock_task(
     if actual_duration is None:
         actual_duration = estimated_duration
     if stress_factors is None:
-        stress_factors = {
-            "time_pressure": 3,
-            "task_complexity": difficulty,
-            "fatigue": 2
-        }
+        stress_factors = {"time_pressure": 3, "task_complexity": difficulty, "fatigue": 2}
     if complexity is None:
         complexity = difficulty
     if base_duration is None:
@@ -153,7 +149,7 @@ def create_mock_task(
         "tools_needed": tools_needed,
         "tools_required": tools_needed,  # Add both versions for consistency
         "is_collaborative": is_collaborative,
-        "focus_type": focus_type
+        "focus_type": focus_type,
     }
 
 
@@ -179,7 +175,7 @@ def create_mock_task_model(
     base_duration=None,
     subtasks=None,
     is_recurring=False,
-    priority=None
+    priority=None,
 ):
     """Create a mock TaskModel for testing."""
     if task_id is None:
@@ -195,11 +191,7 @@ def create_mock_task_model(
     if actual_duration is None:
         actual_duration = estimated_duration
     if stress_factors is None:
-        stress_factors = {
-            "time_pressure": 3,
-            "task_complexity": difficulty,
-            "fatigue": 2
-        }
+        stress_factors = {"time_pressure": 3, "task_complexity": difficulty, "fatigue": 2}
     if complexity is None:
         complexity = difficulty
     if base_duration is None:
@@ -240,7 +232,7 @@ def create_mock_user(
     username: str = "testuser",
     email: str = "test@example.com",
     resting_heart_rate: int = 65,
-    **kwargs
+    **kwargs,
 ) -> UserModel:
     """Create a mock user with the given properties."""
     user_id = user_id or str(uuid.uuid4())
@@ -270,7 +262,7 @@ def create_mock_health_metrics(
     anxiety_level: Optional[int] = 3,
     social_pressure: Optional[int] = 4,
     environment_data: Optional[Dict[str, Any]] = None,
-    **kwargs
+    **kwargs,
 ) -> HealthMetrics:
     """Create mock health metrics with the given properties."""
     metric_id = metric_id or str(uuid.uuid4())
@@ -319,7 +311,7 @@ def mock_db():
             actual_duration=120,
             location="office",
             tools_needed=["computer", "notebook"],
-            focus_type="analytical"
+            focus_type="analytical",
         ),
         "task-2": create_mock_task(
             task_id="task-2",
@@ -335,7 +327,7 @@ def mock_db():
             location="conference_room",
             tools_needed=["computer", "whiteboard"],
             is_collaborative=True,
-            focus_type="collaborative"
+            focus_type="collaborative",
         ),
         "task-3": create_mock_task(
             task_id="task-3",
@@ -350,17 +342,13 @@ def mock_db():
             actual_duration=60,
             location="store",
             tools_needed=["car", "shopping_list"],
-            focus_type="routine"
-        )
+            focus_type="routine",
+        ),
     }
 
     # Create sample user
     users = {
-        user_id: create_mock_user(
-            user_id=user_id,
-            username="testuser",
-            email="test@example.com"
-        )
+        user_id: create_mock_user(user_id=user_id, username="testuser", email="test@example.com")
     }
 
     # Create sample health metrics
@@ -371,8 +359,9 @@ def mock_db():
             timestamp=datetime.now() - timedelta(hours=i),
             heart_rate=75 - (i % 10),
             energy_level=5 + (i % 3),
-            focus_level=6 - (i % 4)
-        ) for i in range(24)
+            focus_level=6 - (i % 4),
+        )
+        for i in range(24)
     }
 
     # Setup execute method to return task, user, or health metrics
@@ -382,10 +371,10 @@ def mock_db():
         # Mock scalar results for different queries
         scalar_result = AsyncMock()
 
-        if 'TaskModel' in str(statement):
+        if "TaskModel" in str(statement):
             # Extract task_id from statement for simple WHERE id = X queries
             task_id = None
-            if hasattr(statement, 'whereclause') and 'id' in str(statement.whereclause):
+            if hasattr(statement, "whereclause") and "id" in str(statement.whereclause):
                 # This is a simplified extraction, in a real test we'd parse the statement properly
                 for task_id in tasks:
                     if task_id in str(statement.whereclause):
@@ -402,10 +391,10 @@ def mock_db():
                 result.scalars.return_value = scalar_result
                 result.all.return_value = [(task,) for task in tasks.values()]
 
-        elif 'UserModel' in str(statement):
+        elif "UserModel" in str(statement):
             # Extract user_id from statement
             user_id = None
-            if hasattr(statement, 'whereclause') and 'id' in str(statement.whereclause):
+            if hasattr(statement, "whereclause") and "id" in str(statement.whereclause):
                 for uid in users:
                     if uid in str(statement.whereclause):
                         user_id = uid
@@ -418,13 +407,13 @@ def mock_db():
                 # All users query
                 result.all.return_value = [(user,) for user in users.values()]
 
-        elif 'HealthMetrics' in str(statement):
+        elif "HealthMetrics" in str(statement):
             # Health metrics query - return all for simplicity
             scalar_result.all.return_value = list(health_metrics.values())
             result.scalars.return_value = scalar_result
 
         # Mock transition observations
-        elif 'transition_observations' in str(statement):
+        elif "transition_observations" in str(statement):
             # Mock transition query results
             result.all.return_value = [
                 {
@@ -434,8 +423,9 @@ def mock_db():
                     "to_task_id": "task-2",
                     "predicted_minutes": 15,
                     "actual_minutes": 20,
-                    "timestamp": datetime.now() - timedelta(days=i)
-                } for i in range(5)
+                    "timestamp": datetime.now() - timedelta(days=i),
+                }
+                for i in range(5)
             ]
 
         return result
@@ -451,6 +441,7 @@ async def run_async_test(coroutine):
     """Helper function to run an async test."""
     return await coroutine
 
+
 def create_mock_model_result(mean=30.0, std=5.0, size=100):
     """Create a mock model result with normal distribution samples
 
@@ -464,6 +455,7 @@ def create_mock_model_result(mean=30.0, std=5.0, size=100):
     """
     return np.random.normal(mean, std, size)
 
+
 def create_mock_pymc3_trace(value_dict=None):
     """Create a mock PyMC3 trace object with specified values
 
@@ -474,7 +466,7 @@ def create_mock_pymc3_trace(value_dict=None):
         A mock trace object
     """
     if value_dict is None:
-        value_dict = {'duration': np.random.normal(30.0, 5.0, 100)}
+        value_dict = {"duration": np.random.normal(30.0, 5.0, 100)}
 
     mock_trace = MagicMock()
     mock_trace.varnames = list(value_dict.keys())
@@ -487,8 +479,8 @@ def create_mock_pymc3_trace(value_dict=None):
 
     return mock_trace
 
-def create_mock_task_sequence(num_tasks=3, locations=None,
-                             base_durations=None, complexities=None):
+
+def create_mock_task_sequence(num_tasks=3, locations=None, base_durations=None, complexities=None):
     """Create a sequence of mock tasks for testing
 
     Args:
@@ -515,13 +507,16 @@ def create_mock_task_sequence(num_tasks=3, locations=None,
         dur_idx = i % len(base_durations)
         comp_idx = i % len(complexities)
 
-        tasks.append(create_mock_task(
-            complexity=complexities[comp_idx],
-            base_duration=base_durations[dur_idx],
-            location=locations[loc_idx]
-        ))
+        tasks.append(
+            create_mock_task(
+                complexity=complexities[comp_idx],
+                base_duration=base_durations[dur_idx],
+                location=locations[loc_idx],
+            )
+        )
 
     return tasks
+
 
 def create_mock_time_block_model(
     id="time-block-1",
@@ -536,7 +531,7 @@ def create_mock_time_block_model(
     buffer_before=None,
     buffer_after=None,
     is_flexible=False,
-    task_id=None
+    task_id=None,
 ):
     """Create a mock TimeBlockModel for testing."""
     # Create a mock

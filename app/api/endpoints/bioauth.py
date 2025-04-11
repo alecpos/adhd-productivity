@@ -19,7 +19,7 @@ from app.services.bioauth_service import (
     BioAuthDeviceInfo,
     BiometricDataPoint,
     BiometricType,
-    WearableDeviceType
+    WearableDeviceType,
 )
 from app.core.security.security import get_current_user
 from app.models.user_model import UserModel
@@ -38,6 +38,7 @@ router = APIRouter(
 
 class DeviceRegistrationRequest(BaseModel):
     """Request body for device registration."""
+
     device_type: WearableDeviceType
     manufacturer: str
     model: str
@@ -50,7 +51,7 @@ async def register_device(
     device_data: DeviceRegistrationRequest = Body(...),
     bioauth_service: BioAuthService = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Register a new wearable device with BioAuth-25 protocol.
@@ -67,13 +68,12 @@ async def register_device(
             model=device_data.model,
             device_identifier=device_data.device_identifier,
             auth_code=device_data.auth_code,
-            db=db
+            db=db,
         )
         return device_info
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Device registration failed: {str(e)}"
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Device registration failed: {str(e)}"
         )
 
 
@@ -81,7 +81,7 @@ async def register_device(
 async def get_user_devices(
     bioauth_service: BioAuthService = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get all registered wearable devices for the current user.
@@ -90,15 +90,11 @@ async def get_user_devices(
     including device information and connection status.
     """
     try:
-        devices = await bioauth_service.get_user_devices(
-            user_id=str(current_user.id),
-            db=db
-        )
+        devices = await bioauth_service.get_user_devices(user_id=str(current_user.id), db=db)
         return devices
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to retrieve devices: {str(e)}"
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to retrieve devices: {str(e)}"
         )
 
 
@@ -110,7 +106,7 @@ async def get_biometric_data(
     end_time: Optional[datetime] = Query(None),
     bioauth_service: BioAuthService = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get biometric data from a specific device and metric type.
@@ -132,7 +128,7 @@ async def get_biometric_data(
             metric_type=metric_type,
             start_time=start_time,
             end_time=end_time,
-            db=db
+            db=db,
         )
         return data_points
     except HTTPException:
@@ -140,14 +136,14 @@ async def get_biometric_data(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to retrieve biometric data: {str(e)}"
+            detail=f"Failed to retrieve biometric data: {str(e)}",
         )
 
 
 @router.post("/webhook", include_in_schema=False)
 async def bioauth_webhook(
     webhook_data: Dict[str, Any] = Body(...),
-    bioauth_service: BioAuthService = Depends(get_bioauth_service)
+    bioauth_service: BioAuthService = Depends(get_bioauth_service),
 ):
     """
     Webhook endpoint for BioAuth-25 device notifications.
@@ -163,8 +159,7 @@ async def bioauth_webhook(
         return result
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Webhook processing failed: {str(e)}"
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Webhook processing failed: {str(e)}"
         )
 
 
@@ -172,7 +167,7 @@ async def bioauth_webhook(
 async def get_stress_indicators(
     bioauth_service: BioAuthService = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get stress indicators based on HRV data from wearable devices.
@@ -183,14 +178,13 @@ async def get_stress_indicators(
     """
     try:
         stress_data = await bioauth_service.get_hrv_stress_indicators(
-            user_id=str(current_user.id),
-            db=db
+            user_id=str(current_user.id), db=db
         )
         return stress_data
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to retrieve stress indicators: {str(e)}"
+            detail=f"Failed to retrieve stress indicators: {str(e)}",
         )
 
 
@@ -198,7 +192,7 @@ async def get_stress_indicators(
 async def get_cognitive_load(
     bioauth_service: BioAuthService = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get cognitive load estimate based on biometric data.
@@ -209,12 +203,11 @@ async def get_cognitive_load(
     """
     try:
         cognitive_data = await bioauth_service.get_cognitive_load_estimate(
-            user_id=str(current_user.id),
-            db=db
+            user_id=str(current_user.id), db=db
         )
         return cognitive_data
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to retrieve cognitive load estimate: {str(e)}"
+            detail=f"Failed to retrieve cognitive load estimate: {str(e)}",
         )

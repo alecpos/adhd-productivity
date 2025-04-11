@@ -46,9 +46,7 @@ async def get_session_join_requests(db: AsyncSession, session_id: UUID) -> List[
     return await service.get_session_join_requests(session_id)
 
 
-async def get_active_session(
-    db: AsyncSession, user_id: UUID
-) -> Optional[BodyDoublingSessionModel]:
+async def get_active_session(db: AsyncSession, user_id: UUID) -> Optional[BodyDoublingSessionModel]:
     """Get the active session for a user."""
     service = BodyDoublingService(db)
     return await service.get_active_session(user_id)
@@ -78,9 +76,7 @@ async def end_session(
     return await service.end_session(session_id, user_id)
 
 
-async def get_user_sessions(
-    db: AsyncSession, user_id: UUID
-) -> List[BodyDoublingSessionModel]:
+async def get_user_sessions(db: AsyncSession, user_id: UUID) -> List[BodyDoublingSessionModel]:
     """Get all sessions for a user."""
     service = BodyDoublingService(db)
     return await service.get_user_sessions(user_id)

@@ -219,9 +219,7 @@ class PredictionService:
             recommendations.append("Consider seeking help or resources to reduce task complexity")
 
     async def _generate_comprehensive_insights(
-        self,
-        predictions: Dict[str, Any],
-        user_id: str
+        self, predictions: Dict[str, Any], user_id: str
     ) -> Dict[str, Any]:
         """
         Generate comprehensive insights from predictions.
@@ -239,7 +237,7 @@ class PredictionService:
             "productivity_score": predictions.get("ensemble_score", 0.0),
             "component_scores": predictions.get("component_predictions", {}),
             "feature_importance": predictions.get("feature_importance", {}),
-            "recommendations": self._generate_recommendations(predictions)
+            "recommendations": self._generate_recommendations(predictions),
         }
 
         return insights

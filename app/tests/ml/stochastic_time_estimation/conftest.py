@@ -14,20 +14,21 @@ from types import ModuleType
 # Make sure mock modules are set up before importing the tests
 # Add these mocks before any test imports happen
 import numpy as np
+
 np.bool = bool  # Fix for numpy bool error
 
 # Add the app directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../")))
 
 # Import the mock PyMC3 module
 from app.tests.ml.stochastic_time_estimation.mock_pymc import *
 
 # Set up the theano mock module in sys.modules first
-sys.modules['theano'] = theano
-sys.modules['theano.tensor'] = theano.tensor
-sys.modules['theano.compile'] = ModuleType('theano.compile')
-sys.modules['theano.compile.sharedvalue'] = ModuleType('theano.compile.sharedvalue')
-sys.modules['theano.tensor.sharedvar'] = theano.tensor.sharedvar
+sys.modules["theano"] = theano
+sys.modules["theano.tensor"] = theano.tensor
+sys.modules["theano.compile"] = ModuleType("theano.compile")
+sys.modules["theano.compile.sharedvalue"] = ModuleType("theano.compile.sharedvalue")
+sys.modules["theano.tensor.sharedvar"] = theano.tensor.sharedvar
 
 # Create a mock for PyMC3
 mock_pymc3 = MagicMock()
@@ -53,28 +54,31 @@ mock_pymc3.Potential = Potential
 mock_pymc3.DensityDist = DensityDist
 
 # Add PyMC3 mock to sys.modules
-sys.modules['pymc3'] = mock_pymc3
+sys.modules["pymc3"] = mock_pymc3
+
 
 # Fixture for creating a mock task
 @pytest.fixture
 def mock_task():
     """Create a mock task for testing"""
     return {
-        'id': '12345',
-        'title': 'Test Task',
-        'description': 'This is a test task for unit testing',
-        'estimated_duration': 60,  # minutes
-        'location': 'Home',
-        'deadline': '2023-12-31T23:59:59',
-        'priority': 'Medium',
-        'tags': ['test', 'unit-test']
+        "id": "12345",
+        "title": "Test Task",
+        "description": "This is a test task for unit testing",
+        "estimated_duration": 60,  # minutes
+        "location": "Home",
+        "deadline": "2023-12-31T23:59:59",
+        "priority": "Medium",
+        "tags": ["test", "unit-test"],
     }
+
 
 # Fixture for asyncio
 @pytest.fixture
 def event_loop():
     """Create an event loop for testing async functions"""
     import asyncio
+
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()

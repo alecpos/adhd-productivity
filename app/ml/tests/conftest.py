@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional
 @dataclass
 class MockUser:
     """Mock user class for testing that doesn't depend on SQLAlchemy."""
+
     id: str = str(uuid4())
     username: str = "testuser"
     email: str = "test@example.com"
@@ -43,6 +44,7 @@ class MockUser:
 @dataclass
 class MockMentalHealthModel:
     """Mock mental health model for testing."""
+
     id: str = str(uuid4())
     user_id: str = None
     mood: int = 5
@@ -60,6 +62,7 @@ class MockMentalHealthModel:
 @dataclass
 class MockEnergyLog:
     """Mock energy log for testing."""
+
     id: str = str(uuid4())
     user_id: str = None
     energy_level: int = 5
@@ -74,6 +77,7 @@ class MockEnergyLog:
 @dataclass
 class MockTaskModel:
     """Mock task model for testing."""
+
     id: str = str(uuid4())
     user_id: str = None
     title: str = "Test Task"
@@ -92,6 +96,7 @@ class MockTaskModel:
 @dataclass
 class MockCalendarEventModel:
     """Mock calendar event model for testing."""
+
     id: str = str(uuid4())
     user_id: str = None
     title: str = "Test Event"
@@ -170,7 +175,7 @@ async def sample_data(db_session, test_user):
             stress_level=3,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
+            user=test_user,
         ),
         MockMentalHealthModel(
             id=str(uuid4()),
@@ -182,8 +187,8 @@ async def sample_data(db_session, test_user):
             stress_level=4,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
-        )
+            user=test_user,
+        ),
     ]
 
     # Sample energy logs
@@ -195,7 +200,7 @@ async def sample_data(db_session, test_user):
             time_of_day="morning",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
+            user=test_user,
         ),
         MockEnergyLog(
             id=str(uuid4()),
@@ -204,8 +209,8 @@ async def sample_data(db_session, test_user):
             time_of_day="evening",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
-        )
+            user=test_user,
+        ),
     ]
 
     # Sample tasks
@@ -221,7 +226,7 @@ async def sample_data(db_session, test_user):
             estimated_duration=45,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
+            user=test_user,
         ),
         MockTaskModel(
             id=str(uuid4()),
@@ -234,8 +239,8 @@ async def sample_data(db_session, test_user):
             estimated_duration=90,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
-        )
+            user=test_user,
+        ),
     ]
 
     # Sample calendar events
@@ -249,7 +254,7 @@ async def sample_data(db_session, test_user):
             end_time=datetime.now(timezone.utc),
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
+            user=test_user,
         ),
         MockCalendarEventModel(
             id=str(uuid4()),
@@ -260,8 +265,8 @@ async def sample_data(db_session, test_user):
             end_time=datetime.now(timezone.utc),
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
-            user=test_user
-        )
+            user=test_user,
+        ),
     ]
 
     # Update user's mock relationships
@@ -296,5 +301,5 @@ async def sample_data(db_session, test_user):
         "mental_health_data": mental_health_data,
         "energy_logs": energy_logs,
         "tasks": tasks,
-        "calendar_events": calendar_events
+        "calendar_events": calendar_events,
     }

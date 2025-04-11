@@ -6,20 +6,24 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
+
 # Create a mock HTTPException
 class MockHTTPException(Exception):
     def __init__(self, status_code, detail):
         self.status_code = status_code
         self.detail = detail
 
+
 # Create mock SessionStatus and SessionType
 class MockSessionStatus:
     COMPLETED = "completed"
     ACTIVE = "active"
 
+
 class MockSessionType:
     WORKING = "working"
     STUDYING = "studying"
+
 
 # Create mocks for schemas
 class MockSessionAnalyticsSchema:
@@ -27,10 +31,12 @@ class MockSessionAnalyticsSchema:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 class MockSessionFeedbackSchema:
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
 
 # Create the AnalyticsService class with minimal dependencies
 class AnalyticsService:
@@ -39,9 +45,7 @@ class AnalyticsService:
     def __init__(self, db):
         self._db = db
 
-    async def add_session_feedback(
-        self, session_id, user_id, feedback_data
-    ):
+    async def add_session_feedback(self, session_id, user_id, feedback_data):
         """Add feedback for a session."""
         # Mock implementation
         session = await self._get_session(session_id)
@@ -52,24 +56,31 @@ class AnalyticsService:
         # Verify user participated in the session
         user_id_str = str(user_id)
         participants = []
-        if hasattr(session, 'meta_data') and session.meta_data and "participants" in session.meta_data:
+        if (
+            hasattr(session, "meta_data")
+            and session.meta_data
+            and "participants" in session.meta_data
+        ):
             participants = session.meta_data["participants"]
 
-        if user_id_str not in participants and session.user_id != user_id and session.host_id != user_id:
+        if (
+            user_id_str not in participants
+            and session.user_id != user_id
+            and session.host_id != user_id
+        ):
             raise MockHTTPException(
-                status_code=403,
-                detail="Only session participants can provide feedback"
+                status_code=403, detail="Only session participants can provide feedback"
             )
 
         # Add user ID to feedback data
         feedback_entry = {
             "user_id": user_id_str,
             "timestamp": datetime.now().isoformat(),
-            **feedback_data
+            **feedback_data,
         }
 
         # Initialize meta_data if needed
-        if not hasattr(session, 'meta_data') or not session.meta_data:
+        if not hasattr(session, "meta_data") or not session.meta_data:
             session.meta_data = {}
 
         # Initialize feedback list if needed
@@ -80,10 +91,18 @@ class AnalyticsService:
         session.meta_data["feedback"].append(feedback_entry)
 
         # Update session-level ratings if this is the first feedback
-        if not hasattr(session, 'focus_rating') or session.focus_rating is None and "focus_rating" in feedback_data:
+        if (
+            not hasattr(session, "focus_rating")
+            or session.focus_rating is None
+            and "focus_rating" in feedback_data
+        ):
             session.focus_rating = feedback_data["focus_rating"]
 
-        if not hasattr(session, 'productivity_rating') or session.productivity_rating is None and "productivity_rating" in feedback_data:
+        if (
+            not hasattr(session, "productivity_rating")
+            or session.productivity_rating is None
+            and "productivity_rating" in feedback_data
+        ):
             session.productivity_rating = feedback_data["productivity_rating"]
 
         # Commit changes
@@ -98,7 +117,7 @@ class AnalyticsService:
         execute_result = await self._db.execute(None)
 
         # Create a regular MagicMock instead of an AsyncMock for scalar_one_or_none
-        if hasattr(execute_result, 'scalar_one_or_none'):
+        if hasattr(execute_result, "scalar_one_or_none"):
             # Return the actual result, not a coroutine
             return execute_result.scalar_one_or_none()
         return None
@@ -109,7 +128,7 @@ class AnalyticsService:
             return "stable"
 
         # Simple linear trend
-        changes = [values[i] - values[i-1] for i in range(1, len(values))]
+        changes = [values[i] - values[i - 1] for i in range(1, len(values))]
         avg_change = sum(changes) / len(changes)
 
         if avg_change > 0.1:  # Threshold for improvement
@@ -118,6 +137,7 @@ class AnalyticsService:
             return "declining"
         else:
             return "stable"
+
 
 class TestAnalyticsService(unittest.IsolatedAsyncioTestCase):
     """Test the AnalyticsService."""
@@ -209,10 +229,7 @@ class TestAnalyticsService(unittest.IsolatedAsyncioTestCase):
         mock_session.id = session_id
         mock_session.user_id = user_id
         mock_session.host_id = user_id
-        mock_session.meta_data = {
-            "participants": [str(user_id)],
-            "feedback": []
-        }
+        mock_session.meta_data = {"participants": [str(user_id)], "feedback": []}
         mock_session.focus_rating = None
         mock_session.productivity_rating = None
 
@@ -240,6 +257,7 @@ class TestAnalyticsService(unittest.IsolatedAsyncioTestCase):
         # Verify database operations
         self.db_mock.commit.assert_called_once()
         self.db_mock.refresh.assert_called_once_with(mock_session)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,6 +12,7 @@ from sqlalchemy import select, func
 from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
 from app.models.task_model import TaskModel
 
+
 class TaskAnalyzerService(BaseService):
     """Service for analyzing tasks and providing insights."""
 
@@ -26,12 +27,10 @@ class TaskAnalyzerService(BaseService):
         initial_delay=0.1,
         max_delay=2.0,
         backoff_factor=2.0,
-        error_message="Failed to analyze task"
+        error_message="Failed to analyze task",
     )
     @BaseService.with_circuit_breaker(
-        name="task_analysis",
-        failure_threshold=5,
-        recovery_timeout=30
+        name="task_analysis", failure_threshold=5, recovery_timeout=30
     )
     async def analyze_task(self, task_id: UUID) -> Dict[str, Any]:
         """Analyze a task and return insights.
@@ -56,7 +55,9 @@ class TaskAnalyzerService(BaseService):
 
         try:
             # Basic analysis
-            word_count = len(task.title.split()) + len(task.description.split() if task.description else [])
+            word_count = len(task.title.split()) + len(
+                task.description.split() if task.description else []
+            )
             estimated_minutes = max(15, word_count * 2)  # Simple estimation
 
             # Advanced analysis using bulkhead pattern
@@ -101,14 +102,13 @@ class TaskAnalyzerService(BaseService):
                 try:
                     # Call LLM service with timeout
                     result = await self.bulkhead(
-                        self._call_llm_analysis,
-                        task.title,
-                        task.description,
-                        timeout=5
+                        self._call_llm_analysis, task.title, task.description, timeout=5
                     )
                     return result
                 except Exception as e:
-                    self.logger.warning(f"LLM analysis failed: {str(e)}, falling back to basic analysis")
+                    self.logger.warning(
+                        f"LLM analysis failed: {str(e)}, falling back to basic analysis"
+                    )
 
             # Fallback to basic analysis
             return self._basic_task_analysis(task)
@@ -122,7 +122,7 @@ class TaskAnalyzerService(BaseService):
                 "energy_level": "medium",
                 "best_time_of_day": "morning",
                 "category": "uncategorized",
-                "tags": []
+                "tags": [],
             }
 
     async def _call_llm_analysis(self, title: str, description: str) -> Dict[str, Any]:
@@ -194,7 +194,7 @@ class TaskAnalyzerService(BaseService):
             "personal": ["family", "friend", "hobby", "health", "exercise"],
             "learning": ["study", "read", "course", "learn", "education"],
             "errands": ["buy", "shop", "clean", "call", "appointment"],
-            "creative": ["design", "write", "create", "brainstorm", "draw"]
+            "creative": ["design", "write", "create", "brainstorm", "draw"],
         }
 
         category = "uncategorized"
@@ -219,13 +219,11 @@ class TaskAnalyzerService(BaseService):
             "energy_level": energy_level,
             "best_time_of_day": best_time_of_day,
             "category": category,
-            "tags": tags[:5]  # Limit to 5 tags
+            "tags": tags[:5],  # Limit to 5 tags
         }
 
     @BaseService.with_retry(
-        max_retries=2,
-        initial_delay=0.1,
-        error_message="Failed to generate task insights"
+        max_retries=2, initial_delay=0.1, error_message="Failed to generate task insights"
     )
     async def generate_task_insights(self, user_id: UUID) -> Dict[str, Any]:
         """Generate insights across all user tasks."""
@@ -243,14 +241,22 @@ class TaskAnalyzerService(BaseService):
             # Calculate basic metrics
             total_tasks = len(tasks)
             completed_tasks = sum(1 for task in tasks if task.status == "COMPLETED")
-            overdue_tasks = sum(1 for task in tasks if task.due_date and task.due_date < datetime.utcnow() and task.status != "COMPLETED")
+            overdue_tasks = sum(
+                1
+                for task in tasks
+                if task.due_date
+                and task.due_date < datetime.utcnow()
+                and task.status != "COMPLETED"
+            )
 
             # Calculate completion rate
             completion_rate = (completed_tasks / total_tasks) * 100 if total_tasks > 0 else 0
 
             # Calculate average cognitive load (if available)
             cognitive_loads = [getattr(task, "cognitive_load", 5) for task in tasks]
-            avg_cognitive_load = sum(cognitive_loads) / len(cognitive_loads) if cognitive_loads else 5
+            avg_cognitive_load = (
+                sum(cognitive_loads) / len(cognitive_loads) if cognitive_loads else 5
+            )
 
             # Generate insights
             insights = {
@@ -261,33 +267,47 @@ class TaskAnalyzerService(BaseService):
                     "completed_tasks": completed_tasks,
                     "overdue_tasks": overdue_tasks,
                     "completion_rate": round(completion_rate, 2),
-                    "avg_cognitive_load": round(avg_cognitive_load, 2)
+                    "avg_cognitive_load": round(avg_cognitive_load, 2),
                 },
                 "insights": [
                     {
                         "type": "completion_trend",
                         "message": f"Your task completion rate is {round(completion_rate, 2)}%.",
-                        "action": "Consider breaking down tasks into smaller pieces" if completion_rate < 50 else "Great job keeping up with your tasks!"
+                        "action": (
+                            "Consider breaking down tasks into smaller pieces"
+                            if completion_rate < 50
+                            else "Great job keeping up with your tasks!"
+                        ),
                     },
                     {
                         "type": "cognitive_load",
                         "message": f"Your average task difficulty is {round(avg_cognitive_load, 2)}/10.",
-                        "action": "Consider mixing in some easier tasks" if avg_cognitive_load > 7 else "You have a good balance of task difficulty"
+                        "action": (
+                            "Consider mixing in some easier tasks"
+                            if avg_cognitive_load > 7
+                            else "You have a good balance of task difficulty"
+                        ),
                     },
                     {
                         "type": "overdue",
                         "message": f"You have {overdue_tasks} overdue tasks.",
-                        "action": "Review and reschedule these tasks" if overdue_tasks > 0 else "All tasks are on schedule!"
-                    }
+                        "action": (
+                            "Review and reschedule these tasks"
+                            if overdue_tasks > 0
+                            else "All tasks are on schedule!"
+                        ),
+                    },
                 ],
-                "recommendations": self._generate_recommendations(tasks)
+                "recommendations": self._generate_recommendations(tasks),
             }
 
             self.logger.info(f"Insights generated for user {user_id}")
             return insights
 
         except Exception as e:
-            self.logger.error(f"Error generating insights for user {user_id}: {str(e)}", exc_info=True)
+            self.logger.error(
+                f"Error generating insights for user {user_id}: {str(e)}", exc_info=True
+            )
             raise
 
     def _generate_recommendations(self, tasks: List[TaskModel]) -> List[Dict[str, str]]:
@@ -295,37 +315,51 @@ class TaskAnalyzerService(BaseService):
         recommendations = []
 
         # Check for high number of overdue tasks
-        overdue_count = sum(1 for task in tasks if task.due_date and task.due_date < datetime.utcnow() and task.status != "COMPLETED")
+        overdue_count = sum(
+            1
+            for task in tasks
+            if task.due_date and task.due_date < datetime.utcnow() and task.status != "COMPLETED"
+        )
         if overdue_count > 3:
-            recommendations.append({
-                "type": "scheduling",
-                "message": "You have several overdue tasks. Consider scheduling a dedicated time block to address them.",
-                "priority": "high"
-            })
+            recommendations.append(
+                {
+                    "type": "scheduling",
+                    "message": "You have several overdue tasks. Consider scheduling a dedicated time block to address them.",
+                    "priority": "high",
+                }
+            )
 
         # Check for tasks with approaching deadlines
-        soon_due = [task for task in tasks if task.due_date and
-                    task.due_date > datetime.utcnow() and
-                    task.due_date < datetime.utcnow() + timedelta(days=2) and
-                    task.status != "COMPLETED"]
+        soon_due = [
+            task
+            for task in tasks
+            if task.due_date
+            and task.due_date > datetime.utcnow()
+            and task.due_date < datetime.utcnow() + timedelta(days=2)
+            and task.status != "COMPLETED"
+        ]
 
         if soon_due:
-            recommendations.append({
-                "type": "upcoming",
-                "message": f"You have {len(soon_due)} tasks due in the next 48 hours. Prioritize these in your schedule.",
-                "priority": "high"
-            })
+            recommendations.append(
+                {
+                    "type": "upcoming",
+                    "message": f"You have {len(soon_due)} tasks due in the next 48 hours. Prioritize these in your schedule.",
+                    "priority": "high",
+                }
+            )
 
         # Check for high cognitive load days
         # This would require more date-based analysis in a real implementation
 
         # General recommendations
         if len(tasks) > 10 and len([t for t in tasks if t.status != "COMPLETED"]) > 7:
-            recommendations.append({
-                "type": "workload",
-                "message": "Your current task list is quite large. Consider using the Eisenhower Matrix to prioritize.",
-                "priority": "medium"
-            })
+            recommendations.append(
+                {
+                    "type": "workload",
+                    "message": "Your current task list is quite large. Consider using the Eisenhower Matrix to prioritize.",
+                    "priority": "medium",
+                }
+            )
 
         return recommendations[:3]  # Limit to top 3 recommendations
 
@@ -343,8 +377,8 @@ class TaskAnalyzerService(BaseService):
                 "llm_service_available": self.llm_service is not None,
                 "circuit_breaker_status": {
                     "task_analysis": self._get_circuit_state("task_analysis")
-                }
-            }
+                },
+            },
         }
 
         return health_info

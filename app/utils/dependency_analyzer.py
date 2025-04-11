@@ -20,9 +20,11 @@ from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class DependencyContext:
     """Context information for a dependency."""
+
     module_name: str
     location: Optional[str] = None
     source_code: Optional[str] = None
@@ -39,8 +41,9 @@ class DependencyContext:
             "functions": self.functions,
             "classes": self.classes,
             "exports": self.exports,
-            "description": self.description
+            "description": self.description,
         }
+
 
 class DependencyAnalyzer:
     """
@@ -52,11 +55,7 @@ class DependencyAnalyzer:
     dependency analysis and suggestions.
     """
 
-    def __init__(
-        self,
-        project_root: Optional[str] = None,
-        rag_config_path: Optional[str] = None
-    ):
+    def __init__(self, project_root: Optional[str] = None, rag_config_path: Optional[str] = None):
         """
         Initialize the DependencyAnalyzer.
 
@@ -65,15 +64,21 @@ class DependencyAnalyzer:
             rag_config_path: Path to the RAG configuration file
         """
         self.project_root = project_root or os.getcwd()
-        self.rag_config_path = rag_config_path or os.path.join(self.project_root, '.debt_rag_config.yaml')
+        self.rag_config_path = rag_config_path or os.path.join(
+            self.project_root, ".debt_rag_config.yaml"
+        )
 
         # Dependency tracking structures
         self.dependencies: Dict[str, Set[str]] = {}  # module -> set of imported modules
-        self.reverse_dependencies: Dict[str, Set[str]] = {}  # module -> set of modules that import it
+        self.reverse_dependencies: Dict[str, Set[str]] = (
+            {}
+        )  # module -> set of modules that import it
         self.module_info: Dict[str, DependencyContext] = {}  # module -> metadata
 
         # Unused import tracking
-        self.unused_imports: Dict[str, List[str]] = {}  # module -> list of potentially unused imports
+        self.unused_imports: Dict[str, List[str]] = (
+            {}
+        )  # module -> list of potentially unused imports
 
         # Initialize RAG system if available
         self.rag_available = self._check_rag_availability()
@@ -88,9 +93,12 @@ class DependencyAnalyzer:
         try:
             # Try to import the technical debt RAG module
             from technical_debt.cli_dependency_rag import get_rag_engine
+
             return True
         except ImportError:
-            logger.warning("Technical debt RAG system not available. Some advanced features will be disabled.")
+            logger.warning(
+                "Technical debt RAG system not available. Some advanced features will be disabled."
+            )
             return False
 
     def analyze_file(self, file_path: str) -> Dict[str, Any]:
@@ -104,7 +112,7 @@ class DependencyAnalyzer:
             Dictionary with dependency analysis results
         """
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
 
             module_name = self._get_module_name(file_path)
@@ -125,7 +133,7 @@ class DependencyAnalyzer:
                 functions=functions,
                 classes=classes,
                 exports=functions + [c for c in classes],
-                description=ast.get_docstring(tree)
+                description=ast.get_docstring(tree),
             )
 
             # Store module info
@@ -144,15 +152,12 @@ class DependencyAnalyzer:
                 "module": module_name,
                 "imports": imports,
                 "functions": functions,
-                "classes": classes
+                "classes": classes,
             }
 
         except Exception as e:
             logger.error(f"Error analyzing file {file_path}: {str(e)}")
-            return {
-                "module": self._get_module_name(file_path),
-                "error": str(e)
-            }
+            return {"module": self._get_module_name(file_path), "error": str(e)}
 
     def _get_module_name(self, file_path: str) -> str:
         """
@@ -248,10 +253,7 @@ class DependencyAnalyzer:
                         else:
                             results["modules"].append(file_result)
                     except Exception as e:
-                        results["errors"].append({
-                            "file": file_path,
-                            "error": str(e)
-                        })
+                        results["errors"].append({"file": file_path, "error": str(e)})
 
         return results
 
@@ -356,10 +358,14 @@ class DependencyAnalyzer:
             "module": module_name,
             "imports": list(self.dependencies.get(module_name, set())),
             "imported_by": list(self.reverse_dependencies.get(module_name, set())),
-            "info": self.module_info.get(module_name, DependencyContext(module_name=module_name)).to_dict()
+            "info": self.module_info.get(
+                module_name, DependencyContext(module_name=module_name)
+            ).to_dict(),
         }
 
-    def trace_dependencies(self, file_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
+    def trace_dependencies(
+        self, file_path: str, output_path: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Trace dependencies for a single file using the CLI dependency RAG.
 
@@ -374,15 +380,18 @@ class DependencyAnalyzer:
             return {
                 "error": "RAG system not available. Cannot trace dependencies using RAG.",
                 "file": file_path,
-                "dependencies": []
+                "dependencies": [],
             }
 
         try:
             # This uses subprocess to run the CLI tool since direct imports might
             # not work well across different environments
             cmd = [
-                sys.executable, "-m", "technical_debt.cli_dependency_rag",
-                "trace-deps", file_path
+                sys.executable,
+                "-m",
+                "technical_debt.cli_dependency_rag",
+                "trace-deps",
+                file_path,
             ]
 
             if output_path:
@@ -394,12 +403,12 @@ class DependencyAnalyzer:
                 return {
                     "error": f"Failed to trace dependencies: {result.stderr}",
                     "file": file_path,
-                    "dependencies": []
+                    "dependencies": [],
                 }
 
             # If output path specified, read from there
             if output_path and os.path.exists(output_path):
-                with open(output_path, 'r') as f:
+                with open(output_path, "r") as f:
                     return json.load(f)
 
             # Otherwise try to parse from stdout
@@ -407,25 +416,14 @@ class DependencyAnalyzer:
                 return json.loads(result.stdout)
             except json.JSONDecodeError:
                 # If JSON parsing fails, return raw output
-                return {
-                    "file": file_path,
-                    "raw_output": result.stdout,
-                    "dependencies": []
-                }
+                return {"file": file_path, "raw_output": result.stdout, "dependencies": []}
 
         except Exception as e:
             logger.error(f"Error tracing dependencies for {file_path}: {str(e)}")
-            return {
-                "error": str(e),
-                "file": file_path,
-                "dependencies": []
-            }
+            return {"error": str(e), "file": file_path, "dependencies": []}
 
     def suggest_with_rag(
-        self,
-        file_path: str,
-        query: Optional[str] = None,
-        language: str = "python"
+        self, file_path: str, query: Optional[str] = None, language: str = "python"
     ) -> Dict[str, Any]:
         """
         Generate dependency-aware suggestions using RAG.
@@ -441,7 +439,7 @@ class DependencyAnalyzer:
         if not self.rag_available:
             return {
                 "error": "RAG system not available. Cannot generate suggestions.",
-                "file": file_path
+                "file": file_path,
             }
 
         try:
@@ -451,10 +449,15 @@ class DependencyAnalyzer:
 
             # Run RAG CLI command
             cmd = [
-                sys.executable, "-m", "technical_debt.cli_dependency_rag",
-                "suggest-with-deps", query,
-                "--file-path", file_path,
-                "--language", language
+                sys.executable,
+                "-m",
+                "technical_debt.cli_dependency_rag",
+                "suggest-with-deps",
+                query,
+                "--file-path",
+                file_path,
+                "--language",
+                language,
             ]
 
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -462,7 +465,7 @@ class DependencyAnalyzer:
             if result.returncode != 0:
                 return {
                     "error": f"Failed to generate suggestions: {result.stderr}",
-                    "file": file_path
+                    "file": file_path,
                 }
 
             # Extract suggestion from output
@@ -490,15 +493,12 @@ class DependencyAnalyzer:
                 "file": file_path,
                 "query": query,
                 "suggestion": suggestion.strip(),
-                "raw_output": output
+                "raw_output": output,
             }
 
         except Exception as e:
             logger.error(f"Error generating suggestions for {file_path}: {str(e)}")
-            return {
-                "error": str(e),
-                "file": file_path
-            }
+            return {"error": str(e), "file": file_path}
 
     def analyze_weekly_resampling_dependencies(self, file_path: str) -> Dict[str, Any]:
         """
@@ -525,7 +525,7 @@ class DependencyAnalyzer:
             "file": file_path,
             "dependencies": deps.get("dependencies", []),
             "weekly_resampling_suggestion": suggestions.get("suggestion", ""),
-            "error": deps.get("error") or suggestions.get("error")
+            "error": deps.get("error") or suggestions.get("error"),
         }
 
 

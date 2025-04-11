@@ -33,6 +33,7 @@ setattr(sys.modules[mock_module_name], "TaskCategoryModel", MockTaskCategoryMode
 from app.models.enums_model import SessionStatus, SessionType
 from app.services.body_doubling.analytics_service import AnalyticsService
 
+
 # Mock Body Doubling Session Model
 class MockBodyDoublingSessionModel:
     """Mock for the BodyDoublingSessionModel."""
@@ -51,7 +52,7 @@ class MockBodyDoublingSessionModel:
         activity_type="Programming",
         focus_rating=None,
         productivity_rating=None,
-        meta_data=None
+        meta_data=None,
     ):
         """Initialize with test data."""
         self.id = id or uuid.uuid4()
@@ -66,10 +67,8 @@ class MockBodyDoublingSessionModel:
         self.activity_type = activity_type
         self.focus_rating = focus_rating
         self.productivity_rating = productivity_rating
-        self.meta_data = meta_data or {
-            "participants": [str(self.user_id)],
-            "feedback": []
-        }
+        self.meta_data = meta_data or {"participants": [str(self.user_id)], "feedback": []}
+
 
 # Mock DB Session
 class MockDBSession:
@@ -110,6 +109,7 @@ class MockDBSession:
         self.sessions[str(session.id)] = session
         return session
 
+
 async def test_analytics_service():
     """Test the analytics service with mocked models."""
     print("Starting standalone test for AnalyticsService...")
@@ -134,7 +134,7 @@ async def test_analytics_service():
         status=SessionStatus.COMPLETED,
         session_type=SessionType.BODY_DOUBLING,
         focus_rating=None,
-        productivity_rating=None
+        productivity_rating=None,
     )
 
     # Add session to mock DB
@@ -152,7 +152,7 @@ async def test_analytics_service():
         "focus_rating": 4,
         "productivity_rating": 5,
         "distraction_level": 2,
-        "notes": "This was a productive test session"
+        "notes": "This was a productive test session",
     }
 
     try:
@@ -162,6 +162,7 @@ async def test_analytics_service():
         print(f"Error adding feedback: {e}")
 
     print("\nStandalone test completed successfully!")
+
 
 if __name__ == "__main__":
     asyncio.run(test_analytics_service())

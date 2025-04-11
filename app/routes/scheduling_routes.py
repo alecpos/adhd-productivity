@@ -15,7 +15,7 @@ from app.schemas.scheduling_schema import (
     CircadianCalendarOptimizationResponse,
     ApplyCircadianOptimizationRequest,
     ApplyCircadianOptimizationResponse,
-    CircadianOptimizationResult
+    CircadianOptimizationResult,
 )
 
 router = APIRouter(prefix="/api/scheduling", tags=["scheduling"])
@@ -85,42 +85,50 @@ async def optimize_with_circadian(
 
         # Delegate to service for actual optimization
         from app.ml.temporal_pattern_recognition import TemporalPatternRecognitionService
+
         tpr_service = TemporalPatternRecognitionService(db)
 
         # Convert scheduling request to task list
         tasks = []
         for task in request.tasks:
-            tasks.append({
-                "id": str(task.id) if task.id else "",
-                "title": task.title,
-                "description": task.description or "",
-                "estimated_duration": task.duration_minutes,
-                "priority": task.priority.value if hasattr(task, "priority") else 5,
-                "is_flexible": task.is_flexible if hasattr(task, "is_flexible") else True,
-                "deadline": task.deadline.isoformat() if task.deadline else None,
-                "focus_required": task.focus_required if hasattr(task, "focus_required") else 5,
-                "energy_required": task.energy_required if hasattr(task, "energy_required") else 5,
-                "creative_required": task.creative_required if hasattr(task, "creative_required") else 5,
-                "complexity": task.complexity if hasattr(task, "complexity") else 5,
-                "executive_function_load": task.executive_function_load if hasattr(task, "executive_function_load") else 5
-            })
+            tasks.append(
+                {
+                    "id": str(task.id) if task.id else "",
+                    "title": task.title,
+                    "description": task.description or "",
+                    "estimated_duration": task.duration_minutes,
+                    "priority": task.priority.value if hasattr(task, "priority") else 5,
+                    "is_flexible": task.is_flexible if hasattr(task, "is_flexible") else True,
+                    "deadline": task.deadline.isoformat() if task.deadline else None,
+                    "focus_required": task.focus_required if hasattr(task, "focus_required") else 5,
+                    "energy_required": (
+                        task.energy_required if hasattr(task, "energy_required") else 5
+                    ),
+                    "creative_required": (
+                        task.creative_required if hasattr(task, "creative_required") else 5
+                    ),
+                    "complexity": task.complexity if hasattr(task, "complexity") else 5,
+                    "executive_function_load": (
+                        task.executive_function_load
+                        if hasattr(task, "executive_function_load")
+                        else 5
+                    ),
+                }
+            )
 
         # Get existing model path from user data if available
         model_path = user_data.get("circadian_dqn_model_path")
 
         # Perform circadian-aware optimization
         result = await tpr_service.optimize_schedule_with_circadian_dqn(
-            user_id=str(current_user.id),
-            tasks=tasks,
-            user_data=user_data,
-            model_path=model_path
+            user_id=str(current_user.id), tasks=tasks, user_data=user_data, model_path=model_path
         )
 
         # Update user's model path for future use
         if result.get("model_path") and result.get("model_path") != model_path:
-            await scheduling_service.update_user_data({
-                "circadian_dqn_model_path": result.get("model_path")
-            })
+            await scheduling_service.update_user_data(
+                {"circadian_dqn_model_path": result.get("model_path")}
+            )
 
         return {
             "schedule": result.get("schedule", []),
@@ -128,12 +136,11 @@ async def optimize_with_circadian(
                 {"hour": hour, "energy_level": level}
                 for hour, level in result.get("energy_curve", {}).items()
             ],
-            "message": "Schedule optimized with circadian rhythm awareness"
+            "message": "Schedule optimized with circadian rhythm awareness",
         }
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Error optimizing schedule with circadian awareness: {str(e)}"
+            status_code=500, detail=f"Error optimizing schedule with circadian awareness: {str(e)}"
         )
 
 
@@ -180,7 +187,8 @@ async def optimize_calendar_with_circadian(
 
         # Filter events to the specified date range
         events_in_range = [
-            event for event in calendar_events
+            event
+            for event in calendar_events
             if request.start_date <= event.start_time <= request.end_date
         ]
 
@@ -210,46 +218,41 @@ async def optimize_calendar_with_circadian(
                 executive_function_load = 6
 
             # Map event priority to numeric scale
-            priority_map = {
-                "high": 8,
-                "medium": 5,
-                "low": 3
-            }
+            priority_map = {"high": 8, "medium": 5, "low": 3}
             priority = priority_map.get(event.priority, 5) if event.priority else 5
 
-            tasks.append({
-                "id": str(event.id),
-                "title": event.title,
-                "description": event.description or "",
-                "estimated_duration": duration_minutes,
-                "priority": priority,
-                "is_flexible": is_flexible,
-                "deadline": event.end_time.isoformat() if event.end_time else None,
-                "focus_required": focus_required,
-                "energy_required": energy_required,
-                "creative_required": meta_data.get("creative_required", 5),
-                "complexity": meta_data.get("complexity", 5),
-                "executive_function_load": executive_function_load,
-                "original_start_time": event.start_time.isoformat(),
-                "original_end_time": event.end_time.isoformat()
-            })
+            tasks.append(
+                {
+                    "id": str(event.id),
+                    "title": event.title,
+                    "description": event.description or "",
+                    "estimated_duration": duration_minutes,
+                    "priority": priority,
+                    "is_flexible": is_flexible,
+                    "deadline": event.end_time.isoformat() if event.end_time else None,
+                    "focus_required": focus_required,
+                    "energy_required": energy_required,
+                    "creative_required": meta_data.get("creative_required", 5),
+                    "complexity": meta_data.get("complexity", 5),
+                    "executive_function_load": executive_function_load,
+                    "original_start_time": event.start_time.isoformat(),
+                    "original_end_time": event.end_time.isoformat(),
+                }
+            )
 
         # Get existing model path from user data if available
         model_path = user_data.get("circadian_dqn_model_path")
 
         # Perform circadian-aware optimization
         result = await tpr_service.optimize_schedule_with_circadian_dqn(
-            user_id=str(current_user.id),
-            tasks=tasks,
-            user_data=user_data,
-            model_path=model_path
+            user_id=str(current_user.id), tasks=tasks, user_data=user_data, model_path=model_path
         )
 
         # Update user's model path for future use
         if result.get("model_path") and result.get("model_path") != model_path:
-            await scheduling_service.update_user_data({
-                "circadian_dqn_model_path": result.get("model_path")
-            })
+            await scheduling_service.update_user_data(
+                {"circadian_dqn_model_path": result.get("model_path")}
+            )
 
         # Convert optimized schedule back to calendar-friendly format
         optimized_schedule = []
@@ -264,21 +267,25 @@ async def optimize_calendar_with_circadian(
 
                 # Calculate time differences
                 original_start = original_event.start_time
-                time_difference_minutes = int((new_start_time - original_start).total_seconds() / 60)
+                time_difference_minutes = int(
+                    (new_start_time - original_start).total_seconds() / 60
+                )
 
                 # Create optimized event entry
-                optimized_schedule.append(CircadianOptimizationResult(
-                    event_id=original_id,
-                    title=original_event.title,
-                    original_start=original_event.start_time,
-                    original_end=original_event.end_time,
-                    suggested_start=new_start_time,
-                    suggested_end=new_end_time,
-                    time_difference_minutes=time_difference_minutes,
-                    suitability_score=item.get("suitability_score", 0.5),
-                    cognitive_category=item.get("cognitive_category", "unknown"),
-                    energy_level=item.get("energy_level", 5.0),
-                ))
+                optimized_schedule.append(
+                    CircadianOptimizationResult(
+                        event_id=original_id,
+                        title=original_event.title,
+                        original_start=original_event.start_time,
+                        original_end=original_event.end_time,
+                        suggested_start=new_start_time,
+                        suggested_end=new_end_time,
+                        time_difference_minutes=time_difference_minutes,
+                        suitability_score=item.get("suitability_score", 0.5),
+                        cognitive_category=item.get("cognitive_category", "unknown"),
+                        energy_level=item.get("energy_level", 5.0),
+                    )
+                )
 
         return CircadianCalendarOptimizationResponse(
             optimized_schedule=optimized_schedule,
@@ -288,12 +295,11 @@ async def optimize_calendar_with_circadian(
             ],
             events_analyzed=len(events_in_range),
             events_optimized=len(optimized_schedule),
-            message="Calendar events optimized with circadian rhythm awareness"
+            message="Calendar events optimized with circadian rhythm awareness",
         )
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Error optimizing calendar with circadian awareness: {str(e)}"
+            status_code=500, detail=f"Error optimizing calendar with circadian awareness: {str(e)}"
         )
 
 
@@ -335,7 +341,7 @@ async def apply_circadian_calendar_optimization(
                 applied_count=0,
                 skipped_count=0,
                 errors=[],
-                total_errors=0
+                total_errors=0,
             )
 
         # Prepare for service method call
@@ -343,8 +349,7 @@ async def apply_circadian_calendar_optimization(
 
         # Apply the optimizations
         results = await calendar_service.apply_circadian_optimization(
-            user_id=current_user.id,
-            optimization_results=results_dicts
+            user_id=current_user.id, optimization_results=results_dicts
         )
 
         # Return the results
@@ -354,11 +359,10 @@ async def apply_circadian_calendar_optimization(
             applied_count=results["applied_count"],
             skipped_count=results["skipped_count"],
             errors=results["errors"][:5],  # Limit errors to first 5 for brevity
-            total_errors=len(results["errors"])
+            total_errors=len(results["errors"]),
         )
 
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Error applying calendar optimizations: {str(e)}"
+            status_code=500, detail=f"Error applying calendar optimizations: {str(e)}"
         )

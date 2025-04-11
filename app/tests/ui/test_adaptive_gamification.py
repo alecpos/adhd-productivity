@@ -50,16 +50,10 @@ class TestUserMotivationProfile:
                 MotivationType.COMPLETION: 0.9,
                 MotivationType.CURIOSITY: 0.6,
             },
-            reward_preferences={
-                RewardType.BADGES: 0.7,
-                RewardType.POINTS: 0.6
-            },
-            mechanic_effectiveness={
-                GameMechanic.PROGRESS_BAR: 0.9,
-                GameMechanic.CHALLENGE: 0.4
-            },
+            reward_preferences={RewardType.BADGES: 0.7, RewardType.POINTS: 0.6},
+            mechanic_effectiveness={GameMechanic.PROGRESS_BAR: 0.9, GameMechanic.CHALLENGE: 0.4},
             burnout_risk=0.2,
-            novelty_decay_rates={"progress_bar": 0.01}
+            novelty_decay_rates={"progress_bar": 0.01},
         )
 
         assert profile.user_id == "test_user"
@@ -80,10 +74,7 @@ class TestGamificationAction:
 
     def test_minimal_action(self):
         """Test creation of a minimal gamification action."""
-        action = GamificationAction(
-            user_id="test_user",
-            mechanic=GameMechanic.PROGRESS_BAR
-        )
+        action = GamificationAction(user_id="test_user", mechanic=GameMechanic.PROGRESS_BAR)
 
         assert action.user_id == "test_user"
         assert action.mechanic == GameMechanic.PROGRESS_BAR
@@ -102,7 +93,7 @@ class TestGamificationAction:
             context={"task_id": "123", "importance": 0.8},
             strength=0.7,
             message="You've unlocked a new challenge!",
-            visual_element={"color": "#FF0000", "animation": "bounce"}
+            visual_element={"color": "#FF0000", "animation": "bounce"},
         )
 
         assert action.user_id == "test_user"
@@ -139,8 +130,7 @@ class TestAdaptiveGamificationEngine:
     def engine(self, gamification_service, user_insights_service):
         """Create an AdaptiveGamificationEngine instance for testing."""
         return AdaptiveGamificationEngine(
-            gamification_service=gamification_service,
-            user_insights_service=user_insights_service
+            gamification_service=gamification_service, user_insights_service=user_insights_service
         )
 
     def test_init(self, engine, gamification_service, user_insights_service):
@@ -149,8 +139,8 @@ class TestAdaptiveGamificationEngine:
         assert engine.user_insights_service == user_insights_service
         assert engine.model_refresh_interval == timedelta(days=1)
         assert engine.user_models == {}
-        assert hasattr(engine, 'message_templates')
-        assert hasattr(engine, 'visual_templates')
+        assert hasattr(engine, "message_templates")
+        assert hasattr(engine, "visual_templates")
 
     def test_load_default_templates(self, engine):
         """Test loading default templates."""
@@ -195,7 +185,7 @@ class TestAdaptiveGamificationEngine:
         # Set up cached model
         engine.user_models["test_user"] = (
             mock_model,
-            datetime.utcnow() - timedelta(hours=1)  # Recent enough to use cache
+            datetime.utcnow() - timedelta(hours=1),  # Recent enough to use cache
         )
 
         model = await engine._get_user_model("test_user")
@@ -214,11 +204,11 @@ class TestAdaptiveGamificationEngine:
         # Set up expired cached model
         engine.user_models["test_user"] = (
             mock_model,
-            datetime.utcnow() - timedelta(days=2)  # Too old
+            datetime.utcnow() - timedelta(days=2),  # Too old
         )
 
         # Mock model creation
-        with patch('app.ui.adaptive_gamification.UserMotivationModel') as MockModel:
+        with patch("app.ui.adaptive_gamification.UserMotivationModel") as MockModel:
             MockModel.return_value = mock_new_model
 
             # Set up mock data
@@ -240,20 +230,11 @@ class TestAdaptiveGamificationEngine:
         # Set up mock model
         mock_model = MagicMock()
         mock_model.predict.return_value = {
-            'motivation_types': {
-                MotivationType.ACHIEVEMENT: 0.8,
-                MotivationType.NOVELTY: 0.7
-            },
-            'reward_preferences': {
-                RewardType.BADGES: 0.9
-            },
-            'mechanic_effectiveness': {
-                GameMechanic.PROGRESS_BAR: 0.6
-            },
-            'burnout_risk': 0.3,
-            'novelty_decay_rates': {
-                'progress_bar': 0.02
-            }
+            "motivation_types": {MotivationType.ACHIEVEMENT: 0.8, MotivationType.NOVELTY: 0.7},
+            "reward_preferences": {RewardType.BADGES: 0.9},
+            "mechanic_effectiveness": {GameMechanic.PROGRESS_BAR: 0.6},
+            "burnout_risk": 0.3,
+            "novelty_decay_rates": {"progress_bar": 0.02},
         }
 
         # Set up cached model
@@ -276,7 +257,7 @@ class TestAdaptiveGamificationEngine:
         assert updated_profile.reward_preferences[RewardType.BADGES] > 0.5  # Increased
         assert updated_profile.mechanic_effectiveness[GameMechanic.PROGRESS_BAR] > 0.5  # Increased
         assert updated_profile.burnout_risk > 0  # Increased from 0
-        assert 'progress_bar' in updated_profile.novelty_decay_rates
+        assert "progress_bar" in updated_profile.novelty_decay_rates
 
         # Check save was called
         gamification_service.save_motivation_profile.assert_called_once()
@@ -289,11 +270,11 @@ class TestAdaptiveGamificationEngine:
             user_id="test_user",
             mechanic_effectiveness={
                 GameMechanic.PROGRESS_BAR: 0.9,  # High effectiveness
-                GameMechanic.CHALLENGE: 0.8,     # High effectiveness
-                GameMechanic.TIMER: 0.5,         # Medium effectiveness
-                GameMechanic.NARRATIVE: 0.3,     # Low effectiveness
-                GameMechanic.LEADERBOARD: 0.7,   # Medium-high effectiveness
-            }
+                GameMechanic.CHALLENGE: 0.8,  # High effectiveness
+                GameMechanic.TIMER: 0.5,  # Medium effectiveness
+                GameMechanic.NARRATIVE: 0.3,  # Low effectiveness
+                GameMechanic.LEADERBOARD: 0.7,  # Medium-high effectiveness
+            },
         )
 
         # Set up the get_user_profile method to return our custom profile
@@ -303,7 +284,7 @@ class TestAdaptiveGamificationEngine:
         neutral_mechanics = await engine.get_optimal_mechanics("test_user", {}, limit=2)
         assert len(neutral_mechanics) == 2
         assert neutral_mechanics[0] == GameMechanic.PROGRESS_BAR  # Highest effectiveness
-        assert neutral_mechanics[1] == GameMechanic.CHALLENGE     # Second highest
+        assert neutral_mechanics[1] == GameMechanic.CHALLENGE  # Second highest
 
         # Test with boring task context (should boost NARRATIVE)
         boring_mechanics = await engine.get_optimal_mechanics(
@@ -321,11 +302,12 @@ class TestAdaptiveGamificationEngine:
 
         # Test with high burnout risk (should reduce CHALLENGE and LEADERBOARD)
         profile.burnout_risk = 0.8  # High burnout
-        burnout_mechanics = await engine.get_optimal_mechanics(
-            "test_user", {}, limit=3
-        )
+        burnout_mechanics = await engine.get_optimal_mechanics("test_user", {}, limit=3)
         # CHALLENGE and LEADERBOARD should be ranked lower
-        if GameMechanic.CHALLENGE in burnout_mechanics and GameMechanic.LEADERBOARD in burnout_mechanics:
+        if (
+            GameMechanic.CHALLENGE in burnout_mechanics
+            and GameMechanic.LEADERBOARD in burnout_mechanics
+        ):
             # If both are still present, PROGRESS_BAR should be ranked higher
             challenge_idx = burnout_mechanics.index(GameMechanic.CHALLENGE)
             leaderboard_idx = burnout_mechanics.index(GameMechanic.LEADERBOARD)
@@ -345,15 +327,14 @@ class TestAdaptiveGamificationEngine:
             reward_preferences={
                 RewardType.BADGES: 0.8,
                 RewardType.POINTS: 0.5,
-            }
+            },
         )
 
         # Set up get_user_profile and get_optimal_mechanics to return known values
         engine.get_user_profile = AsyncMock(return_value=profile)
-        engine.get_optimal_mechanics = AsyncMock(return_value=[
-            GameMechanic.PROGRESS_BAR,
-            GameMechanic.CHALLENGE
-        ])
+        engine.get_optimal_mechanics = AsyncMock(
+            return_value=[GameMechanic.PROGRESS_BAR, GameMechanic.CHALLENGE]
+        )
 
         # Get actions
         context = {"completed": 3, "total": 10}
@@ -381,26 +362,29 @@ class TestAdaptiveGamificationEngine:
             GameMechanic.PROGRESS_BAR: [
                 "You're making great progress! {progress}% complete!",  # First template uses {progress}
                 "Keep it up! Only {remaining}% to go!",
-                "You've come so far already - {progress}% done!"
+                "You've come so far already - {progress}% done!",
             ],
             GameMechanic.CHALLENGE: [
                 "New challenge unlocked: {challenge_name}",
                 "Ready for a challenge? Try {challenge_name}!",
-                "Challenge yourself with: {challenge_name}"
+                "Challenge yourself with: {challenge_name}",
             ],
         }
 
         # Force the random choice to select the first template
-        with patch('numpy.random.choice', return_value="You're making great progress! {progress}% complete!"):
+        with patch(
+            "numpy.random.choice",
+            return_value="You're making great progress! {progress}% complete!",
+        ):
             # Test progress bar message with progress context
             progress_context = {"progress": 30}
-            progress_message = engine._generate_message(
-                GameMechanic.PROGRESS_BAR, progress_context
-            )
+            progress_message = engine._generate_message(GameMechanic.PROGRESS_BAR, progress_context)
             assert "30%" in progress_message
 
         # Test progress bar message with completed/total context
-        with patch('numpy.random.choice', return_value="You've come so far already - {progress}% done!"):
+        with patch(
+            "numpy.random.choice", return_value="You've come so far already - {progress}% done!"
+        ):
             completed_context = {"completed": 3, "total": 10}
             completed_message = engine._generate_message(
                 GameMechanic.PROGRESS_BAR, completed_context
@@ -408,26 +392,20 @@ class TestAdaptiveGamificationEngine:
             assert "30%" in completed_message
 
         # Test challenge message
-        with patch('numpy.random.choice', return_value="New challenge unlocked: {challenge_name}"):
+        with patch("numpy.random.choice", return_value="New challenge unlocked: {challenge_name}"):
             challenge_context = {"challenge_name": "Complete 5 tasks"}
-            challenge_message = engine._generate_message(
-                GameMechanic.CHALLENGE, challenge_context
-            )
+            challenge_message = engine._generate_message(GameMechanic.CHALLENGE, challenge_context)
             assert "Complete 5 tasks" in challenge_message
 
         # Test mechanic without template
-        custom_message = engine._generate_message(
-            GameMechanic.COLLECTION, {}
-        )
+        custom_message = engine._generate_message(GameMechanic.COLLECTION, {})
         assert "collection" in custom_message.lower()
 
     def test_generate_visual_element(self, engine):
         """Test visual element generation for gamification mechanics."""
         # Test progress bar visuals
         progress_element = engine._generate_visual_element(
-            GameMechanic.PROGRESS_BAR,
-            RewardType.BADGES,
-            {"progress": 75}
+            GameMechanic.PROGRESS_BAR, RewardType.BADGES, {"progress": 75}
         )
         assert progress_element["type"] == "progress_bar"
         assert progress_element["progress_percent"] == 75
@@ -438,7 +416,7 @@ class TestAdaptiveGamificationEngine:
         challenge_element = engine._generate_visual_element(
             GameMechanic.CHALLENGE,
             RewardType.ACHIEVEMENT,
-            {"challenge_name": "Daily Goal", "difficulty": "hard"}
+            {"challenge_name": "Daily Goal", "difficulty": "hard"},
         )
         assert challenge_element["type"] == "challenge"
         assert challenge_element["challenge_name"] == "Daily Goal"
@@ -446,9 +424,7 @@ class TestAdaptiveGamificationEngine:
 
         # Test timer visuals
         timer_element = engine._generate_visual_element(
-            GameMechanic.TIMER,
-            RewardType.POINTS,
-            {"duration": 1500}  # 25 minutes
+            GameMechanic.TIMER, RewardType.POINTS, {"duration": 1500}  # 25 minutes
         )
         assert timer_element["type"] == "timer"
         assert timer_element["duration"] == 1500
@@ -462,13 +438,11 @@ class TestAdaptiveGamificationEngine:
             mechanic_effectiveness={
                 GameMechanic.PROGRESS_BAR: 0.8,
             },
-            burnout_risk=0.0
+            burnout_risk=0.0,
         )
 
         # Neutral context
-        neutral_strength = engine._calculate_action_strength(
-            profile, GameMechanic.PROGRESS_BAR, {}
-        )
+        neutral_strength = engine._calculate_action_strength(profile, GameMechanic.PROGRESS_BAR, {})
         assert neutral_strength == 0.8  # Base effectiveness
 
         # High importance task
@@ -491,9 +465,7 @@ class TestAdaptiveGamificationEngine:
 
         # High burnout risk
         profile.burnout_risk = 0.8
-        burnout_strength = engine._calculate_action_strength(
-            profile, GameMechanic.PROGRESS_BAR, {}
-        )
+        burnout_strength = engine._calculate_action_strength(profile, GameMechanic.PROGRESS_BAR, {})
         # When there's no context but high burnout risk, the base value is still returned
         assert burnout_strength == 0.8  # With empty context, returns the base value
 
@@ -513,7 +485,7 @@ class TestAdaptiveGamificationEngine:
             reward_type=RewardType.BADGES,
             context={"task_id": "123"},
             message="You've unlocked a challenge!",
-            visual_element={"type": "challenge", "color": "blue"}
+            visual_element={"type": "challenge", "color": "blue"},
         )
 
         # Apply action
@@ -553,11 +525,9 @@ class TestAdaptiveGamificationEngine:
         engagement_metrics = {
             "completion_rate": 0.8,
             "time_engaged_seconds": 120,
-            "reaction_score": 0.7
+            "reaction_score": 0.7,
         }
-        await engine.track_gamification_effectiveness(
-            "test_user", "action123", engagement_metrics
-        )
+        await engine.track_gamification_effectiveness("test_user", "action123", engagement_metrics)
 
         # Check action retrieval
         gamification_service.get_gamification_action.assert_called_once_with("action123")

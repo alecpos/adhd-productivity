@@ -5,19 +5,25 @@ import ast
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
+
 def get_class_names(file_path: str) -> List[Tuple[str, int]]:
     """Get class names and their line numbers from a Python file."""
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         try:
             tree = ast.parse(file.read())
-            return [(node.name, node.lineno) for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+            return [
+                (node.name, node.lineno)
+                for node in ast.walk(tree)
+                if isinstance(node, ast.ClassDef)
+            ]
         except:
             print(f"Error parsing {file_path}")
             return []
 
+
 def analyze_directory(base_path: str) -> Dict[str, Dict[str, List[Tuple[str, int]]]]:
     """Analyze Python files in specified directories for class definitions."""
-    directories = ['app/routes', 'app/models', 'app/schemas', 'app/services']
+    directories = ["app/routes", "app/models", "app/schemas", "app/services"]
     results = {}
 
     for directory in directories:
@@ -28,7 +34,7 @@ def analyze_directory(base_path: str) -> Dict[str, Dict[str, List[Tuple[str, int
         dir_results = {}
         for root, _, files in os.walk(dir_path):
             for file in files:
-                if file.endswith('.py') and not file.startswith('__'):
+                if file.endswith(".py") and not file.startswith("__"):
                     file_path = os.path.join(root, file)
                     relative_path = os.path.relpath(file_path, base_path)
                     classes = get_class_names(file_path)
@@ -40,7 +46,10 @@ def analyze_directory(base_path: str) -> Dict[str, Dict[str, List[Tuple[str, int
 
     return results
 
-def find_duplicates(results: Dict[str, Dict[str, List[Tuple[str, int]]]]) -> Dict[str, List[Tuple[str, str, int]]]:
+
+def find_duplicates(
+    results: Dict[str, Dict[str, List[Tuple[str, int]]]],
+) -> Dict[str, List[Tuple[str, str, int]]]:
     """Find duplicate class names within each directory."""
     duplicates = {}
 
@@ -61,6 +70,7 @@ def find_duplicates(results: Dict[str, Dict[str, List[Tuple[str, int]]]]) -> Dic
             duplicates[directory] = dir_duplicates
 
     return duplicates
+
 
 def main():
     """Main function."""
@@ -90,6 +100,7 @@ def main():
                 print(f"\nClass '{class_name}' found in:")
                 for file_path, line_no in locations:
                     print(f"  - {file_path} (line {line_no})")
+
 
 if __name__ == "__main__":
     main()

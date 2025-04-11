@@ -17,25 +17,28 @@ logger = logging.getLogger(__name__)
 
 class AccessibilityLevel(str, Enum):
     """Different levels of accessibility features."""
+
     ESSENTIAL = "essential"  # Core accessibility features
-    ENHANCED = "enhanced"    # More extensive accommodations
-    MAXIMUM = "maximum"      # Maximum possible accommodations
+    ENHANCED = "enhanced"  # More extensive accommodations
+    MAXIMUM = "maximum"  # Maximum possible accommodations
 
 
 class ColorTheme(str, Enum):
     """Color themes optimized for different needs."""
+
     STANDARD = "standard"
     HIGH_CONTRAST = "high_contrast"
     DARK = "dark"
     LIGHT = "light"
     REDUCED_BLUE = "reduced_blue"  # Reduces blue light
-    CALM = "calm"                 # Low-stimulation colors
-    FOCUS = "focus"               # Colors that support focus
-    CUSTOM = "custom"              # User-defined colors
+    CALM = "calm"  # Low-stimulation colors
+    FOCUS = "focus"  # Colors that support focus
+    CUSTOM = "custom"  # User-defined colors
 
 
 class FontStyle(str, Enum):
     """Font styles optimized for readability."""
+
     STANDARD = "standard"
     DYSLEXIC_FRIENDLY = "dyslexic_friendly"
     LARGE_PRINT = "large_print"
@@ -46,6 +49,7 @@ class FontStyle(str, Enum):
 
 class AnimationLevel(str, Enum):
     """Animation settings for UI elements."""
+
     FULL = "full"
     REDUCED = "reduced"
     MINIMAL = "minimal"
@@ -54,8 +58,9 @@ class AnimationLevel(str, Enum):
 
 class NotificationStyle(str, Enum):
     """Notification styles for ADHD users."""
+
     STANDARD = "standard"
-    GENTLE = "gentle"          # Less intrusive
+    GENTLE = "gentle"  # Less intrusive
     PERSISTENT = "persistent"  # Stay visible longer
     PRIORITY_ONLY = "priority_only"
     CUSTOM = "custom"
@@ -63,6 +68,7 @@ class NotificationStyle(str, Enum):
 
 class FocusAssistLevel(str, Enum):
     """Focus assist feature levels."""
+
     OFF = "off"
     LOW = "low"
     MEDIUM = "medium"
@@ -72,6 +78,7 @@ class FocusAssistLevel(str, Enum):
 
 class LayoutDensity(str, Enum):
     """Density options for UI layout."""
+
     COMPACT = "compact"
     STANDARD = "standard"
     SPACIOUS = "spacious"
@@ -79,6 +86,7 @@ class LayoutDensity(str, Enum):
 
 class AccessibilityPreferences(BaseModel):
     """User's accessibility preferences for UI customization."""
+
     user_id: str
     color_theme: ColorTheme = ColorTheme.STANDARD
     font_style: FontStyle = FontStyle.STANDARD
@@ -104,6 +112,7 @@ class AccessibilityPreferences(BaseModel):
 
 class WCAGComplianceLevel(str, Enum):
     """WCAG 2.2 compliance levels."""
+
     A = "a"
     AA = "aa"
     AAA = "aaa"
@@ -111,6 +120,7 @@ class WCAGComplianceLevel(str, Enum):
 
 class WCAGGuideline(BaseModel):
     """Representation of a WCAG 2.2 guideline."""
+
     id: str  # E.g., "1.4.3"
     name: str
     description: str
@@ -139,7 +149,7 @@ class AccessibilityService:
                 description="Text and images have sufficient contrast",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Helps users focus on content without strain",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="1.4.10",
@@ -147,7 +157,7 @@ class AccessibilityService:
                 description="Content can be presented without scrolling in two dimensions",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Reduces cognitive load from managing complex layouts",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="1.4.12",
@@ -155,7 +165,7 @@ class AccessibilityService:
                 description="No loss of content when text spacing is adjusted",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Allows for text customization to improve readability",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="2.2.1",
@@ -163,7 +173,7 @@ class AccessibilityService:
                 description="Time limits have user controls",
                 level=WCAGComplianceLevel.A,
                 impact_for_adhd="Critical for ADHD users who may need extra time",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="2.4.5",
@@ -171,7 +181,7 @@ class AccessibilityService:
                 description="Multiple ways to locate a page",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Helps users who may forget navigation paths",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="2.4.7",
@@ -179,7 +189,7 @@ class AccessibilityService:
                 description="Keyboard focus indicator is visible",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Crucial for users who lose track of focus",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="2.5.5",
@@ -187,7 +197,7 @@ class AccessibilityService:
                 description="Clickable targets are at least 44x44 pixels",
                 level=WCAGComplianceLevel.AAA,
                 impact_for_adhd="Reduces errors for users with motor control variations",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="2.5.8",
@@ -195,7 +205,7 @@ class AccessibilityService:
                 description="Adequate spacing between interactive elements",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Prevents accidental clicks, important for impulsivity",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="3.2.4",
@@ -203,7 +213,7 @@ class AccessibilityService:
                 description="Components with same functionality are identified consistently",
                 level=WCAGComplianceLevel.AA,
                 impact_for_adhd="Reduces cognitive load through predictability",
-                implementation_status=True
+                implementation_status=True,
             ),
             WCAGGuideline(
                 id="3.3.7",
@@ -211,7 +221,7 @@ class AccessibilityService:
                 description="Authentication without cognitive function tests",
                 level=WCAGComplianceLevel.A,
                 impact_for_adhd="Reduces barriers for users with memory challenges",
-                implementation_status=True
+                implementation_status=True,
             ),
         ]
         return guidelines
@@ -247,6 +257,7 @@ class AccessibilityService:
         # force the timestamp to be at least 1 microsecond later
         if new_timestamp <= original_timestamp:
             from datetime import timedelta
+
             new_timestamp = original_timestamp + timedelta(microseconds=1)
 
         current_prefs.last_updated = new_timestamp
@@ -264,70 +275,80 @@ class AccessibilityService:
 
         # Apply color theme
         if prefs.color_theme == ColorTheme.HIGH_CONTRAST:
-            css_vars.update({
-                "--background-color": "#000000",
-                "--text-color": "#ffffff",
-                "--primary-color": "#ffff00",
-                "--secondary-color": "#00ffff",
-                "--accent-color": "#ff00ff",
-                "--success-color": "#00ff00",
-                "--error-color": "#ff0000",
-                "--warning-color": "#ffa500",
-                "--info-color": "#00ffff",
-                "--border-color": "#ffffff",
-            })
+            css_vars.update(
+                {
+                    "--background-color": "#000000",
+                    "--text-color": "#ffffff",
+                    "--primary-color": "#ffff00",
+                    "--secondary-color": "#00ffff",
+                    "--accent-color": "#ff00ff",
+                    "--success-color": "#00ff00",
+                    "--error-color": "#ff0000",
+                    "--warning-color": "#ffa500",
+                    "--info-color": "#00ffff",
+                    "--border-color": "#ffffff",
+                }
+            )
         elif prefs.color_theme == ColorTheme.DARK:
-            css_vars.update({
-                "--background-color": "#121212",
-                "--text-color": "#e0e0e0",
-                "--primary-color": "#bb86fc",
-                "--secondary-color": "#03dac6",
-                "--accent-color": "#cf6679",
-                "--success-color": "#4caf50",
-                "--error-color": "#f44336",
-                "--warning-color": "#ff9800",
-                "--info-color": "#2196f3",
-                "--border-color": "#333333",
-            })
+            css_vars.update(
+                {
+                    "--background-color": "#121212",
+                    "--text-color": "#e0e0e0",
+                    "--primary-color": "#bb86fc",
+                    "--secondary-color": "#03dac6",
+                    "--accent-color": "#cf6679",
+                    "--success-color": "#4caf50",
+                    "--error-color": "#f44336",
+                    "--warning-color": "#ff9800",
+                    "--info-color": "#2196f3",
+                    "--border-color": "#333333",
+                }
+            )
         elif prefs.color_theme == ColorTheme.CALM:
-            css_vars.update({
-                "--background-color": "#f5f5f7",
-                "--text-color": "#333333",
-                "--primary-color": "#6b8e9a",
-                "--secondary-color": "#a2b9bc",
-                "--accent-color": "#b2ad7f",
-                "--success-color": "#8fbc8f",
-                "--error-color": "#c8a2c8",
-                "--warning-color": "#e8d2a6",
-                "--info-color": "#add8e6",
-                "--border-color": "#d3d3d3",
-            })
+            css_vars.update(
+                {
+                    "--background-color": "#f5f5f7",
+                    "--text-color": "#333333",
+                    "--primary-color": "#6b8e9a",
+                    "--secondary-color": "#a2b9bc",
+                    "--accent-color": "#b2ad7f",
+                    "--success-color": "#8fbc8f",
+                    "--error-color": "#c8a2c8",
+                    "--warning-color": "#e8d2a6",
+                    "--info-color": "#add8e6",
+                    "--border-color": "#d3d3d3",
+                }
+            )
         elif prefs.color_theme == ColorTheme.FOCUS:
-            css_vars.update({
-                "--background-color": "#ffffff",
-                "--text-color": "#333333",
-                "--primary-color": "#3949ab",
-                "--secondary-color": "#5c6bc0",
-                "--accent-color": "#d81b60",
-                "--success-color": "#2e7d32",
-                "--error-color": "#c62828",
-                "--warning-color": "#f57f17",
-                "--info-color": "#0277bd",
-                "--border-color": "#e0e0e0",
-            })
+            css_vars.update(
+                {
+                    "--background-color": "#ffffff",
+                    "--text-color": "#333333",
+                    "--primary-color": "#3949ab",
+                    "--secondary-color": "#5c6bc0",
+                    "--accent-color": "#d81b60",
+                    "--success-color": "#2e7d32",
+                    "--error-color": "#c62828",
+                    "--warning-color": "#f57f17",
+                    "--info-color": "#0277bd",
+                    "--border-color": "#e0e0e0",
+                }
+            )
         else:  # Standard or other themes
-            css_vars.update({
-                "--background-color": "#ffffff",
-                "--text-color": "#333333",
-                "--primary-color": "#1976d2",
-                "--secondary-color": "#03a9f4",
-                "--accent-color": "#e91e63",
-                "--success-color": "#4caf50",
-                "--error-color": "#f44336",
-                "--warning-color": "#ff9800",
-                "--info-color": "#2196f3",
-                "--border-color": "#e0e0e0",
-            })
+            css_vars.update(
+                {
+                    "--background-color": "#ffffff",
+                    "--text-color": "#333333",
+                    "--primary-color": "#1976d2",
+                    "--secondary-color": "#03a9f4",
+                    "--accent-color": "#e91e63",
+                    "--success-color": "#4caf50",
+                    "--error-color": "#f44336",
+                    "--warning-color": "#ff9800",
+                    "--info-color": "#2196f3",
+                    "--border-color": "#e0e0e0",
+                }
+            )
 
         # Apply font settings
         if prefs.font_style == FontStyle.DYSLEXIC_FRIENDLY:
@@ -391,7 +412,7 @@ class AccessibilityService:
         compliance_by_level = {
             WCAGComplianceLevel.A: {"total": 0, "implemented": 0},
             WCAGComplianceLevel.AA: {"total": 0, "implemented": 0},
-            WCAGComplianceLevel.AAA: {"total": 0, "implemented": 0}
+            WCAGComplianceLevel.AAA: {"total": 0, "implemented": 0},
         }
 
         for guideline in self.wcag_guidelines:
@@ -425,11 +446,13 @@ class AccessibilityService:
         return {
             "total_guidelines": total_guidelines,
             "implemented_guidelines": implemented_guidelines,
-            "compliance_percentage": (implemented_guidelines / total_guidelines) * 100 if total_guidelines > 0 else 0,
+            "compliance_percentage": (
+                (implemented_guidelines / total_guidelines) * 100 if total_guidelines > 0 else 0
+            ),
             "compliance_by_level": {k.value: v for k, v in compliance_by_level.items()},
             "compliance_percentages": {k.value: v for k, v in compliance_percentages.items()},
             "overall_compliance_level": overall_level.value if overall_level else "none",
-            "guidelines": [g.dict() for g in self.wcag_guidelines]
+            "guidelines": [g.dict() for g in self.wcag_guidelines],
         }
 
     def generate_focus_assist_styles(self, level: FocusAssistLevel) -> Dict[str, str]:
@@ -511,10 +534,12 @@ class AccessibilityService:
             "focus_styles": focus_styles,
             "notifications": {
                 "style": prefs.notification_style.value,
-                "duration": 5000 if prefs.notification_style == NotificationStyle.PERSISTENT else 3000,
+                "duration": (
+                    5000 if prefs.notification_style == NotificationStyle.PERSISTENT else 3000
+                ),
                 "position": "top-right",
                 "max_visible": 3 if not prefs.simplify_ui else 1,
-                "audio_enabled": prefs.use_audio_cues
+                "audio_enabled": prefs.use_audio_cues,
             },
             "interactions": {
                 "tooltip_delay": prefs.tooltip_delay,
@@ -522,8 +547,8 @@ class AccessibilityService:
                 "audio_feedback": prefs.use_audio_cues,
                 "keyboard_shortcuts": prefs.keyboard_shortcuts_enabled,
                 "touch_target_size": "large",  # WCAG 2.5.5 compliance
-                "touch_target_spacing": "adequate"  # WCAG 2.5.8 compliance
-            }
+                "touch_target_spacing": "adequate",  # WCAG 2.5.8 compliance
+            },
         }
 
         # Add custom CSS if provided

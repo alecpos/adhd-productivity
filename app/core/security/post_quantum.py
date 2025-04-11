@@ -23,7 +23,12 @@ import requests
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, ec
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    PublicFormat,
+    PrivateFormat,
+    NoEncryption,
+)
 
 # Since actual ML-KEM/Kyber implementation requires C libraries typically,
 # this is a simplified version for demonstration purposes
@@ -35,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 class PostQuantumAlgorithm(str, Enum):
     """Post-quantum cryptographic algorithms supported by the system."""
+
     ML_KEM_512 = "ml_kem_512"  # Lower security, higher performance
     ML_KEM_768 = "ml_kem_768"  # NIST Level 3 (128-bit quantum security)
     ML_KEM_1024 = "ml_kem_1024"  # NIST Level 5 (highest security)
@@ -44,6 +50,7 @@ class PostQuantumAlgorithm(str, Enum):
 @dataclass
 class HybridKeyPair:
     """A hybrid key pair containing both classical and post-quantum keys."""
+
     # Classical keys
     classical_public_key: bytes
     classical_private_key: bytes
@@ -60,6 +67,7 @@ class HybridKeyPair:
 @dataclass
 class HybridCiphertext:
     """Hybrid ciphertext containing both classical and post-quantum encrypted data."""
+
     classical_ciphertext: bytes
     pq_ciphertext: bytes
     algorithm_info: Dict[str, str]
@@ -105,13 +113,11 @@ class PostQuantumCrypto:
                 "private_key_size": 3168,
                 "ciphertext_size": 1568,
                 "shared_secret_size": 32,
-            }
+            },
         }
 
     def generate_hybrid_keypair(
-        self,
-        pq_algorithm: Optional[PostQuantumAlgorithm] = None,
-        classical_key_size: int = 2048
+        self, pq_algorithm: Optional[PostQuantumAlgorithm] = None, classical_key_size: int = 2048
     ) -> HybridKeyPair:
         """
         Generate a hybrid key pair with both classical and post-quantum keys.
@@ -129,20 +135,16 @@ class PostQuantumCrypto:
 
         # Generate classical RSA key
         classical_private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=classical_key_size
+            public_exponent=65537, key_size=classical_key_size
         )
         classical_public_key = classical_private_key.public_key()
 
         # Serialize classical keys
         classical_public_bytes = classical_public_key.public_bytes(
-            encoding=Encoding.DER,
-            format=PublicFormat.SubjectPublicKeyInfo
+            encoding=Encoding.DER, format=PublicFormat.SubjectPublicKeyInfo
         )
         classical_private_bytes = classical_private_key.private_bytes(
-            encoding=Encoding.DER,
-            format=PrivateFormat.PKCS8,
-            encryption_algorithm=NoEncryption()
+            encoding=Encoding.DER, format=PrivateFormat.PKCS8, encryption_algorithm=NoEncryption()
         )
 
         # Generate simulated post-quantum keys
@@ -166,7 +168,7 @@ class PostQuantumCrypto:
             pq_private_key=pq_private_key,
             pq_algorithm=pq_algorithm,
             created_at=time.time(),
-            key_id=key_id
+            key_id=key_id,
         )
 
         # Cache the key pair
@@ -178,7 +180,7 @@ class PostQuantumCrypto:
         self,
         data: bytes,
         recipient_public_key: Union[HybridKeyPair, bytes],
-        pq_algorithm: Optional[PostQuantumAlgorithm] = None
+        pq_algorithm: Optional[PostQuantumAlgorithm] = None,
     ) -> HybridCiphertext:
         """
         Encrypt data using a hybrid approach with both classical and post-quantum encryption.
@@ -215,19 +217,15 @@ class PostQuantumCrypto:
         classical_encrypted_key = classical_public_key.encrypt(
             symmetric_key,
             padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
+                mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None
+            ),
         )
 
         # Simulate encrypting the symmetric key with ML-KEM
         # In a real implementation, this would use the actual ML-KEM encapsulation
         pq_specs = self._pq_algorithms[used_pq_algorithm]
         pq_encrypted_key = self._simulated_pq_encrypt(
-            symmetric_key,
-            pq_public_key,
-            pq_specs["ciphertext_size"]
+            symmetric_key, pq_public_key, pq_specs["ciphertext_size"]
         )
 
         # Generate a nonce for symmetric encryption
@@ -246,18 +244,16 @@ class PostQuantumCrypto:
             algorithm_info={
                 "classical": "RSA-OAEP-256",
                 "pq": used_pq_algorithm,
-                "symmetric": "AES-256-GCM"
+                "symmetric": "AES-256-GCM",
             },
             key_id=key_id,
-            nonce=nonce
+            nonce=nonce,
         )
 
         return hybrid_ct
 
     def hybrid_decrypt(
-        self,
-        ciphertext: HybridCiphertext,
-        recipient_key: Optional[HybridKeyPair] = None
+        self, ciphertext: HybridCiphertext, recipient_key: Optional[HybridKeyPair] = None
     ) -> bytes:
         """
         Decrypt data using a hybrid approach with both classical and post-quantum decryption.
@@ -282,8 +278,7 @@ class PostQuantumCrypto:
 
         # Decrypt using classical cryptography
         classical_private_key = serialization.load_der_private_key(
-            recipient_key.classical_private_key,
-            password=None
+            recipient_key.classical_private_key, password=None
         )
         try:
             symmetric_key_classical = classical_private_key.decrypt(
@@ -291,8 +286,8 @@ class PostQuantumCrypto:
                 padding.OAEP(
                     mgf=padding.MGF1(algorithm=hashes.SHA256()),
                     algorithm=hashes.SHA256(),
-                    label=None
-                )
+                    label=None,
+                ),
             )
         except Exception as e:
             logger.error(f"Classical decryption failed: {e}")
@@ -302,8 +297,7 @@ class PostQuantumCrypto:
         # In a real implementation, this would use the actual ML-KEM decapsulation
         try:
             symmetric_key_pq = self._simulated_pq_decrypt(
-                ciphertext.pq_ciphertext,
-                recipient_key.pq_private_key
+                ciphertext.pq_ciphertext, recipient_key.pq_private_key
             )
         except Exception as e:
             logger.error(f"Post-quantum decryption failed: {e}")
@@ -311,7 +305,9 @@ class PostQuantumCrypto:
 
         # Use the post-quantum key by default, falling back to classical
         # This "hybrid" approach ensures security even if one system is broken
-        symmetric_key = symmetric_key_pq if symmetric_key_pq is not None else symmetric_key_classical
+        symmetric_key = (
+            symmetric_key_pq if symmetric_key_pq is not None else symmetric_key_classical
+        )
 
         if symmetric_key is None:
             raise ValueError("Both classical and post-quantum decryption failed")
@@ -320,7 +316,9 @@ class PostQuantumCrypto:
         encryption_key = self._derive_encryption_key(symmetric_key, ciphertext.nonce)
 
         # Decrypt the data
-        plaintext = self._simulated_symmetric_decrypt(actual_ciphertext, encryption_key, ciphertext.nonce)
+        plaintext = self._simulated_symmetric_decrypt(
+            actual_ciphertext, encryption_key, ciphertext.nonce
+        )
 
         return plaintext
 
@@ -377,10 +375,7 @@ class PostQuantumCrypto:
         """Derive an encryption key from key material using HKDF."""
         # Use HKDF to derive a key for encryption
         return HKDF(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            info=b"hybrid_encryption"
+            algorithm=hashes.SHA256(), length=32, salt=salt, info=b"hybrid_encryption"
         ).derive(key_material)
 
     def _simulated_symmetric_encrypt(self, data: bytes, key: bytes, nonce: bytes) -> bytes:
@@ -428,11 +423,10 @@ class TLSConfig:
             # Hybrid suites (fictitious names for demonstration)
             "TLS_HYBRID_ECDHE_ML_KEM_768_WITH_AES_256_GCM_SHA384",
             "TLS_HYBRID_ECDHE_ML_KEM_512_WITH_AES_128_GCM_SHA256",
-
             # Fallback to standard TLS 1.3 cipher suites
             "TLS_AES_256_GCM_SHA384",
             "TLS_AES_128_GCM_SHA256",
-            "TLS_CHACHA20_POLY1305_SHA256"
+            "TLS_CHACHA20_POLY1305_SHA256",
         ]
 
         # Supported key exchange methods
@@ -440,11 +434,10 @@ class TLSConfig:
             # Hybrid methods
             "HYBRID_ECDHE_ML_KEM_768",
             "HYBRID_ECDHE_ML_KEM_512",
-
             # Classical methods
             "ECDHE_P256",
             "ECDHE_P384",
-            "ECDHE_X25519"
+            "ECDHE_X25519",
         ]
 
     def get_server_config(self) -> Dict[str, Any]:
@@ -469,7 +462,7 @@ class TLSConfig:
             "certificate_type": "X509_WITH_PQ_EXTENSION",
             "server_key_id": server_key.key_id,
             "post_quantum_algorithms": [algo.value for algo in list(PostQuantumAlgorithm)],
-            "minimum_tls_version": "TLS1.3"
+            "minimum_tls_version": "TLS1.3",
         }
 
     def get_client_config(self) -> Dict[str, Any]:
@@ -491,7 +484,7 @@ class TLSConfig:
             "post_quantum_algorithms": [algo.value for algo in list(PostQuantumAlgorithm)],
             "validate_hybrid_cert": True,
             "fallback_to_classical": True,
-            "minimum_tls_version": "TLS1.3"
+            "minimum_tls_version": "TLS1.3",
         }
 
     def configure_requests_session(self, session: requests.Session):
@@ -512,16 +505,19 @@ class TLSConfig:
         # - Set up client certificates with PQ extensions
 
         # For now, just demonstrate the idea with custom headers
-        session.headers.update({
-            "X-PQ-Supported": "true",
-            "X-PQ-Algorithms": ",".join([algo.value for algo in list(PostQuantumAlgorithm)])
-        })
+        session.headers.update(
+            {
+                "X-PQ-Supported": "true",
+                "X-PQ-Algorithms": ",".join([algo.value for algo in list(PostQuantumAlgorithm)]),
+            }
+        )
 
         # In a real implementation, you would configure the SSL context
         # Unfortunately, as of now, most HTTP libraries don't directly support PQ TLS
         # This will change as the IETF standards are finalized and implemented
 
         return session
+
 
 # Initialization function for dependency injection
 def get_post_quantum_crypto() -> PostQuantumCrypto:

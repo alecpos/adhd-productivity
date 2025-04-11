@@ -24,7 +24,9 @@ class FeatureEngineer:
         tasks_df = pd.DataFrame(user_data["tasks"])
 
         # Prepare features for each data type
-        mental_health_features, mental_health_targets = self._prepare_mental_health_features(mental_health_df)
+        mental_health_features, mental_health_targets = self._prepare_mental_health_features(
+            mental_health_df
+        )
         energy_features, energy_targets = self._prepare_energy_features(energy_df)
         task_features, task_targets = self._prepare_task_features(tasks_df)
 

@@ -2,6 +2,7 @@
 
 from uuid import UUID
 
+
 class TimelineService:
     """Service for handling timeline operations."""
 

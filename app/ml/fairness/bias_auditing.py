@@ -28,15 +28,15 @@ logger = logging.getLogger(__name__)
 
 # Protected attribute categories commonly used in auditing
 PROTECTED_ATTRIBUTES = [
-    "neurotype",     # ADHD, non-ADHD, etc.
-    "gender",        # Gender identity
-    "age_group",     # Age demographics
-    "education",     # Education level
-    "socioeconomic", # Socioeconomic indicators
-    "race",          # Racial/ethnic background
-    "language",      # Primary language
-    "disability",    # Other disabilities beyond ADHD
-    "cultural_background", # Cultural differences
+    "neurotype",  # ADHD, non-ADHD, etc.
+    "gender",  # Gender identity
+    "age_group",  # Age demographics
+    "education",  # Education level
+    "socioeconomic",  # Socioeconomic indicators
+    "race",  # Racial/ethnic background
+    "language",  # Primary language
+    "disability",  # Other disabilities beyond ADHD
+    "cultural_background",  # Cultural differences
 ]
 
 # Define bias metrics with descriptions
@@ -51,9 +51,11 @@ BIAS_METRICS = {
     "false_negative_rate_difference": "Difference in false negative rate between groups",
 }
 
+
 @dataclass
 class ProtectedAttribute:
     """Representation of a protected attribute for bias auditing."""
+
     name: str
     values: List[str]
     reference_value: Optional[str] = None
@@ -67,6 +69,7 @@ class ProtectedAttribute:
 @dataclass
 class FairnessMetric:
     """Definition of a fairness metric for bias auditing."""
+
     name: str
     description: str
     calculator: Callable
@@ -84,6 +87,7 @@ class FairnessMetric:
 @dataclass
 class ModelAuditResult:
     """Results of a bias audit for a single model."""
+
     model_name: str
     metrics: Dict[str, Dict[str, float]]  # Metric name -> attribute -> value
     prediction_distribution: Optional[Dict[str, Dict[str, Dict[str, int]]]] = None
@@ -99,7 +103,7 @@ class ModelAuditResult:
             "model_name": self.model_name,
             "metrics": self.metrics,
             "prediction_distribution": self.prediction_distribution,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
 
     def get_metric(self, metric_name: str, attribute: str) -> Optional[float]:
@@ -110,6 +114,7 @@ class ModelAuditResult:
 @dataclass
 class SystemAuditResult:
     """Results of a bias audit for the entire system of models."""
+
     model_results: Dict[str, ModelAuditResult]
     metrics: Dict[str, Dict[str, Dict[str, float]]]  # Level -> metric -> attribute -> value
     timestamp: Optional[str] = None
@@ -121,9 +126,11 @@ class SystemAuditResult:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
-            "model_results": {name: result.to_dict() for name, result in self.model_results.items()},
+            "model_results": {
+                name: result.to_dict() for name, result in self.model_results.items()
+            },
             "metrics": self.metrics,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
 
     def get_system_metric(self, metric_name: str, attribute: str) -> Optional[float]:
@@ -149,7 +156,7 @@ class DisparateImpactCalculator:
         labels: np.ndarray,
         protected_attribute: np.ndarray,
         privileged_groups: List[str],
-        unprivileged_groups: List[str]
+        unprivileged_groups: List[str],
     ) -> float:
         """
         Calculate the disparate impact metric.
@@ -170,13 +177,15 @@ class DisparateImpactCalculator:
 
         # Calculate positive prediction rates for both groups
         priv_positive_rate = np.mean(predictions[privileged_mask]) if np.any(privileged_mask) else 0
-        unpriv_positive_rate = np.mean(predictions[unprivileged_mask]) if np.any(unprivileged_mask) else 0
+        unpriv_positive_rate = (
+            np.mean(predictions[unprivileged_mask]) if np.any(unprivileged_mask) else 0
+        )
 
         # Calculate disparate impact ratio
         if priv_positive_rate > 0:
             di_ratio = unpriv_positive_rate / priv_positive_rate
         else:
-            di_ratio = 1.0 if unpriv_positive_rate == 0 else float('inf')
+            di_ratio = 1.0 if unpriv_positive_rate == 0 else float("inf")
 
         return di_ratio
 
@@ -199,7 +208,7 @@ class EqualOpportunityCalculator:
         labels: np.ndarray,
         protected_attribute: np.ndarray,
         privileged_groups: List[str],
-        unprivileged_groups: List[str]
+        unprivileged_groups: List[str],
     ) -> float:
         """
         Calculate the equal opportunity metric.
@@ -219,8 +228,12 @@ class EqualOpportunityCalculator:
         unprivileged_mask = np.isin(protected_attribute, unprivileged_groups)
 
         # Calculate true positive rates for both groups
-        priv_positive_mask = (labels[privileged_mask] == 1) if np.any(privileged_mask) else np.array([])
-        unpriv_positive_mask = (labels[unprivileged_mask] == 1) if np.any(unprivileged_mask) else np.array([])
+        priv_positive_mask = (
+            (labels[privileged_mask] == 1) if np.any(privileged_mask) else np.array([])
+        )
+        unpriv_positive_mask = (
+            (labels[unprivileged_mask] == 1) if np.any(unprivileged_mask) else np.array([])
+        )
 
         if np.any(priv_positive_mask) and np.any(privileged_mask):
             priv_tpr = np.mean(predictions[privileged_mask][priv_positive_mask])
@@ -255,13 +268,13 @@ class BiasAuditor:
         self.output_dir = output_dir or settings.FAIRNESS_AUDIT_DIRECTORY
         self.calculators = {
             "disparate_impact": DisparateImpactCalculator(),
-            "equal_opportunity": EqualOpportunityCalculator()
+            "equal_opportunity": EqualOpportunityCalculator(),
         }
 
         self.protected_attributes = [
             ProtectedAttribute(name="neurotype", values=["ADHD", "NT"]),
             ProtectedAttribute(name="gender", values=["M", "F", "NB"]),
-            ProtectedAttribute(name="age_group", values=["under_30", "30_to_50", "over_50"])
+            ProtectedAttribute(name="age_group", values=["under_30", "30_to_50", "over_50"]),
         ]
 
         # Create output directory if it doesn't exist
@@ -293,7 +306,7 @@ class BiasAuditor:
         predictions: np.ndarray,
         labels: np.ndarray,
         protected_attributes: Dict[str, np.ndarray],
-        metrics: List[str] = None
+        metrics: List[str] = None,
     ) -> ModelAuditResult:
         """
         Audit a model for bias across protected attributes.
@@ -331,7 +344,9 @@ class BiasAuditor:
                     )
 
                 # Find attribute definition
-                attr_def = next((attr for attr in self.protected_attributes if attr.name == attr_name))
+                attr_def = next(
+                    (attr for attr in self.protected_attributes if attr.name == attr_name)
+                )
 
                 # Calculate metric
                 metric_value = calculator.calculate(
@@ -339,7 +354,9 @@ class BiasAuditor:
                     labels=labels,
                     protected_attribute=attr_values,
                     privileged_groups=[attr_def.reference_value],
-                    unprivileged_groups=[v for v in attr_def.values if v != attr_def.reference_value]
+                    unprivileged_groups=[
+                        v for v in attr_def.values if v != attr_def.reference_value
+                    ],
                 )
 
                 results[metric_name][attr_name] = metric_value
@@ -351,15 +368,11 @@ class BiasAuditor:
 
         # Create and return result
         return ModelAuditResult(
-            model_name=model_name,
-            metrics=results,
-            prediction_distribution=prediction_distribution
+            model_name=model_name, metrics=results, prediction_distribution=prediction_distribution
         )
 
     def audit_system(
-        self,
-        models: Dict[str, Dict[str, Any]],
-        metrics: List[str] = None
+        self, models: Dict[str, Dict[str, Any]], metrics: List[str] = None
     ) -> SystemAuditResult:
         """
         Audit a system of models for bias.
@@ -383,7 +396,7 @@ class BiasAuditor:
                 predictions=model_data["predictions"],
                 labels=model_data["labels"],
                 protected_attributes=model_data["protected_attributes"],
-                metrics=metrics
+                metrics=metrics,
             )
 
         # Calculate system-level metrics
@@ -402,15 +415,10 @@ class BiasAuditor:
                 system_metrics["system_level"][metric_name][attr_name] = np.mean(values)
 
         # Create and return result
-        return SystemAuditResult(
-            model_results=model_results,
-            metrics=system_metrics
-        )
+        return SystemAuditResult(model_results=model_results, metrics=system_metrics)
 
     def _calculate_prediction_distribution(
-        self,
-        predictions: np.ndarray,
-        protected_attributes: Dict[str, np.ndarray]
+        self, predictions: np.ndarray, protected_attributes: Dict[str, np.ndarray]
     ) -> Dict[str, Dict[str, Dict[str, int]]]:
         """
         Calculate prediction distribution across protected attributes.
@@ -434,7 +442,7 @@ class BiasAuditor:
             for value in unique_values:
                 distribution[attr_name][value] = {
                     "positive": int(np.sum(predictions[attr_values == value] == 1)),
-                    "negative": int(np.sum(predictions[attr_values == value] == 0))
+                    "negative": int(np.sum(predictions[attr_values == value] == 0)),
                 }
 
         return distribution
@@ -458,7 +466,9 @@ class BiasAuditor:
             if not calculator:
                 continue
 
-            threshold = getattr(calculator, "threshold", 0.8 if metric_name == "disparate_impact" else 0.1)
+            threshold = getattr(
+                calculator, "threshold", 0.8 if metric_name == "disparate_impact" else 0.1
+            )
 
             for attr_name, value in attr_values.items():
                 # Check if value violates threshold
@@ -469,16 +479,26 @@ class BiasAuditor:
                     is_violation = value > threshold
 
                 if is_violation:
-                    severity = "high" if (value < threshold / 2 if metric_name == "disparate_impact" else value > threshold * 2) else "medium"
+                    severity = (
+                        "high"
+                        if (
+                            value < threshold / 2
+                            if metric_name == "disparate_impact"
+                            else value > threshold * 2
+                        )
+                        else "medium"
+                    )
 
-                    findings.append({
-                        "metric": metric_name,
-                        "attribute": attr_name,
-                        "value": value,
-                        "threshold": threshold,
-                        "severity": severity,
-                        "description": f"{metric_name.replace('_', ' ').title()} shows potential bias in {attr_name}"
-                    })
+                    findings.append(
+                        {
+                            "metric": metric_name,
+                            "attribute": attr_name,
+                            "value": value,
+                            "threshold": threshold,
+                            "severity": severity,
+                            "description": f"{metric_name.replace('_', ' ').title()} shows potential bias in {attr_name}",
+                        }
+                    )
 
         # Determine if bias was detected
         bias_detected = len(findings) > 0
@@ -486,14 +506,16 @@ class BiasAuditor:
         return {
             "bias_detected": bias_detected,
             "findings": findings,
-            "recommendation": "Model should be debiased" if bias_detected else "No significant bias detected"
+            "recommendation": (
+                "Model should be debiased" if bias_detected else "No significant bias detected"
+            ),
         }
 
 
 def get_bias_auditor(
     output_dir: str = "audit_reports",
     fairness_thresholds: Dict[str, float] = None,
-    default_reference_group: Dict[str, str] = None
+    default_reference_group: Dict[str, str] = None,
 ) -> BiasAuditor:
     """
     Factory function to get a bias auditor instance.
@@ -509,12 +531,14 @@ def get_bias_auditor(
     return BiasAuditor(
         output_dir=output_dir,
         fairness_thresholds=fairness_thresholds,
-        default_reference_group=default_reference_group
+        default_reference_group=default_reference_group,
     )
+
 
 @dataclass
 class BiasAuditResult:
     """Container for bias audit results."""
+
     model_id: str
     model_type: str
     datetime: str
@@ -545,11 +569,11 @@ class BiasAuditResult:
 
     def save(self, filepath: str) -> None:
         """Save result to a JSON file."""
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(self.to_dict(), f, indent=2)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'BiasAuditResult':
+    def from_dict(cls, data: Dict[str, Any]) -> "BiasAuditResult":
         """Create a BiasAuditResult from a dictionary."""
         return cls(
             model_id=data.get("model_id", ""),
@@ -569,7 +593,7 @@ class AuditScheduler:
     Scheduler for regular bias audits.
     """
 
-    def __init__(self, auditor: 'BiasAuditor'):
+    def __init__(self, auditor: "BiasAuditor"):
         """
         Initialize the audit scheduler.
 
@@ -587,7 +611,7 @@ class AuditScheduler:
         metrics: List[str],
         frequency: str = "daily",
         next_run_day: int = None,
-        data_sources: Dict[str, Any] = None
+        data_sources: Dict[str, Any] = None,
     ) -> None:
         """
         Schedule a regular bias audit.
@@ -600,15 +624,17 @@ class AuditScheduler:
             next_run_day: Day of week for weekly audits (0=Monday)
             data_sources: Dictionary mapping model names to data sources
         """
-        self.scheduled_audits.append({
-            "name": name,
-            "models": models,
-            "metrics": metrics,
-            "frequency": frequency,
-            "next_run_day": next_run_day,
-            "last_run": None,
-            "data_sources": data_sources or {}
-        })
+        self.scheduled_audits.append(
+            {
+                "name": name,
+                "models": models,
+                "metrics": metrics,
+                "frequency": frequency,
+                "next_run_day": next_run_day,
+                "last_run": None,
+                "data_sources": data_sources or {},
+            }
+        )
 
     def run_scheduled_audits(self) -> List[ModelAuditResult]:
         """
@@ -640,18 +666,18 @@ class AuditScheduler:
                     # Skip models without data sources in production environment
                     if model_name not in audit.get("data_sources", {}):
                         # But if we have a mocked auditor (in tests), continue anyway
-                        if not hasattr(self.auditor, '_extract_mock_name'):
+                        if not hasattr(self.auditor, "_extract_mock_name"):
                             logger.warning(f"No data source for model {model_name}, skipping")
                             continue
 
-                    if hasattr(self.auditor, '_extract_mock_name'):
+                    if hasattr(self.auditor, "_extract_mock_name"):
                         # In test environment, don't try to get data from data source
                         result = self.auditor.audit_model(
                             model_name=model_name,
                             predictions=[],
                             labels=[],
                             protected_attributes={},
-                            metrics=audit["metrics"]
+                            metrics=audit["metrics"],
                         )
                     else:
                         # Normal execution path
@@ -663,15 +689,17 @@ class AuditScheduler:
                             predictions=data["predictions"],
                             labels=data["labels"],
                             protected_attributes=data["protected_attributes"],
-                            metrics=audit["metrics"]
+                            metrics=audit["metrics"],
                         )
 
                     results.append(result)
-                    self.audit_history.append({
-                        "audit_name": audit["name"],
-                        "timestamp": datetime.now().isoformat(),
-                        "result": result
-                    })
+                    self.audit_history.append(
+                        {
+                            "audit_name": audit["name"],
+                            "timestamp": datetime.now().isoformat(),
+                            "result": result,
+                        }
+                    )
 
                 # Update last run timestamp
                 audit["last_run"] = now.isoformat()
@@ -708,14 +736,16 @@ class AuditScheduler:
                     predictions=data["predictions"],
                     labels=data["labels"],
                     protected_attributes=data["protected_attributes"],
-                    metrics=audit["metrics"]
+                    metrics=audit["metrics"],
                 )
 
-                self.audit_history.append({
-                    "audit_name": audit["name"],
-                    "timestamp": datetime.now().isoformat(),
-                    "result": result
-                })
+                self.audit_history.append(
+                    {
+                        "audit_name": audit["name"],
+                        "timestamp": datetime.now().isoformat(),
+                        "result": result,
+                    }
+                )
 
                 # Update last run timestamp
                 audit["last_run"] = datetime.now().isoformat()
@@ -735,7 +765,9 @@ class AuditReporter:
         """Initialize the audit reporter."""
         pass
 
-    def generate_report(self, audit_result: Union[ModelAuditResult, SystemAuditResult]) -> Dict[str, Any]:
+    def generate_report(
+        self, audit_result: Union[ModelAuditResult, SystemAuditResult]
+    ) -> Dict[str, Any]:
         """
         Generate a report from audit results.
 
@@ -767,7 +799,7 @@ class AuditReporter:
             "model_name": audit_result.model_name,
             "metrics": audit_result.metrics,
             "distribution": audit_result.prediction_distribution,
-            "recommendations": []
+            "recommendations": [],
         }
 
         return report
@@ -789,12 +821,10 @@ class AuditReporter:
 
         # Create report
         report = {
-            "system_overview": {
-                "num_models": len(model_reports)
-            },
+            "system_overview": {"num_models": len(model_reports)},
             "model_reports": model_reports,
             "system_metrics": audit_result.metrics.get("system_level", {}),
-            "recommendations": []
+            "recommendations": [],
         }
 
         return report
@@ -814,12 +844,14 @@ class AuditReporter:
         for model_name, model_result in audit_result.model_results.items():
             for metric_name, attr_values in model_result.metrics.items():
                 for attr_name, value in attr_values.items():
-                    data.append({
-                        "model": model_name,
-                        "metric": metric_name,
-                        "attribute": attr_name,
-                        "value": value
-                    })
+                    data.append(
+                        {
+                            "model": model_name,
+                            "metric": metric_name,
+                            "attribute": attr_name,
+                            "value": value,
+                        }
+                    )
 
         df = pd.DataFrame(data)
 
@@ -828,22 +860,20 @@ class AuditReporter:
 
         # Create heatmap for values if we have data
         if not df.empty:
-            pivot = df.pivot_table(
-                index=["model", "attribute"],
-                columns="metric",
-                values="value"
-            )
+            pivot = df.pivot_table(index=["model", "attribute"], columns="metric", values="value")
 
             sns.heatmap(pivot, annot=True, cmap="RdYlGn_r", linewidths=0.5)
             plt.title("Fairness Metrics Across Models and Protected Attributes")
             plt.tight_layout()
         else:
-            plt.text(0.5, 0.5, "No data available", horizontalalignment='center', fontsize=14)
+            plt.text(0.5, 0.5, "No data available", horizontalalignment="center", fontsize=14)
 
         # Return the figure itself
         return plt.gcf()
 
-    def generate_trend_analysis(self, audit_history: List[Dict[str, Any]], model_name: str) -> Dict[str, Any]:
+    def generate_trend_analysis(
+        self, audit_history: List[Dict[str, Any]], model_name: str
+    ) -> Dict[str, Any]:
         """
         Generate trend analysis from historical audit results.
 

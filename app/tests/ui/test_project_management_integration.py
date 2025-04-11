@@ -25,9 +25,7 @@ class TestProjectToolConfig:
     def test_default_config(self):
         """Test that default configuration values are set correctly."""
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
 
         assert config.tool_type == ProjectToolType.JIRA
@@ -55,7 +53,7 @@ class TestProjectToolConfig:
             sync_frequency=SyncFrequency.DAILY,
             project_ids=["project1", "project2"],
             labels_to_sync=["bug", "feature"],
-            last_sync=datetime(2023, 1, 1)
+            last_sync=datetime(2023, 1, 1),
         )
 
         assert config.tool_type == ProjectToolType.GITHUB
@@ -78,7 +76,7 @@ class TestExternalTask:
             status="in_progress",
             start_time=datetime.now(),
             end_time=datetime.now() + timedelta(hours=1),
-            tool_type=ProjectToolType.JIRA
+            tool_type=ProjectToolType.JIRA,
         )
 
         assert task.external_id == "TASK-123"
@@ -113,7 +111,7 @@ class TestExternalTask:
             created_date=now - timedelta(days=1),
             updated_date=now - timedelta(hours=1),
             tool_type=ProjectToolType.JIRA,
-            additional_data={"story_points": 5}
+            additional_data={"story_points": 5},
         )
 
         assert task.external_id == "TASK-456"
@@ -143,7 +141,7 @@ class TestJiraIntegration:
             api_url="https://jira.example.com",
             user_id="test_user",
             auth_token="test_token",
-            project_ids=["TEST"]
+            project_ids=["TEST"],
         )
 
     @pytest.fixture
@@ -217,7 +215,7 @@ class TestJiraIntegration:
             "start_time": datetime.now(),
             "end_time": datetime.now() + timedelta(hours=1),
             "priority": "high",
-            "labels": ["bug", "critical"]
+            "labels": ["bug", "critical"],
         }
 
         created_task = await jira_integration.create_task(task_data)
@@ -232,11 +230,7 @@ class TestJiraIntegration:
     @pytest.mark.asyncio
     async def test_update_task(self, jira_integration):
         """Test updating a task in Jira."""
-        task_data = {
-            "title": "Updated Task",
-            "status": "completed",
-            "priority": "low"
-        }
+        task_data = {"title": "Updated Task", "status": "completed", "priority": "low"}
 
         updated_task = await jira_integration.update_task("TASK-123", task_data)
 
@@ -277,13 +271,11 @@ class TestProjectManagementService:
         assert ProjectToolType.JIRA in service.integration_classes
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
     async def test_register_integration_success(self, mock_test_connection, service):
         """Test successful integration registration."""
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
 
         result = await service.register_integration(config)
@@ -294,13 +286,11 @@ class TestProjectManagementService:
         assert isinstance(service.integrations["test_user"][ProjectToolType.JIRA], JiraIntegration)
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=False)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=False)
     async def test_register_integration_connection_failure(self, mock_test_connection, service):
         """Test integration registration with connection failure."""
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
 
         result = await service.register_integration(config)
@@ -316,9 +306,7 @@ class TestProjectManagementService:
         service.integration_classes = {}
 
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
 
         result = await service.register_integration(config)
@@ -329,14 +317,12 @@ class TestProjectManagementService:
         service.integration_classes = original_classes
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
     async def test_get_user_integrations(self, mock_test_connection, service):
         """Test getting integrations for a user."""
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 
@@ -351,14 +337,12 @@ class TestProjectManagementService:
         assert empty_integrations == []
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
     async def test_get_integration(self, mock_test_connection, service):
         """Test getting a specific integration for a user."""
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 
@@ -373,14 +357,12 @@ class TestProjectManagementService:
         assert none_integration is None
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
     async def test_remove_integration(self, mock_test_connection, service):
         """Test removing an integration for a user."""
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 
@@ -395,24 +377,27 @@ class TestProjectManagementService:
         assert false_result is False
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
-    @patch.object(JiraIntegration, 'fetch_tasks', new_callable=AsyncMock, return_value=[
-        ExternalTask(
-            external_id="TASK-123",
-            title="Test Task",
-            status="in_progress",
-            start_time=datetime.now(),
-            end_time=datetime.now() + timedelta(hours=1),
-            tool_type=ProjectToolType.JIRA
-        )
-    ])
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
+    @patch.object(
+        JiraIntegration,
+        "fetch_tasks",
+        new_callable=AsyncMock,
+        return_value=[
+            ExternalTask(
+                external_id="TASK-123",
+                title="Test Task",
+                status="in_progress",
+                start_time=datetime.now(),
+                end_time=datetime.now() + timedelta(hours=1),
+                tool_type=ProjectToolType.JIRA,
+            )
+        ],
+    )
     async def test_sync_tasks(self, mock_fetch_tasks, mock_test_connection, service):
         """Test synchronizing tasks for a user."""
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 
@@ -433,17 +418,18 @@ class TestProjectManagementService:
         assert empty_results == []
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'get_projects', new_callable=AsyncMock, return_value=[
-        {"id": "10000", "key": "PROJ", "name": "Test Project"}
-    ])
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
+    @patch.object(
+        JiraIntegration,
+        "get_projects",
+        new_callable=AsyncMock,
+        return_value=[{"id": "10000", "key": "PROJ", "name": "Test Project"}],
+    )
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
     async def test_get_available_projects(self, mock_test_connection, mock_get_projects, service):
         """Test getting available projects for a tool type."""
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 
@@ -459,9 +445,11 @@ class TestProjectManagementService:
         assert empty_projects == []
 
     @pytest.mark.asyncio
-    @patch.object(JiraIntegration, 'create_task', new_callable=AsyncMock)
-    @patch.object(JiraIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
-    async def test_create_task_in_external_tool(self, mock_test_connection, mock_create_task, service):
+    @patch.object(JiraIntegration, "create_task", new_callable=AsyncMock)
+    @patch.object(JiraIntegration, "test_connection", new_callable=AsyncMock, return_value=True)
+    async def test_create_task_in_external_tool(
+        self, mock_test_connection, mock_create_task, service
+    ):
         """Test creating a task in an external tool."""
         # Set up mock return value
         task = ExternalTask(
@@ -470,15 +458,13 @@ class TestProjectManagementService:
             status="not_started",
             start_time=datetime.now(),
             end_time=datetime.now() + timedelta(hours=1),
-            tool_type=ProjectToolType.JIRA
+            tool_type=ProjectToolType.JIRA,
         )
         mock_create_task.return_value = task
 
         # Register an integration
         config = ProjectToolConfig(
-            tool_type=ProjectToolType.JIRA,
-            api_url="https://jira.example.com",
-            user_id="test_user"
+            tool_type=ProjectToolType.JIRA, api_url="https://jira.example.com", user_id="test_user"
         )
         await service.register_integration(config)
 

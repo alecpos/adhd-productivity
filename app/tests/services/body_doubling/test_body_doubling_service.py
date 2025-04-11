@@ -77,7 +77,7 @@ def body_doubling_service(
         mock_session_manager,
         mock_matching_engine,
         mock_analytics_service,
-        mock_notification_service
+        mock_notification_service,
     )
     return service
 
@@ -105,7 +105,7 @@ def sample_session_data(sample_user_id):
         start_time=datetime.now(),
         activity_type=ActivityType.WORK,
         max_participants=2,
-        planned_duration=30
+        planned_duration=30,
     )
 
 
@@ -130,7 +130,12 @@ class TestBodyDoublingService:
 
     @pytest.mark.asyncio
     async def test_create_session(
-        self, body_doubling_service, mock_session_manager, mock_notification_service, sample_session_data, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_notification_service,
+        sample_session_data,
+        sample_session,
     ):
         """Test creating a session."""
         # Arrange
@@ -147,7 +152,9 @@ class TestBodyDoublingService:
         )
 
     @pytest.mark.asyncio
-    async def test_get_session(self, body_doubling_service, mock_session_manager, sample_session_id, sample_session):
+    async def test_get_session(
+        self, body_doubling_service, mock_session_manager, sample_session_id, sample_session
+    ):
         """Test getting a session by ID."""
         # Arrange
         mock_session_manager.get_session_by_id.return_value = sample_session
@@ -177,7 +184,13 @@ class TestBodyDoublingService:
 
     @pytest.mark.asyncio
     async def test_join_session(
-        self, body_doubling_service, mock_session_manager, mock_notification_service, sample_session_id, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_notification_service,
+        sample_session_id,
+        sample_user_id,
+        sample_session,
     ):
         """Test joining a session."""
         # Arrange
@@ -189,11 +202,19 @@ class TestBodyDoublingService:
         # Assert
         assert result == sample_session
         mock_session_manager.join_session.assert_called_once_with(sample_session_id, sample_user_id)
-        mock_notification_service.notify_session_join.assert_called_once_with(sample_session_id, sample_user_id)
+        mock_notification_service.notify_session_join.assert_called_once_with(
+            sample_session_id, sample_user_id
+        )
 
     @pytest.mark.asyncio
     async def test_leave_session(
-        self, body_doubling_service, mock_session_manager, mock_notification_service, sample_session_id, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_notification_service,
+        sample_session_id,
+        sample_user_id,
+        sample_session,
     ):
         """Test leaving a session."""
         # Arrange
@@ -204,14 +225,22 @@ class TestBodyDoublingService:
 
         # Assert
         assert result == sample_session
-        mock_session_manager.leave_session.assert_called_once_with(sample_session_id, sample_user_id)
+        mock_session_manager.leave_session.assert_called_once_with(
+            sample_session_id, sample_user_id
+        )
         mock_notification_service.notify_session_leave.assert_called_once_with(
             sample_session_id, sample_user_id, is_host=True
         )
 
     @pytest.mark.asyncio
     async def test_end_session(
-        self, body_doubling_service, mock_session_manager, mock_notification_service, sample_session_id, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_notification_service,
+        sample_session_id,
+        sample_user_id,
+        sample_session,
     ):
         """Test ending a session."""
         # Arrange
@@ -242,7 +271,9 @@ class TestBodyDoublingService:
         mock_matching_engine.find_matching_users.return_value = expected_matches
 
         # Act
-        result = await body_doubling_service.find_matching_users(sample_user_id, user_prefs, criteria)
+        result = await body_doubling_service.find_matching_users(
+            sample_user_id, user_prefs, criteria
+        )
 
         # Assert
         assert result == expected_matches
@@ -252,14 +283,16 @@ class TestBodyDoublingService:
 
     @pytest.mark.asyncio
     async def test_request_match(
-        self, body_doubling_service, mock_matching_engine, mock_notification_service, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_matching_engine,
+        mock_notification_service,
+        sample_user_id,
+        sample_session,
     ):
         """Test requesting a match."""
         # Arrange
-        match_criteria = {
-            "preferences": {"work_style": "focused"},
-            "min_score": 10
-        }
+        match_criteria = {"preferences": {"work_style": "focused"}, "min_score": 10}
         # Use proper UUID objects instead of strings
         user2_id = UUID("22222222-2222-2222-2222-222222222222")
         user3_id = UUID("33333333-3333-3333-3333-333333333333")
@@ -267,8 +300,18 @@ class TestBodyDoublingService:
         session3_id = UUID("55555555-5555-5555-5555-555555555555")
 
         matches = [
-            {"user_id": str(user2_id), "score": 15, "session_id": str(session2_id), "activity_type": "WORK"},
-            {"user_id": str(user3_id), "score": 12, "session_id": str(session3_id), "activity_type": "STUDY"},
+            {
+                "user_id": str(user2_id),
+                "score": 15,
+                "session_id": str(session2_id),
+                "activity_type": "WORK",
+            },
+            {
+                "user_id": str(user3_id),
+                "score": 12,
+                "session_id": str(session3_id),
+                "activity_type": "STUDY",
+            },
         ]
 
         mock_matching_engine.request_match.return_value = sample_session
@@ -281,11 +324,19 @@ class TestBodyDoublingService:
         assert result == sample_session
         mock_matching_engine.request_match.assert_called_once_with(sample_user_id, match_criteria)
         mock_matching_engine.find_matching_users.assert_called_once()
-        assert mock_notification_service.send_match_suggestion.call_count == 2  # Top 3 matches, only 2 available
+        assert (
+            mock_notification_service.send_match_suggestion.call_count == 2
+        )  # Top 3 matches, only 2 available
 
     @pytest.mark.asyncio
     async def test_accept_match(
-        self, body_doubling_service, mock_matching_engine, mock_notification_service, sample_user_id, sample_session_id, sample_session
+        self,
+        body_doubling_service,
+        mock_matching_engine,
+        mock_notification_service,
+        sample_user_id,
+        sample_session_id,
+        sample_session,
     ):
         """Test accepting a match."""
         # Arrange
@@ -307,7 +358,9 @@ class TestBodyDoublingService:
 
             # Assert
             assert result == sample_session
-            mock_matching_engine.accept_match.assert_called_once_with(sample_user_id, sample_session_id)
+            mock_matching_engine.accept_match.assert_called_once_with(
+                sample_user_id, sample_session_id
+            )
             mock_notification_service.notify_match_accepted.assert_called_once_with(
                 sample_session_id, sample_user_id
             )
@@ -342,7 +395,13 @@ class TestBodyDoublingService:
 
     @pytest.mark.asyncio
     async def test_create_group_session(
-        self, body_doubling_service, mock_session_manager, mock_notification_service, mock_db, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_notification_service,
+        mock_db,
+        sample_user_id,
+        sample_session,
     ):
         """Test creating a group session."""
         # Arrange
@@ -355,7 +414,7 @@ class TestBodyDoublingService:
             activity_type=ActivityType.STUDY,
             max_participants=5,
             planned_duration=60,
-            description="Group study session for math"
+            description="Group study session for math",
         )
 
         # Override the session manager's create_session to return our sample_session
@@ -368,18 +427,24 @@ class TestBodyDoublingService:
         # Assert
         assert result == sample_session
         mock_session_manager.create_session.assert_called_once_with(group_data)
-        mock_notification_service.notify_session_join.assert_not_called() # Notification happens inside create_session
+        mock_notification_service.notify_session_join.assert_not_called()  # Notification happens inside create_session
 
     @pytest.mark.asyncio
     async def test_update_preferences(
-        self, body_doubling_service, mock_session_manager, mock_db, sample_user_id, sample_session, sample_session_id
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        mock_db,
+        sample_user_id,
+        sample_session,
+        sample_session_id,
     ):
         """Test updating preferences."""
         # Arrange
         preferences = {
             "work_style": "focused",
             "communication_frequency": "minimal",
-            "preferred_activity_types": ["WORK", "STUDY"]
+            "preferred_activity_types": ["WORK", "STUDY"],
         }
         mock_session_manager.get_session_by_id.return_value = sample_session
 
@@ -388,7 +453,9 @@ class TestBodyDoublingService:
 
         # Assert
         mock_session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
-        mock_session_manager.update_preferences.assert_called_once_with(sample_session_id, preferences)
+        mock_session_manager.update_preferences.assert_called_once_with(
+            sample_session_id, preferences
+        )
 
     @pytest.mark.asyncio
     async def test_update_preferences_no_active_session(
@@ -399,7 +466,7 @@ class TestBodyDoublingService:
         preferences = {
             "work_style": "focused",
             "communication_frequency": "minimal",
-            "preferred_activity_types": ["WORK", "STUDY"]
+            "preferred_activity_types": ["WORK", "STUDY"],
         }
         mock_session_manager.get_session_by_id.return_value = None
 
@@ -413,7 +480,12 @@ class TestBodyDoublingService:
 
     @pytest.mark.asyncio
     async def test_add_session_feedback(
-        self, body_doubling_service, mock_session_manager, sample_session_id, sample_user_id, sample_session
+        self,
+        body_doubling_service,
+        mock_session_manager,
+        sample_session_id,
+        sample_user_id,
+        sample_session,
     ):
         """Test adding feedback to a session."""
         # Arrange
@@ -427,18 +499,18 @@ class TestBodyDoublingService:
                     "timestamp": datetime.now(),
                     "focus_rating": 4,
                     "productivity_rating": 5,
-                    "distraction_level": 2
+                    "distraction_level": 2,
                 },
                 {
                     "timestamp": datetime.now(),
                     "focus_rating": 5,
                     "productivity_rating": 4,
-                    "distraction_level": 1
-                }
+                    "distraction_level": 1,
+                },
             ],
             average_focus_level=4.5,
             average_productivity=4.5,
-            average_distraction_level=1.5
+            average_distraction_level=1.5,
         )
 
         # Act

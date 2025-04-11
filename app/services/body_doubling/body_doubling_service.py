@@ -32,7 +32,9 @@ from app.services.body_doubling.body_doubling_types import (
 from app.utils.error_handler import handle_service_error
 
 
-class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSchema, CreateBodyDoublingSchema]):
+class BodyDoublingService(
+    BaseService[BodyDoublingSessionModel, BodyDoublingSchema, CreateBodyDoublingSchema]
+):
     """Service for managing body doubling sessions."""
 
     def __init__(
@@ -43,7 +45,9 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         notification_service: NotificationService,
     ):
         """Initialize the service with required dependencies."""
-        super().__init__(db=session_manager.db, model=BodyDoublingSessionModel, schema_class=BodyDoublingSchema)
+        super().__init__(
+            db=session_manager.db, model=BodyDoublingSessionModel, schema_class=BodyDoublingSchema
+        )
         self.session_manager = session_manager
         self.matching_engine = matching_engine
         self.analytics_service = analytics_service
@@ -167,13 +171,11 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             # Handle specific error cases with appropriate status codes
             if "not found" in str(e).lower():
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Session not found: {str(e)}"
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Session not found: {str(e)}"
                 )
             elif "already" in str(e).lower():
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Cannot join session: {str(e)}"
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"Cannot join session: {str(e)}"
                 )
             else:
                 # Re-raise unhandled exceptions
@@ -210,13 +212,12 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             # Handle specific error cases with appropriate status codes
             if "not found" in str(e).lower():
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Session not found: {str(e)}"
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Session not found: {str(e)}"
                 )
             elif "not a participant" in str(e).lower():
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Cannot leave session: {str(e)}"
+                    detail=f"Cannot leave session: {str(e)}",
                 )
             else:
                 # Re-raise unhandled exceptions
@@ -253,13 +254,11 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             # Handle specific error cases with appropriate status codes
             if "not found" in str(e).lower():
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Session not found: {str(e)}"
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Session not found: {str(e)}"
                 )
             elif "permission" in str(e).lower() or "not authorized" in str(e).lower():
                 raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Cannot end session: {str(e)}"
+                    status_code=status.HTTP_403_FORBIDDEN, detail=f"Cannot end session: {str(e)}"
                 )
             else:
                 # Re-raise unhandled exceptions
@@ -329,7 +328,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         user_id: UUID,
         user_prefs: Dict[str, Any],
         match_criteria: Dict[str, Any],
-        session: BodyDoublingSessionModel
+        session: BodyDoublingSessionModel,
     ) -> List[Dict[str, Any]]:
         """Find matching users and notify them of the match opportunity.
 
@@ -355,7 +354,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
                 requester_id=user_id,
                 match_score=match["score"],
                 session_id=session.id,
-                activity_type=match.get("activity_type")
+                activity_type=match.get("activity_type"),
             )
 
         return top_matches
@@ -366,7 +365,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         requester_id: UUID,
         match_score: float,
         session_id: UUID,
-        activity_type: Optional[str] = None
+        activity_type: Optional[str] = None,
     ) -> None:
         """Send a match suggestion notification to a potential matching user.
 
@@ -386,9 +385,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             match_user_id, requester_id, match_score, context
         )
 
-    async def accept_match(
-        self, partner_id: UUID, request_id: UUID
-    ) -> BodyDoublingSessionModel:
+    async def accept_match(self, partner_id: UUID, request_id: UUID) -> BodyDoublingSessionModel:
         """Accept a match request and create a paired session.
 
         Args:
@@ -424,9 +421,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         )
 
         # Notify about the partner joining the session
-        await self.notification_service.notify_session_join(
-            session.id, partner_id
-        )
+        await self.notification_service.notify_session_join(session.id, partner_id)
 
     # Analytics Methods (delegated to AnalyticsService)
 
@@ -444,10 +439,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         """
         session = await self.session_manager.get_session_by_id(session_id)
         if not session:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Session not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
         return session
 
     async def get_user_analytics(self, user_id: UUID) -> SessionAnalyticsSchema:
@@ -466,8 +458,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             # Validate that the user exists (could be enhanced with a user check)
             if not user_id:
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Valid user ID is required"
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Valid user ID is required"
                 )
 
             # Get analytics from analytics service
@@ -476,18 +467,21 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         except Exception as e:
             # Log the error for debugging purposes
             import logging
+
             logger = logging.getLogger(__name__)
             logger.error(f"Error getting analytics for user {user_id}: {str(e)}")
 
             # Raise a formatted error
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to generate analytics: {str(e)}"
+                detail=f"Failed to generate analytics: {str(e)}",
             )
 
     # Group Session Methods
 
-    async def create_group_session(self, session_data: CreateBodyDoublingSchema) -> BodyDoublingSessionModel:
+    async def create_group_session(
+        self, session_data: CreateBodyDoublingSchema
+    ) -> BodyDoublingSessionModel:
         """Create a new group session.
 
         Args:
@@ -653,9 +647,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         await self._update_session_in_db(session)
 
         # Send notification to host
-        await self.notification_service.notify_join_request(
-            session_id, session.host_id, user_id
-        )
+        await self.notification_service.notify_join_request(session_id, session.host_id, user_id)
 
         return session
 
@@ -698,9 +690,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
                 detail="User has already requested to join",
             )
 
-    def _initialize_session_metadata(
-        self, session: BodyDoublingSessionModel
-    ) -> Dict[str, Any]:
+    def _initialize_session_metadata(self, session: BodyDoublingSessionModel) -> Dict[str, Any]:
         """Initialize session metadata for group sessions.
 
         Args:
@@ -733,15 +723,18 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             The updated metadata dictionary
         """
         import uuid
+
         request_id = str(uuid.uuid4())
 
         # Create a new join request with required fields
         request_data = join_request.copy()
-        request_data.update({
-            "request_id": request_id,
-            "user_id": str(user_id),
-            "timestamp": str(join_request.get("timestamp")),
-        })
+        request_data.update(
+            {
+                "request_id": request_id,
+                "user_id": str(user_id),
+                "timestamp": str(join_request.get("timestamp")),
+            }
+        )
 
         # Add to join requests
         meta_data["join_requests"].append(request_data)
@@ -777,7 +770,9 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         meta_data = self._initialize_session_metadata(session)
 
         # Find and validate the join request
-        request_index, request_data = self._find_join_request(meta_data["join_requests"], request_id)
+        request_index, request_data = self._find_join_request(
+            meta_data["join_requests"], request_id
+        )
         if request_index is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -851,9 +846,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         await self.notification_service.notify_join_request_response(
             session_id, UUID(user_id), accepted=True
         )
-        await self.notification_service.notify_session_join(
-            session_id, UUID(user_id)
-        )
+        await self.notification_service.notify_session_join(session_id, UUID(user_id))
 
     async def reject_join_request(
         self, session_id: UUID, request_id: str
@@ -877,7 +870,9 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
         meta_data = self._initialize_session_metadata(session)
 
         # Find and validate the join request
-        request_index, request_data = self._find_join_request(meta_data["join_requests"], request_id)
+        request_index, request_data = self._find_join_request(
+            meta_data["join_requests"], request_id
+        )
         if request_index is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -1037,20 +1032,34 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
                 "focus_rating": point.get("focus_rating"),
                 "productivity_rating": point.get("productivity_rating"),
                 "distraction_level": point.get("distraction_level"),
-                "user_id": str(feedback.user_id)
+                "user_id": str(feedback.user_id),
             }
 
             result.append(feedback_point)
 
         # If no points were processed but we have average ratings, create a summary feedback point
-        if not result and (feedback.average_focus_level or feedback.average_productivity or feedback.average_distraction_level):
+        if not result and (
+            feedback.average_focus_level
+            or feedback.average_productivity
+            or feedback.average_distraction_level
+        ):
             summary_point = {
                 "timestamp": datetime.now().isoformat(),
-                "focus_rating": feedback.average_focus_level if feedback.average_focus_level is not None else 0,
-                "productivity_rating": feedback.average_productivity if feedback.average_productivity is not None else 0,
-                "distraction_level": feedback.average_distraction_level if feedback.average_distraction_level is not None else 0,
+                "focus_rating": (
+                    feedback.average_focus_level if feedback.average_focus_level is not None else 0
+                ),
+                "productivity_rating": (
+                    feedback.average_productivity
+                    if feedback.average_productivity is not None
+                    else 0
+                ),
+                "distraction_level": (
+                    feedback.average_distraction_level
+                    if feedback.average_distraction_level is not None
+                    else 0
+                ),
                 "user_id": str(feedback.user_id),
-                "is_summary": True
+                "is_summary": True,
             }
             result.append(summary_point)
 
@@ -1172,7 +1181,8 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             The average focus level as a float (0 if no valid focus ratings)
         """
         focus_levels = [
-            fb.get("focus_rating", 0) for fb in feedback_points
+            fb.get("focus_rating", 0)
+            for fb in feedback_points
             if isinstance(fb.get("focus_rating"), (int, float))
         ]
 
@@ -1234,8 +1244,7 @@ class BodyDoublingService(BaseService[BodyDoublingSessionModel, BodyDoublingSche
             session = await self.session_manager.get_session_by_id(session_id)
             if not session:
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Session not found"
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
                 )
 
             # Update preferences through session manager

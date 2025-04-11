@@ -14,7 +14,9 @@ from typing import Dict, List, Optional, Any, Union
 from uuid import UUID, uuid4
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -40,7 +42,7 @@ class TimeBufferCalculator:
         context_score: float = 1.0,
         task_transition_history: Optional[List[Dict[str, Any]]] = None,
         consider_day_of_week: bool = True,
-        consider_weekly_patterns: bool = True
+        consider_weekly_patterns: bool = True,
     ) -> Dict[str, Any]:
         """
         Calculate buffer time between tasks using enhanced weekly pattern analysis.
@@ -63,9 +65,7 @@ class TimeBufferCalculator:
         if task_transition_history is None:
             self.logger.info("No transition history provided, using mock data")
             task_transition_history = self._generate_mock_transition_data(
-                user_id=user_id,
-                from_task_id=from_task_id,
-                to_task_id=to_task_id
+                user_id=user_id, from_task_id=from_task_id, to_task_id=to_task_id
             )
 
         # Basic calculation (simplified)
@@ -75,27 +75,22 @@ class TimeBufferCalculator:
             "buffer_minutes": base_buffer,
             "explanation": f"Base buffer time between tasks",
             "confidence": 0.7,
-            "patterns": {}
+            "patterns": {},
         }
 
         # Apply weekly pattern analysis if requested
         if consider_weekly_patterns and task_transition_history:
             weekly_patterns = await self.weekly_resampling(
-                transitions=task_transition_history,
-                lookback_days=90
+                transitions=task_transition_history, lookback_days=90
             )
 
             # Adjust buffer based on weekly patterns
             buffer_adjustment = self._apply_weekly_pattern_adjustment(
-                weekly_patterns=weekly_patterns,
-                consider_day_of_week=consider_day_of_week
+                weekly_patterns=weekly_patterns, consider_day_of_week=consider_day_of_week
             )
 
             # Apply adjustment (multiplicative factor)
-            adjusted_buffer = max(
-                self.min_buffer_minutes,
-                int(base_buffer * buffer_adjustment)
-            )
+            adjusted_buffer = max(self.min_buffer_minutes, int(base_buffer * buffer_adjustment))
 
             result["buffer_minutes"] = adjusted_buffer
             result["weekly_adjustment_factor"] = buffer_adjustment
@@ -106,8 +101,7 @@ class TimeBufferCalculator:
         # Apply context score adjustment (simplified)
         context_adjustment = 2.0 - context_score  # Higher context score = less buffer needed
         final_buffer = max(
-            self.min_buffer_minutes,
-            int(result["buffer_minutes"] * context_adjustment)
+            self.min_buffer_minutes, int(result["buffer_minutes"] * context_adjustment)
         )
 
         result["buffer_minutes"] = final_buffer
@@ -150,9 +144,7 @@ class TimeBufferCalculator:
         return max(self.min_buffer_minutes, base_buffer)
 
     def _apply_weekly_pattern_adjustment(
-        self,
-        weekly_patterns: Dict[str, Any],
-        consider_day_of_week: bool = True
+        self, weekly_patterns: Dict[str, Any], consider_day_of_week: bool = True
     ) -> float:
         """
         Calculate adjustment factor based on weekly patterns.
@@ -221,7 +213,7 @@ class TimeBufferCalculator:
         transitions: List[Dict[str, Any]],
         lookback_days: int = 90,
         rolling_window_days: int = 7,
-        include_weekends: bool = True
+        include_weekends: bool = True,
     ) -> Dict[str, Any]:
         """
         Resample historical task transition data to weekly frequency with rolling averages.
@@ -251,7 +243,7 @@ class TimeBufferCalculator:
                 "weekly_transitions": {},
                 "weekly_stats": {},
                 "rolling_averages": {},
-                "patterns": {}
+                "patterns": {},
             }
 
         if not transitions:
@@ -261,28 +253,28 @@ class TimeBufferCalculator:
                 "weekly_transitions": {},
                 "weekly_stats": {},
                 "rolling_averages": {},
-                "patterns": {}
+                "patterns": {},
             }
 
         # Convert transitions to DataFrame for analysis
         df = pd.DataFrame(transitions)
 
         # Ensure timestamp field is in datetime format
-        if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-        elif 'transition_date' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['transition_date'])
+        if "timestamp" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
+        elif "transition_date" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["transition_date"])
         else:
             # If no timestamp field exists, create one based on current time
             logger.warning("No timestamp field found in transition data, using current date")
             now = datetime.now()
             # Create artificial timestamps spread over the lookback period
             timestamps = [now - timedelta(days=i) for i in range(len(df))]
-            df['timestamp'] = timestamps
+            df["timestamp"] = timestamps
 
         # Filter to lookback period
         start_date = datetime.now() - timedelta(days=lookback_days)
-        df = df[df['timestamp'] >= start_date]
+        df = df[df["timestamp"] >= start_date]
 
         if df.empty:
             logger.warning("No transition data available within lookback period")
@@ -291,106 +283,124 @@ class TimeBufferCalculator:
                 "weekly_transitions": {},
                 "weekly_stats": {},
                 "rolling_averages": {},
-                "patterns": {}
+                "patterns": {},
             }
 
         # Remove weekend data if specified
         if not include_weekends:
             # 0 = Monday, 6 = Sunday in datetime.weekday()
-            df = df[df['timestamp'].dt.weekday < 5]
+            df = df[df["timestamp"].dt.weekday < 5]
 
         # Extract numeric variables for analysis
         numeric_cols = []
         for col in df.columns:
-            if col in ['actual_minutes', 'predicted_minutes', 'buffer_minutes', 'transition_time']:
+            if col in ["actual_minutes", "predicted_minutes", "buffer_minutes", "transition_time"]:
                 numeric_cols.append(col)
             elif df[col].dtype in [np.int64, np.float64]:
                 numeric_cols.append(col)
 
         # Add derived columns for analysis
-        if 'actual_minutes' in df.columns and 'predicted_minutes' in df.columns:
-            df['prediction_error'] = df['actual_minutes'] - df['predicted_minutes']
-            df['prediction_error_pct'] = (df['prediction_error'] / df['predicted_minutes']) * 100
-            numeric_cols.extend(['prediction_error', 'prediction_error_pct'])
+        if "actual_minutes" in df.columns and "predicted_minutes" in df.columns:
+            df["prediction_error"] = df["actual_minutes"] - df["predicted_minutes"]
+            df["prediction_error_pct"] = (df["prediction_error"] / df["predicted_minutes"]) * 100
+            numeric_cols.extend(["prediction_error", "prediction_error_pct"])
 
         # Set timestamp as index for resampling
-        df.set_index('timestamp', inplace=True)
+        df.set_index("timestamp", inplace=True)
 
         # Resample data to weekly frequency
         weekly_aggs = {}
         for col in numeric_cols:
-            weekly_aggs[col] = ['mean', 'min', 'max', 'std', 'count']
+            weekly_aggs[col] = ["mean", "min", "max", "std", "count"]
 
-        weekly_df = df[numeric_cols].resample('W-MON').agg(weekly_aggs)
+        weekly_df = df[numeric_cols].resample("W-MON").agg(weekly_aggs)
 
         # Flatten column MultiIndex
-        weekly_df.columns = ['_'.join(col).strip() for col in weekly_df.columns.values]
+        weekly_df.columns = ["_".join(col).strip() for col in weekly_df.columns.values]
 
         # Add week number and year
-        weekly_df['year'] = weekly_df.index.year
-        weekly_df['week_number'] = weekly_df.index.isocalendar().week
+        weekly_df["year"] = weekly_df.index.year
+        weekly_df["week_number"] = weekly_df.index.isocalendar().week
 
         # Calculate rolling averages on daily data first
-        daily_df = df[numeric_cols].resample('D').mean()
+        daily_df = df[numeric_cols].resample("D").mean()
 
         # Apply rolling window to the daily data
         rolling_cols = {}
         for col in numeric_cols:
             rolling_col = f"{col}_rolling_{rolling_window_days}d"
-            daily_df[rolling_col] = daily_df[col].rolling(window=rolling_window_days, min_periods=1).mean()
+            daily_df[rolling_col] = (
+                daily_df[col].rolling(window=rolling_window_days, min_periods=1).mean()
+            )
             rolling_cols[col] = rolling_col
 
         # Resample rolling averages to weekly to align with weekly_df
-        rolling_weekly = daily_df[[rolling_cols[col] for col in numeric_cols]].resample('W-MON').last()
+        rolling_weekly = (
+            daily_df[[rolling_cols[col] for col in numeric_cols]].resample("W-MON").last()
+        )
 
         # Calculate week-over-week changes
-        for col in [c for c in weekly_df.columns if c.endswith('_mean')]:
-            weekly_df[f'{col}_wow_change'] = weekly_df[col].pct_change() * 100
+        for col in [c for c in weekly_df.columns if c.endswith("_mean")]:
+            weekly_df[f"{col}_wow_change"] = weekly_df[col].pct_change() * 100
 
         # Identify patterns in day of week variations
         day_patterns = {}
         for col in numeric_cols:
             # Create a DataFrame grouped by day of week
-            day_data = df[col].groupby(df.index.weekday).agg(['mean', 'std', 'count'])
-            day_data.index = day_data.index.map(lambda x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x])
+            day_data = df[col].groupby(df.index.weekday).agg(["mean", "std", "count"])
+            day_data.index = day_data.index.map(
+                lambda x: [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                ][x]
+            )
             day_patterns[col] = day_data.to_dict()
 
         # Reset index to make timestamp a column again in weekly_df
         weekly_df.reset_index(inplace=True)
-        weekly_df.rename(columns={'index': 'week_start'}, inplace=True)
+        weekly_df.rename(columns={"index": "week_start"}, inplace=True)
 
         # Prepare result dictionary and safe handling of statistics
         most_efficient_week = None
         least_efficient_week = None
         avg_transitions_per_week = None
 
-        if 'actual_minutes_mean' in weekly_df.columns and not weekly_df.empty:
+        if "actual_minutes_mean" in weekly_df.columns and not weekly_df.empty:
             try:
-                min_idx = weekly_df['actual_minutes_mean'].idxmin()
-                max_idx = weekly_df['actual_minutes_mean'].idxmax()
-                if min_idx is not None and 'week_start' in weekly_df.columns:
-                    most_efficient_week = weekly_df.loc[min_idx, 'week_start'].strftime('%Y-%m-%d')
-                if max_idx is not None and 'week_start' in weekly_df.columns:
-                    least_efficient_week = weekly_df.loc[max_idx, 'week_start'].strftime('%Y-%m-%d')
+                min_idx = weekly_df["actual_minutes_mean"].idxmin()
+                max_idx = weekly_df["actual_minutes_mean"].idxmax()
+                if min_idx is not None and "week_start" in weekly_df.columns:
+                    most_efficient_week = weekly_df.loc[min_idx, "week_start"].strftime("%Y-%m-%d")
+                if max_idx is not None and "week_start" in weekly_df.columns:
+                    least_efficient_week = weekly_df.loc[max_idx, "week_start"].strftime("%Y-%m-%d")
             except:
                 logger.warning("Error calculating most/least efficient weeks")
 
-        if 'actual_minutes_count' in weekly_df.columns:
-            avg_transitions_per_week = weekly_df['actual_minutes_count'].mean()
+        if "actual_minutes_count" in weekly_df.columns:
+            avg_transitions_per_week = weekly_df["actual_minutes_count"].mean()
 
         result = {
-            "weekly_transitions": weekly_df.to_dict(orient='records'),
+            "weekly_transitions": weekly_df.to_dict(orient="records"),
             "weekly_stats": {
                 "total_weeks": len(weekly_df),
                 "average_transitions_per_week": avg_transitions_per_week,
                 "most_efficient_week": most_efficient_week,
                 "least_efficient_week": least_efficient_week,
             },
-            "rolling_averages": rolling_weekly.to_dict(orient='records') if not rolling_weekly.empty else {},
+            "rolling_averages": (
+                rolling_weekly.to_dict(orient="records") if not rolling_weekly.empty else {}
+            ),
             "patterns": {
                 "day_of_week": day_patterns,
-                "weekly_trend": self._analyze_weekly_trend(weekly_df) if not weekly_df.empty else {}
-            }
+                "weekly_trend": (
+                    self._analyze_weekly_trend(weekly_df) if not weekly_df.empty else {}
+                ),
+            },
         }
 
         logger.info("Successfully generated weekly transition patterns")
@@ -409,7 +419,7 @@ class TimeBufferCalculator:
         trend_analysis = {}
 
         # Find columns that represent means of metrics
-        mean_cols = [col for col in weekly_df.columns if col.endswith('_mean')]
+        mean_cols = [col for col in weekly_df.columns if col.endswith("_mean")]
 
         for col in mean_cols:
             if weekly_df[col].count() < 3:  # Need at least 3 data points for meaningful trend
@@ -436,8 +446,10 @@ class TimeBufferCalculator:
                 "last_value": last_value,
                 "change": last_value - first_value,
                 "pct_change": pct_change,
-                "direction": "improving" if pct_change < 0 else "worsening" if pct_change > 0 else "stable",
-                "weeks_analyzed": len(weekly_df)
+                "direction": (
+                    "improving" if pct_change < 0 else "worsening" if pct_change > 0 else "stable"
+                ),
+                "weeks_analyzed": len(weekly_df),
             }
 
         return trend_analysis
@@ -448,7 +460,7 @@ class TimeBufferCalculator:
         from_task_id: Union[UUID, str],
         to_task_id: Union[UUID, str],
         num_days: int = 60,
-        transitions_per_day: int = 3
+        transitions_per_day: int = 3,
     ) -> List[Dict[str, Any]]:
         """
         Generate mock transition data for demonstration purposes.
@@ -478,7 +490,7 @@ class TimeBufferCalculator:
             3: 0.9,  # Thursday
             4: 0.8,  # Friday
             5: 1.2,  # Saturday
-            6: 1.1   # Sunday
+            6: 1.1,  # Sunday
         }
 
         # Create a pattern where transitions get better over time
@@ -502,7 +514,7 @@ class TimeBufferCalculator:
 
             # Calculate improvement based on how many days have passed
             days_passed = (current_date - start_date).days
-            time_improvement = improvement_factor ** days_passed
+            time_improvement = improvement_factor**days_passed
 
             for _ in range(day_transitions):
                 # Calculate transition time with some randomness
@@ -527,7 +539,7 @@ class TimeBufferCalculator:
                     "actual_minutes": actual_minutes,
                     "timestamp": timestamp.isoformat(),
                     "context_score": random.uniform(0.5, 1.5),
-                    "difficulty_level": random.choice(["easy", "moderate", "difficult"])
+                    "difficulty_level": random.choice(["easy", "moderate", "difficult"]),
                 }
 
                 transitions.append(transition)
@@ -554,7 +566,7 @@ async def run_example():
         from_task_id=from_task_id,
         to_task_id=to_task_id,
         user_id=user_id,
-        consider_weekly_patterns=False
+        consider_weekly_patterns=False,
     )
 
     logger.info("Calculating buffer WITH weekly pattern analysis...")
@@ -562,14 +574,16 @@ async def run_example():
         from_task_id=from_task_id,
         to_task_id=to_task_id,
         user_id=user_id,
-        consider_weekly_patterns=True
+        consider_weekly_patterns=True,
     )
 
     # Print the results
     print("\n=== Time Buffer Calculation Results ===")
     print(f"Basic calculation: {basic_result['buffer_minutes']} minutes")
     print(f"Enhanced calculation: {enhanced_result['buffer_minutes']} minutes")
-    print(f"Difference: {enhanced_result['buffer_minutes'] - basic_result['buffer_minutes']} minutes")
+    print(
+        f"Difference: {enhanced_result['buffer_minutes'] - basic_result['buffer_minutes']} minutes"
+    )
 
     # Print weekly pattern insights
     if "patterns" in enhanced_result and "weekly_stats" in enhanced_result["patterns"]:
@@ -592,7 +606,7 @@ async def run_example():
         # Convert results to a serializable format
         output = {
             "basic_result": basic_result,
-            "enhanced_result": {k: v for k, v in enhanced_result.items() if k != "patterns"}
+            "enhanced_result": {k: v for k, v in enhanced_result.items() if k != "patterns"},
         }
         json.dump(output, f, indent=2, default=str)
 

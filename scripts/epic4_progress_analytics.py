@@ -39,13 +39,16 @@ except ImportError:
     # Define a minimal version if the module is not available
     class MLDebtSubcategory(Enum):
         """Minimal version of MLDebtSubcategory."""
+
         REINFORCEMENT_LEARNING = "reinforcement_learning"
         MONITORING = "monitoring"
         CIRCADIAN = "circadian"
         OPTIMIZATION = "optimization"
 
+
 class ProgressMetricType(Enum):
     """Types of progress metrics for ML development workflow."""
+
     STORY_COMPLETION = "story_completion"
     CODE_COVERAGE = "code_coverage"
     MODEL_PERFORMANCE = "model_performance"
@@ -56,8 +59,10 @@ class ProgressMetricType(Enum):
     EXPERIMENT_COUNT = "experiment_count"
     REVIEW_COMPLETION = "review_completion"
 
+
 class MLTaskStage(Enum):
     """Development stages for ML tasks."""
+
     PLANNING = "planning"
     DATA_PREPARATION = "data_preparation"
     MODEL_DEVELOPMENT = "model_development"
@@ -66,9 +71,11 @@ class MLTaskStage(Enum):
     REVIEW = "review"
     DEPLOYMENT = "deployment"
 
+
 @dataclass
 class Epic4Story:
     """Represents a story in Epic 4."""
+
     story_id: str
     title: str
     status: str = "Not Started"
@@ -88,7 +95,7 @@ class Epic4Story:
             MLTaskStage.EVALUATION: 0.2,
             MLTaskStage.DOCUMENTATION: 0.1,
             MLTaskStage.REVIEW: 0.05,
-            MLTaskStage.DEPLOYMENT: 0.05
+            MLTaskStage.DEPLOYMENT: 0.05,
         }
 
         completed_weight = sum(stage_weights[stage] for stage in self.stages_completed)
@@ -107,14 +114,20 @@ class Epic4Story:
             "title": self.title,
             "status": self.status,
             "progress": self.progress,
-            "current_stage": self.current_stage.value if isinstance(self.current_stage, MLTaskStage) else self.current_stage,
-            "stages_completed": [s.value if isinstance(s, MLTaskStage) else s for s in self.stages_completed],
+            "current_stage": (
+                self.current_stage.value
+                if isinstance(self.current_stage, MLTaskStage)
+                else self.current_stage
+            ),
+            "stages_completed": [
+                s.value if isinstance(s, MLTaskStage) else s for s in self.stages_completed
+            ],
             "research_references": self.research_references,
-            "ml_task_types": self.ml_task_types
+            "ml_task_types": self.ml_task_types,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Epic4Story':
+    def from_dict(cls, data: Dict[str, Any]) -> "Epic4Story":
         """Create from dictionary."""
         # Convert string stage names to MLTaskStage enum
         current_stage = data.get("current_stage", MLTaskStage.PLANNING.value)
@@ -132,12 +145,14 @@ class Epic4Story:
             current_stage=current_stage,
             stages_completed=stages_completed,
             research_references=data.get("research_references", []),
-            ml_task_types=data.get("ml_task_types", [])
+            ml_task_types=data.get("ml_task_types", []),
         )
+
 
 @dataclass
 class MLExperiment:
     """Represents an ML experiment."""
+
     experiment_id: str
     story_id: str
     title: str
@@ -159,11 +174,11 @@ class MLExperiment:
             "metrics": self.metrics,
             "parameters": self.parameters,
             "tags": self.tags,
-            "is_baseline": self.is_baseline
+            "is_baseline": self.is_baseline,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'MLExperiment':
+    def from_dict(cls, data: Dict[str, Any]) -> "MLExperiment":
         """Create from dictionary."""
         # Parse datetime string
         created_at = data.get("created_at", datetime.datetime.now().isoformat())
@@ -182,12 +197,14 @@ class MLExperiment:
             metrics=data.get("metrics", {}),
             parameters=data.get("parameters", {}),
             tags=data.get("tags", []),
-            is_baseline=data.get("is_baseline", False)
+            is_baseline=data.get("is_baseline", False),
         )
+
 
 @dataclass
 class ResearchImplementation:
     """Tracks implementation of research insights."""
+
     research_id: str
     title: str
     source: str
@@ -213,11 +230,11 @@ class ResearchImplementation:
             "key_insights": self.key_insights,
             "implemented_insights": self.implemented_insights,
             "related_stories": self.related_stories,
-            "implementation_progress": self.implementation_progress
+            "implementation_progress": self.implementation_progress,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'ResearchImplementation':
+    def from_dict(cls, data: Dict[str, Any]) -> "ResearchImplementation":
         """Create from dictionary."""
         return cls(
             research_id=data.get("research_id", ""),
@@ -226,12 +243,14 @@ class ResearchImplementation:
             key_insights=data.get("key_insights", []),
             implemented_insights=data.get("implemented_insights", []),
             related_stories=data.get("related_stories", []),
-            implementation_progress=data.get("implementation_progress", 0.0)
+            implementation_progress=data.get("implementation_progress", 0.0),
         )
+
 
 @dataclass
 class TechnicalDebtRecord:
     """Tracks technical debt over time."""
+
     date: datetime.date
     total_debt_score: float
     debt_by_category: Dict[str, int] = field(default_factory=dict)
@@ -245,11 +264,11 @@ class TechnicalDebtRecord:
             "total_debt_score": self.total_debt_score,
             "debt_by_category": self.debt_by_category,
             "debt_by_severity": self.debt_by_severity,
-            "debt_by_ml_category": self.debt_by_ml_category
+            "debt_by_ml_category": self.debt_by_ml_category,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'TechnicalDebtRecord':
+    def from_dict(cls, data: Dict[str, Any]) -> "TechnicalDebtRecord":
         """Create from dictionary."""
         # Parse date string
         date_str = data.get("date", datetime.date.today().isoformat())
@@ -266,8 +285,9 @@ class TechnicalDebtRecord:
             total_debt_score=data.get("total_debt_score", 0.0),
             debt_by_category=data.get("debt_by_category", {}),
             debt_by_severity=data.get("debt_by_severity", {}),
-            debt_by_ml_category=data.get("debt_by_ml_category", {})
+            debt_by_ml_category=data.get("debt_by_ml_category", {}),
         )
+
 
 class ProgressAnalyticsEngine:
     """
@@ -308,21 +328,21 @@ class ProgressAnalyticsEngine:
             ("ADHD-20", "Create real-time progress monitoring and adaptive adjustment"),
             ("ADHD-17", "Implement reinforcement learning for adaptive scheduling"),
             ("ADHD-18", "Create opportunity cost calculator for task rescheduling"),
-            ("ADHD-19", "Implement circadian-aware schedule adjustment system")
+            ("ADHD-19", "Implement circadian-aware schedule adjustment system"),
         ]
 
         ml_task_types = {
             "ADHD-20": ["progress_monitoring", "time_series"],
             "ADHD-17": ["reinforcement_learning"],
             "ADHD-18": ["optimization", "scheduling"],
-            "ADHD-19": ["circadian_aware", "time_series"]
+            "ADHD-19": ["circadian_aware", "time_series"],
         }
 
         research_references = {
             "ADHD-20": ["journal_attention_disorders_2025"],
             "ADHD-17": ["rlc_2025", "pmc5701950", "icml_2025", "neurips_2025"],
             "ADHD-18": ["learning_dynamics_control_2025"],
-            "ADHD-19": ["journal_circadian_rhythms_2025", "nature_digital_medicine"]
+            "ADHD-19": ["journal_circadian_rhythms_2025", "nature_digital_medicine"],
         }
 
         for story_id, title in epic4_stories:
@@ -330,7 +350,7 @@ class ProgressAnalyticsEngine:
                 story_id=story_id,
                 title=title,
                 ml_task_types=ml_task_types.get(story_id, []),
-                research_references=research_references.get(story_id, [])
+                research_references=research_references.get(story_id, []),
             )
 
     def save_data(self):
@@ -346,7 +366,9 @@ class ProgressAnalyticsEngine:
             json.dump(experiments_data, f, indent=2)
 
         # Save research implementations
-        research_data = {res_id: res.to_dict() for res_id, res in self.research_implementations.items()}
+        research_data = {
+            res_id: res.to_dict() for res_id, res in self.research_implementations.items()
+        }
         with open(os.path.join(self.data_dir, "epic4_research.json"), "w") as f:
             json.dump(research_data, f, indent=2)
 
@@ -390,7 +412,9 @@ class ProgressAnalyticsEngine:
                 with open(research_path, "r") as f:
                     research_data = json.load(f)
                     for res_id, res_dict in research_data.items():
-                        self.research_implementations[res_id] = ResearchImplementation.from_dict(res_dict)
+                        self.research_implementations[res_id] = ResearchImplementation.from_dict(
+                            res_dict
+                        )
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Error loading research data: {e}")
 
@@ -400,7 +424,9 @@ class ProgressAnalyticsEngine:
             try:
                 with open(debt_path, "r") as f:
                     debt_data = json.load(f)
-                    self.technical_debt_history = [TechnicalDebtRecord.from_dict(record) for record in debt_data]
+                    self.technical_debt_history = [
+                        TechnicalDebtRecord.from_dict(record) for record in debt_data
+                    ]
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Error loading technical debt data: {e}")
 
@@ -531,8 +557,9 @@ class ProgressAnalyticsEngine:
 
         return research.research_id
 
-    def add_technical_debt_record(self, record: TechnicalDebtRecord = None,
-                                detect_current: bool = True) -> TechnicalDebtRecord:
+    def add_technical_debt_record(
+        self, record: TechnicalDebtRecord = None, detect_current: bool = True
+    ) -> TechnicalDebtRecord:
         """
         Add a technical debt record to the history.
 
@@ -545,10 +572,7 @@ class ProgressAnalyticsEngine:
         """
         if record is None:
             # Create new record for today
-            record = TechnicalDebtRecord(
-                date=datetime.date.today(),
-                total_debt_score=0.0
-            )
+            record = TechnicalDebtRecord(date=datetime.date.today(), total_debt_score=0.0)
 
         # If requested, run technical debt detection
         if detect_current:
@@ -609,11 +633,12 @@ class ProgressAnalyticsEngine:
 
             # Run the script with --all --json --epic "Epic 4" flags
             import subprocess
+
             result = subprocess.run(
                 ["python", script_path, "--all", "--json", "--epic", "Epic 4"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
 
             # Parse JSON output
@@ -648,8 +673,10 @@ class ProgressAnalyticsEngine:
         Returns:
             Dictionary mapping research IDs to implementation progress
         """
-        return {r_id: research.calculate_progress()
-                for r_id, research in self.research_implementations.items()}
+        return {
+            r_id: research.calculate_progress()
+            for r_id, research in self.research_implementations.items()
+        }
 
     def get_overall_epic_progress(self) -> float:
         """
@@ -688,12 +715,14 @@ class ProgressAnalyticsEngine:
 
         for experiment in sorted(filtered_experiments, key=lambda e: e.created_at):
             for metric_name, metric_value in experiment.metrics.items():
-                all_metrics[metric_name].append({
-                    "date": experiment.created_at,
-                    "value": metric_value,
-                    "experiment_id": experiment.experiment_id,
-                    "experiment_title": experiment.title
-                })
+                all_metrics[metric_name].append(
+                    {
+                        "date": experiment.created_at,
+                        "value": metric_value,
+                        "experiment_id": experiment.experiment_id,
+                        "experiment_title": experiment.title,
+                    }
+                )
 
         return dict(all_metrics)
 
@@ -712,8 +741,7 @@ class ProgressAnalyticsEngine:
 
         # Extract total score trend
         total_score_trend = [
-            {"date": record.date, "value": record.total_debt_score}
-            for record in sorted_records
+            {"date": record.date, "value": record.total_debt_score} for record in sorted_records
         ]
 
         # Collect all ML categories
@@ -729,10 +757,7 @@ class ProgressAnalyticsEngine:
                 for record in sorted_records
             ]
 
-        return {
-            "total_score": total_score_trend,
-            "ml_categories": ml_category_trends
-        }
+        return {"total_score": total_score_trend, "ml_categories": ml_category_trends}
 
     def get_baseline_improvements(self, story_id: str = None) -> Dict[str, Dict[str, float]]:
         """
@@ -773,6 +798,7 @@ class ProgressAnalyticsEngine:
                 improvements[s_id] = story_improvements
 
         return improvements
+
 
 class ProgressDashboardGenerator:
     """
@@ -816,25 +842,30 @@ class ProgressDashboardGenerator:
 
         # Get story titles for better labels
         story_titles = {s_id: self.analytics.stories[s_id].title for s_id in story_ids}
-        labels = [f"{s_id}: {story_titles[s_id][:30]}..." if len(story_titles[s_id]) > 30 else f"{s_id}: {story_titles[s_id]}"
-                 for s_id in story_ids]
+        labels = [
+            (
+                f"{s_id}: {story_titles[s_id][:30]}..."
+                if len(story_titles[s_id]) > 30
+                else f"{s_id}: {story_titles[s_id]}"
+            )
+            for s_id in story_ids
+        ]
 
         # Create horizontal bar chart
-        bars = ax.barh(labels, progresses, color='skyblue')
+        bars = ax.barh(labels, progresses, color="skyblue")
 
         # Add percentage labels
         for bar in bars:
             width = bar.get_width()
             label_x_pos = width + 1
-            ax.text(label_x_pos, bar.get_y() + bar.get_height()/2, f"{width:.1f}%",
-                   va='center')
+            ax.text(label_x_pos, bar.get_y() + bar.get_height() / 2, f"{width:.1f}%", va="center")
 
         # Add gridlines
-        ax.grid(axis='x', linestyle='--', alpha=0.7)
+        ax.grid(axis="x", linestyle="--", alpha=0.7)
 
         # Set labels and title
-        ax.set_xlabel('Completion Percentage')
-        ax.set_title('Epic 4 Story Progress')
+        ax.set_xlabel("Completion Percentage")
+        ax.set_title("Epic 4 Story Progress")
 
         # Set x-axis limit
         ax.set_xlim(0, 110)  # Leave room for percentage labels
@@ -843,11 +874,11 @@ class ProgressDashboardGenerator:
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def _plot_overall_progress(self) -> str:
         """
@@ -860,17 +891,17 @@ class ProgressDashboardGenerator:
         overall_progress = self.analytics.get_overall_epic_progress()
 
         # Create figure
-        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={'projection': 'polar'})
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={"projection": "polar"})
 
         # Plot progress as a partially filled circle
         theta = np.linspace(0, 2 * np.pi * overall_progress, 100)
         radii = np.ones_like(theta)
 
         # Create background circle (light gray)
-        ax.fill_between(np.linspace(0, 2 * np.pi, 100), 0, 0.8, color='lightgray', alpha=0.5)
+        ax.fill_between(np.linspace(0, 2 * np.pi, 100), 0, 0.8, color="lightgray", alpha=0.5)
 
         # Create progress arc
-        ax.fill_between(theta, 0, 0.8, color='green', alpha=0.6)
+        ax.fill_between(theta, 0, 0.8, color="green", alpha=0.6)
 
         # Remove grid and tick labels
         ax.grid(False)
@@ -879,17 +910,17 @@ class ProgressDashboardGenerator:
 
         # Add percentage text in the center
         percentage = int(overall_progress * 100)
-        ax.text(0, 0, f"{percentage}%", fontsize=36, ha='center', va='center')
+        ax.text(0, 0, f"{percentage}%", fontsize=36, ha="center", va="center")
 
         plt.tight_layout()
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def _plot_research_implementation(self) -> str:
         """
@@ -909,29 +940,38 @@ class ProgressDashboardGenerator:
 
         # Sort by research ID
         research_ids = sorted(research_progress.keys())
-        progresses = [research_progress[r_id] * 100 for r_id in research_ids]  # Convert to percentages
+        progresses = [
+            research_progress[r_id] * 100 for r_id in research_ids
+        ]  # Convert to percentages
 
         # Get research titles for better labels
-        research_titles = {r_id: self.analytics.research_implementations[r_id].title for r_id in research_ids}
-        labels = [f"{research_titles[r_id][:40]}..." if len(research_titles[r_id]) > 40 else research_titles[r_id]
-                 for r_id in research_ids]
+        research_titles = {
+            r_id: self.analytics.research_implementations[r_id].title for r_id in research_ids
+        }
+        labels = [
+            (
+                f"{research_titles[r_id][:40]}..."
+                if len(research_titles[r_id]) > 40
+                else research_titles[r_id]
+            )
+            for r_id in research_ids
+        ]
 
         # Create horizontal bar chart
-        bars = ax.barh(labels, progresses, color='lightgreen')
+        bars = ax.barh(labels, progresses, color="lightgreen")
 
         # Add percentage labels
         for bar in bars:
             width = bar.get_width()
             label_x_pos = width + 1
-            ax.text(label_x_pos, bar.get_y() + bar.get_height()/2, f"{width:.1f}%",
-                   va='center')
+            ax.text(label_x_pos, bar.get_y() + bar.get_height() / 2, f"{width:.1f}%", va="center")
 
         # Add gridlines
-        ax.grid(axis='x', linestyle='--', alpha=0.7)
+        ax.grid(axis="x", linestyle="--", alpha=0.7)
 
         # Set labels and title
-        ax.set_xlabel('Implementation Percentage')
-        ax.set_title('Research Implementation Progress')
+        ax.set_xlabel("Implementation Percentage")
+        ax.set_title("Research Implementation Progress")
 
         # Set x-axis limit
         ax.set_xlim(0, 110)  # Leave room for percentage labels
@@ -940,11 +980,11 @@ class ProgressDashboardGenerator:
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def _plot_tech_debt_trend(self) -> str:
         """
@@ -956,40 +996,40 @@ class ProgressDashboardGenerator:
         # Get technical debt trends
         debt_trends = self.analytics.get_technical_debt_trend()
 
-        if not debt_trends or 'total_score' not in debt_trends:
+        if not debt_trends or "total_score" not in debt_trends:
             return ""
 
         # Create figure
         fig, ax = plt.subplots(figsize=(12, 6))
 
         # Plot total score trend
-        total_score_trend = debt_trends['total_score']
-        dates = [item['date'] for item in total_score_trend]
-        values = [item['value'] for item in total_score_trend]
+        total_score_trend = debt_trends["total_score"]
+        dates = [item["date"] for item in total_score_trend]
+        values = [item["value"] for item in total_score_trend]
 
-        ax.plot(dates, values, marker='o', linestyle='-', linewidth=2, label='Total Debt Score')
+        ax.plot(dates, values, marker="o", linestyle="-", linewidth=2, label="Total Debt Score")
 
         # Format x-axis as dates
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
         plt.xticks(rotation=45)
 
         # Add gridlines
-        ax.grid(linestyle='--', alpha=0.7)
+        ax.grid(linestyle="--", alpha=0.7)
 
         # Set labels and title
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Technical Debt Score')
-        ax.set_title('Technical Debt Trend')
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Technical Debt Score")
+        ax.set_title("Technical Debt Trend")
 
         plt.tight_layout()
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def _plot_ml_debt_categories(self) -> str:
         """
@@ -1001,15 +1041,19 @@ class ProgressDashboardGenerator:
         # Get technical debt trends
         debt_trends = self.analytics.get_technical_debt_trend()
 
-        if not debt_trends or 'ml_categories' not in debt_trends or not debt_trends['ml_categories']:
+        if (
+            not debt_trends
+            or "ml_categories" not in debt_trends
+            or not debt_trends["ml_categories"]
+        ):
             return ""
 
         # Create figure
         fig, ax = plt.subplots(figsize=(12, 6))
 
         # Get all categories and dates
-        ml_categories = debt_trends['ml_categories']
-        all_dates = sorted(set(item['date'] for items in ml_categories.values() for item in items))
+        ml_categories = debt_trends["ml_categories"]
+        all_dates = sorted(set(item["date"] for items in ml_categories.values() for item in items))
 
         # Create a DataFrame for plotting
         df = pd.DataFrame(index=all_dates, columns=ml_categories.keys())
@@ -1017,7 +1061,7 @@ class ProgressDashboardGenerator:
         # Fill DataFrame with data
         for category, items in ml_categories.items():
             for item in items:
-                df.at[item['date'], category] = item['value']
+                df.at[item["date"], category] = item["value"]
 
         # Fill NaN values with 0
         df = df.fillna(0)
@@ -1029,31 +1073,31 @@ class ProgressDashboardGenerator:
         df.plot.area(ax=ax, stacked=True, alpha=0.7)
 
         # Format x-axis as dates
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
         plt.xticks(rotation=45)
 
         # Add gridlines
-        ax.grid(linestyle='--', alpha=0.7)
+        ax.grid(linestyle="--", alpha=0.7)
 
         # Set labels and title
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Issue Count')
-        ax.set_title('ML Technical Debt Categories')
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Issue Count")
+        ax.set_title("ML Technical Debt Categories")
 
         # Add legend with cleaner labels
         handles, labels = ax.get_legend_handles_labels()
-        clean_labels = [label.replace('_', ' ').title() for label in labels]
-        ax.legend(handles, clean_labels, loc='upper left')
+        clean_labels = [label.replace("_", " ").title() for label in labels]
+        ax.legend(handles, clean_labels, loc="upper left")
 
         plt.tight_layout()
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def _plot_experiment_metrics(self, story_id: str = None) -> Dict[str, str]:
         """
@@ -1076,50 +1120,53 @@ class ProgressDashboardGenerator:
 
         for metric_name, metric_values in metrics_data.items():
             # Sort by date
-            sorted_values = sorted(metric_values, key=lambda x: x['date'])
+            sorted_values = sorted(metric_values, key=lambda x: x["date"])
 
             # Extract dates and values
-            dates = [item['date'] for item in sorted_values]
-            values = [item['value'] for item in sorted_values]
-            titles = [item['experiment_title'] for item in sorted_values]
+            dates = [item["date"] for item in sorted_values]
+            values = [item["value"] for item in sorted_values]
+            titles = [item["experiment_title"] for item in sorted_values]
 
             # Create figure
             fig, ax = plt.subplots(figsize=(12, 6))
 
             # Plot values
-            ax.plot(dates, values, marker='o', linestyle='-', linewidth=2)
+            ax.plot(dates, values, marker="o", linestyle="-", linewidth=2)
 
             # Add data point labels
             for i, (date, value, title) in enumerate(zip(dates, values, titles)):
-                ax.annotate(f"{title}",
-                          xy=(date, value),
-                          xytext=(0, 10),
-                          textcoords="offset points",
-                          ha='center', va='bottom',
-                          rotation=45,
-                          fontsize=8)
+                ax.annotate(
+                    f"{title}",
+                    xy=(date, value),
+                    xytext=(0, 10),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    rotation=45,
+                    fontsize=8,
+                )
 
             # Format x-axis as dates
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d %H:%M"))
             plt.xticks(rotation=45)
 
             # Add gridlines
-            ax.grid(linestyle='--', alpha=0.7)
+            ax.grid(linestyle="--", alpha=0.7)
 
             # Set labels and title
-            ax.set_xlabel('Date')
+            ax.set_xlabel("Date")
             ax.set_ylabel(metric_name)
-            ax.set_title(f'Experiment Metric: {metric_name}')
+            ax.set_title(f"Experiment Metric: {metric_name}")
 
             plt.tight_layout()
 
             # Convert to base64
             buf = io.BytesIO()
-            plt.savefig(buf, format='png', dpi=100)
+            plt.savefig(buf, format="png", dpi=100)
             buf.seek(0)
             plt.close(fig)
 
-            metric_plots[metric_name] = base64.b64encode(buf.read()).decode('utf-8')
+            metric_plots[metric_name] = base64.b64encode(buf.read()).decode("utf-8")
 
         return metric_plots
 
@@ -1159,28 +1206,28 @@ class ProgressDashboardGenerator:
         fig, ax = plt.subplots(figsize=(12, 8))
 
         # Plot as grouped bar chart
-        df.plot(kind='bar', ax=ax)
+        df.plot(kind="bar", ax=ax)
 
         # Add gridlines
-        ax.grid(axis='y', linestyle='--', alpha=0.7)
+        ax.grid(axis="y", linestyle="--", alpha=0.7)
 
         # Set labels and title
-        ax.set_xlabel('Story ID')
-        ax.set_ylabel('Improvement')
-        ax.set_title('Improvements Over Baseline')
+        ax.set_xlabel("Story ID")
+        ax.set_ylabel("Improvement")
+        ax.set_title("Improvements Over Baseline")
 
         # Add legend
-        ax.legend(title='Metrics')
+        ax.legend(title="Metrics")
 
         plt.tight_layout()
 
         # Convert to base64
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100)
+        plt.savefig(buf, format="png", dpi=100)
         buf.seek(0)
         plt.close(fig)
 
-        return base64.b64encode(buf.read()).decode('utf-8')
+        return base64.b64encode(buf.read()).decode("utf-8")
 
     def generate_dashboard(self) -> str:
         """
@@ -1199,15 +1246,14 @@ class ProgressDashboardGenerator:
         experiment_plots = self._plot_experiment_metrics()
 
         # Generate Markdown
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         overall_progress = self.analytics.get_overall_epic_progress() * 100  # Convert to percentage
 
         md = [
             f"# Epic 4: Dynamic Schedule Rebalancing - Progress Dashboard\n\n",
             f"**Generated:** {timestamp}\n\n",
             f"**Overall Progress:** {overall_progress:.1f}%\n\n",
-
-            "## Progress Overview\n\n"
+            "## Progress Overview\n\n",
         ]
 
         if overall_progress_plot:
@@ -1223,8 +1269,14 @@ class ProgressDashboardGenerator:
         md.append("|----------|-------|--------|---------------|----------|\n")
 
         for story_id, story in sorted(self.analytics.stories.items()):
-            current_stage = story.current_stage.value if isinstance(story.current_stage, MLTaskStage) else story.current_stage
-            md.append(f"| {story.story_id} | {story.title} | {story.status} | {current_stage} | {story.progress*100:.1f}% |\n")
+            current_stage = (
+                story.current_stage.value
+                if isinstance(story.current_stage, MLTaskStage)
+                else story.current_stage
+            )
+            md.append(
+                f"| {story.story_id} | {story.title} | {story.status} | {current_stage} | {story.progress*100:.1f}% |\n"
+            )
 
         md.append("\n")
 
@@ -1239,8 +1291,12 @@ class ProgressDashboardGenerator:
             md.append("|----------|--------|-------------------------|----------------|\n")
 
             for research_id, research in sorted(self.analytics.research_implementations.items()):
-                related_stories = ", ".join(research.related_stories) if research.related_stories else "None"
-                md.append(f"| {research.title} | {research.source} | {research.implementation_progress*100:.1f}% | {related_stories} |\n")
+                related_stories = (
+                    ", ".join(research.related_stories) if research.related_stories else "None"
+                )
+                md.append(
+                    f"| {research.title} | {research.source} | {research.implementation_progress*100:.1f}% | {related_stories} |\n"
+                )
 
             md.append("\n")
 
@@ -1267,8 +1323,14 @@ class ProgressDashboardGenerator:
                     md.append("| Category | Issue Count |\n")
                     md.append("|----------|------------|\n")
 
-                    for category, count in sorted(latest_debt.debt_by_ml_category.items(), key=lambda x: x[1], reverse=True):
-                        clean_category = category.replace('_', ' ').title() if isinstance(category, str) else str(category)
+                    for category, count in sorted(
+                        latest_debt.debt_by_ml_category.items(), key=lambda x: x[1], reverse=True
+                    ):
+                        clean_category = (
+                            category.replace("_", " ").title()
+                            if isinstance(category, str)
+                            else str(category)
+                        )
                         md.append(f"| {clean_category} | {count} |\n")
 
                     md.append("\n")
@@ -1329,7 +1391,7 @@ class ProgressDashboardGenerator:
         if markdown_content is None:
             markdown_content = self.generate_dashboard()
 
-        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = os.path.join(self.output_dir, f"epic4_progress_dashboard_{timestamp}.md")
 
         with open(output_path, "w") as f:
@@ -1338,122 +1400,89 @@ class ProgressDashboardGenerator:
         print(f"Dashboard saved to {output_path}")
         return output_path
 
+
 def main():
     """Main function to run the progress analytics system."""
-    parser = argparse.ArgumentParser(
-        description="Epic 4 Progress Analytics System"
-    )
+    parser = argparse.ArgumentParser(description="Epic 4 Progress Analytics System")
 
     # Add subparsers for different commands
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Dashboard generation command
     dashboard_parser = subparsers.add_parser("dashboard", help="Generate a progress dashboard")
-    dashboard_parser.add_argument(
-        "--output-dir",
-        help="Output directory for the dashboard"
-    )
+    dashboard_parser.add_argument("--output-dir", help="Output directory for the dashboard")
 
     # Update story command
     update_story_parser = subparsers.add_parser("update-story", help="Update a story's progress")
+    update_story_parser.add_argument("story_id", help="ID of the story to update")
     update_story_parser.add_argument(
-        "story_id",
-        help="ID of the story to update"
+        "--status", choices=["Not Started", "In Progress", "Done"], help="New status for the story"
     )
     update_story_parser.add_argument(
-        "--status",
-        choices=["Not Started", "In Progress", "Done"],
-        help="New status for the story"
+        "--stage", choices=[stage.value for stage in MLTaskStage], help="Current stage of the story"
     )
     update_story_parser.add_argument(
-        "--stage",
-        choices=[stage.value for stage in MLTaskStage],
-        help="Current stage of the story"
-    )
-    update_story_parser.add_argument(
-        "--complete-stage",
-        action="store_true",
-        help="Mark the current stage as completed"
+        "--complete-stage", action="store_true", help="Mark the current stage as completed"
     )
 
     # Add experiment command
     add_experiment_parser = subparsers.add_parser("add-experiment", help="Add an experiment")
+    add_experiment_parser.add_argument("story_id", help="ID of the story for the experiment")
+    add_experiment_parser.add_argument("title", help="Title of the experiment")
     add_experiment_parser.add_argument(
-        "story_id",
-        help="ID of the story for the experiment"
-    )
-    add_experiment_parser.add_argument(
-        "title",
-        help="Title of the experiment"
-    )
-    add_experiment_parser.add_argument(
-        "--ml-task-type",
-        help="ML task type for the experiment",
-        default="reinforcement_learning"
+        "--ml-task-type", help="ML task type for the experiment", default="reinforcement_learning"
     )
     add_experiment_parser.add_argument(
         "--metrics",
         help="Comma-separated list of metric=value pairs (e.g., accuracy=0.85,loss=0.2)",
-        required=True
+        required=True,
     )
     add_experiment_parser.add_argument(
         "--parameters",
-        help="Comma-separated list of param=value pairs (e.g., learning_rate=0.01,batch_size=32)"
+        help="Comma-separated list of param=value pairs (e.g., learning_rate=0.01,batch_size=32)",
     )
+    add_experiment_parser.add_argument("--tags", help="Comma-separated list of tags")
     add_experiment_parser.add_argument(
-        "--tags",
-        help="Comma-separated list of tags"
-    )
-    add_experiment_parser.add_argument(
-        "--baseline",
-        action="store_true",
-        help="Mark this experiment as a baseline"
+        "--baseline", action="store_true", help="Mark this experiment as a baseline"
     )
 
     # Add research implementation command
-    add_research_parser = subparsers.add_parser("add-research", help="Add a research implementation")
+    add_research_parser = subparsers.add_parser(
+        "add-research", help="Add a research implementation"
+    )
+    add_research_parser.add_argument("title", help="Title of the research")
+    add_research_parser.add_argument("source", help="Source of the research")
     add_research_parser.add_argument(
-        "title",
-        help="Title of the research"
+        "--insights", help="Comma-separated list of key insights", required=True
     )
     add_research_parser.add_argument(
-        "source",
-        help="Source of the research"
+        "--implemented-insights", help="Comma-separated list of implemented insights"
     )
     add_research_parser.add_argument(
-        "--insights",
-        help="Comma-separated list of key insights",
-        required=True
-    )
-    add_research_parser.add_argument(
-        "--implemented-insights",
-        help="Comma-separated list of implemented insights"
-    )
-    add_research_parser.add_argument(
-        "--related-stories",
-        help="Comma-separated list of related story IDs"
+        "--related-stories", help="Comma-separated list of related story IDs"
     )
 
     # Update tech debt command
-    tech_debt_parser = subparsers.add_parser("update-tech-debt", help="Update technical debt record")
+    tech_debt_parser = subparsers.add_parser(
+        "update-tech-debt", help="Update technical debt record"
+    )
     tech_debt_parser.add_argument(
-        "--detect",
-        action="store_true",
-        help="Run technical debt detection"
+        "--detect", action="store_true", help="Run technical debt detection"
     )
 
     # List stories command
-    list_stories_parser = subparsers.add_parser("list-stories", help="List all stories and their progress")
+    list_stories_parser = subparsers.add_parser(
+        "list-stories", help="List all stories and their progress"
+    )
 
     # List experiments command
     list_experiments_parser = subparsers.add_parser("list-experiments", help="List all experiments")
-    list_experiments_parser.add_argument(
-        "--story-id",
-        help="Filter by story ID"
-    )
+    list_experiments_parser.add_argument("--story-id", help="Filter by story ID")
 
     # List research command
-    list_research_parser = subparsers.add_parser("list-research", help="List all research implementations")
+    list_research_parser = subparsers.add_parser(
+        "list-research", help="List all research implementations"
+    )
 
     args = parser.parse_args()
 
@@ -1522,7 +1551,7 @@ def main():
             metrics=metrics,
             parameters=parameters,
             tags=tags,
-            is_baseline=args.baseline
+            is_baseline=args.baseline,
         )
 
         # Add experiment
@@ -1539,7 +1568,9 @@ def main():
         # Parse implemented insights
         implemented_insights = []
         if args.implemented_insights:
-            implemented_insights = [insight.strip() for insight in args.implemented_insights.split(",")]
+            implemented_insights = [
+                insight.strip() for insight in args.implemented_insights.split(",")
+            ]
 
         # Parse related stories
         related_stories = []
@@ -1553,7 +1584,7 @@ def main():
             source=args.source,
             key_insights=insights,
             implemented_insights=implemented_insights,
-            related_stories=related_stories
+            related_stories=related_stories,
         )
 
         # Add research implementation
@@ -1570,8 +1601,14 @@ def main():
 
         if record.debt_by_ml_category:
             print("ML-specific debt categories:")
-            for category, count in sorted(record.debt_by_ml_category.items(), key=lambda x: x[1], reverse=True):
-                category_name = category.replace("_", " ").title() if isinstance(category, str) else str(category)
+            for category, count in sorted(
+                record.debt_by_ml_category.items(), key=lambda x: x[1], reverse=True
+            ):
+                category_name = (
+                    category.replace("_", " ").title()
+                    if isinstance(category, str)
+                    else str(category)
+                )
                 print(f"  {category_name}: {count}")
 
     elif args.command == "list-stories":
@@ -1583,13 +1620,17 @@ def main():
 
         for story_id, story in sorted(analytics.stories.items()):
             progress = story.calculate_progress() * 100
-            print(f"{story.story_id:<10} {story.title[:50]:<50} {story.status:<12} {progress:<10.1f}%")
+            print(
+                f"{story.story_id:<10} {story.title[:50]:<50} {story.status:<12} {progress:<10.1f}%"
+            )
 
     elif args.command == "list-experiments":
         # List all experiments
         filtered_experiments = list(analytics.experiments.values())
         if args.story_id:
-            filtered_experiments = [exp for exp in filtered_experiments if exp.story_id == args.story_id]
+            filtered_experiments = [
+                exp for exp in filtered_experiments if exp.story_id == args.story_id
+            ]
 
         if not filtered_experiments:
             print("No experiments found.")
@@ -1602,7 +1643,9 @@ def main():
 
         for exp in sorted(filtered_experiments, key=lambda e: e.created_at):
             created_str = exp.created_at.strftime("%Y-%m-%d")
-            print(f"{exp.experiment_id[:15]:<15} {exp.story_id:<10} {exp.title[:35]:<35} {exp.ml_task_type[:20]:<20} {created_str:<15}")
+            print(
+                f"{exp.experiment_id[:15]:<15} {exp.story_id:<10} {exp.title[:35]:<35} {exp.ml_task_type[:20]:<20} {created_str:<15}"
+            )
 
         # Print metrics
         print("\nMetrics:")
@@ -1624,7 +1667,9 @@ def main():
 
         for research_id, research in sorted(analytics.research_implementations.items()):
             progress = research.calculate_progress() * 100
-            print(f"{research_id[:15]:<15} {research.title[:35]:<35} {research.source[:30]:<30} {progress:<10.1f}%")
+            print(
+                f"{research_id[:15]:<15} {research.title[:35]:<35} {research.source[:30]:<30} {progress:<10.1f}%"
+            )
 
         # Print insights
         for research_id, research in sorted(analytics.research_implementations.items()):
@@ -1637,6 +1682,7 @@ def main():
     else:
         # No command provided, show help
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()

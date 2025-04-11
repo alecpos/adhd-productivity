@@ -10,7 +10,11 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from app.core.integrations.external_task import ExternalTask, ExternalTaskStatus, ExternalTaskPriority
+from app.core.integrations.external_task import (
+    ExternalTask,
+    ExternalTaskStatus,
+    ExternalTaskPriority,
+)
 
 
 class StatusMapper:
@@ -26,7 +30,7 @@ class StatusMapper:
         "Done": ExternalTaskStatus.COMPLETED,
         "Closed": ExternalTaskStatus.COMPLETED,
         "Resolved": ExternalTaskStatus.COMPLETED,
-        "Blocked": ExternalTaskStatus.BLOCKED
+        "Blocked": ExternalTaskStatus.BLOCKED,
     }
 
     # Reverse mapping for status (ExternalTaskStatus to Jira status)
@@ -34,7 +38,7 @@ class StatusMapper:
         ExternalTaskStatus.NOT_STARTED: "To Do",
         ExternalTaskStatus.IN_PROGRESS: "In Progress",
         ExternalTaskStatus.COMPLETED: "Done",
-        ExternalTaskStatus.BLOCKED: "Blocked"
+        ExternalTaskStatus.BLOCKED: "Blocked",
     }
 
     @classmethod
@@ -76,7 +80,7 @@ class PriorityMapper:
         "High": ExternalTaskPriority.HIGH,
         "Medium": ExternalTaskPriority.MEDIUM,
         "Low": ExternalTaskPriority.LOW,
-        "Lowest": ExternalTaskPriority.TRIVIAL
+        "Lowest": ExternalTaskPriority.TRIVIAL,
     }
 
     # Reverse mapping for priority (ExternalTaskPriority to Jira priority)
@@ -85,7 +89,7 @@ class PriorityMapper:
         ExternalTaskPriority.HIGH: "High",
         ExternalTaskPriority.MEDIUM: "Medium",
         ExternalTaskPriority.LOW: "Low",
-        ExternalTaskPriority.TRIVIAL: "Lowest"
+        ExternalTaskPriority.TRIVIAL: "Lowest",
     }
 
     @classmethod

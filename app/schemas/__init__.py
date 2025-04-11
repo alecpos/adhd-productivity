@@ -12,7 +12,7 @@ from app.schemas.body_doubling_schema import (
     UpdateBodyDoublingSchema,
     BodyDoublingResponseSchema,
     BodyDoublingListSchema,
-    InteractionSchema
+    InteractionSchema,
 )
 from app.schemas.calendar_event_schema import EventSchema
 from app.schemas.calendar_schema import CalendarSchema
@@ -71,5 +71,5 @@ __all__ = [
     "InteractionSchema",
     "Token",
     "TokenData",
-    "TokenResponse"
+    "TokenResponse",
 ]

@@ -13,7 +13,7 @@ from app.ml.fairness.shap_explainer import (
     ProductivitySHAPExplainer,
     DurationSHAPExplainer,
     RecommendationExplanation,
-    get_explainer
+    get_explainer,
 )
 
 
@@ -43,10 +43,7 @@ class TestSHAPExplainer:
     def test_register_model(self):
         """Test registering a model with the explainer."""
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         assert self.model_name in self.explainer.models
@@ -67,27 +64,26 @@ class TestSHAPExplainer:
 
         # Register model
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         # Mock the visual explanation to avoid visual rendering issues
-        with patch.object(SHAPExplainer, '_create_visual_explanation', return_value='mock_base64_image'):
+        with patch.object(
+            SHAPExplainer, "_create_visual_explanation", return_value="mock_base64_image"
+        ):
             # Test explanation
             explanation = self.explainer.explain_recommendation(
                 self.model_name,
                 self.input_features,
                 self.recommendation_id,
                 self.recommendation_type,
-                self.recommendation_value
+                self.recommendation_value,
             )
 
         assert isinstance(explanation, RecommendationExplanation)
         assert explanation.recommendation_id == self.recommendation_id
         assert explanation.recommendation_type == self.recommendation_type
-        assert explanation.visual_explanation == 'mock_base64_image'
+        assert explanation.visual_explanation == "mock_base64_image"
 
         # Verify the explainer was called with correct parameters
         mock_shap_explainer.assert_called_once()
@@ -99,10 +95,7 @@ class TestSHAPExplainer:
         confidence = 0.85
 
         text = self.explainer._generate_text_explanation(
-            self.recommendation_type,
-            top_factors,
-            confidence,
-            self.recommendation_value
+            self.recommendation_type, top_factors, confidence, self.recommendation_value
         )
 
         assert isinstance(text, str)
@@ -117,7 +110,15 @@ class TestSHAPExplainer:
     @patch("app.ml.fairness.shap_explainer.shap.Explanation")
     @patch("app.ml.fairness.shap_explainer.plt.savefig")
     @patch("app.ml.fairness.shap_explainer.plt.close")
-    def test_create_visual_explanation(self, mock_close, mock_savefig, mock_explanation, mock_b64encode, mock_waterfall, mock_figure):
+    def test_create_visual_explanation(
+        self,
+        mock_close,
+        mock_savefig,
+        mock_explanation,
+        mock_b64encode,
+        mock_waterfall,
+        mock_figure,
+    ):
         """Test creating a visual explanation."""
         # Setup mocks
         mock_b64encode.return_value = b"test_base64_data"
@@ -137,9 +138,7 @@ class TestSHAPExplainer:
 
         with patch("app.ml.fairness.shap_explainer.io.BytesIO", return_value=mock_buf):
             visual = self.explainer._create_visual_explanation(
-                self.feature_names,
-                np.random.rand(1, 5),
-                self.input_features
+                self.feature_names, np.random.rand(1, 5), self.input_features
             )
 
         # Verify mocks were called correctly
@@ -160,7 +159,13 @@ class TestProductivitySHAPExplainer:
         self.explainer = ProductivitySHAPExplainer(self.productivity_model)
 
         # Setup model
-        self.productivity_model.feature_names = ["time_of_day", "day_of_week", "task_type", "energy_level", "location"]
+        self.productivity_model.feature_names = [
+            "time_of_day",
+            "day_of_week",
+            "task_type",
+            "energy_level",
+            "location",
+        ]
 
         # Setup time window
         self.time_window = {
@@ -168,7 +173,7 @@ class TestProductivitySHAPExplainer:
             "end_time": "11:00",
             "productivity_score": 0.85,
             "confidence": 0.9,
-            "day_of_week": "Monday"
+            "day_of_week": "Monday",
         }
 
         # Setup features
@@ -193,9 +198,7 @@ class TestProductivitySHAPExplainer:
 
         # Test explaining a time window
         explanation = self.explainer.explain_optimal_time_window(
-            self.time_window,
-            self.input_features,
-            "window_123"
+            self.time_window, self.input_features, "window_123"
         )
 
         # Verify the base method was called correctly
@@ -212,7 +215,13 @@ class TestDurationSHAPExplainer:
         self.explainer = DurationSHAPExplainer(self.duration_model)
 
         # Setup model
-        self.duration_model.feature_names = ["task_type", "complexity", "user_history", "focus_level", "time_of_day"]
+        self.duration_model.feature_names = [
+            "task_type",
+            "complexity",
+            "user_history",
+            "focus_level",
+            "time_of_day",
+        ]
 
         # Setup task
         self.task = {
@@ -220,7 +229,7 @@ class TestDurationSHAPExplainer:
             "type": "writing",
             "complexity": "medium",
             "estimated_duration": 45,
-            "id": "task_123"
+            "id": "task_123",
         }
 
         # Setup features and other parameters
@@ -251,7 +260,7 @@ class TestDurationSHAPExplainer:
             self.duration_estimate,
             self.confidence_interval,
             self.input_features,
-            "estimate_123"
+            "estimate_123",
         )
 
         # Verify the base method was called correctly
@@ -261,13 +270,15 @@ class TestDurationSHAPExplainer:
     def test_estimate_feature_importance(self):
         """Test estimating feature importance."""
         # Mock the duration model's feature importance method
-        self.duration_model.get_feature_importance = MagicMock(return_value={
-            "task_type": 0.3,
-            "complexity": 0.4,
-            "user_history": 0.15,
-            "focus_level": 0.1,
-            "time_of_day": 0.05
-        })
+        self.duration_model.get_feature_importance = MagicMock(
+            return_value={
+                "task_type": 0.3,
+                "complexity": 0.4,
+                "user_history": 0.15,
+                "focus_level": 0.1,
+                "time_of_day": 0.05,
+            }
+        )
 
         # Test feature importance estimation
         importances = self.explainer._estimate_feature_importance(self.input_features, self.task)
@@ -279,17 +290,10 @@ class TestDurationSHAPExplainer:
 
     def test_generate_duration_explanation(self):
         """Test generating a duration explanation text."""
-        top_features = [
-            ("complexity", 0.4),
-            ("task_type", 0.3),
-            ("user_history", 0.15)
-        ]
+        top_features = [("complexity", 0.4), ("task_type", 0.3), ("user_history", 0.15)]
 
         explanation = self.explainer._generate_duration_explanation(
-            self.task["name"],
-            self.duration_estimate,
-            top_features,
-            self.confidence_interval
+            self.task["name"], self.duration_estimate, top_features, self.confidence_interval
         )
 
         assert isinstance(explanation, str)
@@ -337,7 +341,7 @@ class TestSHAPExplainerEdgeCases:
         original_explain = self.explainer.explain_recommendation
 
         def patched_explain(*args, **kwargs):
-            model_name = args[0] if args else kwargs.get('model_name')
+            model_name = args[0] if args else kwargs.get("model_name")
             if model_name not in self.explainer.models:
                 raise ValueError(f"Model '{model_name}' not registered with explainer")
             return original_explain(*args, **kwargs)
@@ -352,29 +356,28 @@ class TestSHAPExplainerEdgeCases:
                 np.random.rand(1, 5),
                 "test_rec_123",
                 "schedule",
-                "Some recommendation"
+                "Some recommendation",
             )
 
     def test_explain_with_invalid_input_shape(self):
         """Test explaining with invalid input shape."""
         # Register model
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         # Add validation to the explainer to check input shape
         original_explain = self.explainer.explain_recommendation
 
         def patched_explain(*args, **kwargs):
-            model_name = args[0] if args else kwargs.get('model_name')
-            input_features = args[1] if len(args) > 1 else kwargs.get('input_features')
+            model_name = args[0] if args else kwargs.get("model_name")
+            input_features = args[1] if len(args) > 1 else kwargs.get("input_features")
             feature_names = self.explainer.feature_names.get(model_name, [])
 
             if input_features.shape[1] != len(feature_names):
-                raise ValueError(f"Input features must have {len(feature_names)} features, got {input_features.shape[1]}")
+                raise ValueError(
+                    f"Input features must have {len(feature_names)} features, got {input_features.shape[1]}"
+                )
             return original_explain(*args, **kwargs)
 
         # Apply the patch
@@ -387,7 +390,7 @@ class TestSHAPExplainerEdgeCases:
                 np.random.rand(1, 10),  # Wrong shape, should be (1, 5)
                 "test_rec_123",
                 "schedule",
-                "Some recommendation"
+                "Some recommendation",
             )
 
     def test_register_with_invalid_background_data(self):
@@ -397,7 +400,9 @@ class TestSHAPExplainerEdgeCases:
 
         def patched_register(model_name, model, background_data, feature_names):
             if background_data.shape[1] != len(feature_names):
-                raise ValueError(f"Background data must have {len(feature_names)} features, got {background_data.shape[1]}")
+                raise ValueError(
+                    f"Background data must have {len(feature_names)} features, got {background_data.shape[1]}"
+                )
             return original_register(model_name, model, background_data, feature_names)
 
         # Apply the patch
@@ -409,7 +414,7 @@ class TestSHAPExplainerEdgeCases:
                 self.model_name,
                 self.model,
                 np.random.rand(10, 10),  # Wrong shape for features
-                self.feature_names  # Only 5 feature names
+                self.feature_names,  # Only 5 feature names
             )
 
     def test_register_with_mismatched_feature_names(self):
@@ -419,7 +424,9 @@ class TestSHAPExplainerEdgeCases:
 
         def patched_register(model_name, model, background_data, feature_names):
             if background_data.shape[1] != len(feature_names):
-                raise ValueError(f"Number of feature names must match number of features in background data")
+                raise ValueError(
+                    f"Number of feature names must match number of features in background data"
+                )
             return original_register(model_name, model, background_data, feature_names)
 
         # Apply the patch
@@ -431,7 +438,7 @@ class TestSHAPExplainerEdgeCases:
                 self.model_name,
                 self.model,
                 np.random.rand(10, 5),
-                ["feature1", "feature2"]  # Only 2 feature names for 5 features
+                ["feature1", "feature2"],  # Only 2 feature names for 5 features
             )
 
     @patch("app.ml.fairness.shap_explainer.shap.Explainer")
@@ -444,10 +451,7 @@ class TestSHAPExplainerEdgeCases:
 
         # Register model
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         # Add error handling to the explain method
@@ -470,7 +474,7 @@ class TestSHAPExplainerEdgeCases:
                 np.random.rand(1, 5),
                 "test_rec_123",
                 "schedule",
-                "Some recommendation"
+                "Some recommendation",
             )
 
 
@@ -487,10 +491,7 @@ class TestExplanationPerformance:
 
         # Register model
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         # Prepare input for explanation
@@ -524,14 +525,16 @@ class TestExplanationPerformance:
         self.explainer.explain_recommendation = patched_explain
 
         # Mock the visual explanation to avoid rendering issues
-        with patch.object(SHAPExplainer, '_create_visual_explanation', return_value='mock_base64_image'):
+        with patch.object(
+            SHAPExplainer, "_create_visual_explanation", return_value="mock_base64_image"
+        ):
             # First explanation should calculate SHAP values
             explanation1 = self.explainer.explain_recommendation(
                 self.model_name,
                 self.input_features,
                 self.recommendation_id,
                 self.recommendation_type,
-                self.recommendation_value
+                self.recommendation_value,
             )
 
             # Second explanation with same inputs should use cached values
@@ -540,7 +543,7 @@ class TestExplanationPerformance:
                 self.input_features,
                 self.recommendation_id,
                 self.recommendation_type,
-                self.recommendation_value
+                self.recommendation_value,
             )
 
         # Verify both explanations are valid
@@ -558,10 +561,11 @@ class TestExplanationPerformance:
 
         # Add a time attribute to the explainer for testing
         import time
+
         self.explainer.time = time
 
         # Verify the explainer has the necessary attributes for caching
-        assert hasattr(self.explainer, 'cache_timeout')
+        assert hasattr(self.explainer, "cache_timeout")
 
 
 class TestIntegrationWithFallbackProtocols:
@@ -578,10 +582,7 @@ class TestIntegrationWithFallbackProtocols:
 
         # Register model
         self.explainer.register_model(
-            self.model_name,
-            self.model,
-            self.background_data,
-            self.feature_names
+            self.model_name, self.model, self.background_data, self.feature_names
         )
 
         # Create fallback protocol
@@ -589,7 +590,7 @@ class TestIntegrationWithFallbackProtocols:
         self.protocol.apply_fallback.return_value = {
             "action": "notify",
             "message": "Low confidence prediction",
-            "prediction": "fallback_prediction"
+            "prediction": "fallback_prediction",
         }
 
     @patch("app.ml.fairness.shap_explainer.shap.Explainer")
@@ -608,11 +609,13 @@ class TestIntegrationWithFallbackProtocols:
         # Apply fallback
         fallback_result = self.protocol.apply_fallback(
             {"value": "original_prediction", "confidence": confidence},
-            {"context_data": "some_value"}
+            {"context_data": "some_value"},
         )
 
         # Mock the visual explanation
-        with patch.object(SHAPExplainer, '_create_visual_explanation', return_value='mock_base64_image'):
+        with patch.object(
+            SHAPExplainer, "_create_visual_explanation", return_value="mock_base64_image"
+        ):
             # Explain the fallback result
             explanation = self.explainer.explain_recommendation(
                 self.model_name,
@@ -620,7 +623,7 @@ class TestIntegrationWithFallbackProtocols:
                 "test_rec_123",
                 "schedule_with_fallback",
                 fallback_result["prediction"],
-                confidence=confidence  # Pass confidence as a keyword argument
+                confidence=confidence,  # Pass confidence as a keyword argument
             )
 
         # Verify explanation is generated
@@ -641,7 +644,9 @@ class TestIntegrationWithFallbackProtocols:
         input_features = np.random.rand(1, 5)
 
         # Mock the visual explanation
-        with patch.object(SHAPExplainer, '_create_visual_explanation', return_value='mock_base64_image'):
+        with patch.object(
+            SHAPExplainer, "_create_visual_explanation", return_value="mock_base64_image"
+        ):
             # Explain with high confidence
             high_confidence_explanation = self.explainer.explain_recommendation(
                 self.model_name,
@@ -649,7 +654,7 @@ class TestIntegrationWithFallbackProtocols:
                 "test_rec_123",
                 "schedule",
                 "Some recommendation",
-                confidence=0.9  # High confidence
+                confidence=0.9,  # High confidence
             )
 
             # Explain with low confidence
@@ -659,7 +664,7 @@ class TestIntegrationWithFallbackProtocols:
                 "test_rec_124",
                 "schedule",
                 "Some recommendation",
-                confidence=0.3  # Low confidence
+                confidence=0.3,  # Low confidence
             )
 
         # Verify both explanations are generated

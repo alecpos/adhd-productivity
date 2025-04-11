@@ -4,6 +4,7 @@ Smart Reminder Service for ADHD Calendar.
 This service provides contextually-aware reminders for commitments and tasks,
 supporting proactive forgetfulness and distraction mitigation.
 """
+
 import logging
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any, Tuple
@@ -34,7 +35,7 @@ class SmartReminderService(BaseService):
         self,
         db: Session,
         commitment_service: Optional[CommitmentDetectionService] = None,
-        notifications_service: Optional[NotificationsService] = None
+        notifications_service: Optional[NotificationsService] = None,
     ):
         """Initialize the smart reminder service."""
         super().__init__(db)
@@ -53,8 +54,7 @@ class SmartReminderService(BaseService):
         """
         # Get commitments due in the next 24 hours
         due_commitments = self.commitment_service.get_commitments_due_soon(
-            user_id=user_id,
-            hours_threshold=24
+            user_id=user_id, hours_threshold=24
         )
 
         # Convert to reminders
@@ -68,7 +68,7 @@ class SmartReminderService(BaseService):
                     time_frame=commitment.time_frame,
                     priority=commitment.priority,
                     related_person=commitment.related_person,
-                    action_required=commitment.action_required
+                    action_required=commitment.action_required,
                 )
             )
 
@@ -98,7 +98,7 @@ class SmartReminderService(BaseService):
                 priority=reminder.priority.value,
                 status="sent",
                 scheduled_time=datetime.utcnow(),
-                related_commitment_id=reminder.commitment_id
+                related_commitment_id=reminder.commitment_id,
             )
 
             self.db.add(db_reminder)
@@ -110,7 +110,7 @@ class SmartReminderService(BaseService):
                 title=f"Commitment Reminder",
                 message=message,
                 notification_type="commitment_reminder",
-                data={"commitment_id": reminder.commitment_id}
+                data={"commitment_id": reminder.commitment_id},
             )
 
             return True
@@ -178,15 +178,12 @@ class SmartReminderService(BaseService):
             return {
                 "total_due": len(due_reminders),
                 "sent": sent_count,
-                "processed_at": datetime.utcnow().isoformat()
+                "processed_at": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"Error processing smart reminders: {str(e)}")
-            return {
-                "error": str(e),
-                "processed_at": datetime.utcnow().isoformat()
-            }
+            return {"error": str(e), "processed_at": datetime.utcnow().isoformat()}
 
     def _prioritize_reminders(
         self, reminders: List[CommitmentReminder], user_id: UUID
@@ -212,7 +209,7 @@ class SmartReminderService(BaseService):
                 CommitmentPriority.CRITICAL: 0,
                 CommitmentPriority.HIGH: 1,
                 CommitmentPriority.MEDIUM: 2,
-                CommitmentPriority.LOW: 3
+                CommitmentPriority.LOW: 3,
             }
             priority_value = priority_values.get(reminder.priority, 4)
             due_date = reminder.due_date or datetime.max
@@ -226,10 +223,7 @@ class SmartReminderService(BaseService):
         return sorted_reminders[:5]
 
     def schedule_reminder_for_commitment(
-        self,
-        commitment_id: int,
-        reminder_time: datetime,
-        user_id: UUID
+        self, commitment_id: int, reminder_time: datetime, user_id: UUID
     ) -> ReminderModel:
         """
         Schedule a reminder for a specific commitment.
@@ -260,7 +254,7 @@ class SmartReminderService(BaseService):
             priority=commitment.priority.value,
             status="scheduled",
             scheduled_time=reminder_time,
-            related_commitment_id=commitment_id
+            related_commitment_id=commitment_id,
         )
 
         self.db.add(reminder)
@@ -288,7 +282,7 @@ class SmartReminderService(BaseService):
         user_id: UUID,
         from_date: Optional[datetime] = None,
         to_date: Optional[datetime] = None,
-        limit: int = 50
+        limit: int = 50,
     ) -> List[ReminderModel]:
         """
         Get reminder history for a user.
@@ -315,7 +309,9 @@ class SmartReminderService(BaseService):
 
         return query.all()
 
-    def get_contextual_reminders(self, user_id: UUID, context: Dict[str, Any]) -> List[CommitmentReminder]:
+    def get_contextual_reminders(
+        self, user_id: UUID, context: Dict[str, Any]
+    ) -> List[CommitmentReminder]:
         """
         Get reminders that are relevant to the current context.
 

@@ -144,9 +144,7 @@ def test_custom_hidden_layers(model_factory):
     # Test activity recommender with custom layers
     num_activities = 5
     activity_model = model_factory.create_activity_recommender(
-        input_shape=input_shape,
-        num_activities=num_activities,
-        hidden_layers=hidden_layers
+        input_shape=input_shape, num_activities=num_activities, hidden_layers=hidden_layers
     )
     assert isinstance(activity_model, tf.keras.Model)
 
@@ -161,31 +159,27 @@ def test_model_compilation(model_factory):
 
     # Instead of checking metrics directly, we'll verify the model can be compiled
     assert mood_model._is_compiled
-    assert hasattr(mood_model, 'loss')
+    assert hasattr(mood_model, "loss")
 
     # Test energy predictor compilation
     energy_model = model_factory.create_energy_predictor(input_shape)
     assert energy_model.optimizer.__class__.__name__ == "Adam"
     assert energy_model._is_compiled
-    assert hasattr(energy_model, 'loss')
+    assert hasattr(energy_model, "loss")
 
     # Test task predictor compilation
     task_model = model_factory.create_task_predictor(input_shape)
     assert task_model.optimizer.__class__.__name__ == "Adam"
     assert task_model._is_compiled
-    assert hasattr(task_model, 'loss')
+    assert hasattr(task_model, "loss")
 
     # Test activity recommender compilation
     num_activities = 5
     activity_model = model_factory.create_activity_recommender(input_shape, num_activities)
     assert activity_model.optimizer.__class__.__name__ == "Adam"
     assert activity_model._is_compiled
-    assert hasattr(activity_model, 'loss')
+    assert hasattr(activity_model, "loss")
 
     # Compile the model with metrics if needed
-    if not any('accuracy' in metric.name for metric in activity_model.metrics):
-        activity_model.compile(
-            optimizer='adam',
-            loss='binary_crossentropy',
-            metrics=['accuracy']
-        )
+    if not any("accuracy" in metric.name for metric in activity_model.metrics):
+        activity_model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])

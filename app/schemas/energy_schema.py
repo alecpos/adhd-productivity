@@ -11,7 +11,7 @@ from app.schemas.shared_components_schema import (
     Break,
     EnvironmentalFactors,
     Interruption,
-    SessionAnalytics
+    SessionAnalytics,
 )
 
 
@@ -104,42 +104,27 @@ class EnergyPatterns(BaseSchema):
     """Schema for energy pattern analysis."""
 
     daily_patterns: Dict[str, List[Dict[str, Any]]] = Field(
-        ...,
-        description="Energy patterns by day of week"
+        ..., description="Energy patterns by day of week"
     )
     hourly_patterns: Dict[str, List[Dict[str, Any]]] = Field(
-        ...,
-        description="Energy patterns by hour of day"
+        ..., description="Energy patterns by hour of day"
     )
     activity_patterns: Dict[str, Dict[str, float]] = Field(
-        ...,
-        description="Energy levels by activity type"
+        ..., description="Energy levels by activity type"
     )
-    peak_hours: List[time] = Field(
-        ...,
-        description="Hours with highest average energy levels"
-    )
-    low_hours: List[time] = Field(
-        ...,
-        description="Hours with lowest average energy levels"
-    )
+    peak_hours: List[time] = Field(..., description="Hours with highest average energy levels")
+    low_hours: List[time] = Field(..., description="Hours with lowest average energy levels")
     optimal_break_times: List[Dict[str, Any]] = Field(
-        ...,
-        description="Suggested break times based on energy patterns"
+        ..., description="Suggested break times based on energy patterns"
     )
     focus_correlation: float = Field(
-        ...,
-        description="Correlation between energy and focus levels",
-        ge=-1,
-        le=1
+        ..., description="Correlation between energy and focus levels", ge=-1, le=1
     )
     environmental_impacts: Dict[str, float] = Field(
-        ...,
-        description="Impact of environmental factors on energy levels"
+        ..., description="Impact of environmental factors on energy levels"
     )
     recommendations: List[str] = Field(
-        ...,
-        description="Personalized recommendations based on patterns"
+        ..., description="Personalized recommendations based on patterns"
     )
 
 
@@ -185,11 +170,13 @@ class EnergyInsights(BaseSchema):
 
 class EnergyLogCreateSchema(EnergyLogCreate):
     """Alias for EnergyLogCreate for consistent naming."""
+
     pass
 
 
 class EnergyLogResponseSchema(EnergyLogResponse):
     """Alias for EnergyLogResponse for consistent naming."""
+
     pass
 
 
@@ -207,5 +194,5 @@ __all__ = [
     "EnergyInsights",
     "EnergyPatternsSchema",
     "EnergyLogCreateSchema",
-    "EnergyLogResponseSchema"
+    "EnergyLogResponseSchema",
 ]

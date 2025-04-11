@@ -4,6 +4,7 @@ Commitment Detection Service for ADHD Calendar.
 This service provides functionality to detect commitments in text,
 supporting proactive forgetfulness and distraction mitigation.
 """
+
 import re
 import time
 import logging
@@ -13,13 +14,18 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.models.commitment_model import CommitmentModel, CommitmentSource, CommitmentStatus, CommitmentPriority
+from app.models.commitment_model import (
+    CommitmentModel,
+    CommitmentSource,
+    CommitmentStatus,
+    CommitmentPriority,
+)
 from app.schemas.commitment_schema import (
     CommitmentCreate,
     CommitmentDetectionRequest,
     CommitmentDetectionResponse,
     CommitmentUpdate,
-    CommitmentInDB
+    CommitmentInDB,
 )
 from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
 from app.services.llm_service import LLMService
@@ -53,13 +59,13 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             r"I\s+have\s+to\s+([^.,;!?]+)",
             r"(?:don't\s+let\s+me\s+forget|remind\s+me)\s+to\s+([^.,;!?]+)",
         ]
-        self.compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.commitment_patterns]
+        self.compiled_patterns = [
+            re.compile(pattern, re.IGNORECASE) for pattern in self.commitment_patterns
+        ]
 
         # Initialize bulkhead for LLM processing
         self._llm_processing_bulkhead = self.with_bulkhead(
-            name="llm_processing",
-            max_concurrent_calls=3,
-            max_queue_size=10
+            name="llm_processing", max_concurrent_calls=3, max_queue_size=10
         )
 
     @BaseService.with_retry(
@@ -67,12 +73,10 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         initial_delay=0.2,
         max_delay=2.0,
         backoff_factor=2.0,
-        error_message="Failed to detect commitments"
+        error_message="Failed to detect commitments",
     )
     @BaseService.with_circuit_breaker(
-        name="detect_commitments",
-        failure_threshold=5,
-        recovery_timeout=30
+        name="detect_commitments", failure_threshold=5, recovery_timeout=30
     )
     def detect_commitments(
         self, request: CommitmentDetectionRequest
@@ -86,7 +90,9 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         Returns:
             A response containing detected commitments
         """
-        logger.info(f"Detecting commitments for user {request.user_id} in text of length {len(request.text)}")
+        logger.info(
+            f"Detecting commitments for user {request.user_id} in text of length {len(request.text)}"
+        )
         start_time = time.time()
 
         try:
@@ -108,7 +114,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                     detection_confidence=details.get("confidence", 0.7),
                     priority=details.get("priority", CommitmentPriority.MEDIUM),
                     due_date=details.get("due_date"),
-                    status=CommitmentStatus.PENDING
+                    status=CommitmentStatus.PENDING,
                 )
                 commitment_creates.append(commitment)
 
@@ -123,13 +129,15 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                         logger.error(f"Error saving commitment: {str(e)}")
 
             elapsed_time = time.time() - start_time
-            logger.info(f"Commitment detection completed in {elapsed_time:.2f}s, found {len(commitment_creates)} commitments")
+            logger.info(
+                f"Commitment detection completed in {elapsed_time:.2f}s, found {len(commitment_creates)} commitments"
+            )
 
             return CommitmentDetectionResponse(
                 commitments=commitment_creates,
                 saved_commitments=saved_commitments,
                 request_id=request.request_id,
-                processing_time=elapsed_time
+                processing_time=elapsed_time,
             )
         except Exception as e:
             logger.error(f"Error in detect_commitments: {str(e)}", exc_info=True)
@@ -145,11 +153,13 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                 matches = pattern.finditer(text)
                 for match in matches:
                     commitment_text = match.group(1).strip()
-                    if commitment_text and len(commitment_text) > 3:  # Filter out very short matches
+                    if (
+                        commitment_text and len(commitment_text) > 3
+                    ):  # Filter out very short matches
                         commitments[commitment_text] = {
                             "source": "regex",
                             "confidence": 0.7,
-                            "pattern": pattern.pattern
+                            "pattern": pattern.pattern,
                         }
 
             logger.debug(f"Detected {len(commitments)} commitments with regex")
@@ -163,14 +173,14 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         initial_delay=0.5,
         max_delay=3.0,
         backoff_factor=2.0,
-        error_message="Failed to detect commitments with LLM"
+        error_message="Failed to detect commitments with LLM",
     )
     @BaseService.with_circuit_breaker(
-        name="llm_detection",
-        failure_threshold=3,
-        recovery_timeout=60
+        name="llm_detection", failure_threshold=3, recovery_timeout=60
     )
-    def _detect_with_llm(self, text: str, context: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    def _detect_with_llm(
+        self, text: str, context: Optional[str] = None
+    ) -> Dict[str, Dict[str, Any]]:
         """
         Use LLM to detect commitments with advanced semantic understanding.
 
@@ -196,7 +206,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                             "source": "llm",
                             "confidence": item.get("confidence", 0.8),
                             "due_date": item.get("due_date"),
-                            "priority": item.get("priority", CommitmentPriority.MEDIUM)
+                            "priority": item.get("priority", CommitmentPriority.MEDIUM),
                         }
 
                 logger.debug(f"Detected {len(commitments)} commitments with LLM")
@@ -213,12 +223,15 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             # Fallback to regex only
             return {}
 
-    async def bulkhead_llm_processing(self, text: str, context: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    async def bulkhead_llm_processing(
+        self, text: str, context: Optional[str] = None
+    ) -> Dict[str, Dict[str, Any]]:
         """
         Process text with LLM using bulkhead pattern.
 
         This provides isolation for the resource-intensive LLM processing.
         """
+
         # Define the operation to perform inside the bulkhead
         async def process_with_llm():
             if not self.llm_service:
@@ -236,7 +249,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                         "source": "llm",
                         "confidence": item.get("confidence", 0.8),
                         "due_date": item.get("due_date"),
-                        "priority": item.get("priority", CommitmentPriority.MEDIUM)
+                        "priority": item.get("priority", CommitmentPriority.MEDIUM),
                     }
 
             return commitments
@@ -252,8 +265,9 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             return {}
 
     def _merge_commitment_detections(
-        self, regex_commitments: Dict[str, Dict[str, Any]],
-        llm_commitments: Dict[str, Dict[str, Any]]
+        self,
+        regex_commitments: Dict[str, Dict[str, Any]],
+        llm_commitments: Dict[str, Dict[str, Any]],
     ) -> Dict[str, Dict[str, Any]]:
         """Merge and deduplicate commitments from different detection methods."""
         # Start with LLM commitments as they're likely higher quality
@@ -265,10 +279,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                 merged[text] = details
             else:
                 # If already detected by LLM, increase confidence
-                merged[text]["confidence"] = min(
-                    0.95,
-                    merged[text].get("confidence", 0.7) + 0.1
-                )
+                merged[text]["confidence"] = min(0.95, merged[text].get("confidence", 0.7) + 0.1)
                 merged[text]["source"] = "multiple"
 
         return merged
@@ -278,12 +289,10 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         initial_delay=0.1,
         max_delay=1.0,
         backoff_factor=2.0,
-        error_message="Failed to create commitment"
+        error_message="Failed to create commitment",
     )
     @BaseService.with_circuit_breaker(
-        name="create_commitment",
-        failure_threshold=5,
-        recovery_timeout=30
+        name="create_commitment", failure_threshold=5, recovery_timeout=30
     )
     def create_commitment(self, commitment_data: CommitmentCreate) -> CommitmentModel:
         """Create a new commitment with resilience patterns."""
@@ -300,7 +309,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                 due_date=commitment_data.due_date,
                 status=commitment_data.status,
                 created_at=datetime.now(),
-                updated_at=datetime.now()
+                updated_at=datetime.now(),
             )
 
             self.db.add(commitment)
@@ -347,7 +356,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
                 notes=commitment.notes,
                 should_remind=commitment.should_remind,
                 reminder_frequency=commitment.reminder_frequency,
-                cross_references=commitment.cross_references
+                cross_references=commitment.cross_references,
             )
 
             self.db.add(db_commitment)
@@ -372,7 +381,9 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         Raises:
             ServiceException: If commitment not found
         """
-        commitment = self.db.query(CommitmentModel).filter(CommitmentModel.id == commitment_id).first()
+        commitment = (
+            self.db.query(CommitmentModel).filter(CommitmentModel.id == commitment_id).first()
+        )
 
         if not commitment:
             raise ServiceException(f"Commitment with ID {commitment_id} not found")
@@ -431,7 +442,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         source: Optional[CommitmentSource] = None,
         priority: Optional[CommitmentPriority] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: int = 100,
     ) -> Tuple[List[CommitmentModel], int]:
         """
         Get commitments for a user with optional filters.
@@ -487,8 +498,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             The updated commitment model
         """
         return self.update_commitment(
-            commitment_id,
-            CommitmentUpdate(status=CommitmentStatus.CONFIRMED)
+            commitment_id, CommitmentUpdate(status=CommitmentStatus.CONFIRMED)
         )
 
     def reject_commitment(self, commitment_id: int) -> CommitmentModel:
@@ -502,8 +512,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             The updated commitment model
         """
         return self.update_commitment(
-            commitment_id,
-            CommitmentUpdate(status=CommitmentStatus.REJECTED)
+            commitment_id, CommitmentUpdate(status=CommitmentStatus.REJECTED)
         )
 
     def complete_commitment(self, commitment_id: int) -> CommitmentModel:
@@ -517,8 +526,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             The updated commitment model
         """
         return self.update_commitment(
-            commitment_id,
-            CommitmentUpdate(status=CommitmentStatus.COMPLETED)
+            commitment_id, CommitmentUpdate(status=CommitmentStatus.COMPLETED)
         )
 
     def analyze_journal_entry(self, text: str, user_id: UUID) -> List[CommitmentModel]:
@@ -534,9 +542,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         """
         # Detect commitments
         detection_request = CommitmentDetectionRequest(
-            text=text,
-            source=CommitmentSource.JOURNAL,
-            user_id=user_id
+            text=text, source=CommitmentSource.JOURNAL, user_id=user_id
         )
 
         detection_response = self.detect_commitments(detection_request)
@@ -545,9 +551,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         return self.create_multiple_commitments(detection_response.detected_commitments)
 
     def get_commitments_due_soon(
-        self,
-        user_id: UUID,
-        hours_threshold: int = 24
+        self, user_id: UUID, hours_threshold: int = 24
     ) -> List[CommitmentModel]:
         """
         Get commitments due within the specified hours threshold.
@@ -571,7 +575,7 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             CommitmentModel.status.in_([CommitmentStatus.DETECTED, CommitmentStatus.CONFIRMED]),
             CommitmentModel.due_date.isnot(None),
             CommitmentModel.due_date <= threshold,
-            CommitmentModel.due_date >= now
+            CommitmentModel.due_date >= now,
         )
 
         return query.all()
@@ -589,14 +593,14 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
         circuit_states = {
             "detect_commitments": self._get_circuit_state("detect_commitments"),
             "llm_detection": self._get_circuit_state("llm_detection"),
-            "create_commitment": self._get_circuit_state("create_commitment")
+            "create_commitment": self._get_circuit_state("create_commitment"),
         }
 
         # Get bulkhead state
         bulkhead_state = {
             "llm_processing": {
                 "max_concurrent": 3,  # From initialization
-                "max_queue": 10       # From initialization
+                "max_queue": 10,  # From initialization
             }
         }
 
@@ -611,35 +615,30 @@ class CommitmentDetectionService(BaseService[CommitmentModel, CommitmentInDB, Co
             "details": {
                 "circuits": circuit_states,
                 "bulkheads": bulkhead_state,
-                "llm_service": llm_health
-            }
+                "llm_service": llm_health,
+            },
         }
 
     async def _get_llm_health(self) -> Dict[str, Any]:
         """Get health status of LLM service."""
         if not self.llm_service:
-            return {
-                "status": "unavailable",
-                "message": "LLM service not configured"
-            }
+            return {"status": "unavailable", "message": "LLM service not configured"}
 
         # Check if circuit is open for LLM
         if self._get_circuit_state("llm_detection") == OPEN:
-            return {
-                "status": "unhealthy",
-                "message": "Circuit breaker open for LLM service"
-            }
+            return {"status": "unhealthy", "message": "Circuit breaker open for LLM service"}
 
         try:
             # Try a quick health probe to the LLM service
             is_healthy = self.llm_service.check_availability()
             return {
                 "status": "healthy" if is_healthy else "degraded",
-                "message": "LLM service responding normally" if is_healthy else "LLM service responding but degraded"
+                "message": (
+                    "LLM service responding normally"
+                    if is_healthy
+                    else "LLM service responding but degraded"
+                ),
             }
         except Exception as e:
             logger.error(f"Error checking LLM service health: {str(e)}")
-            return {
-                "status": "unhealthy",
-                "message": f"Error connecting to LLM service: {str(e)}"
-            }
+            return {"status": "unhealthy", "message": f"Error connecting to LLM service: {str(e)}"}

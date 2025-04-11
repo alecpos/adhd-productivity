@@ -1,4 +1,5 @@
 """Service for optimizing user schedules using ML models."""
+
 import logging
 from datetime import datetime, time, timedelta, timezone
 from typing import Any, Dict, List, Optional
@@ -12,12 +13,14 @@ from app.schemas.scheduling_schema import (
     WorkHours,
     EnergySchedulingPattern as EnergyPatternSchema,
     SchedulePreferences as ScheduleParamsSchema,
-    TimeBlockBaseSchema as ScheduleOptimizerSchema
+    TimeBlockBaseSchema as ScheduleOptimizerSchema,
 )
+
 
 # Simple schema for None returns
 class NoneSchema:
     pass
+
 
 logger = logging.getLogger(__name__)
 

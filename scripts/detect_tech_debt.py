@@ -29,19 +29,22 @@ from app.utils.tech_debt import (
     DebtCategory,
     DebtStatus,
     MLDebtSubcategory,
-    get_debt_manager
+    get_debt_manager,
 )
 
 # Import our Epic 4 ML tech debt patterns
 try:
     from ml_tech_debt_patterns import get_epic4_tech_debt_patterns, MLDebtSubcategory
+
     HAS_EPIC4_PATTERNS = True
 except ImportError:
     HAS_EPIC4_PATTERNS = False
 
+
 @dataclass
 class AnalysisResult:
     """Result of a technical debt analysis."""
+
     file_path: str
     line_number: int
     pattern_type: str
@@ -54,15 +57,26 @@ class AnalysisResult:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
-            'file_path': self.file_path,
-            'line_number': self.line_number,
-            'pattern_type': self.pattern_type,
-            'debt_category': self.debt_category.value if isinstance(self.debt_category, DebtCategory) else self.debt_category,
-            'severity': self.severity.value if isinstance(self.severity, DebtSeverity) else self.severity,
-            'message': self.message,
-            'matched_text': self.matched_text,
-            'subcategory': self.subcategory.value if isinstance(self.subcategory, MLDebtSubcategory) else self.subcategory
+            "file_path": self.file_path,
+            "line_number": self.line_number,
+            "pattern_type": self.pattern_type,
+            "debt_category": (
+                self.debt_category.value
+                if isinstance(self.debt_category, DebtCategory)
+                else self.debt_category
+            ),
+            "severity": (
+                self.severity.value if isinstance(self.severity, DebtSeverity) else self.severity
+            ),
+            "message": self.message,
+            "matched_text": self.matched_text,
+            "subcategory": (
+                self.subcategory.value
+                if isinstance(self.subcategory, MLDebtSubcategory)
+                else self.subcategory
+            ),
         }
+
 
 class TechnicalDebtDetector:
     """Detect technical debt in code files."""
@@ -71,114 +85,114 @@ class TechnicalDebtDetector:
     TECH_DEBT_PATTERNS = [
         # Todo comments
         {
-            'pattern': r'#\s*(todo|fixme|hack|xxx):\s*(.*)',
-            'message': 'TODO comment indicates potential technical debt: {match}',
-            'category': DebtCategory.CODE_QUALITY,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'todo_comment'
+            "pattern": r"#\s*(todo|fixme|hack|xxx):\s*(.*)",
+            "message": "TODO comment indicates potential technical debt: {match}",
+            "category": DebtCategory.CODE_QUALITY,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "todo_comment",
         },
         # Magic numbers
         {
-            'pattern': r'\b\d{3,}\b',
-            'message': 'Magic number detected: {match}',
-            'category': DebtCategory.CODE_QUALITY,
-            'severity': DebtSeverity.LOW,
-            'type': 'magic_number'
+            "pattern": r"\b\d{3,}\b",
+            "message": "Magic number detected: {match}",
+            "category": DebtCategory.CODE_QUALITY,
+            "severity": DebtSeverity.LOW,
+            "type": "magic_number",
         },
         # Commented-out code
         {
-            'pattern': r'#\s*(if|for|while|def|class)',
-            'message': 'Commented out code found: {match}',
-            'category': DebtCategory.CODE_QUALITY,
-            'severity': DebtSeverity.LOW,
-            'type': 'commented_code'
+            "pattern": r"#\s*(if|for|while|def|class)",
+            "message": "Commented out code found: {match}",
+            "category": DebtCategory.CODE_QUALITY,
+            "severity": DebtSeverity.LOW,
+            "type": "commented_code",
         },
         # Hardcoded credentials
         {
-            'pattern': r'(password|api_key|secret|token|auth)\s*=\s*["\'][^"\']+["\']',
-            'message': 'Hardcoded credentials detected: {match}',
-            'category': DebtCategory.SECURITY,
-            'severity': DebtSeverity.CRITICAL,
-            'type': 'hardcoded_credentials'
+            "pattern": r'(password|api_key|secret|token|auth)\s*=\s*["\'][^"\']+["\']',
+            "message": "Hardcoded credentials detected: {match}",
+            "category": DebtCategory.SECURITY,
+            "severity": DebtSeverity.CRITICAL,
+            "type": "hardcoded_credentials",
         },
         # Long lines
         {
-            'pattern': r'^.{120,}$',
-            'message': 'Line exceeds 120 characters',
-            'category': DebtCategory.CODE_QUALITY,
-            'severity': DebtSeverity.LOW,
-            'type': 'long_line'
+            "pattern": r"^.{120,}$",
+            "message": "Line exceeds 120 characters",
+            "category": DebtCategory.CODE_QUALITY,
+            "severity": DebtSeverity.LOW,
+            "type": "long_line",
         },
         # Complex comprehensions
         {
-            'pattern': r'\[.*\bfor\b.*\bif\b.*\bfor\b.*\]',
-            'message': 'Complex list comprehension: {match}',
-            'category': DebtCategory.CODE_QUALITY,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'complex_comprehension'
+            "pattern": r"\[.*\bfor\b.*\bif\b.*\bfor\b.*\]",
+            "message": "Complex list comprehension: {match}",
+            "category": DebtCategory.CODE_QUALITY,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "complex_comprehension",
         },
         # Dynamic imports
         {
-            'pattern': r'__import__\(|importlib|eval\(',
-            'message': 'Dynamic code execution: {match}',
-            'category': DebtCategory.SECURITY,
-            'severity': DebtSeverity.HIGH,
-            'type': 'dynamic_execution'
+            "pattern": r"__import__\(|importlib|eval\(",
+            "message": "Dynamic code execution: {match}",
+            "category": DebtCategory.SECURITY,
+            "severity": DebtSeverity.HIGH,
+            "type": "dynamic_execution",
         },
         # Database raw SQL
         {
-            'pattern': r'execute\(["\']\s*SELECT|UPDATE|INSERT|DELETE',
-            'message': 'Raw SQL execution: {match}',
-            'category': DebtCategory.SECURITY,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'raw_sql'
+            "pattern": r'execute\(["\']\s*SELECT|UPDATE|INSERT|DELETE',
+            "message": "Raw SQL execution: {match}",
+            "category": DebtCategory.SECURITY,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "raw_sql",
         },
         # ML-specific: Direct model saving
         {
-            'pattern': r'\.save\(["\'].*\.pkl["\']\)|pickle\.dump',
-            'message': 'Using basic pickle for model saving: {match}',
-            'category': DebtCategory.ML_SPECIFIC,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'insecure_serialization',
-            'subcategory': MLDebtSubcategory.REPRODUCIBILITY
+            "pattern": r'\.save\(["\'].*\.pkl["\']\)|pickle\.dump',
+            "message": "Using basic pickle for model saving: {match}",
+            "category": DebtCategory.ML_SPECIFIC,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "insecure_serialization",
+            "subcategory": MLDebtSubcategory.REPRODUCIBILITY,
         },
         # ML-specific: Hardcoded hyperparameters
         {
-            'pattern': r'\b(learning_rate|epochs|batch_size|n_estimators|max_depth|num_leaves|embedding_dim|dropout)\s*=\s*\d+(\.\d+)?',
-            'message': 'Hardcoded ML hyperparameter: {match}',
-            'category': DebtCategory.ML_SPECIFIC,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'hardcoded_hyperparameter',
-            'subcategory': MLDebtSubcategory.MODEL_COMPLEXITY
+            "pattern": r"\b(learning_rate|epochs|batch_size|n_estimators|max_depth|num_leaves|embedding_dim|dropout)\s*=\s*\d+(\.\d+)?",
+            "message": "Hardcoded ML hyperparameter: {match}",
+            "category": DebtCategory.ML_SPECIFIC,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "hardcoded_hyperparameter",
+            "subcategory": MLDebtSubcategory.MODEL_COMPLEXITY,
         },
         # ML-specific: Data leakage risk
         {
-            'pattern': r'train_test_split\([^,]+\)',
-            'message': 'Potential data leakage - no random state in split: {match}',
-            'category': DebtCategory.ML_SPECIFIC,
-            'severity': DebtSeverity.HIGH,
-            'type': 'data_leakage_risk',
-            'subcategory': MLDebtSubcategory.DATA_QUALITY
+            "pattern": r"train_test_split\([^,]+\)",
+            "message": "Potential data leakage - no random state in split: {match}",
+            "category": DebtCategory.ML_SPECIFIC,
+            "severity": DebtSeverity.HIGH,
+            "type": "data_leakage_risk",
+            "subcategory": MLDebtSubcategory.DATA_QUALITY,
         },
         # ML-specific: Missing validation
         {
-            'pattern': r'\.fit\([^,]+\)',
-            'message': 'Model training without explicit validation data: {match}',
-            'category': DebtCategory.ML_SPECIFIC,
-            'severity': DebtSeverity.MEDIUM,
-            'type': 'missing_validation',
-            'subcategory': MLDebtSubcategory.EVALUATION
-        }
+            "pattern": r"\.fit\([^,]+\)",
+            "message": "Model training without explicit validation data: {match}",
+            "category": DebtCategory.ML_SPECIFIC,
+            "severity": DebtSeverity.MEDIUM,
+            "type": "missing_validation",
+            "subcategory": MLDebtSubcategory.EVALUATION,
+        },
     ]
 
     # File patterns to exclude
     EXCLUDE_PATTERNS = [
-        r'.*\.git/.*',
-        r'.*venv/.*',
-        r'.*__pycache__/.*',
-        r'.*\.ipynb_checkpoints/.*',
-        r'.*\.pytest_cache/.*',
-        r'.*\.(json|md|txt|csv|yml|yaml)$'
+        r".*\.git/.*",
+        r".*venv/.*",
+        r".*__pycache__/.*",
+        r".*\.ipynb_checkpoints/.*",
+        r".*\.pytest_cache/.*",
+        r".*\.(json|md|txt|csv|yml|yaml)$",
     ]
 
     def __init__(self, repository_root: Optional[str] = None):
@@ -196,7 +210,7 @@ class TechnicalDebtDetector:
         self._load_epic4_patterns()
 
         self.compiled_patterns = [
-            {**pattern, 'compiled': re.compile(pattern['pattern'])}
+            {**pattern, "compiled": re.compile(pattern["pattern"])}
             for pattern in self.TECH_DEBT_PATTERNS
         ]
         self.exclude_compiled = [re.compile(pattern) for pattern in self.EXCLUDE_PATTERNS]
@@ -211,16 +225,24 @@ class TechnicalDebtDetector:
             # Convert pattern format to match our existing patterns
             for pattern in epic4_patterns:
                 pattern_dict = {
-                    'pattern': pattern['pattern'],
-                    'message': pattern['message'],
-                    'category': getattr(DebtCategory, pattern['category']) if hasattr(DebtCategory, pattern['category']) else pattern['category'],
-                    'severity': getattr(DebtSeverity, pattern['severity']) if hasattr(DebtSeverity, pattern['severity']) else pattern['severity'],
-                    'type': pattern['type']
+                    "pattern": pattern["pattern"],
+                    "message": pattern["message"],
+                    "category": (
+                        getattr(DebtCategory, pattern["category"])
+                        if hasattr(DebtCategory, pattern["category"])
+                        else pattern["category"]
+                    ),
+                    "severity": (
+                        getattr(DebtSeverity, pattern["severity"])
+                        if hasattr(DebtSeverity, pattern["severity"])
+                        else pattern["severity"]
+                    ),
+                    "type": pattern["type"],
                 }
 
                 # Add subcategory if present
-                if 'subcategory' in pattern:
-                    pattern_dict['subcategory'] = pattern['subcategory']
+                if "subcategory" in pattern:
+                    pattern_dict["subcategory"] = pattern["subcategory"]
 
                 self.TECH_DEBT_PATTERNS.append(pattern_dict)
 
@@ -238,12 +260,12 @@ class TechnicalDebtDetector:
         try:
             # Get only staged Python files
             result = subprocess.run(
-                ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', '*.py'],
+                ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM", "*.py"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
-            return result.stdout.strip().split('\n') if result.stdout.strip() else []
+            return result.stdout.strip().split("\n") if result.stdout.strip() else []
         except subprocess.CalledProcessError:
             print("Error: Failed to get staged files. Are you in a git repository?")
             return []
@@ -253,7 +275,7 @@ class TechnicalDebtDetector:
         all_files = []
         for root, _, files in os.walk(self.repository_root):
             for file in files:
-                if file.endswith('.py'):
+                if file.endswith(".py"):
                     file_path = os.path.relpath(os.path.join(root, file), self.repository_root)
                     if not self.is_excluded(file_path):
                         all_files.append(file_path)
@@ -268,30 +290,34 @@ class TechnicalDebtDetector:
         full_path = os.path.join(self.repository_root, file_path)
 
         try:
-            with open(full_path, 'r', encoding='utf-8') as f:
+            with open(full_path, "r", encoding="utf-8") as f:
                 lines = f.readlines()
 
             for line_num, line in enumerate(lines, 1):
                 for pattern in self.compiled_patterns:
-                    matches = pattern['compiled'].findall(line)
+                    matches = pattern["compiled"].findall(line)
                     if matches:
                         for match in matches:
-                            match_text = match[1] if isinstance(match, tuple) and len(match) > 1 else match
-                            match_text = match_text if isinstance(match_text, str) else str(match_text)
+                            match_text = (
+                                match[1] if isinstance(match, tuple) and len(match) > 1 else match
+                            )
+                            match_text = (
+                                match_text if isinstance(match_text, str) else str(match_text)
+                            )
 
                             # Format the message with the match
-                            message = pattern['message'].format(match=match_text)
+                            message = pattern["message"].format(match=match_text)
 
                             # Create an analysis result
                             result = AnalysisResult(
                                 file_path=file_path,
                                 line_number=line_num,
-                                pattern_type=pattern['type'],
-                                debt_category=pattern['category'],
-                                severity=pattern['severity'],
+                                pattern_type=pattern["type"],
+                                debt_category=pattern["category"],
+                                severity=pattern["severity"],
                                 message=message,
                                 matched_text=line.strip(),
-                                subcategory=pattern.get('subcategory')
+                                subcategory=pattern.get("subcategory"),
                             )
                             results.append(result)
         except Exception as e:
@@ -311,13 +337,17 @@ class TechnicalDebtDetector:
 
         return all_results
 
-    def register_technical_debt(self, results: List[AnalysisResult], auto_add: bool = False) -> List[str]:
+    def register_technical_debt(
+        self, results: List[AnalysisResult], auto_add: bool = False
+    ) -> List[str]:
         """Register detected technical debt in the debt manager."""
         added_items = []
 
         for result in results:
             title = f"{result.pattern_type.replace('_', ' ').title()} in {result.file_path}"
-            description = f"{result.message}\nFound at line {result.line_number}: {result.matched_text}"
+            description = (
+                f"{result.message}\nFound at line {result.line_number}: {result.matched_text}"
+            )
 
             if auto_add:
                 item = TechnicalDebtItem(
@@ -329,7 +359,7 @@ class TechnicalDebtDetector:
                     file_path=result.file_path,
                     line_numbers=[result.line_number],
                     subcategory=result.subcategory,
-                    tags=[result.pattern_type]
+                    tags=[result.pattern_type],
                 )
 
                 item_id = self.debt_manager.add_item(item)
@@ -354,7 +384,7 @@ class TechnicalDebtDetector:
             DebtSeverity.LOW: 1,
             DebtSeverity.MEDIUM: 3,
             DebtSeverity.HIGH: 5,
-            DebtSeverity.CRITICAL: 10
+            DebtSeverity.CRITICAL: 10,
         }
 
         # Calculate weighted severity score
@@ -454,20 +484,30 @@ class TechnicalDebtDetector:
 
         # Add general recommendation based on score
         if score >= 15:
-            recommendations.append("Consider addressing critical and high severity issues before committing.")
+            recommendations.append(
+                "Consider addressing critical and high severity issues before committing."
+            )
 
         # Add specific recommendations based on categories
         if categories.get("security", 0) > 0:
-            recommendations.append("Address security-related debt immediately as it poses significant risk.")
+            recommendations.append(
+                "Address security-related debt immediately as it poses significant risk."
+            )
 
         if categories.get("ml_specific", 0) > 0:
-            recommendations.append("Review ML-specific issues to ensure model reliability and reproducibility.")
+            recommendations.append(
+                "Review ML-specific issues to ensure model reliability and reproducibility."
+            )
 
         if categories.get("code_quality", 0) > 5:
-            recommendations.append("Significant code quality debt detected. Consider a focused refactoring session.")
+            recommendations.append(
+                "Significant code quality debt detected. Consider a focused refactoring session."
+            )
 
         # Add recommendation to register debt
-        recommendations.append("Run with --auto-add to register these items in the technical debt system.")
+        recommendations.append(
+            "Run with --auto-add to register these items in the technical debt system."
+        )
 
         return recommendations
 
@@ -500,36 +540,36 @@ class TechnicalDebtDetector:
             return results
 
         # Filter patterns by epic
-        epic_patterns = [p for p in self.TECH_DEBT_PATTERNS if p.get('epic') == epic]
+        epic_patterns = [p for p in self.TECH_DEBT_PATTERNS if p.get("epic") == epic]
 
         if not epic_patterns:
             return results
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            lines = content.split('\n')
+            lines = content.split("\n")
 
             for i, line in enumerate(lines):
                 for pattern in epic_patterns:
-                    regex = re.compile(pattern['pattern'], re.IGNORECASE)
+                    regex = re.compile(pattern["pattern"], re.IGNORECASE)
                     match = regex.search(line)
 
                     if match:
                         result = AnalysisResult(
                             file_path=file_path,
                             line_number=i + 1,
-                            pattern_type=pattern['type'],
-                            debt_category=pattern['category'],
-                            severity=pattern['severity'],
-                            message=pattern['message'].format(match=match.group(0)),
-                            matched_text=match.group(0)
+                            pattern_type=pattern["type"],
+                            debt_category=pattern["category"],
+                            severity=pattern["severity"],
+                            message=pattern["message"].format(match=match.group(0)),
+                            matched_text=match.group(0),
                         )
 
                         # Add subcategory if present
-                        if 'subcategory' in pattern:
-                            result.subcategory = pattern['subcategory']
+                        if "subcategory" in pattern:
+                            result.subcategory = pattern["subcategory"]
 
                         results.append(result)
         except Exception as e:
@@ -551,7 +591,7 @@ class TechnicalDebtDetector:
             if self.is_excluded(file_path):
                 continue
 
-            file_results = self.analyze_file_by_epic(file_path, 'Epic 4')
+            file_results = self.analyze_file_by_epic(file_path, "Epic 4")
             results.extend(file_results)
 
         return results
@@ -568,7 +608,7 @@ class TechnicalDebtDetector:
             List of recommendation strings
         """
         # Filter results by epic
-        epic_results = [r for r in results if hasattr(r, 'epic') and r.epic == epic]
+        epic_results = [r for r in results if hasattr(r, "epic") and r.epic == epic]
 
         if not epic_results:
             return []
@@ -578,7 +618,7 @@ class TechnicalDebtDetector:
         # Group by subcategory
         subcategories = {}
         for result in epic_results:
-            if not hasattr(result, 'subcategory') or result.subcategory is None:
+            if not hasattr(result, "subcategory") or result.subcategory is None:
                 continue
 
             subcategory = result.subcategory
@@ -590,25 +630,40 @@ class TechnicalDebtDetector:
         # Generate recommendations by subcategory
         for subcategory, results in subcategories.items():
             if len(results) > 2:
-                remediation = next((r.remediation for r in results if hasattr(r, 'remediation')), None)
+                remediation = next(
+                    (r.remediation for r in results if hasattr(r, "remediation")), None
+                )
                 if remediation:
-                    recommendations.append(f"Consider focusing on {subcategory.value} issues: {len(results)} instances found. {remediation}")
+                    recommendations.append(
+                        f"Consider focusing on {subcategory.value} issues: {len(results)} instances found. {remediation}"
+                    )
 
         # Add research-backed recommendations
-        research_refs = set(r.research_reference for r in epic_results if hasattr(r, 'research_reference') and r.research_reference)
+        research_refs = set(
+            r.research_reference
+            for r in epic_results
+            if hasattr(r, "research_reference") and r.research_reference
+        )
         for ref in research_refs:
             recommendations.append(f"Research insight: {ref}")
 
         return recommendations
 
+
 def main():
     """Main function to run the technical debt detection."""
-    parser = argparse.ArgumentParser(description='Detect technical debt in code.')
-    parser.add_argument('--all', action='store_true', help='Scan all Python files in the project')
-    parser.add_argument('--staged', action='store_true', help='Scan only staged files')
-    parser.add_argument('--json', action='store_true', help='Output in JSON format')
-    parser.add_argument('--auto-add', action='store_true', help='Automatically add detected issues to the debt tracking system')
-    parser.add_argument('--epic', type=str, help='Scan only for technical debt specific to an epic (e.g., "Epic 4")')
+    parser = argparse.ArgumentParser(description="Detect technical debt in code.")
+    parser.add_argument("--all", action="store_true", help="Scan all Python files in the project")
+    parser.add_argument("--staged", action="store_true", help="Scan only staged files")
+    parser.add_argument("--json", action="store_true", help="Output in JSON format")
+    parser.add_argument(
+        "--auto-add",
+        action="store_true",
+        help="Automatically add detected issues to the debt tracking system",
+    )
+    parser.add_argument(
+        "--epic", type=str, help='Scan only for technical debt specific to an epic (e.g., "Epic 4")'
+    )
 
     args = parser.parse_args()
 
@@ -637,14 +692,16 @@ def main():
     if args.json:
         # Output results as JSON
         output = {
-            'results': [result.to_dict() for result in results],
-            'score': score,
-            'assessment': detector._get_assessment(score),
-            'recommendations': detector._get_recommendations(results, score),
+            "results": [result.to_dict() for result in results],
+            "score": score,
+            "assessment": detector._get_assessment(score),
+            "recommendations": detector._get_recommendations(results, score),
         }
 
         if args.epic:
-            output['epic_recommendations'] = detector._get_recommendations_by_epic(results, args.epic)
+            output["epic_recommendations"] = detector._get_recommendations_by_epic(
+                results, args.epic
+            )
 
         print(json.dumps(output, indent=2))
     else:
@@ -675,6 +732,7 @@ def main():
         return 1
 
     return 0
+
 
 if __name__ == "__main__":
     main()

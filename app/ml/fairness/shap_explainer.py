@@ -28,6 +28,7 @@ class RecommendationExplanation:
     """
     Data class to store explanation details for a model recommendation.
     """
+
     recommendation_id: str
     recommendation_type: str
     model_name: str
@@ -49,8 +50,9 @@ class SHAPExplainer:
         self.feature_names = {}
         self.background_data = {}
 
-    def register_model(self, model_name: str, model: Any,
-                       background_data: np.ndarray, feature_names: List[str]) -> None:
+    def register_model(
+        self, model_name: str, model: Any, background_data: np.ndarray, feature_names: List[str]
+    ) -> None:
         """
         Register a model with the explainer.
 
@@ -72,7 +74,7 @@ class SHAPExplainer:
         recommendation_type: str,
         recommendation_value: Any,
         confidence: Optional[float] = None,
-        num_top_features: int = 5
+        num_top_features: int = 5,
     ) -> RecommendationExplanation:
         """
         Generate an explanation for a model recommendation.
@@ -89,7 +91,9 @@ class SHAPExplainer:
         Returns:
             RecommendationExplanation object containing text and visual explanations
         """
-        logger.debug(f"Generating explanation for {recommendation_type} recommendation {recommendation_id}")
+        logger.debug(
+            f"Generating explanation for {recommendation_type} recommendation {recommendation_id}"
+        )
 
         # Verify the model exists
         if model_name not in self.models:
@@ -136,7 +140,7 @@ class SHAPExplainer:
 
         # Determine confidence if not provided
         if confidence is None:
-            if hasattr(model, 'predict_proba'):
+            if hasattr(model, "predict_proba"):
                 try:
                     probs = model.predict_proba(input_features)
                     confidence = float(np.max(probs))
@@ -171,7 +175,7 @@ class SHAPExplainer:
             top_factors=top_factors,
             confidence=confidence,
             explanation_text=explanation_text,
-            visual_explanation=visual_explanation
+            visual_explanation=visual_explanation,
         )
 
     def _generate_text_explanation(
@@ -179,7 +183,7 @@ class SHAPExplainer:
         recommendation_type: str,
         top_factors: List[Tuple[str, float]],
         confidence: float,
-        recommendation_value: Any
+        recommendation_value: Any,
     ) -> str:
         """
         Generate a human-readable text explanation.
@@ -198,7 +202,11 @@ class SHAPExplainer:
         for feature, importance in top_factors:
             direction = "increases" if importance > 0 else "decreases"
             magnitude = abs(importance)
-            impact = "significantly" if magnitude > 0.3 else "somewhat" if magnitude > 0.1 else "slightly"
+            impact = (
+                "significantly"
+                if magnitude > 0.3
+                else "somewhat" if magnitude > 0.1 else "slightly"
+            )
             factor_texts.append(f"{feature} {impact} {direction} this {recommendation_type}")
 
         factors_text = ". ".join(factor_texts)
@@ -212,22 +220,21 @@ class SHAPExplainer:
             confidence_text = "low confidence"
 
         # Combine everything into an explanation
-        explanation = dedent(f"""
+        explanation = dedent(
+            f"""
         This {recommendation_type} recommendation was made with {confidence_text} ({confidence:.0%}).
 
         Key factors influencing this recommendation:
         {factors_text}.
 
         The system recommends: {recommendation_value}
-        """).strip()
+        """
+        ).strip()
 
         return explanation
 
     def _create_visual_explanation(
-        self,
-        feature_names: List[str],
-        shap_values: np.ndarray,
-        input_features: np.ndarray
+        self, feature_names: List[str], shap_values: np.ndarray, input_features: np.ndarray
     ) -> str:
         """
         Create a visual explanation as a base64 encoded image.
@@ -248,29 +255,23 @@ class SHAPExplainer:
                 # Create a SHAP Explanation object with feature values and names
                 # This is needed for the waterfall plot to properly display feature names
                 explanation = shap.Explanation(
-                    values=shap_values[0],
-                    data=input_features[0],
-                    feature_names=feature_names
+                    values=shap_values[0], data=input_features[0], feature_names=feature_names
                 )
 
                 # Create a waterfall plot showing how each feature contributes
                 # Note: The waterfall function takes a SHAP Explanation object
-                shap.plots.waterfall(
-                    explanation,
-                    max_display=8,
-                    show=False
-                )
+                shap.plots.waterfall(explanation, max_display=8, show=False)
 
                 plt.title("Feature Impact on Recommendation")
                 plt.tight_layout()
 
                 # Save the figure to a bytes buffer
                 buf = io.BytesIO()
-                plt.savefig(buf, format='png', dpi=150)
+                plt.savefig(buf, format="png", dpi=150)
                 buf.seek(0)
 
                 # Convert to base64 for easy embedding in web pages
-                image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+                image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
                 return image_base64
             except Exception as e:
@@ -302,7 +303,7 @@ class ProductivitySHAPExplainer(SHAPExplainer):
         self.productivity_model = productivity_model
 
         # Register the model automatically
-        if hasattr(productivity_model, 'get_background_data'):
+        if hasattr(productivity_model, "get_background_data"):
             background_data = productivity_model.get_background_data()
         else:
             # Create dummy background data if not available
@@ -312,14 +313,11 @@ class ProductivitySHAPExplainer(SHAPExplainer):
             "productivity_model",
             productivity_model,
             background_data,
-            productivity_model.feature_names
+            productivity_model.feature_names,
         )
 
     def explain_optimal_time_window(
-        self,
-        time_window: Dict[str, Any],
-        input_features: np.ndarray,
-        window_id: str
+        self, time_window: Dict[str, Any], input_features: np.ndarray, window_id: str
     ) -> RecommendationExplanation:
         """
         Explain why a specific time window is recommended for productivity.
@@ -340,7 +338,9 @@ class ProductivitySHAPExplainer(SHAPExplainer):
         day_of_week = time_window.get("day_of_week", "")
 
         # Create a descriptive recommendation value
-        recommendation_value = f"Schedule focused work {day_of_week} between {start_time} and {end_time}"
+        recommendation_value = (
+            f"Schedule focused work {day_of_week} between {start_time} and {end_time}"
+        )
 
         # Generate explanation
         return self.explain_recommendation(
@@ -349,7 +349,7 @@ class ProductivitySHAPExplainer(SHAPExplainer):
             recommendation_id=window_id,
             recommendation_type="productivity window",
             recommendation_value=recommendation_value,
-            confidence=confidence
+            confidence=confidence,
         )
 
 
@@ -369,17 +369,14 @@ class DurationSHAPExplainer(SHAPExplainer):
         self.duration_model = duration_model
 
         # Register the model automatically
-        if hasattr(duration_model, 'get_background_data'):
+        if hasattr(duration_model, "get_background_data"):
             background_data = duration_model.get_background_data()
         else:
             # Create dummy background data if not available
             background_data = np.random.rand(10, len(duration_model.feature_names))
 
         self.register_model(
-            "duration_model",
-            duration_model,
-            background_data,
-            duration_model.feature_names
+            "duration_model", duration_model, background_data, duration_model.feature_names
         )
 
     def explain_duration_estimate(
@@ -388,7 +385,7 @@ class DurationSHAPExplainer(SHAPExplainer):
         duration_estimate: float,
         confidence_interval: Tuple[float, float],
         input_features: np.ndarray,
-        estimate_id: str
+        estimate_id: str,
     ) -> RecommendationExplanation:
         """
         Explain a duration estimate for a task.
@@ -410,7 +407,7 @@ class DurationSHAPExplainer(SHAPExplainer):
         top_factors = sorted(
             [(feature, importance) for feature, importance in feature_importance.items()],
             key=lambda x: abs(x[1]),
-            reverse=True
+            reverse=True,
         )[:5]
 
         # Calculate confidence from interval width
@@ -426,13 +423,11 @@ class DurationSHAPExplainer(SHAPExplainer):
             recommendation_type="duration estimate",
             recommendation_value=duration_estimate,
             num_top_features=5,
-            confidence=confidence
+            confidence=confidence,
         )
 
     def _estimate_feature_importance(
-        self,
-        input_features: np.ndarray,
-        task: Dict[str, Any]
+        self, input_features: np.ndarray, task: Dict[str, Any]
     ) -> Dict[str, float]:
         """
         Estimate feature importance for duration prediction.
@@ -445,14 +440,13 @@ class DurationSHAPExplainer(SHAPExplainer):
             Dictionary mapping feature names to importance values
         """
         # If the model has a feature importance method, use it
-        if hasattr(self.duration_model, 'get_feature_importance'):
+        if hasattr(self.duration_model, "get_feature_importance"):
             return self.duration_model.get_feature_importance(input_features, task)
 
         # Otherwise, calculate using SHAP
         if "duration_model" not in self.explainers:
             self.explainers["duration_model"] = shap.Explainer(
-                self.duration_model,
-                self.background_data["duration_model"]
+                self.duration_model, self.background_data["duration_model"]
             )
 
         explainer = self.explainers["duration_model"]
@@ -467,7 +461,7 @@ class DurationSHAPExplainer(SHAPExplainer):
         task_name: str,
         duration_estimate: float,
         top_features: List[Tuple[str, float]],
-        confidence_interval: Tuple[float, float]
+        confidence_interval: Tuple[float, float],
     ) -> str:
         """
         Generate a human-readable explanation for a duration estimate.
@@ -514,14 +508,16 @@ class DurationSHAPExplainer(SHAPExplainer):
         factors_text = ". ".join(factor_texts)
 
         # Combine into explanation
-        explanation = dedent(f"""
+        explanation = dedent(
+            f"""
         The task "{task_name}" will likely take {duration_text} to complete.
 
         This estimate could vary {interval_text} depending on conditions.
 
         Key factors affecting this estimate:
         {factors_text}.
-        """).strip()
+        """
+        ).strip()
 
         return explanation
 
@@ -537,9 +533,9 @@ def get_explainer(model_type: str, model: Any) -> SHAPExplainer:
     Returns:
         An appropriate SHAP explainer for the model
     """
-    if model_type == 'productivity' or model.__class__.__name__ == 'ProductivityPatternLSTM':
+    if model_type == "productivity" or model.__class__.__name__ == "ProductivityPatternLSTM":
         return ProductivitySHAPExplainer(model)
-    elif model_type == 'duration' or model.__class__.__name__ == 'BayesianDurationPredictor':
+    elif model_type == "duration" or model.__class__.__name__ == "BayesianDurationPredictor":
         return DurationSHAPExplainer(model)
     else:
         # Generic explainer

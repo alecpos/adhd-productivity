@@ -98,13 +98,9 @@ class Settings(BaseSettings):
     HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
     HUGGINGFACE_TEXT_MODEL: str = os.getenv("HUGGINGFACE_TEXT_MODEL", "deepseek-ai/DeepSeek-R1")
     HUGGINGFACE_SENTIMENT_MODEL: str = os.getenv(
-        "HUGGINGFACE_SENTIMENT_MODEL",
-        "distilbert-base-uncased-finetuned-sst-2-english"
+        "HUGGINGFACE_SENTIMENT_MODEL", "distilbert-base-uncased-finetuned-sst-2-english"
     )
-    HUGGINGFACE_TASK_MODEL: str = os.getenv(
-        "HUGGINGFACE_TASK_MODEL",
-        "microsoft/deberta-v3-base"
-    )
+    HUGGINGFACE_TASK_MODEL: str = os.getenv("HUGGINGFACE_TASK_MODEL", "microsoft/deberta-v3-base")
 
     # Database settings
     DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "20"))
@@ -126,9 +122,7 @@ class Settings(BaseSettings):
     # JWT settings
     JWT_SECRET_KEY: str = secrets.token_urlsafe(32)
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
-    JWT_REFRESH_SECRET_KEY: str = os.getenv(
-        "JWT_REFRESH_SECRET_KEY", secrets.token_urlsafe(32)
-    )
+    JWT_REFRESH_SECRET_KEY: str = os.getenv("JWT_REFRESH_SECRET_KEY", secrets.token_urlsafe(32))
 
     # Security settings
     BCRYPT_ROUNDS: int = 12

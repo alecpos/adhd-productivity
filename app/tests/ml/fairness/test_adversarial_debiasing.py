@@ -12,7 +12,7 @@ from app.ml.fairness.adversarial_debiasing import (
     AdversarialDebiasingModel,
     ReminderDebiasingModel,
     SuggestionDebiasingModel,
-    DebiasingService
+    DebiasingService,
 )
 
 
@@ -31,7 +31,7 @@ class TestAdversarialDebiasingModel:
             output_dim=self.output_dim,
             protected_dim=self.protected_dim,
             dropout=0.2,
-            lambda_param=0.5
+            lambda_param=0.5,
         )
 
     def test_init(self):
@@ -101,7 +101,7 @@ class TestAdversarialDebiasingModel:
         batch = {
             "features": torch.rand(batch_size, self.input_dim),
             "targets": torch.rand(batch_size, self.output_dim),
-            "protected_attributes": torch.rand(batch_size, self.protected_dim)
+            "protected_attributes": torch.rand(batch_size, self.protected_dim),
         }
 
         # Create optimizer mocks
@@ -130,7 +130,7 @@ class TestAdversarialDebiasingModel:
         test_data = {
             "features": torch.rand(num_samples, self.input_dim),
             "targets": torch.rand(num_samples, self.output_dim),
-            "protected_attributes": torch.rand(num_samples, self.protected_dim)
+            "protected_attributes": torch.rand(num_samples, self.protected_dim),
         }
 
         # Evaluate model
@@ -170,7 +170,7 @@ class TestAdversarialDebiasingModel:
             output_dim=self.output_dim,
             protected_dim=self.protected_dim,
             dropout=0.2,
-            lambda_param=0.5
+            lambda_param=0.5,
         )
 
         # Use actual state_dict from the temporary model
@@ -183,8 +183,8 @@ class TestAdversarialDebiasingModel:
                 "output_dim": self.output_dim,
                 "protected_dim": self.protected_dim,
                 "dropout": 0.2,
-                "lambda_param": 0.5
-            }
+                "lambda_param": 0.5,
+            },
         }
 
         # Load model
@@ -217,7 +217,7 @@ class TestReminderDebiasingModel:
             feature_extractor=self.feature_extractor,
             protected_attributes=self.protected_attributes,
             hidden_dim=32,
-            lambda_param=0.5
+            lambda_param=0.5,
         )
 
     def test_init(self):
@@ -237,14 +237,14 @@ class TestReminderDebiasingModel:
         # Test forward_with_features method
         inputs = {
             "task": {"name": "Task 1", "priority": 3},
-            "user": {"name": "User 1", "neurotype": "adhd"}
+            "user": {"name": "User 1", "neurotype": "adhd"},
         }
 
         # Mock the feature extractor and predictor outputs
         self.feature_extractor.return_value = torch.rand(1, self.input_dim)
 
         # Use patch to mock the predictor output instead of replacing it
-        with patch.object(self.model.predictor, '__call__', return_value=torch.tensor([[0.7]])):
+        with patch.object(self.model.predictor, "__call__", return_value=torch.tensor([[0.7]])):
             # Call forward_with_features
             result = self.model.forward_with_features(inputs)
 
@@ -269,7 +269,7 @@ class TestSuggestionDebiasingModel:
             num_task_types=self.num_task_types,
             protected_attributes=self.protected_attributes,
             hidden_dim=64,
-            lambda_param=0.5
+            lambda_param=0.5,
         )
 
     def test_init(self):
@@ -287,19 +287,20 @@ class TestSuggestionDebiasingModel:
     def test_custom_suggestion_functions(self):
         """Test any custom functions specific to the SuggestionDebiasingModel."""
         # Create dummy data for get_debiased_suggestions
-        user_features = {
-            "neurotype": "adhd",
-            "preference_scores": [0.8, 0.6, 0.4, 0.2, 0.1]
-        }
+        user_features = {"neurotype": "adhd", "preference_scores": [0.8, 0.6, 0.4, 0.2, 0.1]}
         tasks = [{"name": "Task 1", "type": "focus"}, {"name": "Task 2", "type": "creative"}]
         time_slots = [{"start": "09:00", "end": "10:00"}, {"start": "14:00", "end": "15:00"}]
 
         # Mock the necessary methods without replacing predictor module
-        with patch.object(self.model, '_extract_user_features', return_value=torch.rand(1, 5)), \
-             patch.object(self.model, '_extract_task_features', return_value=torch.rand(1, 5)), \
-             patch.object(self.model, '_extract_slot_features', return_value=torch.rand(1, 5)), \
-             patch.object(self.model.predictor, '__call__', return_value=torch.rand(1, self.num_task_types)), \
-             patch.object(torch, 'cat', return_value=torch.rand(1, self.input_dim)):
+        with (
+            patch.object(self.model, "_extract_user_features", return_value=torch.rand(1, 5)),
+            patch.object(self.model, "_extract_task_features", return_value=torch.rand(1, 5)),
+            patch.object(self.model, "_extract_slot_features", return_value=torch.rand(1, 5)),
+            patch.object(
+                self.model.predictor, "__call__", return_value=torch.rand(1, self.num_task_types)
+            ),
+            patch.object(torch, "cat", return_value=torch.rand(1, self.input_dim)),
+        ):
 
             # Attempt to call get_debiased_suggestions
             try:
@@ -351,7 +352,7 @@ class TestDebiasingService:
         service.initialize_models(
             reminder_feature_extractor=mock_feature_extractor,
             suggestion_input_dim=20,
-            num_task_types=5
+            num_task_types=5,
         )
 
         # Check that models were created
@@ -391,14 +392,18 @@ class TestDebiasingService:
         # Create dummy reminders and user profile
         reminders = [
             {"id": "reminder1", "task": {"name": "Task 1"}, "priority": 0.9},
-            {"id": "reminder2", "task": {"name": "Task 2"}, "priority": 0.7}
+            {"id": "reminder2", "task": {"name": "Task 2"}, "priority": 0.7},
         ]
-        user_profile = {"id": "user123", "neurotype": "adhd", "preferences": {"work_hours": "morning"}}
+        user_profile = {
+            "id": "user123",
+            "neurotype": "adhd",
+            "preferences": {"work_hours": "morning"},
+        }
 
         # Mock forward_with_features method
         self.reminder_model.forward_with_features.side_effect = [
             torch.tensor([[0.85]]),  # First reminder
-            torch.tensor([[0.65]])   # Second reminder
+            torch.tensor([[0.65]]),  # Second reminder
         ]
 
         # Get debiased reminders
@@ -421,7 +426,7 @@ class TestDebiasingService:
         # Mock get_debiased_suggestions method
         expected_result = [
             {"task_id": "task1", "slot_id": "slot1", "score": 0.9},
-            {"task_id": "task2", "slot_id": "slot2", "score": 0.8}
+            {"task_id": "task2", "slot_id": "slot2", "score": 0.8},
         ]
         self.suggestion_model.get_debiased_suggestions.return_value = expected_result
 
@@ -431,37 +436,40 @@ class TestDebiasingService:
         # Check output
         assert result == expected_result
         self.suggestion_model.get_debiased_suggestions.assert_called_once_with(
-            user_features=user_features,
-            tasks=tasks,
-            time_slots=time_slots
+            user_features=user_features, tasks=tasks, time_slots=time_slots
         )
 
     def test_audit_fairness(self):
         """Test auditing fairness across protected groups."""
         # Create dummy test data for auditing
         test_data = [
-            {"task": {"id": "task1"}, "user": {"id": "user1"}, "original_priority": 0.9, "protected_attributes": {"neurotype": "ADHD", "gender": "F"}},
-            {"task": {"id": "task2"}, "user": {"id": "user2"}, "original_priority": 0.8, "protected_attributes": {"neurotype": "NT", "gender": "M"}}
+            {
+                "task": {"id": "task1"},
+                "user": {"id": "user1"},
+                "original_priority": 0.9,
+                "protected_attributes": {"neurotype": "ADHD", "gender": "F"},
+            },
+            {
+                "task": {"id": "task2"},
+                "user": {"id": "user2"},
+                "original_priority": 0.8,
+                "protected_attributes": {"neurotype": "NT", "gender": "M"},
+            },
         ]
 
         # Define protected groups
-        protected_groups = {
-            "neurotype": [0, 1],  # ADHD, NT
-            "gender": [0, 1]      # F, M
-        }
+        protected_groups = {"neurotype": [0, 1], "gender": [0, 1]}  # ADHD, NT  # F, M
 
         # Mock evaluate_equity method of the reminder model
         self.reminder_model.evaluate_equity.return_value = {
             "demographic_parity_diff": 0.05,
             "equal_opportunity_diff": 0.03,
-            "fairness_score": 0.92
+            "fairness_score": 0.92,
         }
 
         # Audit fairness
         fairness_metrics = self.service.audit_fairness(
-            model_type="reminder",
-            test_data=test_data,
-            protected_groups=protected_groups
+            model_type="reminder", test_data=test_data, protected_groups=protected_groups
         )
 
         # Check output
@@ -469,6 +477,7 @@ class TestDebiasingService:
         assert "demographic_parity_diff" in fairness_metrics
         assert "fairness_score" in fairness_metrics
         self.reminder_model.evaluate_equity.assert_called_once()
+
 
 def test_get_debiasing_service():
     """Test the get_debiasing_service factory function."""
@@ -484,6 +493,7 @@ def test_get_debiasing_service():
     service2 = get_debiasing_service()
     assert service is service2
 
+
 class TestMultiAttributeDebiasing:
     """Tests for debiasing across multiple protected attributes simultaneously."""
 
@@ -494,7 +504,7 @@ class TestMultiAttributeDebiasing:
         self.protected_attributes = {
             "adhd_type": ["inattentive", "hyperactive", "combined"],
             "gender": ["male", "female", "non_binary"],
-            "age_group": ["18-25", "26-40", "41-60", "60+"]
+            "age_group": ["18-25", "26-40", "41-60", "60+"],
         }
 
         # Calculate encoded dimension for all protected attributes
@@ -507,7 +517,7 @@ class TestMultiAttributeDebiasing:
             output_dim=self.output_dim,
             protected_dim=self.protected_dim,
             dropout=0.2,
-            lambda_param=0.5
+            lambda_param=0.5,
         )
 
         # Sample data
@@ -517,8 +527,8 @@ class TestMultiAttributeDebiasing:
             "protected": {
                 "adhd_type": torch.randint(0, 3, (50,)),
                 "gender": torch.randint(0, 3, (50,)),
-                "age_group": torch.randint(0, 4, (50,))
-            }
+                "age_group": torch.randint(0, 4, (50,)),
+            },
         }
 
     def test_init_multi_attribute(self):
@@ -586,7 +596,7 @@ class TestMultiAttributeDebiasing:
         batch = {
             "features": self.sample_data["X"],
             "targets": self.sample_data["y"],
-            "protected_attributes": encoded_protected
+            "protected_attributes": encoded_protected,
         }
 
         # Create optimizers
@@ -595,9 +605,7 @@ class TestMultiAttributeDebiasing:
 
         # Initial loss values - call with batch and optimizers
         initial_p_loss, initial_a_loss = self.model.training_step(
-            batch,
-            predictor_optimizer,
-            adversary_optimizer
+            batch, predictor_optimizer, adversary_optimizer
         )
 
         # Training step should update model parameters
@@ -607,14 +615,13 @@ class TestMultiAttributeDebiasing:
         # Run more training steps
         for _ in range(5):
             p_loss, a_loss = self.model.training_step(
-                batch,
-                predictor_optimizer,
-                adversary_optimizer
+                batch, predictor_optimizer, adversary_optimizer
             )
 
         # Loss should change after training
         assert p_loss != initial_p_loss
         assert a_loss != initial_a_loss
+
 
 class TestDebiasingServiceEdgeCases:
     """Test edge cases for the DebiasingService."""
@@ -714,6 +721,7 @@ class TestDebiasingServiceEdgeCases:
         mock_log_error.assert_called_once()
         assert "Error debiasing reminder" in mock_log_error.call_args[0][0]
 
+
 class TestIntegrationWithBiasAuditing:
     """Integration tests between debiasing and bias auditing components."""
 
@@ -730,7 +738,7 @@ class TestIntegrationWithBiasAuditing:
         # Sample data
         self.reminders = [
             {"id": "r1", "task": {"name": "Task 1"}, "priority": 0.8},
-            {"id": "r2", "task": {"name": "Task 2"}, "priority": 0.6}
+            {"id": "r2", "task": {"name": "Task 2"}, "priority": 0.6},
         ]
 
         self.user_profile = {"id": "user123", "neurotype": "adhd"}
@@ -742,11 +750,13 @@ class TestIntegrationWithBiasAuditing:
         self.debiasing_service.audit_fairness.return_value = {
             "original_fairness": {"disparate_impact": 0.75},
             "debiased_fairness": {"disparate_impact": 0.90},
-            "improvement": {"disparate_impact": 0.15}
+            "improvement": {"disparate_impact": 0.15},
         }
 
         # Get debiased reminders
-        debiased_reminders = self.debiasing_service.get_debiased_reminders(self.reminders, self.user_profile)
+        debiased_reminders = self.debiasing_service.get_debiased_reminders(
+            self.reminders, self.user_profile
+        )
 
         # Check that priorities were debiased
         assert len(debiased_reminders) == 2
@@ -757,7 +767,7 @@ class TestIntegrationWithBiasAuditing:
         audit_data = {
             "original_reminders": self.reminders,
             "debiased_reminders": debiased_reminders,
-            "protected_attributes": {"neurotype": self.user_profile["neurotype"]}
+            "protected_attributes": {"neurotype": self.user_profile["neurotype"]},
         }
 
         # Check that the debiasing service can work with an auditor
@@ -765,5 +775,8 @@ class TestIntegrationWithBiasAuditing:
             results = self.debiasing_service.audit_fairness.return_value
 
             # Verify improvement in fairness metrics
-            assert results["debiased_fairness"]["disparate_impact"] > results["original_fairness"]["disparate_impact"]
+            assert (
+                results["debiased_fairness"]["disparate_impact"]
+                > results["original_fairness"]["disparate_impact"]
+            )
             assert results["improvement"]["disparate_impact"] > 0

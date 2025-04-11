@@ -24,9 +24,9 @@ COVERAGE_EXPECTATIONS = {
             "test_evaluate",
             "test_update_with_observation",
             "test_extract_features",
-            "test_save_and_load"
+            "test_save_and_load",
         ],
-        "test_count_minimum": 10
+        "test_count_minimum": 10,
     },
     "nlp_complexity_analyzer": {
         "required_methods": [
@@ -36,9 +36,9 @@ COVERAGE_EXPECTATIONS = {
             "test_get_time_factor",
             "test_extract_complexity_features",
             "test_calculate_complexity_score",
-            "test_save_and_load"
+            "test_save_and_load",
         ],
-        "test_count_minimum": 10
+        "test_count_minimum": 10,
     },
     "contextual_stressor_detector": {
         "required_methods": [
@@ -48,9 +48,9 @@ COVERAGE_EXPECTATIONS = {
             "test_analyze_physiological_stress",
             "test_calculate_overall_stress",
             "test_calculate_stress_time_impact",
-            "test_save_and_load"
+            "test_save_and_load",
         ],
-        "test_count_minimum": 10
+        "test_count_minimum": 10,
     },
     "time_buffer_calculator": {
         "required_methods": [
@@ -60,18 +60,19 @@ COVERAGE_EXPECTATIONS = {
             "test_calculate_buffers_for_task_sequence",
             "test_analyze_transition_difficulty",
             "test_analyze_context_changes",
-            "test_save_and_load"
+            "test_save_and_load",
         ],
-        "test_count_minimum": 10
-    }
+        "test_count_minimum": 10,
+    },
 }
+
 
 def extract_test_methods(test_file):
     """
     Extract all test methods from a test file.
     Returns a list of method names.
     """
-    with open(test_file, 'r') as f:
+    with open(test_file, "r") as f:
         content = f.read()
 
     # Find all test methods using regex
@@ -80,6 +81,7 @@ def extract_test_methods(test_file):
     matches = method_pattern.findall(content)
 
     return matches
+
 
 def verify_test_coverage(component):
     """
@@ -114,7 +116,9 @@ def verify_test_coverage(component):
         # Create the report
         report_lines = []
         report_lines.append(f"Test File: {os.path.basename(test_file)}")
-        report_lines.append(f"Total Test Methods: {test_count} {'✅' if test_count_ok else '❌'} (minimum expected: {test_count_minimum})")
+        report_lines.append(
+            f"Total Test Methods: {test_count} {'✅' if test_count_ok else '❌'} (minimum expected: {test_count_minimum})"
+        )
 
         if missing_methods:
             report_lines.append(f"Missing Required Test Methods: {'❌'}")
@@ -134,6 +138,7 @@ def verify_test_coverage(component):
 
     except Exception as e:
         return False, f"❌ Error analyzing test file {test_file}: {e}"
+
 
 def main():
     """Main function to verify test coverage for all components."""
@@ -169,6 +174,7 @@ def main():
         print("\n❌ Some components need improved test coverage. See details above.")
 
     return 0 if overall_success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

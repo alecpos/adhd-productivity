@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
+
 class CalendarPlatform(str, Enum):
     GOOGLE = "google"
     OUTLOOK = "outlook"
@@ -19,12 +20,14 @@ class CalendarPlatform(str, Enum):
     CALDAV = "caldav"
     OTHER = "other"
 
+
 class EventType(str, Enum):
     TASK = "task"
     MEETING = "meeting"
     REMINDER = "reminder"
     APPOINTMENT = "appointment"
     OTHER = "other"
+
 
 class ExternalEvent(BaseModel):
     id: str
@@ -35,6 +38,7 @@ class ExternalEvent(BaseModel):
     platform: CalendarPlatform
     event_type: EventType = EventType.OTHER
 
+
 class CalendarSyncResult(BaseModel):
     platform: CalendarPlatform
     events_synced: int
@@ -42,51 +46,55 @@ class CalendarSyncResult(BaseModel):
     timestamp: datetime
     error_message: Optional[str] = None
 
+
 class CalendarIntegrationConfig(BaseModel):
     user_id: str
     platform: CalendarPlatform
     enabled: bool = True
     sync_frequency: int = 15  # minutes
 
+
 class CalendarIntegrationService:
     async def get_user_integrations(self, user_id: str) -> List[CalendarIntegrationConfig]:
         return [CalendarIntegrationConfig(user_id=user_id, platform=CalendarPlatform.GOOGLE)]
 
-    async def register_integration(self, user_id: str, config: Dict[str, Any]) -> CalendarIntegrationConfig:
+    async def register_integration(
+        self, user_id: str, config: Dict[str, Any]
+    ) -> CalendarIntegrationConfig:
         return CalendarIntegrationConfig(user_id=user_id, platform=CalendarPlatform.GOOGLE)
 
     async def remove_integration(self, user_id: str, platform: CalendarPlatform) -> bool:
         return True
 
-    async def sync_calendars(self, user_id: str, platforms: Optional[List[CalendarPlatform]] = None) -> Dict[CalendarPlatform, int]:
+    async def sync_calendars(
+        self, user_id: str, platforms: Optional[List[CalendarPlatform]] = None
+    ) -> Dict[CalendarPlatform, int]:
         return {CalendarPlatform.GOOGLE: 5}
 
-    async def get_available_calendars(self, user_id: str, platform: CalendarPlatform) -> List[Dict[str, Any]]:
+    async def get_available_calendars(
+        self, user_id: str, platform: CalendarPlatform
+    ) -> List[Dict[str, Any]]:
         return [{"id": "cal1", "name": "Primary Calendar"}]
 
-    async def create_event(self, user_id: str, platform: CalendarPlatform, event_data: Dict[str, Any]) -> ExternalEvent:
+    async def create_event(
+        self, user_id: str, platform: CalendarPlatform, event_data: Dict[str, Any]
+    ) -> ExternalEvent:
         return ExternalEvent(
-            id="evt1",
-            title="Test Event",
-            start_time=datetime.now(),
-            platform=platform
+            id="evt1", title="Test Event", start_time=datetime.now(), platform=platform
         )
 
-    async def update_event(self, user_id: str, platform: CalendarPlatform, event_id: str, event_data: Dict[str, Any]) -> ExternalEvent:
+    async def update_event(
+        self, user_id: str, platform: CalendarPlatform, event_id: str, event_data: Dict[str, Any]
+    ) -> ExternalEvent:
         return ExternalEvent(
-            id=event_id,
-            title="Updated Event",
-            start_time=datetime.now(),
-            platform=platform
+            id=event_id, title="Updated Event", start_time=datetime.now(), platform=platform
         )
 
     async def delete_event(self, user_id: str, platform: CalendarPlatform, event_id: str) -> bool:
         return True
 
-router = APIRouter(
-    prefix="/calendars",
-    tags=["Calendar Integration", "Integration"]
-)
+
+router = APIRouter(prefix="/calendars", tags=["Calendar Integration", "Integration"])
 calendar_integration_service = CalendarIntegrationService()
 
 
@@ -122,7 +130,9 @@ async def remove_integration(
     """
     Remove a calendar integration for the current user.
     """
-    return await calendar_integration_service.remove_integration(current_user.id, calendar_id, platform)
+    return await calendar_integration_service.remove_integration(
+        current_user.id, calendar_id, platform
+    )
 
 
 @router.get("/sync", response_model=List[CalendarSyncResult])

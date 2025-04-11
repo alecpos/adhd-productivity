@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.middleware.error_handler import setup_error_handling
 from app.routes.example_task_route import router as task_router
 
+
 def create_application() -> FastAPI:
     """
     Create and configure the FastAPI application.

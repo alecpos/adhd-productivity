@@ -16,8 +16,10 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union, Any
 from datetime import datetime
 
+
 class MLTaskType:
     """ML task types for template selection."""
+
     NLP = "nlp"
     TIME_SERIES = "time_series"
     COMPUTER_VISION = "computer_vision"
@@ -44,7 +46,7 @@ class MLTaskType:
             cls.OPTIMIZATION,
             cls.SCHEDULE_REBALANCING,
             cls.PROGRESS_MONITORING,
-            cls.CIRCADIAN_AWARE
+            cls.CIRCADIAN_AWARE,
         ]
 
     @classmethod
@@ -54,32 +56,35 @@ class MLTaskType:
             cls.REINFORCEMENT_LEARNING: [
                 "Threshold-based RL architectures for ADHD populations",
                 "Momentum-Aware RL with time-on-task decay models",
-                "Ethical RL Frameworks with adversarial debiasing"
+                "Ethical RL Frameworks with adversarial debiasing",
             ],
             cls.TIME_SERIES: [
                 "Ultradian cycle alignment (90-minute focus/rest cycles)",
                 "Personalized Chronotype Detection with federated learning",
-                "Dynamic Light Exposure Adjustments for task-switching"
+                "Dynamic Light Exposure Adjustments for task-switching",
             ],
             cls.SCHEDULE_REBALANCING: [
                 "Partial reinforcement schedules with dynamic reward shaping",
                 "Causal ML for ADHD management interventions",
-                "Equitable AI for preventing schedule optimization bias"
+                "Equitable AI for preventing schedule optimization bias",
             ],
             cls.CIRCADIAN_AWARE: [
                 "Sleep-wake phase predictions with differential privacy",
                 "Circadian Rhythm optimization for ADHD cognitive performance",
-                "40 lux blue light exposure effects on task-switching efficiency"
-            ]
+                "40 lux blue light exposure effects on task-switching efficiency",
+            ],
         }
 
         return research_mapping.get(domain, [])
 
+
 class TaskComplexity:
     """Complexity levels for ML tasks."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
+
 
 class MLTemplateSelector:
     """Selects and customizes ML reasoning templates based on task type and context."""
@@ -114,16 +119,16 @@ class MLTemplateSelector:
         return {
             "nlp": {
                 "ML Architecture": "### NLP Architecture\n- **Model Type:** [e.g., Transformer, LSTM, etc.]\n- **Tokenization Approach:** [approach details]\n- **Embedding Strategy:** [strategy details]\n- **Contextual Features:** [features description]",
-                "Ethical Considerations": "### NLP-Specific Ethical Considerations\n- **Language Bias Assessment:** [assessment details]\n- **Multilingual Support:** [support details]\n- **Cultural Context Awareness:** [awareness approach]"
+                "Ethical Considerations": "### NLP-Specific Ethical Considerations\n- **Language Bias Assessment:** [assessment details]\n- **Multilingual Support:** [support details]\n- **Cultural Context Awareness:** [awareness approach]",
             },
             "time_series": {
                 "ML Architecture": "### Time Series Architecture\n- **Model Type:** [e.g., ARIMA, Prophet, RNN, etc.]\n- **Forecasting Horizon:** [horizon details]\n- **Seasonality Handling:** [approach details]\n- **Anomaly Detection:** [detection method]",
-                "Data Requirements": "### Time Series Data Requirements\n- **Historical Data Span:** [time span required]\n- **Sampling Frequency:** [frequency details]\n- **Missing Data Strategy:** [strategy details]\n- **Seasonal Factors:** [factors to consider]"
+                "Data Requirements": "### Time Series Data Requirements\n- **Historical Data Span:** [time span required]\n- **Sampling Frequency:** [frequency details]\n- **Missing Data Strategy:** [strategy details]\n- **Seasonal Factors:** [factors to consider]",
             },
             "computer_vision": {
                 "ML Architecture": "### Computer Vision Architecture\n- **Model Type:** [e.g., CNN, YOLO, etc.]\n- **Image Preprocessing:** [preprocessing details]\n- **Feature Extraction:** [extraction approach]\n- **Augmentation Strategy:** [strategy details]",
-                "Ethical Considerations": "### Vision-Specific Ethical Considerations\n- **Facial Recognition Policy:** [policy details]\n- **Image Source Ethics:** [ethical considerations]\n- **Visual Privacy:** [privacy approach]"
-            }
+                "Ethical Considerations": "### Vision-Specific Ethical Considerations\n- **Facial Recognition Policy:** [policy details]\n- **Image Source Ethics:** [ethical considerations]\n- **Visual Privacy:** [privacy approach]",
+            },
         }
 
     def select_template(self, task_type: str, project_context: Dict[str, Any] = None) -> str:
@@ -224,8 +229,12 @@ class MLTemplateSelector:
 
         # Add to Research Alignment section if it exists
         if "## 3. Research Alignment" in template:
-            insert_position = template.find("## 3. Research Alignment") + len("## 3. Research Alignment")
-            template = template[:insert_position] + "\n\n" + research_section + template[insert_position:]
+            insert_position = template.find("## 3. Research Alignment") + len(
+                "## 3. Research Alignment"
+            )
+            template = (
+                template[:insert_position] + "\n\n" + research_section + template[insert_position:]
+            )
         else:
             # Or add as a new section if it doesn't exist
             template += "\n## Research Insights\n\n" + research_section
@@ -263,7 +272,9 @@ class MLTemplateSelector:
         """List all available templates."""
         return list(self.templates.keys())
 
-    def update_domain_specific_sections(self, task_type: str, section_updates: Dict[str, str]) -> None:
+    def update_domain_specific_sections(
+        self, task_type: str, section_updates: Dict[str, str]
+    ) -> None:
         """Update domain-specific sections for a task type."""
         if task_type not in self.domain_specific_sections:
             self.domain_specific_sections[task_type] = {}
@@ -279,6 +290,7 @@ class MLTemplateSelector:
     def get_domain_specific_sections(self, task_type: str) -> Dict[str, str]:
         """Get domain-specific sections for a task type."""
         return self.domain_specific_sections.get(task_type, {})
+
 
 def detect_ml_domain(task_description: str) -> str:
     """
@@ -305,69 +317,176 @@ def detect_ml_domain(task_description: str) -> str:
         MLTaskType.OPTIMIZATION: 0,
         MLTaskType.SCHEDULE_REBALANCING: 0,
         MLTaskType.PROGRESS_MONITORING: 0,
-        MLTaskType.CIRCADIAN_AWARE: 0
+        MLTaskType.CIRCADIAN_AWARE: 0,
     }
 
     # NLP-related keywords
     nlp_keywords = [
-        "text", "language", "nlp", "sentiment", "topic", "document", "word",
-        "sentence", "paragraph", "token", "bert", "gpt", "transformer",
-        "embedding", "semantic", "syntax", "grammar", "translation"
+        "text",
+        "language",
+        "nlp",
+        "sentiment",
+        "topic",
+        "document",
+        "word",
+        "sentence",
+        "paragraph",
+        "token",
+        "bert",
+        "gpt",
+        "transformer",
+        "embedding",
+        "semantic",
+        "syntax",
+        "grammar",
+        "translation",
     ]
 
     # Time-series related keywords
     time_series_keywords = [
-        "time series", "time-series", "temporal", "forecast", "prediction",
-        "sequence", "trend", "seasonal", "periodicity", "lstm", "arima",
-        "prophet", "anomaly detection", "time window", "timestamp"
+        "time series",
+        "time-series",
+        "temporal",
+        "forecast",
+        "prediction",
+        "sequence",
+        "trend",
+        "seasonal",
+        "periodicity",
+        "lstm",
+        "arima",
+        "prophet",
+        "anomaly detection",
+        "time window",
+        "timestamp",
     ]
 
     # Computer vision related keywords
     vision_keywords = [
-        "image", "vision", "computer vision", "video", "camera", "visual",
-        "object detection", "recognition", "segmentation", "cnn", "convolutional",
-        "yolo", "resnet", "pixel", "scene", "face", "gesture"
+        "image",
+        "vision",
+        "computer vision",
+        "video",
+        "camera",
+        "visual",
+        "object detection",
+        "recognition",
+        "segmentation",
+        "cnn",
+        "convolutional",
+        "yolo",
+        "resnet",
+        "pixel",
+        "scene",
+        "face",
+        "gesture",
     ]
 
     # Reinforcement Learning related keywords
     rl_keywords = [
-        "reinforcement", "rl", "agent", "environment", "reward", "action", "state",
-        "policy", "q-learning", "dqn", "a3c", "ppo", "mdp", "markov", "trajectory",
-        "episode", "adaptive schedule", "behavioral intervention"
+        "reinforcement",
+        "rl",
+        "agent",
+        "environment",
+        "reward",
+        "action",
+        "state",
+        "policy",
+        "q-learning",
+        "dqn",
+        "a3c",
+        "ppo",
+        "mdp",
+        "markov",
+        "trajectory",
+        "episode",
+        "adaptive schedule",
+        "behavioral intervention",
     ]
 
     # Multi-modal related keywords
     multimodal_keywords = [
-        "multi-modal", "multimodal", "cross-modal", "multiple modalities", "sensor fusion",
-        "modality", "heterogeneous data", "multi-input", "wearable", "biometric", "calendar"
+        "multi-modal",
+        "multimodal",
+        "cross-modal",
+        "multiple modalities",
+        "sensor fusion",
+        "modality",
+        "heterogeneous data",
+        "multi-input",
+        "wearable",
+        "biometric",
+        "calendar",
     ]
 
     # Optimization related keywords
     optimization_keywords = [
-        "optimization", "scheduling", "allocate", "maximize", "minimize", "constraint",
-        "objective function", "linear programming", "nonlinear", "combinatorial",
-        "opportunity cost", "tradeoff", "utility", "resource allocation"
+        "optimization",
+        "scheduling",
+        "allocate",
+        "maximize",
+        "minimize",
+        "constraint",
+        "objective function",
+        "linear programming",
+        "nonlinear",
+        "combinatorial",
+        "opportunity cost",
+        "tradeoff",
+        "utility",
+        "resource allocation",
     ]
 
     # Schedule rebalancing keywords
     rebalancing_keywords = [
-        "rebalance", "reschedule", "dynamic schedule", "adaptive scheduling", "task shift",
-        "schedule adjustment", "reallocation", "priority adjustment", "time management",
-        "executive function", "time blindness"
+        "rebalance",
+        "reschedule",
+        "dynamic schedule",
+        "adaptive scheduling",
+        "task shift",
+        "schedule adjustment",
+        "reallocation",
+        "priority adjustment",
+        "time management",
+        "executive function",
+        "time blindness",
     ]
 
     # Progress monitoring keywords
     monitoring_keywords = [
-        "monitor", "progress", "tracking", "real-time", "dashboard", "visualization",
-        "alert", "notification", "completion rate", "performance metric", "milestone",
-        "status update", "adaptive adjustment"
+        "monitor",
+        "progress",
+        "tracking",
+        "real-time",
+        "dashboard",
+        "visualization",
+        "alert",
+        "notification",
+        "completion rate",
+        "performance metric",
+        "milestone",
+        "status update",
+        "adaptive adjustment",
     ]
 
     # Circadian-aware keywords
     circadian_keywords = [
-        "circadian", "sleep", "wake", "rhythm", "diurnal", "cycle", "chronotype",
-        "morning", "evening", "ultradian", "energy level", "focus window", "sleep-wake",
-        "light exposure", "90-minute cycle", "chronobiology"
+        "circadian",
+        "sleep",
+        "wake",
+        "rhythm",
+        "diurnal",
+        "cycle",
+        "chronotype",
+        "morning",
+        "evening",
+        "ultradian",
+        "energy level",
+        "focus window",
+        "sleep-wake",
+        "light exposure",
+        "90-minute cycle",
+        "chronobiology",
     ]
 
     # Count keyword occurrences
@@ -421,10 +540,9 @@ def detect_ml_domain(task_description: str) -> str:
 
     return max(domain_scores.items(), key=lambda x: x[1])[0]
 
+
 def generate_from_template(
-    template_name: str,
-    output_path: str,
-    replacements: Optional[Dict[str, str]] = None
+    template_name: str, output_path: str, replacements: Optional[Dict[str, str]] = None
 ) -> None:
     """
     Generates a new file from a template with optional replacements.
@@ -453,16 +571,17 @@ def generate_from_template(
         return
 
     # Apply replacements
-    with open(template_path, 'r') as template_file:
+    with open(template_path, "r") as template_file:
         content = template_file.read()
 
     for placeholder, replacement in replacements.items():
         content = content.replace(placeholder, replacement)
 
-    with open(output_path, 'w') as output_file:
+    with open(output_path, "w") as output_file:
         output_file.write(content)
 
     print(f"Created {output_path} from template {template_name} with custom replacements")
+
 
 def main():
     """Main function to run the script."""
@@ -498,6 +617,7 @@ def main():
         f.write(template)
 
     print(f"Template for {domain} domain generated at {args.output}")
+
 
 if __name__ == "__main__":
     main()

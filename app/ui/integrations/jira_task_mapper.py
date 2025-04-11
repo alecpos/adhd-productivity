@@ -8,9 +8,17 @@ task objects and vice versa, ensuring proper field mapping and data consistency.
 import logging
 from typing import Any, Dict, List, Optional
 
-from app.core.integrations.external_task import ExternalTask, ExternalTaskStatus, ExternalTaskPriority
+from app.core.integrations.external_task import (
+    ExternalTask,
+    ExternalTaskStatus,
+    ExternalTaskPriority,
+)
 from app.ui.integrations.jira_field_mappers import (
-    StatusMapper, PriorityMapper, DateFormatter, FieldExtractor, CustomFieldMapper
+    StatusMapper,
+    PriorityMapper,
+    DateFormatter,
+    FieldExtractor,
+    CustomFieldMapper,
 )
 
 
@@ -64,7 +72,7 @@ class JiraTaskMapper:
             project_name=FieldExtractor.extract_project_name(fields),
             labels=fields.get("labels", []),
             url=FieldExtractor.get_issue_url(jira_issue),
-            raw_data=jira_issue  # Store original Jira data for reference
+            raw_data=jira_issue,  # Store original Jira data for reference
         )
 
         # Map custom fields
@@ -105,11 +113,7 @@ class JiraTaskMapper:
 
     def _create_base_jira_fields(self, task: ExternalTask) -> Dict[str, Any]:
         """Create the base Jira fields dictionary from task."""
-        return {
-            "summary": task.title,
-            "description": task.description or "",
-            "labels": task.labels
-        }
+        return {"summary": task.title, "description": task.description or "", "labels": task.labels}
 
     def _add_status_field_if_needed(self, task: ExternalTask, jira_fields: Dict[str, Any]) -> None:
         """Add status field to Jira fields if needed."""
@@ -119,7 +123,9 @@ class JiraTaskMapper:
                 # Note: Changing status in Jira typically requires a transition
                 jira_fields["status"] = {"name": jira_status}
 
-    def _add_priority_field_if_needed(self, task: ExternalTask, jira_fields: Dict[str, Any]) -> None:
+    def _add_priority_field_if_needed(
+        self, task: ExternalTask, jira_fields: Dict[str, Any]
+    ) -> None:
         """Add priority field to Jira fields if needed."""
         if task.priority != ExternalTaskPriority.MEDIUM:
             jira_priority = PriorityMapper.external_to_jira(task.priority)

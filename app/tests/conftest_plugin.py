@@ -10,6 +10,7 @@ import platform
 import sys
 import pytest
 
+
 # Define the hook to set up asyncio for pytest
 def pytest_configure(config):
     """Configure pytest to use the proper event loop policy."""
@@ -36,6 +37,7 @@ def pytest_configure(config):
 
         # Apply the patch to the policy
         policy.get_event_loop = patched_get_event_loop
+
 
 # Force the right event loop policy when this module is imported
 pytest_configure(None)

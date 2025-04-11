@@ -9,19 +9,24 @@ from app.schemas.schema_validation_schema import RequiredFieldRule, ValidationRu
 
 class NoneSchema(BaseSchema):
     """Schema for None type returns."""
+
     pass
 
 
 class DictSchema(BaseSchema):
     """Schema for dictionary returns."""
+
     data: Dict[str, Any] = Field(default_factory=dict)
 
 
 class SchemaManagerSchema(BaseSchema):
     """Manager for handling schema operations and migrations."""
+
     registry: SchemaRegistry = Field(default_factory=SchemaRegistry)
     factory: SchemaFactory = Field(default_factory=SchemaFactory)
-    migrations: Dict[str, Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]] = Field(default_factory=dict)
+    migrations: Dict[str, Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]] = Field(
+        default_factory=dict
+    )
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

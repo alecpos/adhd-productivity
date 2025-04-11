@@ -10,8 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
+
 # We should use BaseModel directly since it's our DeclarativeBase
 from app.models.base_model import BaseModel
+
 # Import all models to ensure proper table registration
 from app.database.base import Base
 
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Determine if the database is SQLite
 is_sqlite = "sqlite" in settings.DATABASE_URL
+
 
 # Define pool arguments separately to reduce nesting
 def get_engine_args() -> Dict[str, Any]:
@@ -42,11 +45,9 @@ def get_engine_args() -> Dict[str, Any]:
 
     return {**common_args, **pool_args}
 
+
 # Create engine with appropriate arguments
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    **get_engine_args()
-)
+engine = create_async_engine(settings.DATABASE_URL, **get_engine_args())
 
 async_session_maker = sessionmaker(
     engine,

@@ -27,7 +27,7 @@ from app.ml.temporal_pattern_recognition.models import (
     ProductivityPatternLSTM,
     CircadianRhythmModel,
     ProductivityCorrelationSystem,
-    MentalHealthFederatedModel
+    MentalHealthFederatedModel,
 )
 
 from app.schemas.scheduling_schema import EnergySchedulingPattern, WorkHours
@@ -106,9 +106,7 @@ class TemporalPatternRecognitionService:
             logger.info(f"Loaded federated model from {federated_model_path}")
         else:
             self.federated_model = MentalHealthFederatedModel(
-                input_dim=10,
-                dp_noise_multiplier=0.1,
-                dp_l2_norm_clip=1.0
+                input_dim=10, dp_noise_multiplier=0.1, dp_l2_norm_clip=1.0
             ).to(self.device)
             logger.info("Initialized new federated model")
 
@@ -154,7 +152,7 @@ class TemporalPatternRecognitionService:
             "productivity_pattern": self.productivity_pattern,
             "circadian_rhythm": self.circadian_rhythm,
             "correlation_system": self.correlation_system,
-            "federated_model": self.federated_model
+            "federated_model": self.federated_model,
         }
 
         for name, model in models.items():
@@ -170,7 +168,7 @@ class TemporalPatternRecognitionService:
         user_id: str,
         time_blocks: List[Dict[str, Any]],
         mental_health_logs: List[Dict[str, Any]],
-        days_to_predict: int = 7
+        days_to_predict: int = 7,
     ) -> Dict[str, Any]:
         """Analyze productivity patterns using the LSTM model.
 
@@ -187,6 +185,7 @@ class TemporalPatternRecognitionService:
 
         # Preprocess data for LSTM
         from app.ml.preprocessing.preprocessor import ProductivityPatternPreprocessor
+
         preprocessor = ProductivityPatternPreprocessor()
         X, y = preprocessor.preprocess(time_blocks, mental_health_logs)
 
@@ -199,21 +198,14 @@ class TemporalPatternRecognitionService:
             return {
                 "optimal_windows": optimal_windows,
                 "productivity_bottlenecks": bottlenecks,
-                "predictions": predictions.tolist()
+                "predictions": predictions.tolist(),
             }
         else:
             logger.warning("Not enough data for productivity pattern analysis")
-            return {
-                "optimal_windows": [],
-                "productivity_bottlenecks": [],
-                "predictions": []
-            }
+            return {"optimal_windows": [], "productivity_bottlenecks": [], "predictions": []}
 
     async def model_circadian_rhythm(
-        self,
-        user_id: str,
-        energy_logs: List[Dict[str, Any]],
-        user_data: Dict[str, Any]
+        self, user_id: str, energy_logs: List[Dict[str, Any]], user_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Model user's circadian rhythm for optimal task allocation.
 
@@ -228,24 +220,22 @@ class TemporalPatternRecognitionService:
         logger.info(f"Modeling circadian rhythm for user {user_id}")
 
         # Preprocess energy logs
-        X = np.array([[log['energy_level'], log['time_of_day'], log['day_of_week']]
-                     for log in energy_logs])
+        X = np.array(
+            [[log["energy_level"], log["time_of_day"], log["day_of_week"]] for log in energy_logs]
+        )
 
         # Make predictions
         predictions = self.circadian_rhythm.predict_energy_levels(X)
         optimal_times = self.circadian_rhythm.get_optimal_task_times(predictions)
 
-        return {
-            "energy_predictions": predictions.tolist(),
-            "optimal_task_times": optimal_times
-        }
+        return {"energy_predictions": predictions.tolist(), "optimal_task_times": optimal_times}
 
     async def generate_productivity_insights(
         self,
         user_id: str,
         time_blocks: List[Dict[str, Any]],
         mental_health_logs: List[Dict[str, Any]],
-        productivity_metrics: List[Dict[str, Any]]
+        productivity_metrics: List[Dict[str, Any]],
     ) -> Dict[str, Any]:
         """Generate productivity insights using correlation system.
 
@@ -261,34 +251,33 @@ class TemporalPatternRecognitionService:
         logger.info(f"Generating productivity insights for user {user_id}")
 
         # Combine features
-        X = np.array([
+        X = np.array(
             [
-                block['productivity_score'],
-                block['task_complexity'],
-                block['time_of_day'],
-                log['stress_level'],
-                log['sleep_quality'],
-                metric['focus_score'],
-                metric['distraction_count']
+                [
+                    block["productivity_score"],
+                    block["task_complexity"],
+                    block["time_of_day"],
+                    log["stress_level"],
+                    log["sleep_quality"],
+                    metric["focus_score"],
+                    metric["distraction_count"],
+                ]
+                for block, log, metric in zip(time_blocks, mental_health_logs, productivity_metrics)
             ]
-            for block, log, metric in zip(time_blocks, mental_health_logs, productivity_metrics)
-        ])
+        )
 
         # Analyze correlations
         correlations = self.correlation_system.analyze_correlations(X)
         feature_importance = self.correlation_system.get_feature_importance(X)
 
-        return {
-            "correlations": correlations,
-            "feature_importance": feature_importance
-        }
+        return {"correlations": correlations, "feature_importance": feature_importance}
 
     async def run_federated_analysis(
         self,
         user_id: str,
         mental_health_data: Dict[str, Any],
         anonymize: bool = True,
-        include_sensitive: bool = False
+        include_sensitive: bool = False,
     ) -> Dict[str, Any]:
         """Run federated analysis on mental health data.
 
@@ -304,19 +293,21 @@ class TemporalPatternRecognitionService:
         logger.info(f"Running federated analysis for user {user_id}")
 
         # Prepare data
-        X = np.array([
+        X = np.array(
             [
-                data['stress_level'],
-                data['anxiety_score'],
-                data['sleep_quality'],
-                data['mood_score'],
-                data['energy_level'],
-                data['focus_score'],
-                data['social_interaction'],
-                data['physical_activity']
+                [
+                    data["stress_level"],
+                    data["anxiety_score"],
+                    data["sleep_quality"],
+                    data["mood_score"],
+                    data["energy_level"],
+                    data["focus_score"],
+                    data["social_interaction"],
+                    data["physical_activity"],
+                ]
+                for data in mental_health_data["logs"]
             ]
-            for data in mental_health_data['logs']
-        ])
+        )
 
         # Get insights
         insights = self.federated_model.predict_mental_health_insights(X)
@@ -325,8 +316,8 @@ class TemporalPatternRecognitionService:
             "insights": insights,
             "privacy_metrics": {
                 "noise_multiplier": self.federated_model.dp_noise_multiplier,
-                "l2_norm_clip": self.federated_model.dp_l2_norm_clip
-            }
+                "l2_norm_clip": self.federated_model.dp_l2_norm_clip,
+            },
         }
 
     async def generate_comprehensive_insights(
@@ -336,7 +327,7 @@ class TemporalPatternRecognitionService:
         mental_health_logs: List[Dict[str, Any]],
         energy_logs: List[Dict[str, Any]],
         productivity_metrics: List[Dict[str, Any]],
-        user_data: Dict[str, Any]
+        user_data: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Generate comprehensive insights combining all models.
 
@@ -357,19 +348,15 @@ class TemporalPatternRecognitionService:
         productivity_results = await self.analyze_productivity_patterns(
             user_id, time_blocks, mental_health_logs
         )
-        circadian_results = await self.model_circadian_rhythm(
-            user_id, energy_logs, user_data
-        )
+        circadian_results = await self.model_circadian_rhythm(user_id, energy_logs, user_data)
         correlation_results = await self.generate_productivity_insights(
             user_id, time_blocks, mental_health_logs, productivity_metrics
         )
-        federated_results = await self.run_federated_analysis(
-            user_id, {"logs": mental_health_logs}
-        )
+        federated_results = await self.run_federated_analysis(user_id, {"logs": mental_health_logs})
 
         return {
             "productivity_analysis": productivity_results,
             "circadian_analysis": circadian_results,
             "correlation_analysis": correlation_results,
-            "federated_analysis": federated_results
+            "federated_analysis": federated_results,
         }

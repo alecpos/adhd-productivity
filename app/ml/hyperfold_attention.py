@@ -29,12 +29,13 @@ class RiemannianProjection(nn.Module):
     Based on the MIT Media Lab's research on non-Euclidean attention spaces
     for neurodivergent temporal pattern modeling.
     """
+
     def __init__(
         self,
         embedding_dim: int,
         manifold_dim: int,
         curvature: float = -1.0,
-        learnable_curvature: bool = True
+        learnable_curvature: bool = True,
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
@@ -47,7 +48,7 @@ class RiemannianProjection(nn.Module):
         if learnable_curvature:
             self.curvature = nn.Parameter(torch.tensor([curvature]))
         else:
-            self.register_buffer('curvature', torch.tensor([curvature]))
+            self.register_buffer("curvature", torch.tensor([curvature]))
 
         # Scale for numerical stability
         self.scale = nn.Parameter(torch.ones(1))
@@ -86,11 +87,12 @@ class TemporalFolding(nn.Module):
     Implements the multi-dimensional folding of temporal sequences to better
     capture daily, weekly, monthly, and seasonal patterns.
     """
+
     def __init__(
         self,
         embedding_dim: int,
         num_folds: int = 4,
-        fold_periods: List[int] = [24, 168, 720, 8760]  # hours in day, week, month, year
+        fold_periods: List[int] = [24, 168, 720, 8760],  # hours in day, week, month, year
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
@@ -98,19 +100,14 @@ class TemporalFolding(nn.Module):
         self.fold_periods = fold_periods
 
         # Projections for each fold dimension
-        self.fold_projections = nn.ModuleList([
-            nn.Linear(embedding_dim, embedding_dim // num_folds)
-            for _ in range(num_folds)
-        ])
+        self.fold_projections = nn.ModuleList(
+            [nn.Linear(embedding_dim, embedding_dim // num_folds) for _ in range(num_folds)]
+        )
 
         # Final integration layer
         self.integration = nn.Linear(embedding_dim, embedding_dim)
 
-    def forward(
-        self,
-        x: torch.Tensor,
-        timestamps: torch.Tensor
-    ) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, timestamps: torch.Tensor) -> torch.Tensor:
         """
         Apply temporal folding to input embeddings based on timestamps.
 
@@ -158,6 +155,7 @@ class HyperfoldAttention(nn.Module):
     pattern recognition, with adaptations for ADHD-specific time perception
     characteristics.
     """
+
     def __init__(
         self,
         embedding_dim: int,
@@ -165,7 +163,7 @@ class HyperfoldAttention(nn.Module):
         dropout: float = 0.1,
         use_riemannian: bool = True,
         use_temporal_folding: bool = True,
-        circadian_aware: bool = True
+        circadian_aware: bool = True,
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
@@ -193,7 +191,9 @@ class HyperfoldAttention(nn.Module):
 
         # Circadian-aware modulation
         if circadian_aware:
-            self.circadian_modulation = nn.Linear(embedding_dim + 1, embedding_dim)  # +1 for energy level
+            self.circadian_modulation = nn.Linear(
+                embedding_dim + 1, embedding_dim
+            )  # +1 for energy level
 
     def forward(
         self,
@@ -202,7 +202,7 @@ class HyperfoldAttention(nn.Module):
         value: torch.Tensor,
         timestamps: Optional[torch.Tensor] = None,
         energy_levels: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None
+        attention_mask: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Compute hyperfold attention.
@@ -286,6 +286,7 @@ class HyperfoldTemporalEncoder(nn.Module):
     This encoder is suitable for processing time series data with irregular
     patterns, particularly for ADHD-specific temporal characteristics.
     """
+
     def __init__(
         self,
         embedding_dim: int = 256,
@@ -295,25 +296,27 @@ class HyperfoldTemporalEncoder(nn.Module):
         dropout: float = 0.1,
         use_riemannian: bool = True,
         use_temporal_folding: bool = True,
-        circadian_aware: bool = True
+        circadian_aware: bool = True,
     ):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.num_layers = num_layers
 
         # Encoder layers
-        self.layers = nn.ModuleList([
-            HyperfoldEncoderLayer(
-                embedding_dim=embedding_dim,
-                num_heads=num_heads,
-                feed_forward_dim=feed_forward_dim,
-                dropout=dropout,
-                use_riemannian=use_riemannian,
-                use_temporal_folding=use_temporal_folding,
-                circadian_aware=circadian_aware
-            )
-            for _ in range(num_layers)
-        ])
+        self.layers = nn.ModuleList(
+            [
+                HyperfoldEncoderLayer(
+                    embedding_dim=embedding_dim,
+                    num_heads=num_heads,
+                    feed_forward_dim=feed_forward_dim,
+                    dropout=dropout,
+                    use_riemannian=use_riemannian,
+                    use_temporal_folding=use_temporal_folding,
+                    circadian_aware=circadian_aware,
+                )
+                for _ in range(num_layers)
+            ]
+        )
 
         # Layer normalization at the end
         self.layer_norm = nn.LayerNorm(embedding_dim)
@@ -323,7 +326,7 @@ class HyperfoldTemporalEncoder(nn.Module):
         x: torch.Tensor,
         timestamps: Optional[torch.Tensor] = None,
         energy_levels: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None
+        attention_mask: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Process sequences through the hyperfold encoder.
@@ -351,6 +354,7 @@ class HyperfoldEncoderLayer(nn.Module):
     """
     Single encoder layer with hyperfold attention mechanism.
     """
+
     def __init__(
         self,
         embedding_dim: int,
@@ -359,7 +363,7 @@ class HyperfoldEncoderLayer(nn.Module):
         dropout: float = 0.1,
         use_riemannian: bool = True,
         use_temporal_folding: bool = True,
-        circadian_aware: bool = True
+        circadian_aware: bool = True,
     ):
         super().__init__()
 
@@ -370,7 +374,7 @@ class HyperfoldEncoderLayer(nn.Module):
             dropout=dropout,
             use_riemannian=use_riemannian,
             use_temporal_folding=use_temporal_folding,
-            circadian_aware=circadian_aware
+            circadian_aware=circadian_aware,
         )
 
         # Feed-forward network
@@ -378,7 +382,7 @@ class HyperfoldEncoderLayer(nn.Module):
             nn.Linear(embedding_dim, feed_forward_dim),
             nn.GELU(),
             nn.Dropout(dropout),
-            nn.Linear(feed_forward_dim, embedding_dim)
+            nn.Linear(feed_forward_dim, embedding_dim),
         )
 
         # Layer normalizations
@@ -393,7 +397,7 @@ class HyperfoldEncoderLayer(nn.Module):
         x: torch.Tensor,
         timestamps: Optional[torch.Tensor] = None,
         energy_levels: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None
+        attention_mask: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Process input through the encoder layer.
@@ -416,7 +420,7 @@ class HyperfoldEncoderLayer(nn.Module):
             value=x,
             timestamps=timestamps,
             energy_levels=energy_levels,
-            attention_mask=attention_mask
+            attention_mask=attention_mask,
         )
         x = residual + self.dropout(attn_output)
 
@@ -439,13 +443,14 @@ class TemporalPatternPredictor(nn.Module):
     2. Recognizing patterns in task completion
     3. Detecting anomalies in productive periods
     """
+
     def __init__(
         self,
         input_dim: int,
         embedding_dim: int = 256,
         num_layers: int = 4,
         num_heads: int = 8,
-        num_patterns: int = 5  # Number of pattern classes to recognize
+        num_patterns: int = 5,  # Number of pattern classes to recognize
     ):
         super().__init__()
 
@@ -457,7 +462,7 @@ class TemporalPatternPredictor(nn.Module):
             embedding_dim=embedding_dim,
             num_layers=num_layers,
             num_heads=num_heads,
-            circadian_aware=True
+            circadian_aware=True,
         )
 
         # Pattern prediction head
@@ -467,10 +472,7 @@ class TemporalPatternPredictor(nn.Module):
         # as the optimality predictor
         if num_patterns != 1:
             # Time optimality prediction head (0-1 score for each time slot)
-            self.optimality_predictor = nn.Sequential(
-                nn.Linear(embedding_dim, 1),
-                nn.Sigmoid()
-            )
+            self.optimality_predictor = nn.Sequential(nn.Linear(embedding_dim, 1), nn.Sigmoid())
         self.num_patterns = num_patterns
 
     def forward(
@@ -478,7 +480,7 @@ class TemporalPatternPredictor(nn.Module):
         features: torch.Tensor,
         timestamps: torch.Tensor,
         energy_levels: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None
+        attention_mask: Optional[torch.Tensor] = None,
     ) -> Dict[str, torch.Tensor]:
         """
         Predict temporal patterns from input features.
@@ -500,10 +502,7 @@ class TemporalPatternPredictor(nn.Module):
 
         # Apply hyperfold encoder
         encoded = self.encoder(
-            x=x,
-            timestamps=timestamps,
-            energy_levels=energy_levels,
-            attention_mask=attention_mask
+            x=x, timestamps=timestamps, energy_levels=energy_levels, attention_mask=attention_mask
         )
 
         # Predict patterns
@@ -517,18 +516,15 @@ class TemporalPatternPredictor(nn.Module):
             optimality_scores = self.optimality_predictor(encoded)
 
         return {
-            'pattern_logits': pattern_logits,
-            'optimality_scores': optimality_scores,
-            'embeddings': encoded
+            "pattern_logits": pattern_logits,
+            "optimality_scores": optimality_scores,
+            "embeddings": encoded,
         }
 
 
 # Example usage function
 def integrate_hyperfold_with_calendar(
-    task_features_df,
-    user_energy_curve,
-    timestamps,
-    model_path=None
+    task_features_df, user_energy_curve, timestamps, model_path=None
 ):
     """
     Example function showing how to integrate the Hyperfold model with
@@ -547,8 +543,14 @@ def integrate_hyperfold_with_calendar(
     import torch
 
     # Convert inputs to tensors
-    feature_cols = ['duration_minutes', 'focus_required', 'executive_function_load',
-                    'creative_required', 'complexity', 'priority_numeric']
+    feature_cols = [
+        "duration_minutes",
+        "focus_required",
+        "executive_function_load",
+        "creative_required",
+        "complexity",
+        "priority_numeric",
+    ]
 
     features = torch.tensor(task_features_df[feature_cols].values, dtype=torch.float32)
     features = features.unsqueeze(0)  # Add batch dimension
@@ -578,53 +580,55 @@ def integrate_hyperfold_with_calendar(
     # Make predictions
     with torch.no_grad():
         predictions = model(
-            features=features,
-            timestamps=timestamps_tensor,
-            energy_levels=energy_tensor
+            features=features, timestamps=timestamps_tensor, energy_levels=energy_tensor
         )
 
     # Process results
-    optimality_scores = predictions['optimality_scores'].squeeze().numpy()
-    pattern_logits = predictions['pattern_logits'].squeeze().numpy()
+    optimality_scores = predictions["optimality_scores"].squeeze().numpy()
+    pattern_logits = predictions["pattern_logits"].squeeze().numpy()
 
     # Create output DataFrame
-    results_df = pd.DataFrame({
-        'timestamp': timestamps,
-        'optimality_score': optimality_scores,
-    })
+    results_df = pd.DataFrame(
+        {
+            "timestamp": timestamps,
+            "optimality_score": optimality_scores,
+        }
+    )
 
     # Add pattern probabilities
     pattern_probs = F.softmax(torch.tensor(pattern_logits), dim=-1).numpy()
-    pattern_names = ['focus_peak', 'creativity_peak', 'energy_dip',
-                     'execution_optimal', 'social_optimal']
+    pattern_names = [
+        "focus_peak",
+        "creativity_peak",
+        "energy_dip",
+        "execution_optimal",
+        "social_optimal",
+    ]
 
     for i, pattern in enumerate(pattern_names):
-        results_df[f'{pattern}_probability'] = pattern_probs[:, i]
+        results_df[f"{pattern}_probability"] = pattern_probs[:, i]
 
     # Identify optimal time windows (where score > 0.7)
     optimal_windows = []
     current_window = None
 
     for i, row in results_df.iterrows():
-        if row['optimality_score'] > 0.7:
+        if row["optimality_score"] > 0.7:
             if current_window is None:
-                current_window = {'start': row['timestamp'], 'score': row['optimality_score']}
+                current_window = {"start": row["timestamp"], "score": row["optimality_score"]}
             else:
                 # Update end time and average score
-                current_window['end'] = row['timestamp']
-                current_window['score'] = (current_window['score'] + row['optimality_score']) / 2
+                current_window["end"] = row["timestamp"]
+                current_window["score"] = (current_window["score"] + row["optimality_score"]) / 2
         elif current_window is not None:
             # Finalize the window
-            current_window['end'] = results_df.iloc[i-1]['timestamp']
+            current_window["end"] = results_df.iloc[i - 1]["timestamp"]
             optimal_windows.append(current_window)
             current_window = None
 
     # Add the last window if exists
     if current_window is not None:
-        current_window['end'] = results_df.iloc[-1]['timestamp']
+        current_window["end"] = results_df.iloc[-1]["timestamp"]
         optimal_windows.append(current_window)
 
-    return {
-        'detailed_scores': results_df,
-        'optimal_windows': optimal_windows
-    }
+    return {"detailed_scores": results_df, "optimal_windows": optimal_windows}

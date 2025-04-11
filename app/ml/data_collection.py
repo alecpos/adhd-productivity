@@ -26,9 +26,7 @@ class DataCollector:
         end_date: Optional[datetime] = None,
     ) -> List[Dict[str, Any]]:
         """Get mental health data for a user."""
-        query = select(MentalHealthModel).where(
-            MentalHealthModel.user_id == user_id
-        )
+        query = select(MentalHealthModel).where(MentalHealthModel.user_id == user_id)
         if start_date:
             query = query.where(MentalHealthModel.created_at >= start_date)
         if end_date:
@@ -55,9 +53,7 @@ class DataCollector:
         end_date: Optional[datetime] = None,
     ) -> List[Dict[str, Any]]:
         """Get energy level data for a user."""
-        query = select(EnergyLog).where(
-            EnergyLog.user_id == user_id
-        )
+        query = select(EnergyLog).where(EnergyLog.user_id == user_id)
         if start_date:
             query = query.where(EnergyLog.timestamp >= start_date)
         if end_date:
@@ -105,9 +101,7 @@ class DataCollector:
         end_date: Optional[datetime] = None,
     ) -> List[Dict[str, Any]]:
         """Get calendar event data for a user."""
-        query = select(CalendarEventModel).where(
-            CalendarEventModel.user_id == user_id
-        )
+        query = select(CalendarEventModel).where(CalendarEventModel.user_id == user_id)
         if start_date:
             query = query.where(CalendarEventModel.start_time >= start_date)
         if end_date:

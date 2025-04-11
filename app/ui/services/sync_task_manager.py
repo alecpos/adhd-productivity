@@ -161,8 +161,11 @@ class SyncTaskManager:
         return tasks_to_export, tasks_to_update
 
     async def _process_imports(
-        self, tasks: List[ExternalTask], user_id: str,
-        integration: ProjectToolIntegration, result: SyncResult
+        self,
+        tasks: List[ExternalTask],
+        user_id: str,
+        integration: ProjectToolIntegration,
+        result: SyncResult,
     ) -> None:
         """
         Process task imports.
@@ -181,13 +184,15 @@ class SyncTaskManager:
                 self.logger.info(f"Imported task {ext_task.external_id} from {integration.name}")
             except Exception as e:
                 self._handle_task_error(
-                    f"Error importing task {ext_task.external_id}: {str(e)}",
-                    result
+                    f"Error importing task {ext_task.external_id}: {str(e)}", result
                 )
 
     async def _process_import_updates(
-        self, task_pairs: List[Tuple[Dict[str, Any], ExternalTask]],
-        user_id: str, integration: ProjectToolIntegration, result: SyncResult
+        self,
+        task_pairs: List[Tuple[Dict[str, Any], ExternalTask]],
+        user_id: str,
+        integration: ProjectToolIntegration,
+        result: SyncResult,
     ) -> None:
         """
         Process task updates during import.
@@ -206,13 +211,15 @@ class SyncTaskManager:
                 self.logger.info(f"Updated task {ext_task.external_id} from {integration.name}")
             except Exception as e:
                 self._handle_task_error(
-                    f"Error updating task {ext_task.external_id}: {str(e)}",
-                    result
+                    f"Error updating task {ext_task.external_id}: {str(e)}", result
                 )
 
     async def _process_exports(
-        self, tasks: List[Dict[str, Any]], user_id: str,
-        integration: ProjectToolIntegration, result: SyncResult
+        self,
+        tasks: List[Dict[str, Any]],
+        user_id: str,
+        integration: ProjectToolIntegration,
+        result: SyncResult,
     ) -> None:
         """
         Process task exports.
@@ -231,14 +238,14 @@ class SyncTaskManager:
                 result.tasks_exported += 1
                 self.logger.info(f"Exported task {task.get('id')} to {integration.name}")
             except Exception as e:
-                self._handle_task_error(
-                    f"Error exporting task {task.get('id')}: {str(e)}",
-                    result
-                )
+                self._handle_task_error(f"Error exporting task {task.get('id')}: {str(e)}", result)
 
     async def _process_export_updates(
-        self, tasks: List[Dict[str, Any]], user_id: str,
-        integration: ProjectToolIntegration, result: SyncResult
+        self,
+        tasks: List[Dict[str, Any]],
+        user_id: str,
+        integration: ProjectToolIntegration,
+        result: SyncResult,
     ) -> None:
         """
         Process task updates during export.
@@ -257,8 +264,7 @@ class SyncTaskManager:
                 self.logger.info(f"Updated task {task.get('id')} in {integration.name}")
             except Exception as e:
                 self._handle_task_error(
-                    f"Error updating external task {task.get('external_id')}: {str(e)}",
-                    result
+                    f"Error updating external task {task.get('external_id')}: {str(e)}", result
                 )
 
     def _handle_task_error(self, error_msg: str, result: SyncResult) -> None:

@@ -179,7 +179,7 @@ class JiraApiClient:
             "method": method,
             "params": params,
             "headers": headers,
-            "json": json
+            "json": json,
         }
 
         if method == "DELETE":
@@ -243,8 +243,8 @@ class JiraApiClient:
                     "priority": {"name": "High"},
                     "assignee": {"displayName": "John Doe"},
                     "labels": ["adhd-calendar", "integration"],
-                    "project": {"id": "10000", "key": "PROJ"}
-                }
+                    "project": {"id": "10000", "key": "PROJ"},
+                },
             }
         ]
 
@@ -252,5 +252,5 @@ class JiraApiClient:
         """Return mock projects for testing."""
         return [
             {"id": "10000", "key": "PROJ1", "name": "Project One"},
-            {"id": "10001", "key": "PROJ2", "name": "Project Two"}
+            {"id": "10001", "key": "PROJ2", "name": "Project Two"},
         ]

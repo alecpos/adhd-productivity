@@ -9,6 +9,7 @@ import unittest
 import asyncio
 from typing import List, Dict, Any
 
+
 # Import just what we need for the test
 class MockAnalyticsService:
     """Simplified version of the AnalyticsService with only essential functions."""
@@ -19,7 +20,7 @@ class MockAnalyticsService:
             return "stable"
 
         # Simple linear trend
-        changes = [values[i] - values[i-1] for i in range(1, len(values))]
+        changes = [values[i] - values[i - 1] for i in range(1, len(values))]
         avg_change = sum(changes) / len(changes)
 
         if avg_change > 0.1:  # Threshold for improvement
@@ -29,75 +30,98 @@ class MockAnalyticsService:
         else:
             return "stable"
 
-    def generate_simple_insights(self,
-                               focus_ratings: List[float],
-                               productivity_ratings: List[float]) -> Dict[str, Any]:
+    def generate_simple_insights(
+        self, focus_ratings: List[float], productivity_ratings: List[float]
+    ) -> Dict[str, Any]:
         """Generate simple insights based on focus and productivity ratings."""
         insights = {
             "message": "Here are some insights based on your session history",
-            "insights": []
+            "insights": [],
         }
 
         # Add focus trend insight
         focus_trend = self._calculate_trend(focus_ratings)
         if focus_trend == "improving":
-            insights["insights"].append({
-                "type": "focus",
-                "insight": "Your focus has been improving over time",
-                "confidence": "high" if len(focus_ratings) > 5 else "medium"
-            })
+            insights["insights"].append(
+                {
+                    "type": "focus",
+                    "insight": "Your focus has been improving over time",
+                    "confidence": "high" if len(focus_ratings) > 5 else "medium",
+                }
+            )
         elif focus_trend == "declining":
-            insights["insights"].append({
-                "type": "focus",
-                "insight": "Your focus has been declining recently",
-                "confidence": "high" if len(focus_ratings) > 5 else "medium"
-            })
+            insights["insights"].append(
+                {
+                    "type": "focus",
+                    "insight": "Your focus has been declining recently",
+                    "confidence": "high" if len(focus_ratings) > 5 else "medium",
+                }
+            )
         else:
-            insights["insights"].append({
-                "type": "focus",
-                "insight": "Your focus has been stable",
-                "confidence": "medium"
-            })
+            insights["insights"].append(
+                {"type": "focus", "insight": "Your focus has been stable", "confidence": "medium"}
+            )
 
         # Add productivity trend insight
         productivity_trend = self._calculate_trend(productivity_ratings)
         if productivity_trend == "improving":
-            insights["insights"].append({
-                "type": "productivity",
-                "insight": "Your productivity has been improving over time",
-                "confidence": "high" if len(productivity_ratings) > 5 else "medium"
-            })
+            insights["insights"].append(
+                {
+                    "type": "productivity",
+                    "insight": "Your productivity has been improving over time",
+                    "confidence": "high" if len(productivity_ratings) > 5 else "medium",
+                }
+            )
         elif productivity_trend == "declining":
-            insights["insights"].append({
-                "type": "productivity",
-                "insight": "Your productivity has been declining recently",
-                "confidence": "high" if len(productivity_ratings) > 5 else "medium"
-            })
+            insights["insights"].append(
+                {
+                    "type": "productivity",
+                    "insight": "Your productivity has been declining recently",
+                    "confidence": "high" if len(productivity_ratings) > 5 else "medium",
+                }
+            )
         else:
-            insights["insights"].append({
-                "type": "productivity",
-                "insight": "Your productivity has been stable",
-                "confidence": "medium"
-            })
+            insights["insights"].append(
+                {
+                    "type": "productivity",
+                    "insight": "Your productivity has been stable",
+                    "confidence": "medium",
+                }
+            )
 
         # Add correlation insight if we have both metrics
-        if focus_ratings and productivity_ratings and len(focus_ratings) == len(productivity_ratings):
+        if (
+            focus_ratings
+            and productivity_ratings
+            and len(focus_ratings) == len(productivity_ratings)
+        ):
             # This is a very simplified correlation calculation
-            correlation = "strong" if abs(sum(focus_ratings) / len(focus_ratings) -
-                                       sum(productivity_ratings) / len(productivity_ratings)) < 0.5 else "weak"
+            correlation = (
+                "strong"
+                if abs(
+                    sum(focus_ratings) / len(focus_ratings)
+                    - sum(productivity_ratings) / len(productivity_ratings)
+                )
+                < 0.5
+                else "weak"
+            )
 
             if correlation == "strong":
-                insights["insights"].append({
-                    "type": "correlation",
-                    "insight": "There is a strong correlation between your focus and productivity",
-                    "confidence": "medium"
-                })
+                insights["insights"].append(
+                    {
+                        "type": "correlation",
+                        "insight": "There is a strong correlation between your focus and productivity",
+                        "confidence": "medium",
+                    }
+                )
             else:
-                insights["insights"].append({
-                    "type": "correlation",
-                    "insight": "There appears to be a weak correlation between your focus and productivity",
-                    "confidence": "low"
-                })
+                insights["insights"].append(
+                    {
+                        "type": "correlation",
+                        "insight": "There appears to be a weak correlation between your focus and productivity",
+                        "confidence": "low",
+                    }
+                )
 
         return insights
 
@@ -174,7 +198,7 @@ class TestAnalyticsService(unittest.TestCase):
 
 def run_tests():
     """Run the tests."""
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
 
 
 if __name__ == "__main__":

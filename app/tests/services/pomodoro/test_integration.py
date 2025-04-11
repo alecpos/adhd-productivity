@@ -18,7 +18,9 @@ async def setup_pomodoro_table(db_session: AsyncSession):
     connection = await db_session.connection()
 
     # Create the table if it doesn't exist
-    await connection.run_sync(lambda sync_conn: PomodoroSessionModel.__table__.create(sync_conn, checkfirst=True))
+    await connection.run_sync(
+        lambda sync_conn: PomodoroSessionModel.__table__.create(sync_conn, checkfirst=True)
+    )
 
     # Return the session for other fixtures to use
     return db_session
@@ -28,7 +30,9 @@ class TestPomodoroIntegration:
     """Integration tests for the Pomodoro service components."""
 
     @pytest.mark.asyncio
-    async def test_create_and_retrieve_session(self, setup_pomodoro_table, db_session: AsyncSession):
+    async def test_create_and_retrieve_session(
+        self, setup_pomodoro_table, db_session: AsyncSession
+    ):
         """Test creating and retrieving a session."""
         # Arrange
         service = PomodoroService(db=db_session)
@@ -37,11 +41,7 @@ class TestPomodoroIntegration:
 
         # Act - Create a new session
         session = await service.create_session(
-            user_id=user_id,
-            task_id=task_id,
-            duration=25,
-            break_duration=5,
-            long_break_duration=15
+            user_id=user_id, task_id=task_id, duration=25, break_duration=5, long_break_duration=15
         )
 
         # Act - Retrieve the session
@@ -68,11 +68,7 @@ class TestPomodoroIntegration:
 
         # Act - Create a new session
         session = await service.create_session(
-            user_id=user_id,
-            task_id=task_id,
-            duration=25,
-            break_duration=5,
-            long_break_duration=15
+            user_id=user_id, task_id=task_id, duration=25, break_duration=5, long_break_duration=15
         )
 
         # Act - Complete a work period
@@ -80,7 +76,7 @@ class TestPomodoroIntegration:
             "productivity_rating": 8,
             "distractions": 2,
             "notes": "Productive session",
-            "completed_tasks": [str(uuid.uuid4())]
+            "completed_tasks": [str(uuid.uuid4())],
         }
         await service.complete_work_period(session.id, completion_data)
 
@@ -96,7 +92,7 @@ class TestPomodoroIntegration:
         break_data = {
             "break_activity": "Quick walk",
             "refreshed_rating": 9,
-            "notes": "Felt refreshed"
+            "notes": "Felt refreshed",
         }
         await service.complete_break_period(session.id, break_data)
 
@@ -105,16 +101,16 @@ class TestPomodoroIntegration:
 
         # Assert - Check session after break period
         assert updated_session.status == PomodoroStatus.READY.value
-        assert hasattr(updated_session, 'breaks_taken')
+        assert hasattr(updated_session, "breaks_taken")
         assert len(updated_session.breaks_taken) == 1
-        assert updated_session.breaks_taken[0]['activity'] == "Quick walk"
+        assert updated_session.breaks_taken[0]["activity"] == "Quick walk"
 
         # Act - Record an interruption
         interruption_data = {
             "type": "phone_call",
             "duration": 5,
             "reason": "Important call",
-            "action_taken": "Paused timer"
+            "action_taken": "Paused timer",
         }
         await service.record_interruption(session.id, interruption_data)
 
@@ -124,7 +120,7 @@ class TestPomodoroIntegration:
         # Assert - Check session after interruption
         assert interrupted_session.status == PomodoroStatus.PAUSED.value
         assert len(interrupted_session.interruptions) == 1
-        assert interrupted_session.interruptions[0]['type'] == "phone_call"
+        assert interrupted_session.interruptions[0]["type"] == "phone_call"
 
     @pytest.mark.asyncio
     async def test_session_preferences_update(self, setup_pomodoro_table, db_session: AsyncSession):
@@ -136,18 +132,14 @@ class TestPomodoroIntegration:
 
         # Act - Create a new session
         session = await service.create_session(
-            user_id=user_id,
-            task_id=task_id,
-            duration=25,
-            break_duration=5,
-            long_break_duration=15
+            user_id=user_id, task_id=task_id, duration=25, break_duration=5, long_break_duration=15
         )
 
         # Act - Update session preferences
         preferences = {
             "work_duration": 30,
             "short_break_duration": 10,
-            "sound_notifications": False
+            "sound_notifications": False,
         }
         updated_session = await service.update_session_preferences(session.id, preferences)
 
@@ -165,7 +157,9 @@ class TestPomodoroIntegration:
         assert retrieved_session.meta_data["sound_notifications"] == False
 
     @pytest.mark.asyncio
-    async def test_user_sessions_and_analytics(self, setup_pomodoro_table, db_session: AsyncSession):
+    async def test_user_sessions_and_analytics(
+        self, setup_pomodoro_table, db_session: AsyncSession
+    ):
         """Test retrieving user sessions and analytics."""
         # Arrange
         service = PomodoroService(db=db_session)
@@ -174,25 +168,15 @@ class TestPomodoroIntegration:
 
         # Act - Create multiple sessions for the user
         session1 = await service.create_session(
-            user_id=user_id,
-            task_id=task_id,
-            duration=25,
-            break_duration=5
+            user_id=user_id, task_id=task_id, duration=25, break_duration=5
         )
 
         session2 = await service.create_session(
-            user_id=user_id,
-            task_id=task_id,
-            duration=30,
-            break_duration=10
+            user_id=user_id, task_id=task_id, duration=30, break_duration=10
         )
 
         # Complete first session's work period
-        completion_data = {
-            "productivity_rating": 8,
-            "distractions": 2,
-            "notes": "Good focus"
-        }
+        completion_data = {"productivity_rating": 8, "distractions": 2, "notes": "Good focus"}
         await service.complete_work_period(session1.id, completion_data)
 
         # Act - Get user sessions

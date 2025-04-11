@@ -4,7 +4,7 @@ import json
 import os
 
 # Load the analysis file
-with open('adhd_calendar_analysis.json', 'r') as f:
+with open("adhd_calendar_analysis.json", "r") as f:
     analysis = json.load(f)
 
 # Files to check
@@ -13,7 +13,7 @@ target_files = [
     "/Users/alecposner/documents/adhd_calendar_backend/app/main.py",
     "/Users/alecposner/documents/adhd_calendar_backend/app/ui/project_management_integration.py",
     "/Users/alecposner/documents/adhd_calendar_backend/app/ui/integrations/jira_integration.py",
-    "/Users/alecposner/documents/adhd_calendar_backend/app/ui/services/sync_service.py"
+    "/Users/alecposner/documents/adhd_calendar_backend/app/ui/services/sync_service.py",
 ]
 
 # Find and report nested depth
@@ -24,6 +24,6 @@ for file_data in analysis:
         print(f"  Cyclomatic Complexity: {file_data['cyclomatic_complexity']}")
         print(f"  Maintainability Index: {file_data['maintainability_index']}")
         print(f"  Technical Debt Scores:")
-        for score_name, score_value in file_data['technical_debt_scores'].items():
+        for score_name, score_value in file_data["technical_debt_scores"].items():
             print(f"    {score_name}: {score_value}")
         print()

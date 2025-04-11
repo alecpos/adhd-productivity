@@ -64,7 +64,7 @@ class JiraAuthenticator:
         auth_methods = {
             "basic": self._authenticate_basic,
             "token": self._authenticate_token,
-            "oauth": self._authenticate_oauth
+            "oauth": self._authenticate_oauth,
         }
 
         # Check if the configured method is supported
@@ -118,7 +118,9 @@ class JiraAuthenticator:
         # API tokens last longer, so use 24 hour expiry
         return self._set_auth_credentials(credentials, "Token authentication", expiry_seconds=86400)
 
-    def _set_auth_credentials(self, credentials: str, auth_type: str, expiry_seconds: int = 3600) -> bool:
+    def _set_auth_credentials(
+        self, credentials: str, auth_type: str, expiry_seconds: int = 3600
+    ) -> bool:
         """
         Encode credentials and set authentication token.
 
@@ -277,7 +279,7 @@ class JiraAuthenticator:
             "token_expiry_seconds": round(time_remaining),
             "auth_errors": self.auth_errors,
             "last_authenticated": self.token_expiry - 3600 if self.token_expiry else None,
-            "username": self.config.username if self.authenticated else None
+            "username": self.config.username if self.authenticated else None,
         }
 
     def get_health_metrics(self) -> Dict[str, object]:
@@ -291,5 +293,7 @@ class JiraAuthenticator:
             "is_healthy": self.authenticated and self._is_token_valid(),
             "auth_errors": self.auth_errors,
             "auth_method": self.config.auth_method,
-            "token_time_remaining_seconds": round(max(0, self.token_expiry - time.time())) if self.token_expiry else 0
+            "token_time_remaining_seconds": (
+                round(max(0, self.token_expiry - time.time())) if self.token_expiry else 0
+            ),
         }

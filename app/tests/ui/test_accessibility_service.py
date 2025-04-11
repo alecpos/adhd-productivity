@@ -23,6 +23,7 @@ from app.ui.accessibility import (
     WCAGComplianceLevel,
 )
 
+
 class TestAccessibilityService:
     """Test the AccessibilityService directly without FastAPI dependencies."""
 
@@ -69,11 +70,9 @@ class TestAccessibilityService:
         await asyncio.sleep(0.001)
 
         # Update preferences
-        updated = await service.update_user_preferences("update_user", {
-            "color_theme": ColorTheme.DARK,
-            "font_size": 20,
-            "reduced_motion": True
-        })
+        updated = await service.update_user_preferences(
+            "update_user", {"color_theme": ColorTheme.DARK, "font_size": 20, "reduced_motion": True}
+        )
 
         # Verify updates were applied
         assert updated.color_theme == ColorTheme.DARK
@@ -98,7 +97,7 @@ class TestAccessibilityService:
             color_theme=ColorTheme.DARK,
             font_style=FontStyle.COMIC_SANS,
             font_size=20,
-            layout_density=LayoutDensity.SPACIOUS
+            layout_density=LayoutDensity.SPACIOUS,
         )
         service.user_preferences["theme_user"] = preferences
 
@@ -156,7 +155,7 @@ class TestAccessibilityService:
             color_theme=ColorTheme.CALM,
             notification_style=NotificationStyle.PERSISTENT,
             focus_assist_level=FocusAssistLevel.HIGH,
-            distraction_reduction=True
+            distraction_reduction=True,
         )
         service.user_preferences["ui_user"] = preferences
 
@@ -182,8 +181,7 @@ class TestAccessibilityService:
 
         # Get UI settings with context
         context_settings = await service.generate_adhd_optimized_ui_settings(
-            "ui_user",
-            {"current_hour": 22, "energy_level": 0.3}
+            "ui_user", {"current_hour": 22, "energy_level": 0.3}
         )
 
         # Verify evening adaptations - check for blue light filter and/or darker colors
@@ -191,9 +189,10 @@ class TestAccessibilityService:
         css_vars = context_settings["css_variables"]
         has_evening_adaptations = (
             # Check for possible evening mode indicators
-            "--blue-light-filter" in css_vars or
-            "--night-mode" in css_vars or
-            "--reduced-brightness" in css_vars or
+            "--blue-light-filter" in css_vars
+            or "--night-mode" in css_vars
+            or "--reduced-brightness" in css_vars
+            or
             # Or check if there are color modifications due to evening
             (css_vars.get("--contrast-ratio", "1.0") != "1.0")
         )
@@ -202,8 +201,10 @@ class TestAccessibilityService:
         if not has_evening_adaptations:
             # Check for color variables that might indicate evening mode
             has_evening_adaptations = (
-                "--background-color" in css_vars and css_vars["--background-color"].startswith("#") or
-                "--text-color" in css_vars and css_vars["--text-color"].startswith("#")
+                "--background-color" in css_vars
+                and css_vars["--background-color"].startswith("#")
+                or "--text-color" in css_vars
+                and css_vars["--text-color"].startswith("#")
             )
 
         assert has_evening_adaptations, "No evening mode adaptations detected"
@@ -211,8 +212,9 @@ class TestAccessibilityService:
         # Verify energy-based adaptations are present in some form
         has_energy_adaptations = (
             # Check interactions are adjusted for low energy
-            context_settings["interactions"].get("reduced_interaction_required", False) or
-            context_settings["interactions"].get("simplify_ui", False) or
+            context_settings["interactions"].get("reduced_interaction_required", False)
+            or context_settings["interactions"].get("simplify_ui", False)
+            or
             # Check for any energy-related setting
             any("energy" in key.lower() for key in context_settings.keys())
         )

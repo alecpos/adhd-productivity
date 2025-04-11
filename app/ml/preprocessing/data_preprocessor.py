@@ -8,6 +8,7 @@ import pandas as pd
 import tensorflow as tf
 from datetime import datetime
 
+
 class DataPreprocessor:
     def __init__(self):
         self.mood_scaler = StandardScaler()

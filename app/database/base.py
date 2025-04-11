@@ -21,6 +21,7 @@ Base = declarative_base()
 # we'll leave it to the engine initialization code to ensure models are loaded
 # when needed.
 
+
 # Create async engine
 def create_engine():
     """Create SQLAlchemy engine with settings."""
@@ -32,6 +33,7 @@ def create_engine():
         max_overflow=settings.DB_MAX_OVERFLOW,
     )
     return engine
+
 
 # Define session
 def create_session_factory(engine):

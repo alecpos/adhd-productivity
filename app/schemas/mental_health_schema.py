@@ -17,7 +17,9 @@ class MentalHealthLogBaseSchema(BaseModel):
     notes: Optional[str] = Field(None, description="Additional notes or context")
     energy_level: Optional[int] = Field(None, ge=1, le=10, description="Energy level from 1-10")
     sleep_quality: Optional[int] = Field(None, ge=1, le=10, description="Sleep quality from 1-10")
-    activity_log: Optional[List[str]] = Field(None, description="List of activities during this period")
+    activity_log: Optional[List[str]] = Field(
+        None, description="List of activities during this period"
+    )
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -31,7 +33,9 @@ class MentalHealthLogBaseSchema(BaseModel):
 class MentalHealthLogCreateSchema(MentalHealthLogBaseSchema):
     """Schema for creating a mental health log"""
 
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="When this log was created")
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow, description="When this log was created"
+    )
 
 
 class MentalHealthLogUpdateSchema(BaseModel):
@@ -73,11 +77,19 @@ class MentalHealthStatsSchema(BaseModel):
     average_anxiety: float = Field(..., description="Average anxiety level")
     average_energy: Optional[float] = Field(None, description="Average energy level")
     average_sleep: Optional[float] = Field(None, description="Average sleep quality")
-    most_common_activities: List[str] = Field(default_factory=list, description="Most frequent activities")
+    most_common_activities: List[str] = Field(
+        default_factory=list, description="Most frequent activities"
+    )
     last_log_date: Optional[datetime] = Field(None, description="Date of the last log")
-    streak_days: Optional[int] = Field(None, description="Current streak of consecutive days with logs")
-    improvement_areas: List[str] = Field(default_factory=list, description="Areas needing improvement")
-    progress_indicators: Dict[str, Any] = Field(default_factory=dict, description="Progress indicators")
+    streak_days: Optional[int] = Field(
+        None, description="Current streak of consecutive days with logs"
+    )
+    improvement_areas: List[str] = Field(
+        default_factory=list, description="Areas needing improvement"
+    )
+    progress_indicators: Dict[str, Any] = Field(
+        default_factory=dict, description="Progress indicators"
+    )
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -88,9 +100,15 @@ class MentalHealthInsightsSchema(BaseModel):
     mood_average: float = Field(..., description="Average mood score over the period")
     stress_average: float = Field(..., description="Average stress level over the period")
     anxiety_average: float = Field(..., description="Average anxiety level over the period")
-    energy_average: Optional[float] = Field(None, description="Average energy level over the period")
-    sleep_quality_average: Optional[float] = Field(None, description="Average sleep quality over the period")
-    common_activities: Optional[List[str]] = Field(None, description="Most common activities logged")
+    energy_average: Optional[float] = Field(
+        None, description="Average energy level over the period"
+    )
+    sleep_quality_average: Optional[float] = Field(
+        None, description="Average sleep quality over the period"
+    )
+    common_activities: Optional[List[str]] = Field(
+        None, description="Most common activities logged"
+    )
     recommendations: List[str] = Field(..., description="Personalized recommendations")
     stress_indicators: List[str] = Field(..., description="Identified stress indicators")
 
@@ -105,7 +123,9 @@ class MentalHealthTrendsSchema(BaseModel):
     stress_trend: List[Dict[str, Any]] = Field(..., description="Stress level trends")
     anxiety_trend: List[Dict[str, Any]] = Field(..., description="Anxiety level trends")
     energy_trend: Optional[List[Dict[str, Any]]] = Field(None, description="Energy level trends")
-    correlations: Optional[List[Dict[str, Any]]] = Field(None, description="Identified correlations")
+    correlations: Optional[List[Dict[str, Any]]] = Field(
+        None, description="Identified correlations"
+    )
 
     model_config = ConfigDict(from_attributes=True)
 

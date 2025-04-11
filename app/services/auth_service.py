@@ -60,9 +60,7 @@ class AuthService:
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt
 
-    def create_expired_token(
-        self, data: Dict[str, Any]
-    ) -> str:
+    def create_expired_token(self, data: Dict[str, Any]) -> str:
         """Create an expired token for testing."""
         to_encode = data.copy()
         expire = datetime.utcnow() - timedelta(minutes=1)
@@ -114,9 +112,7 @@ class AuthService:
             if user_id is None:
                 raise UnauthorizedException("Invalid refresh token")
 
-            query = (
-                select(UserModel).where(UserModel.id == UUID(user_id)).with_for_update()
-            )
+            query = select(UserModel).where(UserModel.id == UUID(user_id)).with_for_update()
             result = await self.db.execute(query)
             user = result.scalar_one_or_none()
 
@@ -316,8 +312,7 @@ class AuthService:
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db)
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ) -> UserModel:
     """Get the current user from a token.
 

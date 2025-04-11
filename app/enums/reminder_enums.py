@@ -2,8 +2,10 @@
 
 from enum import Enum
 
+
 class ReminderType(Enum):
     """Reminder type enum."""
+
     MENTAL_HEALTH_CHECK = "mental_health_check"
     TASK_DUE = "task_due"
     FOCUS_SESSION = "focus_session"
@@ -13,14 +15,17 @@ class ReminderType(Enum):
     EXERCISE = "exercise"
     CUSTOM = "custom"
 
+
 class ReminderFrequency(Enum):
     """Reminder frequency enum."""
+
     ONCE = "once"
     HOURLY = "hourly"
     DAILY = "daily"
     WEEKLY = "weekly"
     MONTHLY = "monthly"
     CUSTOM = "custom"
+
 
 class ReminderType(Enum):
     MENTAL_HEALTH_CHECK = "mental_health_check"

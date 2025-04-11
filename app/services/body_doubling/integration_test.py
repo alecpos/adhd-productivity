@@ -37,6 +37,7 @@ except ImportError as e:
     logger.error("Make sure the database and model dependencies are properly set up")
     sys.exit(1)
 
+
 async def create_test_session(db, user_id=None, completed=True):
     """Create a test session in the database."""
     if user_id is None:
@@ -56,10 +57,7 @@ async def create_test_session(db, user_id=None, completed=True):
         activity_type="Programming",
         focus_rating=None,
         productivity_rating=None,
-        meta_data={
-            "participants": [str(user_id), str(uuid.uuid4())],
-            "feedback": []
-        }
+        meta_data={"participants": [str(user_id), str(uuid.uuid4())], "feedback": []},
     )
 
     db.add(session)
@@ -68,6 +66,7 @@ async def create_test_session(db, user_id=None, completed=True):
 
     logger.info(f"Created test session: {session.id}")
     return session
+
 
 async def cleanup_test_sessions(db, session_ids):
     """Clean up test sessions from the database."""
@@ -85,6 +84,7 @@ async def cleanup_test_sessions(db, session_ids):
     await db.commit()
     logger.info("Cleanup completed")
 
+
 async def test_add_feedback(db, analytics_service):
     """Test adding feedback to a session."""
     # Create a test user and session
@@ -96,7 +96,7 @@ async def test_add_feedback(db, analytics_service):
         "focus_rating": 4,
         "productivity_rating": 5,
         "distraction_level": 2,
-        "notes": "This was a productive integration test session"
+        "notes": "This was a productive integration test session",
     }
 
     logger.info(f"Adding feedback for session {session.id}")
@@ -113,12 +113,13 @@ async def test_add_feedback(db, analytics_service):
 
         assert updated_session.focus_rating == 4
         assert updated_session.productivity_rating == 5
-        assert len(updated_session.meta_data['feedback']) == 1
+        assert len(updated_session.meta_data["feedback"]) == 1
 
         return session.id
     except Exception as e:
         logger.error(f"Error adding feedback: {e}")
         return session.id
+
 
 async def test_get_user_analytics(db, analytics_service):
     """Test getting user analytics."""
@@ -140,12 +141,10 @@ async def test_get_user_analytics(db, analytics_service):
                 "focus_rating": rating,
                 "productivity_rating": rating,
                 "distraction_level": 3 - i,  # 3, 2, 1
-                "notes": f"Integration test session {i+1}"
+                "notes": f"Integration test session {i+1}",
             }
 
-            await analytics_service.add_session_feedback(
-                session.id, user_id, feedback_data
-            )
+            await analytics_service.add_session_feedback(session.id, user_id, feedback_data)
 
             # Set different activity types
             activity_types = ["Programming", "Reading", "Programming"]
@@ -175,6 +174,7 @@ async def test_get_user_analytics(db, analytics_service):
         logger.error(f"Error testing user analytics: {e}")
         return session_ids
 
+
 async def test_get_focus_pattern_insights(db, analytics_service, session_ids):
     """Test getting focus pattern insights."""
     if not session_ids:
@@ -201,6 +201,7 @@ async def test_get_focus_pattern_insights(db, analytics_service, session_ids):
         assert "insights generated successfully" in insights["message"]
     except Exception as e:
         logger.error(f"Error testing focus pattern insights: {e}")
+
 
 async def run_integration_tests():
     """Run all integration tests."""
@@ -240,6 +241,7 @@ async def run_integration_tests():
             logger.error(f"Error during cleanup: {e}")
 
     logger.info("=== AnalyticsService Integration Tests Completed ===")
+
 
 if __name__ == "__main__":
     # Run the async tests

@@ -42,7 +42,7 @@ class TestPomodoroService:
             "meta_data": {
                 "auto_start_breaks": False,
                 "sound_notifications": True,
-                "strict_mode": False
+                "strict_mode": False,
             },
             "completed_tasks": [],
             "focus_scores": [],
@@ -57,7 +57,7 @@ class TestPomodoroService:
             "total_focus_time": 0,
             "success_rate": 0.0,
             "productivity_score": None,
-            "focus_level": None
+            "focus_level": None,
         }
 
     @pytest.fixture
@@ -71,6 +71,7 @@ class TestPomodoroService:
 
     def setup_db_mocks(self, mock_db, sample_session, scenario="success"):
         """Set up database mocks for testing."""
+
         # Setup a class that simulates scalars().all() behavior
         class ScalarsMock:
             def all(self):
@@ -83,9 +84,15 @@ class TestPomodoroService:
             result_mock = MagicMock()
 
             # For a select query looking for a single item by id
-            if isinstance(query, select.__class__) and hasattr(query, '_where_criteria') and len(query._where_criteria) > 0:
+            if (
+                isinstance(query, select.__class__)
+                and hasattr(query, "_where_criteria")
+                and len(query._where_criteria) > 0
+            ):
                 # Simulate looking for a session by ID
-                result_mock.scalar_one_or_none.return_value = sample_session if scenario != "not_found" else None
+                result_mock.scalar_one_or_none.return_value = (
+                    sample_session if scenario != "not_found" else None
+                )
                 result_mock.scalars.return_value = ScalarsMock()
 
             # For an update operation
@@ -115,7 +122,9 @@ class TestPomodoroService:
         session_manager.get_one = AsyncMock(return_value=sample_session)
 
         # Mock the schema conversion in the service method
-        with patch('app.schemas.pomodoro_schema.PomodoroResponseSchema.model_validate') as mock_validate:
+        with patch(
+            "app.schemas.pomodoro_schema.PomodoroResponseSchema.model_validate"
+        ) as mock_validate:
             mock_validate.return_value = response_schema
 
             # Act
@@ -124,7 +133,7 @@ class TestPomodoroService:
             # Assert
             assert result is not None
             assert result.id == sample_session["id"]
-            session_manager.get_one.assert_called_once_with(filters={'id': sample_session["id"]})
+            session_manager.get_one.assert_called_once_with(filters={"id": sample_session["id"]})
 
     @pytest.mark.asyncio
     async def test_get_session_not_found(self, mock_db, sample_session):
@@ -142,7 +151,7 @@ class TestPomodoroService:
 
         assert exc_info.value.status_code == 404
         assert exc_info.value.detail == "Session not found"
-        session_manager.get_one.assert_called_once_with(filters={'id': random_id})
+        session_manager.get_one.assert_called_once_with(filters={"id": random_id})
 
     @pytest.mark.asyncio
     async def test_get_user_sessions(self, mock_db, sample_session):
@@ -199,14 +208,17 @@ class TestPomodoroService:
         mock_db.refresh = AsyncMock()  # Async operation
 
         # Mock the model_validate to return the sample session as a schema
-        with patch('app.schemas.pomodoro_schema.PomodoroResponseSchema.model_validate', return_value=PomodoroResponseSchema.model_validate(sample_session)):
+        with patch(
+            "app.schemas.pomodoro_schema.PomodoroResponseSchema.model_validate",
+            return_value=PomodoroResponseSchema.model_validate(sample_session),
+        ):
             # Act
             result = await session_manager.create_session(
                 user_id=sample_session["user_id"],
                 task_id=sample_session["task_id"],
                 duration=sample_session["work_duration"],
                 break_duration=sample_session["short_break_duration"],
-                long_break_duration=sample_session["long_break_duration"]
+                long_break_duration=sample_session["long_break_duration"],
             )
 
             # Assert - check individual fields
@@ -238,9 +250,11 @@ class TestPomodoroService:
         updated_obj = MagicMock()
         for key, value in sample_session.items():
             setattr(updated_obj, key, value)
-        updated_obj.focus_scores = [{'productivity_rating': 8, 'distractions': 2, 'notes': 'Productive session'}]
+        updated_obj.focus_scores = [
+            {"productivity_rating": 8, "distractions": 2, "notes": "Productive session"}
+        ]
         updated_obj.completed_tasks = []
-        updated_obj.status = 'break'
+        updated_obj.status = "break"
         updated_obj.completed_sessions = 1
         updated_obj.current_session = 2
 
@@ -252,7 +266,7 @@ class TestPomodoroService:
             "productivity_rating": 8,
             "distractions": 2,
             "notes": "Productive session",
-            "completed_tasks": [str(uuid.uuid4())]
+            "completed_tasks": [str(uuid.uuid4())],
         }
 
         # Act
@@ -270,11 +284,11 @@ class TestPomodoroService:
         assert update_data["current_session"] == 2
 
         # Check the result contains expected values
-        assert result.status == 'break'
+        assert result.status == "break"
         assert result.completed_sessions == 1
         assert result.current_session == 2
         assert len(result.focus_scores) == 1
-        assert result.focus_scores[0]['productivity_rating'] == 8
+        assert result.focus_scores[0]["productivity_rating"] == 8
 
     @pytest.mark.asyncio
     async def test_complete_break_period(self, mock_db, sample_session):
@@ -298,7 +312,7 @@ class TestPomodoroService:
         break_data = {
             "break_activity": "Quick walk",
             "refreshed_rating": 9,
-            "notes": "Felt refreshed"
+            "notes": "Felt refreshed",
         }
 
         # Act
@@ -332,7 +346,7 @@ class TestPomodoroService:
         preferences = {
             "work_duration": 30,
             "short_break_duration": 10,
-            "sound_notifications": False
+            "sound_notifications": False,
         }
 
         # Act
@@ -355,8 +369,8 @@ class TestPomodoroService:
 
         # Add get_one method as it's used but not in BaseService
         async def get_one(filters=None):
-            if filters and 'id' in filters:
-                if filters['id'] == sample_session['id']:
+            if filters and "id" in filters:
+                if filters["id"] == sample_session["id"]:
                     return sample_session
             return None
 

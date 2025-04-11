@@ -7,6 +7,7 @@ from fastapi import HTTPException
 # Instead of importing the real function, we'll create a mock
 # from app.routes.scheduling_routes import optimize_with_circadian
 
+
 # Mock implementation of the optimize_with_circadian function
 async def mock_optimize_with_circadian(request, current_user, db):
     """Mock implementation for testing."""
@@ -19,23 +20,23 @@ async def mock_optimize_with_circadian(request, current_user, db):
                 "end_time": "2025-03-15 11:00:00",
                 "cognitive_category": "focus_intensive",
                 "energy_level": 8.0,
-                "suitability_score": 0.85
+                "suitability_score": 0.85,
             }
         ],
         "energy_curve": [
             {"hour": 9, "energy_level": 8.0},
             {"hour": 10, "energy_level": 7.5},
-            {"hour": 14, "energy_level": 6.0}
+            {"hour": 14, "energy_level": 6.0},
         ],
-        "message": "Schedule optimized with circadian rhythm awareness"
+        "message": "Schedule optimized with circadian rhythm awareness",
     }
+
 
 # Mock implementation for error testing
 async def mock_optimize_with_circadian_error(request, current_user, db):
     """Mock implementation that raises an exception."""
     raise HTTPException(
-        status_code=500,
-        detail="Error optimizing schedule with circadian awareness: Test error"
+        status_code=500, detail="Error optimizing schedule with circadian awareness: Test error"
     )
 
 
@@ -64,15 +65,13 @@ class TestSchedulingRoutesEpic4:
                 complexity=6,
                 priority=MagicMock(value=3),
                 is_flexible=True,
-                deadline=None
+                deadline=None,
             )
         ]
 
         # Call our mock function directly
         response = await mock_optimize_with_circadian(
-            request=request,
-            current_user=current_user,
-            db=db
+            request=request, current_user=current_user, db=db
         )
 
         # Verify we got the expected response
@@ -103,9 +102,7 @@ class TestSchedulingRoutesEpic4:
         # Call should raise HTTPException
         with pytest.raises(HTTPException) as exc_info:
             await mock_optimize_with_circadian_error(
-                request=request,
-                current_user=current_user,
-                db=db
+                request=request, current_user=current_user, db=db
             )
 
         # Check exception details

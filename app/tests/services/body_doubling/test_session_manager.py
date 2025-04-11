@@ -19,6 +19,7 @@ from app.utils.route_utils import validation_error
 
 class ScalarsMock:
     """A mock for scalars() return values"""
+
     def __init__(self, result=None):
         self.result = result if result else []
 
@@ -26,7 +27,11 @@ class ScalarsMock:
         return self.result if isinstance(self.result, list) else [self.result]
 
     def first(self):
-        return self.result[0] if self.result and isinstance(self.result, list) and len(self.result) > 0 else self.result
+        return (
+            self.result[0]
+            if self.result and isinstance(self.result, list) and len(self.result) > 0
+            else self.result
+        )
 
 
 @pytest.fixture
@@ -65,7 +70,7 @@ def sample_session_data(sample_user_id):
         planned_duration=30,
         description=None,
         energy_level=None,
-        environment_data=None
+        environment_data=None,
     )
 
 
@@ -88,8 +93,8 @@ def sample_session(sample_user_id, sample_session_id):
             "participants": [str(sample_user_id)],
             "interactions": [],
             "breaks": [],
-            "feedback": None
-        }
+            "feedback": None,
+        },
     )
 
 
@@ -140,7 +145,9 @@ class TestSessionManager:
         assert session.activity_type == sample_session_data.activity_type
 
     @pytest.mark.asyncio
-    async def test_get_session_by_id_found(self, session_manager, mock_db, sample_session, sample_session_id):
+    async def test_get_session_by_id_found(
+        self, session_manager, mock_db, sample_session, sample_session_id
+    ):
         """Test getting a session by ID when it exists."""
         # Create a custom mock for the entire db.execute method
         # This approach ensures we're not trying to await the mock itself
@@ -187,7 +194,9 @@ class TestSessionManager:
         assert mock_db.execute.called
 
     @pytest.mark.asyncio
-    async def test_get_active_session(self, session_manager, mock_db, sample_session, sample_user_id):
+    async def test_get_active_session(
+        self, session_manager, mock_db, sample_session, sample_user_id
+    ):
         """Test getting active session for a user."""
         # Create a custom mock for the entire db.execute method
 
@@ -301,7 +310,7 @@ class TestSessionManager:
         # Important part: User ID is already in participants
         sample_session.meta_data = {
             "participants": [str(sample_user_id), str(sample_session.user_id)],
-            "join_requests": []
+            "join_requests": [],
         }
 
         # Store original method
@@ -417,7 +426,9 @@ class TestSessionManager:
             mock_db.execute = original_execute
 
     @pytest.mark.asyncio
-    async def test_leave_session_not_found(self, session_manager, mock_db, sample_session_id, sample_user_id):
+    async def test_leave_session_not_found(
+        self, session_manager, mock_db, sample_session_id, sample_user_id
+    ):
         """Test leaving a session that doesn't exist."""
         # Arrange
         session_manager.get_session_by_id = AsyncMock(return_value=None)
@@ -491,7 +502,9 @@ class TestSessionManager:
         session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
 
     @pytest.mark.asyncio
-    async def test_get_user_sessions(self, session_manager, mock_db, sample_session, sample_user_id):
+    async def test_get_user_sessions(
+        self, session_manager, mock_db, sample_session, sample_user_id
+    ):
         """Test getting all sessions for a user."""
         # Arrange
         result_mock = AsyncMock()

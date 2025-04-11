@@ -11,12 +11,13 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../")))
 
 # Mock dependencies
-sys.modules['app.main'] = MagicMock()
-sys.modules['app.routes'] = MagicMock()
-sys.modules['app.routes.body_doubling_routes'] = MagicMock()
+sys.modules["app.main"] = MagicMock()
+sys.modules["app.routes"] = MagicMock()
+sys.modules["app.routes.body_doubling_routes"] = MagicMock()
+
 
 # Create HTTP Exception
 class HTTPException(Exception):
@@ -25,8 +26,10 @@ class HTTPException(Exception):
         self.detail = detail
         super().__init__(f"{status_code}: {detail}")
 
-sys.modules['fastapi'] = MagicMock()
-sys.modules['fastapi'].HTTPException = HTTPException
+
+sys.modules["fastapi"] = MagicMock()
+sys.modules["fastapi"].HTTPException = HTTPException
+
 
 # Create mock models
 class MockSessionStatus:
@@ -34,10 +37,12 @@ class MockSessionStatus:
     ACTIVE = "active"
     CANCELLED = "cancelled"
 
+
 class MockSessionType:
     WORKING = "working"
     STUDYING = "studying"
     CREATIVE = "creative"
+
 
 # Create mock schemas
 class MockSessionAnalyticsSchema:
@@ -45,10 +50,12 @@ class MockSessionAnalyticsSchema:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 class MockSessionFeedbackSchema:
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
 
 # Mock the model
 class MockBodyDoublingSessionModel:
@@ -56,31 +63,36 @@ class MockBodyDoublingSessionModel:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 # Set up mocks
-sys.modules['app.models.body_doubling_model'] = MagicMock()
-sys.modules['app.models.body_doubling_model'].BodyDoublingSessionModel = MockBodyDoublingSessionModel
+sys.modules["app.models.body_doubling_model"] = MagicMock()
+sys.modules["app.models.body_doubling_model"].BodyDoublingSessionModel = (
+    MockBodyDoublingSessionModel
+)
 
-sys.modules['app.models.enums_model'] = MagicMock()
-sys.modules['app.models.enums_model'].SessionStatus = MockSessionStatus
-sys.modules['app.models.enums_model'].SessionType = MockSessionType
+sys.modules["app.models.enums_model"] = MagicMock()
+sys.modules["app.models.enums_model"].SessionStatus = MockSessionStatus
+sys.modules["app.models.enums_model"].SessionType = MockSessionType
 
-sys.modules['app.schemas.body_doubling_schema'] = MagicMock()
-sys.modules['app.schemas.body_doubling_schema'].SessionAnalyticsSchema = MockSessionAnalyticsSchema
-sys.modules['app.schemas.body_doubling_schema'].SessionFeedbackSchema = MockSessionFeedbackSchema
+sys.modules["app.schemas.body_doubling_schema"] = MagicMock()
+sys.modules["app.schemas.body_doubling_schema"].SessionAnalyticsSchema = MockSessionAnalyticsSchema
+sys.modules["app.schemas.body_doubling_schema"].SessionFeedbackSchema = MockSessionFeedbackSchema
 
 # Mock sqlalchemy
-sys.modules['sqlalchemy'] = MagicMock()
-sys.modules['sqlalchemy.ext.asyncio'] = MagicMock()
-sys.modules['sqlalchemy.ext.asyncio'].AsyncSession = MagicMock()
+sys.modules["sqlalchemy"] = MagicMock()
+sys.modules["sqlalchemy.ext.asyncio"] = MagicMock()
+sys.modules["sqlalchemy.ext.asyncio"].AsyncSession = MagicMock()
 
 # Import the service
 from app.services.body_doubling.analytics_service import AnalyticsService
+
 
 @pytest.fixture
 def mock_db_session():
     """Create a mock database session."""
     session = AsyncMock()
     return session
+
 
 @pytest.fixture
 def sample_session():
@@ -110,11 +122,12 @@ def sample_session():
                     "productivity_rating": 4,
                     "distraction_level": 2,
                     "notes": "Good session",
-                    "timestamp": (now - timedelta(minutes=65)).isoformat()
+                    "timestamp": (now - timedelta(minutes=65)).isoformat(),
                 }
-            ]
-        }
+            ],
+        },
     )
+
 
 @pytest.mark.asyncio
 async def test_calculate_trend():
@@ -139,6 +152,7 @@ async def test_calculate_trend():
     # Single value
     assert service._calculate_trend([4]) == "stable"
 
+
 @pytest.mark.asyncio
 async def test_get_user_analytics_no_sessions(mock_db_session):
     """Test getting user analytics when no sessions exist."""
@@ -161,6 +175,7 @@ async def test_get_user_analytics_no_sessions(mock_db_session):
     assert len(result.most_productive_times) == 0
     assert len(result.preferred_activity_types) == 0
 
+
 @pytest.mark.asyncio
 async def test_get_session_analytics_not_found(mock_db_session):
     """Test getting session analytics for a non-existent session."""
@@ -177,6 +192,7 @@ async def test_get_session_analytics_not_found(mock_db_session):
 
     assert exc_info.value.status_code == 404
     assert f"Session {session_id}" in str(exc_info.value.detail)
+
 
 @pytest.mark.asyncio
 async def test_add_session_feedback_success(mock_db_session, sample_session):
@@ -206,6 +222,7 @@ async def test_add_session_feedback_success(mock_db_session, sample_session):
     # Verify DB operations
     mock_db_session.commit.assert_called_once()
     mock_db_session.refresh.assert_called_once_with(sample_session)
+
 
 if __name__ == "__main__":
     pytest.main(["-xvs", __file__])

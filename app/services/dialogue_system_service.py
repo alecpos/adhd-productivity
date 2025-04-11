@@ -4,6 +4,7 @@ Dialogue System Service for ADHD Calendar.
 This service implements the 'forgot anything?' NLP dialogue system
 for proactive forgetfulness and distraction mitigation.
 """
+
 import logging
 import re
 import json
@@ -19,7 +20,7 @@ from app.schemas.commitment_schema import (
     DialogueResponse,
     DialogueSession,
     DialogueMessage,
-    CommitmentResponse
+    CommitmentResponse,
 )
 from app.services.base_service import BaseService
 from app.services.llm_service import LLMService
@@ -42,7 +43,7 @@ class DialogueSystemService(BaseService):
         self,
         db: Session,
         llm_service: Optional[LLMService] = None,
-        commitment_service: Optional[CommitmentDetectionService] = None
+        commitment_service: Optional[CommitmentDetectionService] = None,
     ):
         """Initialize the dialogue system service."""
         super().__init__(db)
@@ -75,7 +76,9 @@ class DialogueSystemService(BaseService):
 
         # Check for commitments in the message
         if len(request.message.strip()) > 5:  # Only analyze non-trivial messages
-            detection_result = self._detect_commitments_in_message(request.message, user_id, session)
+            detection_result = self._detect_commitments_in_message(
+                request.message, user_id, session
+            )
 
             # If commitments were detected, add them to the session
             if detection_result:
@@ -87,16 +90,11 @@ class DialogueSystemService(BaseService):
 
         # Generate response based on dialogue context
         system_message, suggestions = self._generate_system_response(
-            session,
-            detected_commitments,
-            request.context
+            session, detected_commitments, request.context
         )
 
         # Add system message to session
-        system_dialogue_message = DialogueMessage(
-            content=system_message,
-            is_user=False
-        )
+        system_dialogue_message = DialogueMessage(content=system_message, is_user=False)
         session.messages.append(system_dialogue_message)
 
         # Update session timestamp
@@ -111,12 +109,10 @@ class DialogueSystemService(BaseService):
             session_id=session.session_id,
             detected_commitments=detected_commitments,
             suggestions=suggestions,
-            context=session.context
+            context=session.context,
         )
 
-    def _get_or_create_session(
-        self, session_id: Optional[str], user_id: str
-    ) -> DialogueSession:
+    def _get_or_create_session(self, session_id: Optional[str], user_id: str) -> DialogueSession:
         """
         Get an existing session or create a new one.
 
@@ -138,7 +134,7 @@ class DialogueSystemService(BaseService):
             user_id=user_id,
             messages=[],
             detected_commitments=[],
-            context={}
+            context={},
         )
 
         self.active_sessions[new_session_id] = session
@@ -163,7 +159,7 @@ class DialogueSystemService(BaseService):
                 "text": message,
                 "source": CommitmentSource.CHAT,
                 "user_id": user_id,
-                "context": session.context
+                "context": session.context,
             }
 
             detection_response = self.commitment_service.detect_commitments(detection_request)
@@ -188,7 +184,7 @@ class DialogueSystemService(BaseService):
         self,
         session: DialogueSession,
         detected_commitments: List[CommitmentResponse],
-        context: Optional[Dict[str, Any]]
+        context: Optional[Dict[str, Any]],
     ) -> Tuple[str, List[str]]:
         """
         Generate a response from the system.
@@ -202,10 +198,12 @@ class DialogueSystemService(BaseService):
             Tuple of (system message, suggested follow-up messages)
         """
         # Combine session messages for context
-        messages_context = "\n".join([
-            f"{'User' if msg.is_user else 'System'}: {msg.content}"
-            for msg in session.messages[-5:]  # Use last 5 messages for context
-        ])
+        messages_context = "\n".join(
+            [
+                f"{'User' if msg.is_user else 'System'}: {msg.content}"
+                for msg in session.messages[-5:]  # Use last 5 messages for context
+            ]
+        )
 
         # Get pending commitments for this user
         pending_commitments = self._get_pending_commitments_summary(session.user_id)
@@ -219,23 +217,23 @@ class DialogueSystemService(BaseService):
             detected_commitments=detected_commitments,
             pending_commitments=pending_commitments,
             upcoming_tasks=upcoming_tasks,
-            context=context
+            context=context,
         )
 
         try:
             llm_response = self.llm_service.generate_structured_output(
-                prompt=prompt,
-                output_format={
-                    "response": "string",
-                    "suggestions": ["string"]
-                }
+                prompt=prompt, output_format={"response": "string", "suggestions": ["string"]}
             )
 
-            return llm_response.get("response", "I'm sorry, I couldn't process that."), llm_response.get("suggestions", [])
+            return llm_response.get(
+                "response", "I'm sorry, I couldn't process that."
+            ), llm_response.get("suggestions", [])
 
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
-            return "I'm sorry, I encountered an issue processing your message.", ["Can I help you with something else?"]
+            return "I'm sorry, I encountered an issue processing your message.", [
+                "Can I help you with something else?"
+            ]
 
     def _create_response_generation_prompt(
         self,
@@ -243,7 +241,7 @@ class DialogueSystemService(BaseService):
         detected_commitments: List[CommitmentResponse],
         pending_commitments: str,
         upcoming_tasks: str,
-        context: Optional[Dict[str, Any]]
+        context: Optional[Dict[str, Any]],
     ) -> str:
         """
         Create a prompt for response generation.
@@ -291,17 +289,16 @@ class DialogueSystemService(BaseService):
         # Format detected commitments
         formatted_detected = "None"
         if detected_commitments:
-            formatted_detected = "\n".join([
-                f"- {c.text} (Priority: {c.priority.value})"
-                for c in detected_commitments
-            ])
+            formatted_detected = "\n".join(
+                [f"- {c.text} (Priority: {c.priority.value})" for c in detected_commitments]
+            )
 
         # Format the prompt with all the information
         formatted_prompt = prompt.format(
             messages_context=messages_context,
             detected_commitments=formatted_detected,
             pending_commitments=pending_commitments,
-            upcoming_tasks=upcoming_tasks
+            upcoming_tasks=upcoming_tasks,
         )
 
         # Add additional context if provided
@@ -324,18 +321,19 @@ class DialogueSystemService(BaseService):
         """
         try:
             commitments, _ = self.commitment_service.get_user_commitments(
-                user_id=user_id,
-                status=CommitmentStatus.CONFIRMED,
-                limit=5
+                user_id=user_id, status=CommitmentStatus.CONFIRMED, limit=5
             )
 
             if not commitments:
                 return "No pending commitments."
 
-            return "\n".join([
-                f"- {c.text}" + (f" (Due: {c.due_date.strftime('%Y-%m-%d')})" if c.due_date else "")
-                for c in commitments
-            ])
+            return "\n".join(
+                [
+                    f"- {c.text}"
+                    + (f" (Due: {c.due_date.strftime('%Y-%m-%d')})" if c.due_date else "")
+                    for c in commitments
+                ]
+            )
 
         except Exception as e:
             logger.error(f"Error getting pending commitments: {str(e)}")
@@ -366,16 +364,13 @@ class DialogueSystemService(BaseService):
         """
         # Find sessions for this user
         user_sessions = [
-            session for session in self.active_sessions.values()
+            session
+            for session in self.active_sessions.values()
             if str(session.user_id) == str(user_id)
         ]
 
         # Sort by updated time (most recent first)
-        return sorted(
-            user_sessions,
-            key=lambda s: s.updated_at,
-            reverse=True
-        )
+        return sorted(user_sessions, key=lambda s: s.updated_at, reverse=True)
 
     def clear_old_sessions(self, max_age_hours: int = 24) -> int:
         """
@@ -389,7 +384,8 @@ class DialogueSystemService(BaseService):
         """
         cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
         session_ids_to_remove = [
-            session_id for session_id, session in self.active_sessions.items()
+            session_id
+            for session_id, session in self.active_sessions.items()
             if session.updated_at < cutoff_time
         ]
 

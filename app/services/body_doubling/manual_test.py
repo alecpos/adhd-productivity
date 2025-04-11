@@ -14,6 +14,7 @@ from app.services.body_doubling.analytics_service import AnalyticsService
 from app.models.body_doubling_model import BodyDoublingSessionModel
 from app.models.enums_model import SessionStatus, SessionType
 
+
 # Mock database session for testing
 class MockDBSession:
     """Mock database session for testing."""
@@ -54,6 +55,7 @@ class MockDBSession:
         self.sessions[str(session.id)] = session
         return session
 
+
 # Helper function to create a sample session
 def create_sample_session(user_id=None, session_id=None, completed=True):
     """Create a sample session for testing."""
@@ -77,11 +79,9 @@ def create_sample_session(user_id=None, session_id=None, completed=True):
         activity_type="Programming",
         focus_rating=None,
         productivity_rating=None,
-        meta_data={
-            "participants": [str(user_id), str(uuid.uuid4())],
-            "feedback": []
-        }
+        meta_data={"participants": [str(user_id), str(uuid.uuid4())], "feedback": []},
     )
+
 
 async def test_add_feedback():
     """Test adding feedback to a session."""
@@ -104,7 +104,7 @@ async def test_add_feedback():
         "focus_rating": 4,
         "productivity_rating": 5,
         "distraction_level": 2,
-        "notes": "This was a productive session"
+        "notes": "This was a productive session",
     }
 
     print(f"Adding feedback for session {session_id}...")
@@ -120,6 +120,7 @@ async def test_add_feedback():
     print(f"First feedback item: {updated_session.meta_data['feedback'][0]}")
 
     return updated_session
+
 
 async def test_get_user_analytics():
     """Test getting user analytics."""
@@ -168,6 +169,7 @@ async def test_get_user_analytics():
 
     return analytics
 
+
 async def test_get_focus_pattern_insights():
     """Test getting focus pattern insights."""
     # Create mock DB session
@@ -191,7 +193,7 @@ async def test_get_focus_pattern_insights():
                 "productivity_rating": 4 + i % 2,
                 "distraction_level": 2,
                 "notes": f"Session {i+1}",
-                "timestamp": (datetime.now() - timedelta(days=i)).isoformat()
+                "timestamp": (datetime.now() - timedelta(days=i)).isoformat(),
             }
         ]
         session.activity_type = "Programming" if i % 2 == 0 else "Reading"
@@ -206,9 +208,12 @@ async def test_get_focus_pattern_insights():
     print(f"Message: {insights['message']}")
     print("\nInsights:")
     for idx, insight in enumerate(insights["insights"]):
-        print(f"{idx+1}. [{insight['type']}] {insight['insight']} (Confidence: {insight['confidence']})")
+        print(
+            f"{idx+1}. [{insight['type']}] {insight['insight']} (Confidence: {insight['confidence']})"
+        )
 
     return insights
+
 
 async def run_all_tests():
     """Run all tests."""
@@ -219,6 +224,7 @@ async def run_all_tests():
     await test_get_focus_pattern_insights()
 
     print("\n=== All Manual Tests Completed Successfully ===")
+
 
 if __name__ == "__main__":
     asyncio.run(run_all_tests())

@@ -48,7 +48,9 @@ class MatchingEngine:
             and isinstance(user_prefs["preferred_tasks"], list)
             and isinstance(match_prefs["preferred_tasks"], list)
         ):
-            matching_tasks = set(user_prefs["preferred_tasks"]) & set(match_prefs["preferred_tasks"])
+            matching_tasks = set(user_prefs["preferred_tasks"]) & set(
+                match_prefs["preferred_tasks"]
+            )
             score += len(matching_tasks) * 5.0
 
         # Score activity type preference
@@ -66,7 +68,9 @@ class MatchingEngine:
         return score
 
     def _score_history_compatibility(
-        self, user_history: Optional[List[Dict[str, Any]]], match_history: Optional[List[Dict[str, Any]]]
+        self,
+        user_history: Optional[List[Dict[str, Any]]],
+        match_history: Optional[List[Dict[str, Any]]],
     ) -> float:
         """Calculate compatibility score based on session history."""
         if not user_history or not match_history:
@@ -75,9 +79,7 @@ class MatchingEngine:
         score = 0.0
 
         # Score high productivity sessions
-        productive_user = any(
-            session.get("productivity_rating", 0) > 3 for session in user_history
-        )
+        productive_user = any(session.get("productivity_rating", 0) > 3 for session in user_history)
         productive_match = any(
             session.get("productivity_rating", 0) > 3 for session in match_history
         )
@@ -85,8 +87,16 @@ class MatchingEngine:
             score += 5.0
 
         # Score session duration preference
-        user_durations = [session.get("duration_minutes", 0) for session in user_history if "duration_minutes" in session]
-        match_durations = [session.get("duration_minutes", 0) for session in match_history if "duration_minutes" in session]
+        user_durations = [
+            session.get("duration_minutes", 0)
+            for session in user_history
+            if "duration_minutes" in session
+        ]
+        match_durations = [
+            session.get("duration_minutes", 0)
+            for session in match_history
+            if "duration_minutes" in session
+        ]
 
         if user_durations and match_durations:
             avg_user_duration = sum(user_durations) / len(user_durations)
@@ -163,7 +173,9 @@ class MatchingEngine:
 
             # Get other user's preferences
             match_prefs = session.meta_data.get("preferences", {}) if session.meta_data else {}
-            match_history = session.meta_data.get("session_history", []) if session.meta_data else []
+            match_history = (
+                session.meta_data.get("session_history", []) if session.meta_data else []
+            )
 
             # Calculate match score
             match_score = self._calculate_match_score(
@@ -172,13 +184,17 @@ class MatchingEngine:
 
             # Add to matches if score is above threshold
             if match_score > criteria.get("min_score", 10):
-                matches.append({
-                    "user_id": str(session.user_id),
-                    "session_id": str(session.id),
-                    "score": match_score,
-                    "activity_type": session.activity_type.value if session.activity_type else None,
-                    "preferences": match_prefs,
-                })
+                matches.append(
+                    {
+                        "user_id": str(session.user_id),
+                        "session_id": str(session.id),
+                        "score": match_score,
+                        "activity_type": (
+                            session.activity_type.value if session.activity_type else None
+                        ),
+                        "preferences": match_prefs,
+                    }
+                )
 
         # Sort matches by score (highest first)
         matches.sort(key=lambda x: x["score"], reverse=True)
@@ -268,11 +284,10 @@ class MatchingEngine:
         from app.models.body_doubling_model import BodyDoublingSessionModel
 
         # Update the session status to ACTIVE and set the meta_data
-        session_update = update(BodyDoublingSessionModel).where(
-            BodyDoublingSessionModel.id == session_id
-        ).values(
-            status=SessionStatus.ACTIVE,
-            meta_data=updated_meta_data
+        session_update = (
+            update(BodyDoublingSessionModel)
+            .where(BodyDoublingSessionModel.id == session_id)
+            .values(status=SessionStatus.ACTIVE, meta_data=updated_meta_data)
         )
 
         await self.db.execute(session_update)

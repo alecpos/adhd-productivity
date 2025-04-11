@@ -148,12 +148,14 @@ class EnergyService(BaseService[EnergyLog, EnergyLogResponseSchema, EnergyLogCre
                     avg_energy = sum((log.energy_level for log in slot_logs)) / len(slot_logs)
                     activities = list(set((log.activity for log in slot_logs)))
                     recommendations = self._generate_recommendations(avg_energy, activities)
-                    daily_patterns.append({
-                        "time_of_day": slot,
-                        "average_energy": avg_energy,
-                        "common_activities": activities[:5],
-                        "recommendations": recommendations,
-                    })
+                    daily_patterns.append(
+                        {
+                            "time_of_day": slot,
+                            "average_energy": avg_energy,
+                            "common_activities": activities[:5],
+                            "recommendations": recommendations,
+                        }
+                    )
             weekly_patterns = []
             days = [
                 "Monday",
@@ -170,17 +172,23 @@ class EnergyService(BaseService[EnergyLog, EnergyLogResponseSchema, EnergyLogCre
                     avg_energy = sum((log.energy_level for log in day_logs)) / len(day_logs)
                     activities = list(set((log.activity for log in day_logs)))
                     recommendations = self._generate_recommendations(avg_energy, activities)
-                    weekly_patterns.append({
-                        "time_of_day": day,
-                        "average_energy": avg_energy,
-                        "common_activities": activities[:5],
-                        "recommendations": recommendations,
-                    })
+                    weekly_patterns.append(
+                        {
+                            "time_of_day": day,
+                            "average_energy": avg_energy,
+                            "common_activities": activities[:5],
+                            "recommendations": recommendations,
+                        }
+                    )
             peak_times = [
-                pattern["time_of_day"] for pattern in daily_patterns if pattern["average_energy"] >= 7
+                pattern["time_of_day"]
+                for pattern in daily_patterns
+                if pattern["average_energy"] >= 7
             ]
             low_times = [
-                pattern["time_of_day"] for pattern in daily_patterns if pattern["average_energy"] <= 4
+                pattern["time_of_day"]
+                for pattern in daily_patterns
+                if pattern["average_energy"] <= 4
             ]
             activity_correlations = self._calculate_activity_correlations(logs)
             logger.info(f"Successfully analyzed energy patterns for user {user_id}")
@@ -194,7 +202,7 @@ class EnergyService(BaseService[EnergyLog, EnergyLogResponseSchema, EnergyLogCre
                     "low_times": low_times,
                     "activity_correlations": activity_correlations,
                 },
-                meta_data=None
+                meta_data=None,
             )
         except Exception as e:
             logger.error(f"Error analyzing energy patterns: {str(e)}")
@@ -216,23 +224,29 @@ class EnergyService(BaseService[EnergyLog, EnergyLogResponseSchema, EnergyLogCre
         """Generate recommendations based on energy level and activities."""
         recommendations = []
         if energy_level >= 7:
-            recommendations.extend([
-                "This is a high energy period - great for challenging tasks",
-                "Schedule important meetings or deep work during this time",
-                "Take advantage of focus for complex problem-solving",
-            ])
+            recommendations.extend(
+                [
+                    "This is a high energy period - great for challenging tasks",
+                    "Schedule important meetings or deep work during this time",
+                    "Take advantage of focus for complex problem-solving",
+                ]
+            )
         elif 4 <= energy_level < 7:
-            recommendations.extend([
-                "Moderate energy level - good for routine tasks",
-                "Balance between active work and breaks",
-                "Consider collaborative activities",
-            ])
+            recommendations.extend(
+                [
+                    "Moderate energy level - good for routine tasks",
+                    "Balance between active work and breaks",
+                    "Consider collaborative activities",
+                ]
+            )
         else:
-            recommendations.extend([
-                "Low energy period - focus on lighter tasks",
-                "Take regular breaks and avoid demanding activities",
-                "Consider scheduling rest or recovery time",
-            ])
+            recommendations.extend(
+                [
+                    "Low energy period - focus on lighter tasks",
+                    "Take regular breaks and avoid demanding activities",
+                    "Consider scheduling rest or recovery time",
+                ]
+            )
         return recommendations
 
     def _calculate_activity_correlations(self, logs: List[EnergyLog]) -> Dict[str, float]:

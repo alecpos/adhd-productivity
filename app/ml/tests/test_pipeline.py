@@ -78,7 +78,7 @@ async def test_data_preprocessing():
             "stress_level": 3,
             "sleep_quality": 7,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -89,7 +89,7 @@ async def test_data_preprocessing():
             "stress_level": 4,
             "sleep_quality": 6,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
 
@@ -100,7 +100,7 @@ async def test_data_preprocessing():
             "focus_level": 5,
             "time_of_day": "morning",
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -108,7 +108,7 @@ async def test_data_preprocessing():
             "focus_level": 3,
             "time_of_day": "evening",
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
 
@@ -122,7 +122,7 @@ async def test_data_preprocessing():
             "actual_duration": 50,
             "focus_level": 4,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
         {
             "user_id": str(uuid4()),
@@ -133,7 +133,7 @@ async def test_data_preprocessing():
             "actual_duration": 0,
             "focus_level": 0,
             "timestamp": datetime.now(),
-            "date": datetime.now().date()
+            "date": datetime.now().date(),
         },
     ]
 
@@ -142,7 +142,7 @@ async def test_data_preprocessing():
         mental_health_data=mental_health_data,
         energy_data=energy_data,
         task_data=task_data,
-        calendar_data=[]
+        calendar_data=[],
     )
 
     # Test preprocessing - if the data format doesn't match exactly, at least check that methods run
@@ -189,18 +189,12 @@ async def test_model_creation():
 
     # Test multi-task model
     multi_task_model = model_factory.create_multi_task_model(
-        input_shape=(25,),
-        num_tasks=3,
-        hidden_layers=[64, 32],
-        task_specific_layers=[16, 8]
+        input_shape=(25,), num_tasks=3, hidden_layers=[64, 32], task_specific_layers=[16, 8]
     )
     assert isinstance(multi_task_model, tf.keras.Model)
 
     # Test sequence model
-    sequence_model = model_factory.create_sequence_model(
-        input_shape=(14, 5),
-        output_dim=1
-    )
+    sequence_model = model_factory.create_sequence_model(input_shape=(14, 5), output_dim=1)
     assert isinstance(sequence_model, tf.keras.Model)
 
     print("Model creation tests passed successfully!")

@@ -21,12 +21,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from tabulate import tabulate
+
 try:
     from sklearn.metrics import (
         confusion_matrix,
         classification_report,
         mean_squared_error,
-        r2_score
+        r2_score,
     )
 except ImportError:
     # Mock these if not available
@@ -47,6 +48,7 @@ except ImportError:
     class ServiceMetrics:
         def __init__(self, name):
             self.name = name
+
 
 class MLProjectAnalytics:
     """ML project analytics and visualization dashboard."""
@@ -153,11 +155,13 @@ class MLProjectAnalytics:
                 if model_id not in self.performance_history:
                     self.performance_history[model_id] = []
 
-                self.performance_history[model_id].append({
-                    "timestamp": timestamp,
-                    "metrics": eval_metrics,
-                    "version": model_data.get("version", "unknown")
-                })
+                self.performance_history[model_id].append(
+                    {
+                        "timestamp": timestamp,
+                        "metrics": eval_metrics,
+                        "version": model_data.get("version", "unknown"),
+                    }
+                )
 
         # Sort history by timestamp
         for model_id in self.performance_history:
@@ -169,12 +173,7 @@ class MLProjectAnalytics:
         """Analyze trends across experiments."""
         print("Analyzing experiment trends...")
 
-        trends = {
-            "hyperparameters": {},
-            "metrics": {},
-            "training_times": [],
-            "model_sizes": []
-        }
+        trends = {"hyperparameters": {}, "metrics": {}, "training_times": [], "model_sizes": []}
 
         # Collect hyperparameters and metrics
         for exp_id, exp_data in self.experiments.items():
@@ -185,21 +184,25 @@ class MLProjectAnalytics:
                     end = datetime.datetime.fromisoformat(exp_data["end_time"])
                     duration = (end - start).total_seconds() / 60  # in minutes
 
-                    trends["training_times"].append({
-                        "experiment_id": exp_id,
-                        "duration_minutes": duration,
-                        "model_type": exp_data.get("model_type", "unknown")
-                    })
+                    trends["training_times"].append(
+                        {
+                            "experiment_id": exp_id,
+                            "duration_minutes": duration,
+                            "model_type": exp_data.get("model_type", "unknown"),
+                        }
+                    )
                 except (ValueError, TypeError):
                     pass
 
             # Model size
             if "model_size_kb" in exp_data:
-                trends["model_sizes"].append({
-                    "experiment_id": exp_id,
-                    "size_kb": exp_data["model_size_kb"],
-                    "model_type": exp_data.get("model_type", "unknown")
-                })
+                trends["model_sizes"].append(
+                    {
+                        "experiment_id": exp_id,
+                        "size_kb": exp_data["model_size_kb"],
+                        "model_type": exp_data.get("model_type", "unknown"),
+                    }
+                )
 
             # Hyperparameters
             hyperparams = exp_data.get("hyperparameters", {})
@@ -207,11 +210,13 @@ class MLProjectAnalytics:
                 if param not in trends["hyperparameters"]:
                     trends["hyperparameters"][param] = []
 
-                trends["hyperparameters"][param].append({
-                    "experiment_id": exp_id,
-                    "value": value,
-                    "performance": exp_data.get("best_metric", 0)
-                })
+                trends["hyperparameters"][param].append(
+                    {
+                        "experiment_id": exp_id,
+                        "value": value,
+                        "performance": exp_data.get("best_metric", 0),
+                    }
+                )
 
             # Metrics
             metrics = exp_data.get("metrics", {})
@@ -221,12 +226,14 @@ class MLProjectAnalytics:
 
                 # Only add if it's a numeric value
                 if isinstance(metric_value, (int, float)):
-                    trends["metrics"][metric_name].append({
-                        "experiment_id": exp_id,
-                        "value": metric_value,
-                        "model_type": exp_data.get("model_type", "unknown"),
-                        "timestamp": exp_data.get("end_time", "")
-                    })
+                    trends["metrics"][metric_name].append(
+                        {
+                            "experiment_id": exp_id,
+                            "value": metric_value,
+                            "model_type": exp_data.get("model_type", "unknown"),
+                            "timestamp": exp_data.get("end_time", ""),
+                        }
+                    )
 
         return trends
 
@@ -271,9 +278,15 @@ class MLProjectAnalytics:
 
                 # Higher is better for most metrics
                 # For error metrics (MSE, RMSE, etc.), lower is better
-                is_error_metric = any(err in primary_metric.lower() for err in ["error", "loss", "mse", "rmse", "mae"])
+                is_error_metric = any(
+                    err in primary_metric.lower() for err in ["error", "loss", "mse", "rmse", "mae"]
+                )
 
-                if best_value is None or (is_error_metric and value < best_value) or (not is_error_metric and value > best_value):
+                if (
+                    best_value is None
+                    or (is_error_metric and value < best_value)
+                    or (not is_error_metric and value > best_value)
+                ):
                     best_value = value
                     best_model = (model_id, model_data)
 
@@ -284,7 +297,7 @@ class MLProjectAnalytics:
                     "metrics": model_data.get("evaluation_metrics", {}),
                     "created_at": model_data.get("created_at", ""),
                     "version": model_data.get("version", "unknown"),
-                    "hyperparameters": model_data.get("hyperparameters", {})
+                    "hyperparameters": model_data.get("hyperparameters", {}),
                 }
 
         return best_models
@@ -317,12 +330,16 @@ class MLProjectAnalytics:
         metrics = {
             "model_count": len(self.models),
             "experiment_count": len(self.experiments),
-            "tasks_covered": len(set(model.get("task", "unknown") for model in self.models.values())),
-            "model_types": set(model.get("model_type", "unknown") for model in self.models.values()),
+            "tasks_covered": len(
+                set(model.get("task", "unknown") for model in self.models.values())
+            ),
+            "model_types": set(
+                model.get("model_type", "unknown") for model in self.models.values()
+            ),
             "latest_model_date": None,
             "improvement_trends": {},
             "average_training_time": None,
-            "experiment_success_rate": 0
+            "experiment_success_rate": 0,
         }
 
         # Latest model date
@@ -332,7 +349,9 @@ class MLProjectAnalytics:
             if created_at:
                 try:
                     if isinstance(created_at, str):
-                        created_at = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                        created_at = datetime.datetime.fromisoformat(
+                            created_at.replace("Z", "+00:00")
+                        )
                     dates.append(created_at)
                 except (ValueError, TypeError):
                     pass
@@ -349,13 +368,19 @@ class MLProjectAnalytics:
             last = history[-1]
 
             for metric, value in first["metrics"].items():
-                if metric in last["metrics"] and isinstance(value, (int, float)) and isinstance(last["metrics"][metric], (int, float)):
+                if (
+                    metric in last["metrics"]
+                    and isinstance(value, (int, float))
+                    and isinstance(last["metrics"][metric], (int, float))
+                ):
                     if model_id not in metrics["improvement_trends"]:
                         metrics["improvement_trends"][model_id] = {}
 
                     # Calculate improvement percentage
                     # For error metrics, improvement is a decrease
-                    is_error_metric = any(err in metric.lower() for err in ["error", "loss", "mse", "rmse", "mae"])
+                    is_error_metric = any(
+                        err in metric.lower() for err in ["error", "loss", "mse", "rmse", "mae"]
+                    )
 
                     if is_error_metric:
                         if value > 0:  # Avoid division by zero
@@ -366,7 +391,9 @@ class MLProjectAnalytics:
                         if value > 0:  # Avoid division by zero
                             improvement = (last["metrics"][metric] - value) / value * 100
                         else:
-                            improvement = last["metrics"][metric] * 100  # Treat as 100% improvement from 0
+                            improvement = (
+                                last["metrics"][metric] * 100
+                            )  # Treat as 100% improvement from 0
 
                     metrics["improvement_trends"][model_id][metric] = improvement
 
@@ -387,7 +414,9 @@ class MLProjectAnalytics:
 
         # Experiment success rate
         if self.experiments:
-            success_count = sum(1 for exp in self.experiments.values() if exp.get("status") == "success")
+            success_count = sum(
+                1 for exp in self.experiments.values() if exp.get("status") == "success"
+            )
             metrics["experiment_success_rate"] = success_count / len(self.experiments) * 100
 
         return metrics
@@ -434,7 +463,9 @@ class MLProjectAnalytics:
                 plt.xticks(rotation=45, ha="right")
                 plt.tight_layout()
 
-                chart_path = os.path.join(charts_dir, f"model_performance_by_task_{self.date_str}.png")
+                chart_path = os.path.join(
+                    charts_dir, f"model_performance_by_task_{self.date_str}.png"
+                )
                 plt.savefig(chart_path)
                 plt.close()
 
@@ -464,7 +495,9 @@ class MLProjectAnalytics:
                     continue
 
                 try:
-                    timestamp = datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
+                    timestamp = datetime.datetime.fromisoformat(
+                        item["timestamp"].replace("Z", "+00:00")
+                    )
                     model_types[model_type]["timestamps"].append(timestamp)
                     model_types[model_type]["values"].append(item["value"])
                 except (ValueError, TypeError):
@@ -556,8 +589,7 @@ class MLProjectAnalytics:
 
         # Save dashboard
         output_path = os.path.join(
-            self.output_dir,
-            f"ml_project_dashboard_{self.date_str}.{format}"
+            self.output_dir, f"ml_project_dashboard_{self.date_str}.{format}"
         )
 
         with open(output_path, "w") as f:
@@ -566,18 +598,20 @@ class MLProjectAnalytics:
         print(f"Dashboard generated at {output_path}")
         return dashboard
 
-    def _generate_markdown_dashboard(self,
-                                   trends: Dict[str, Any],
-                                   best_models: Dict[str, Dict[str, Any]],
-                                   project_metrics: Dict[str, Any],
-                                   chart_files: Dict[str, str]) -> str:
+    def _generate_markdown_dashboard(
+        self,
+        trends: Dict[str, Any],
+        best_models: Dict[str, Dict[str, Any]],
+        project_metrics: Dict[str, Any],
+        chart_files: Dict[str, str],
+    ) -> str:
         """Generate a markdown dashboard."""
         lines = [
             "# ML Project Analytics Dashboard",
             f"**Generated on:** {self.date_str}",
             "",
             "## Project Summary",
-            ""
+            "",
         ]
 
         # Project summary
@@ -586,9 +620,30 @@ class MLProjectAnalytics:
             ["Total Experiments", project_metrics["experiment_count"]],
             ["Tasks Covered", project_metrics["tasks_covered"]],
             ["Model Types", ", ".join(project_metrics["model_types"])],
-            ["Latest Model", project_metrics["latest_model_date"].strftime("%Y-%m-%d") if project_metrics["latest_model_date"] else "N/A"],
-            ["Avg. Training Time", f"{project_metrics['average_training_time']:.1f} minutes" if project_metrics["average_training_time"] else "N/A"],
-            ["Experiment Success Rate", f"{project_metrics['experiment_success_rate']:.1f}%" if project_metrics["experiment_success_rate"] else "N/A"]
+            [
+                "Latest Model",
+                (
+                    project_metrics["latest_model_date"].strftime("%Y-%m-%d")
+                    if project_metrics["latest_model_date"]
+                    else "N/A"
+                ),
+            ],
+            [
+                "Avg. Training Time",
+                (
+                    f"{project_metrics['average_training_time']:.1f} minutes"
+                    if project_metrics["average_training_time"]
+                    else "N/A"
+                ),
+            ],
+            [
+                "Experiment Success Rate",
+                (
+                    f"{project_metrics['experiment_success_rate']:.1f}%"
+                    if project_metrics["experiment_success_rate"]
+                    else "N/A"
+                ),
+            ],
         ]
 
         lines.append(tabulate(summary_table, tablefmt="pipe", headers=["Metric", "Value"]))
@@ -629,7 +684,11 @@ class MLProjectAnalytics:
                     for param, value in model_data["hyperparameters"].items():
                         hyperparams_table.append([param, value])
 
-                    lines.append(tabulate(hyperparams_table, tablefmt="pipe", headers=["Hyperparameter", "Value"]))
+                    lines.append(
+                        tabulate(
+                            hyperparams_table, tablefmt="pipe", headers=["Hyperparameter", "Value"]
+                        )
+                    )
                     lines.append("")
 
         # Performance trends
@@ -665,7 +724,11 @@ class MLProjectAnalytics:
                 for item in values:
                     hp_table.append([item["experiment_id"], item["value"], item["performance"]])
 
-                lines.append(tabulate(hp_table, tablefmt="pipe", headers=["Experiment", "Value", "Performance"]))
+                lines.append(
+                    tabulate(
+                        hp_table, tablefmt="pipe", headers=["Experiment", "Value", "Performance"]
+                    )
+                )
                 lines.append("")
 
         # Improvement analysis
@@ -681,27 +744,31 @@ class MLProjectAnalytics:
                 for metric, improvement in metrics.items():
                     improvement_table.append([model_id, metric, f"{improvement:.2f}%"])
 
-            lines.append(tabulate(improvement_table, tablefmt="pipe", headers=["Model", "Metric", "Improvement"]))
+            lines.append(
+                tabulate(
+                    improvement_table, tablefmt="pipe", headers=["Model", "Metric", "Improvement"]
+                )
+            )
             lines.append("")
 
         # Recommendations
         lines.append("## Recommendations")
         lines.append("")
 
-        recommendations = self._generate_recommendations(
-            trends, best_models, project_metrics
-        )
+        recommendations = self._generate_recommendations(trends, best_models, project_metrics)
 
         for recommendation in recommendations:
             lines.append(f"- {recommendation}")
 
         return "\n".join(lines)
 
-    def _generate_html_dashboard(self,
-                               trends: Dict[str, Any],
-                               best_models: Dict[str, Dict[str, Any]],
-                               project_metrics: Dict[str, Any],
-                               chart_files: Dict[str, str]) -> str:
+    def _generate_html_dashboard(
+        self,
+        trends: Dict[str, Any],
+        best_models: Dict[str, Dict[str, Any]],
+        project_metrics: Dict[str, Any],
+        chart_files: Dict[str, str],
+    ) -> str:
         """Generate an HTML dashboard."""
         # In a real implementation, use a proper HTML template engine
         # For simplicity, we're just building a basic HTML file here
@@ -729,7 +796,7 @@ class MLProjectAnalytics:
 
         # Simple conversion from markdown to HTML
         in_table = False
-        for line in markdown.split('\n'):
+        for line in markdown.split("\n"):
             if line.startswith("# "):
                 html_lines.append(f"<h1>{line[2:]}</h1>")
             elif line.startswith("## "):
@@ -783,10 +850,12 @@ class MLProjectAnalytics:
 
         return "\n".join(html_lines)
 
-    def _generate_recommendations(self,
-                                trends: Dict[str, Any],
-                                best_models: Dict[str, Dict[str, Any]],
-                                project_metrics: Dict[str, Any]) -> List[str]:
+    def _generate_recommendations(
+        self,
+        trends: Dict[str, Any],
+        best_models: Dict[str, Dict[str, Any]],
+        project_metrics: Dict[str, Any],
+    ) -> List[str]:
         """Generate recommendations based on analysis."""
         recommendations = []
 
@@ -794,8 +863,10 @@ class MLProjectAnalytics:
         if project_metrics["model_types"]:
             # Check for common model types
             has_ensemble = any("ensemble" in mt.lower() for mt in project_metrics["model_types"])
-            has_neural_net = any(nn in " ".join(project_metrics["model_types"]).lower()
-                                for nn in ["neural", "deep", "nn", "transformer", "bert", "gpt"])
+            has_neural_net = any(
+                nn in " ".join(project_metrics["model_types"]).lower()
+                for nn in ["neural", "deep", "nn", "transformer", "bert", "gpt"]
+            )
 
             if not has_ensemble:
                 recommendations.append(
@@ -820,11 +891,21 @@ class MLProjectAnalytics:
 
             # Check if performance correlates with parameter values
             # Simple check - are higher values generally better?
-            values_sorted = sorted(values, key=lambda x: x["value"] if isinstance(x["value"], (int, float)) else 0)
+            values_sorted = sorted(
+                values, key=lambda x: x["value"] if isinstance(x["value"], (int, float)) else 0
+            )
 
             if len(values_sorted) >= 3:
-                first_perf = values_sorted[0]["performance"] if isinstance(values_sorted[0]["performance"], (int, float)) else 0
-                last_perf = values_sorted[-1]["performance"] if isinstance(values_sorted[-1]["performance"], (int, float)) else 0
+                first_perf = (
+                    values_sorted[0]["performance"]
+                    if isinstance(values_sorted[0]["performance"], (int, float))
+                    else 0
+                )
+                last_perf = (
+                    values_sorted[-1]["performance"]
+                    if isinstance(values_sorted[-1]["performance"], (int, float))
+                    else 0
+                )
 
                 if last_perf > first_perf * 1.2:  # 20% improvement
                     recommendations.append(
@@ -871,7 +952,9 @@ def main():
     """Main function to run the dashboard generation."""
     parser = argparse.ArgumentParser(description="Generate ML project analytics dashboard.")
     parser.add_argument("--output-dir", help="Directory to store the dashboard output")
-    parser.add_argument("--format", choices=["markdown", "html"], default="markdown", help="Output format")
+    parser.add_argument(
+        "--format", choices=["markdown", "html"], default="markdown", help="Output format"
+    )
     parser.add_argument("--model-dir", help="Directory containing model files")
     parser.add_argument("--logs-dir", help="Directory containing experiment logs")
     args = parser.parse_args()

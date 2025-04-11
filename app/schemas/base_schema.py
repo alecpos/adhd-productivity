@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
+
 class BaseSchema(BaseModel):
     """Base schema with common configurations.
 
@@ -16,16 +17,19 @@ class BaseSchema(BaseModel):
     - UUID field handling
     - Datetime field handling
     """
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class UUIDSchema(BaseSchema):
     """Schema with UUID primary key."""
+
     id: UUID
 
 
 class TimestampedSchema(UUIDSchema):
     """Schema with UUID and timestamps."""
+
     created_at: datetime
     updated_at: datetime
 

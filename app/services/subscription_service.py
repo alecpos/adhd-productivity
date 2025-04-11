@@ -19,7 +19,9 @@ from typing import Optional, Dict, Any
 from uuid import UUID
 
 
-class SubscriptionService(BaseService[SubscriptionModel, SubscriptionResponseSchema, SubscriptionCreateSchema]):
+class SubscriptionService(
+    BaseService[SubscriptionModel, SubscriptionResponseSchema, SubscriptionCreateSchema]
+):
     """Service for managing subscriptions."""
 
     def __init__(self, db: AsyncSession):
@@ -54,9 +56,7 @@ class SubscriptionService(BaseService[SubscriptionModel, SubscriptionResponseSch
         query = query.offset(skip).limit(limit)
         result = await self.db.execute(query)
         subscriptions = result.scalars().all()
-        total_query = select(self.model).where(
-            self.model.user_id == user_id
-        )
+        total_query = select(self.model).where(self.model.user_id == user_id)
         active_query = total_query.where(self.model.status == "active")
         total_count = len((await self.db.execute(total_query)).scalars().all())
         active_count = len((await self.db.execute(active_query)).scalars().all())
@@ -92,9 +92,7 @@ class SubscriptionService(BaseService[SubscriptionModel, SubscriptionResponseSch
     ) -> Optional[SubscriptionResponseSchema]:
         """Update a subscription with validation."""
         validate_schema(updates)
-        result = await self.db.execute(
-            select(self.model).where(self.model.id == subscription_id)
-        )
+        result = await self.db.execute(select(self.model).where(self.model.id == subscription_id))
         subscription = result.scalar_one_or_none()
         if subscription:
             update_data = updates.dict(exclude_unset=True)
@@ -108,9 +106,7 @@ class SubscriptionService(BaseService[SubscriptionModel, SubscriptionResponseSch
     @handle_service_error
     async def delete_subscription(self, subscription_id: UUID) -> bool:
         """Delete a subscription."""
-        result = await self.db.execute(
-            select(self.model).where(self.model.id == subscription_id)
-        )
+        result = await self.db.execute(select(self.model).where(self.model.id == subscription_id))
         subscription = result.scalar_one_or_none()
         if subscription:
             await self.db.delete(subscription)
@@ -121,9 +117,7 @@ class SubscriptionService(BaseService[SubscriptionModel, SubscriptionResponseSch
         self, subscription_id: UUID, payment_data: Dict[str, Any]
     ) -> Optional[SubscriptionResponseSchema]:
         """Process a subscription payment and update payment history."""
-        result = await self.db.execute(
-            select(self.model).where(self.model.id == subscription_id)
-        )
+        result = await self.db.execute(select(self.model).where(self.model.id == subscription_id))
         subscription = result.scalar_one_or_none()
         if subscription:
             payment_data["processed_at"] = datetime.utcnow()

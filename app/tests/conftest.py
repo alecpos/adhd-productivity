@@ -66,7 +66,7 @@ from app.tests.ml.stochastic_time_estimation.mock_models import (
     MockMentalHealthModel,
     MockEnergyModel,
     MockBaseMLModel,
-    MockFeatureEngineer
+    MockFeatureEngineer,
 )
 
 T = TypeVar("T")  # Add type variable for generic types
@@ -83,8 +83,9 @@ logging.getLogger("sqlalchemy.orm").setLevel(logging.WARNING)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
 # Mock dependencies that cause issues during testing
-sys.modules['app.routes'] = MagicMock()
-sys.modules['app.routes.body_doubling_routes'] = MagicMock()
+sys.modules["app.routes"] = MagicMock()
+sys.modules["app.routes.body_doubling_routes"] = MagicMock()
+
 
 @pytest.fixture(scope="session")
 def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
@@ -211,7 +212,7 @@ async def body_doubling_service(db_session: AsyncSession) -> BodyDoublingService
         session_manager=session_manager,
         matching_engine=matching_engine,
         analytics_service=analytics_service,
-        notification_service=notification_service
+        notification_service=notification_service,
     )
 
 
@@ -266,9 +267,7 @@ async def test_streak(test_user: UserModel, db_session: AsyncSession) -> StreakM
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_leaderboard(
-    test_user: UserModel, db_session: AsyncSession
-) -> LeaderboardModel:
+async def test_leaderboard(test_user: UserModel, db_session: AsyncSession) -> LeaderboardModel:
     """Create a test leaderboard entry."""
     logger.debug("Creating test leaderboard entry")
     leaderboard = LeaderboardModel(user_id=test_user.id, category="global", rank=1, score=100.0)
@@ -336,9 +335,7 @@ async def test_badge(test_user: UserModel, db_session: AsyncSession) -> BadgeMod
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_achievement(
-    test_user: UserModel, db_session: AsyncSession
-) -> AchievementModel:
+async def test_achievement(test_user: UserModel, db_session: AsyncSession) -> AchievementModel:
     """Create a test achievement."""
     achievement = AchievementModel(
         id=uuid4(),
@@ -455,9 +452,7 @@ def task_to_block_dict() -> Callable[[TaskSchema], Dict[str, Any]]:
             "duration": duration,
             "block_type": BlockType.TASK,
             "priority": (
-                BlockPriority.HIGH
-                if task.priority == BlockPriority.HIGH
-                else BlockPriority.MEDIUM
+                BlockPriority.HIGH if task.priority == BlockPriority.HIGH else BlockPriority.MEDIUM
             ),
             "energy_level": min(task.energy_required or 5, 10),
             "focus_level": min(task.energy_required or 5, 10),
@@ -504,34 +499,35 @@ def patch_imports():
     Patch imports to use mocks instead of real modules.
     """
     # Mock PyMC3 and its dependencies
-    sys.modules['pymc3'] = MagicMock()
-    sys.modules['theano'] = MockTheano()
-    sys.modules['theano.tensor'] = MagicMock()
+    sys.modules["pymc3"] = MagicMock()
+    sys.modules["theano"] = MockTheano()
+    sys.modules["theano.tensor"] = MagicMock()
 
     # Patch app.models.mental_health_model to include MentalHealthModel
     mental_health_module = MagicMock()
     mental_health_module.MentalHealthModel = MockMentalHealthModel
-    sys.modules['app.models.mental_health_model'] = mental_health_module
+    sys.modules["app.models.mental_health_model"] = mental_health_module
 
     # Patch app.models.energy_model
     energy_module = MagicMock()
     energy_module.EnergyModel = MockEnergyModel
-    sys.modules['app.models.energy_model'] = energy_module
+    sys.modules["app.models.energy_model"] = energy_module
 
     # Patch ML base models
     ml_models_module = MagicMock()
     ml_models_module.BaseMLModel = MockBaseMLModel
-    sys.modules['app.ml.models'] = ml_models_module
+    sys.modules["app.ml.models"] = ml_models_module
 
     # Patch feature engineering
     feature_eng_module = MagicMock()
     feature_eng_module.FeatureEngineer = MockFeatureEngineer
-    sys.modules['app.ml.feature_engineering'] = feature_eng_module
+    sys.modules["app.ml.feature_engineering"] = feature_eng_module
 
     # Patch numpy bool
     try:
         import numpy as np
-        if not hasattr(np, 'bool_'):
+
+        if not hasattr(np, "bool_"):
             np.bool_ = bool
     except ImportError:
         pass
@@ -540,9 +536,13 @@ def patch_imports():
 
     # Clean up after tests complete
     for module in [
-        'pymc3', 'theano', 'theano.tensor',
-        'app.models.mental_health_model', 'app.models.energy_model',
-        'app.ml.models', 'app.ml.feature_engineering'
+        "pymc3",
+        "theano",
+        "theano.tensor",
+        "app.models.mental_health_model",
+        "app.models.energy_model",
+        "app.ml.models",
+        "app.ml.feature_engineering",
     ]:
         if module in sys.modules:
             del sys.modules[module]
@@ -551,6 +551,7 @@ def patch_imports():
 @pytest.fixture
 def mock_db():
     """Mock database session."""
+
     class MockDB:
         def __init__(self):
             self.data = {}

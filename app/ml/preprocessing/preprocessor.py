@@ -10,10 +10,11 @@ class DataPreprocessor:
     """Preprocess data for ML models."""
 
     def __init__(
-        self, mental_health_data: List[Dict],
+        self,
+        mental_health_data: List[Dict],
         energy_data: List[Dict],
         task_data: List[Dict],
-        calendar_data: List[Dict]
+        calendar_data: List[Dict],
     ):
         """Initialize with various data sources."""
         self.mental_health_data = mental_health_data
@@ -24,7 +25,9 @@ class DataPreprocessor:
     def preprocess(self) -> pd.DataFrame:
         """Preprocess all data and return a DataFrame."""
         # Convert data to DataFrames
-        mental_health_df = pd.DataFrame(self.mental_health_data) if self.mental_health_data else pd.DataFrame()
+        mental_health_df = (
+            pd.DataFrame(self.mental_health_data) if self.mental_health_data else pd.DataFrame()
+        )
         energy_df = pd.DataFrame(self.energy_data) if self.energy_data else pd.DataFrame()
         task_df = pd.DataFrame(self.task_data) if self.task_data else pd.DataFrame()
         calendar_df = pd.DataFrame(self.calendar_data) if self.calendar_data else pd.DataFrame()
@@ -41,7 +44,7 @@ class DataPreprocessor:
         mental_health_df: pd.DataFrame,
         energy_df: pd.DataFrame,
         task_df: pd.DataFrame,
-        calendar_df: pd.DataFrame
+        calendar_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Combine features from different data sources."""
         # This is a placeholder implementation
@@ -58,27 +61,33 @@ class DataPreprocessor:
         # Add mental health features
         if not mental_health_df.empty and "timestamp" in mental_health_df.columns:
             mental_health_df["date"] = pd.to_datetime(mental_health_df["timestamp"]).dt.date
-            mental_health_agg = mental_health_df.groupby("date").agg({
-                "mood": "mean",
-                "anxiety_level": "mean",
-                "focus_level": "mean",
-                "energy_level": "mean",
-                "stress_level": "mean"
-            }).reset_index()
+            mental_health_agg = (
+                mental_health_df.groupby("date")
+                .agg(
+                    {
+                        "mood": "mean",
+                        "anxiety_level": "mean",
+                        "focus_level": "mean",
+                        "energy_level": "mean",
+                        "stress_level": "mean",
+                    }
+                )
+                .reset_index()
+            )
             base_df = pd.merge(base_df, mental_health_agg, on="date", how="left")
 
         # Add energy features
         if not energy_df.empty and "timestamp" in energy_df.columns:
             energy_df["date"] = pd.to_datetime(energy_df["timestamp"]).dt.date
-            energy_agg = energy_df.groupby("date").agg({
-                "energy_level": "mean",
-                "focus_level": "mean"
-            }).reset_index()
+            energy_agg = (
+                energy_df.groupby("date")
+                .agg({"energy_level": "mean", "focus_level": "mean"})
+                .reset_index()
+            )
             # Rename columns to avoid collision with mental health features
-            energy_agg = energy_agg.rename(columns={
-                "energy_level": "energy_log_level",
-                "focus_level": "energy_log_focus"
-            })
+            energy_agg = energy_agg.rename(
+                columns={"energy_level": "energy_log_level", "focus_level": "energy_log_focus"}
+            )
             base_df = pd.merge(base_df, energy_agg, on="date", how="left")
 
         # Add task features
@@ -87,20 +96,28 @@ class DataPreprocessor:
             # Example: count tasks per day, average estimated duration, etc.
             if "due_date" in task_df.columns:
                 task_df["date"] = pd.to_datetime(task_df["due_date"]).dt.date
-                task_agg = task_df.groupby("date").agg({
-                    "id": "count",
-                    "estimated_duration": "mean",
-                    "priority": "mean",
-                    "energy_required": "mean",
-                    "focus_required": "mean"
-                }).reset_index()
-                task_agg = task_agg.rename(columns={
-                    "id": "task_count",
-                    "estimated_duration": "avg_task_duration",
-                    "priority": "avg_task_priority",
-                    "energy_required": "avg_task_energy",
-                    "focus_required": "avg_task_focus"
-                })
+                task_agg = (
+                    task_df.groupby("date")
+                    .agg(
+                        {
+                            "id": "count",
+                            "estimated_duration": "mean",
+                            "priority": "mean",
+                            "energy_required": "mean",
+                            "focus_required": "mean",
+                        }
+                    )
+                    .reset_index()
+                )
+                task_agg = task_agg.rename(
+                    columns={
+                        "id": "task_count",
+                        "estimated_duration": "avg_task_duration",
+                        "priority": "avg_task_priority",
+                        "energy_required": "avg_task_energy",
+                        "focus_required": "avg_task_focus",
+                    }
+                )
                 base_df = pd.merge(base_df, task_agg, on="date", how="left")
 
         # Add calendar features
@@ -109,9 +126,15 @@ class DataPreprocessor:
             # Example: count events per day, total duration, etc.
             if "start_time" in calendar_df.columns:
                 calendar_df["date"] = pd.to_datetime(calendar_df["start_time"]).dt.date
-                calendar_agg = calendar_df.groupby("date").agg({
-                    "id": "count",
-                }).reset_index()
+                calendar_agg = (
+                    calendar_df.groupby("date")
+                    .agg(
+                        {
+                            "id": "count",
+                        }
+                    )
+                    .reset_index()
+                )
                 calendar_agg = calendar_agg.rename(columns={"id": "event_count"})
                 base_df = pd.merge(base_df, calendar_agg, on="date", how="left")
 
@@ -285,7 +308,7 @@ class DataPreprocessor:
         targets = []
 
         for i in range(len(sorted_data) - sequence_length):
-            seq = sorted_data[i:i + sequence_length]
+            seq = sorted_data[i : i + sequence_length]
             target = sorted_data[i + sequence_length]
 
             # Extract features from sequence
@@ -294,7 +317,7 @@ class DataPreprocessor:
                 features = [
                     item.get("energy_level", 0),
                     item.get("focus_level", 0),
-                    item.get("mood_score", 0)
+                    item.get("mood_score", 0),
                 ]
                 seq_features.append(features)
 
@@ -388,7 +411,7 @@ class ProductivityPatternPreprocessor:
         self,
         time_blocks: pd.DataFrame,
         mental_health_logs: pd.DataFrame,
-        energy_logs: Optional[pd.DataFrame] = None
+        energy_logs: Optional[pd.DataFrame] = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Preprocess time block data for productivity pattern analysis.
 
@@ -404,7 +427,7 @@ class ProductivityPatternPreprocessor:
             return np.array([]), np.array([])
 
         # Sort data by timestamp
-        sorted_blocks = time_blocks.sort_values(by="start_time").to_dict('records')
+        sorted_blocks = time_blocks.sort_values(by="start_time").to_dict("records")
 
         # Extract features
         # For each time block, we extract:
@@ -455,8 +478,16 @@ class ProductivityPatternPreprocessor:
         """
         # Define possible block types
         block_types = [
-            "task", "meeting", "focus", "break", "learning",
-            "exercise", "social", "leisure", "chore", "meal"
+            "task",
+            "meeting",
+            "focus",
+            "break",
+            "learning",
+            "exercise",
+            "social",
+            "leisure",
+            "chore",
+            "meal",
         ]
 
         # Create one-hot vector
@@ -482,7 +513,7 @@ class ProductivityPatternPreprocessor:
         sequence_targets = []
 
         for i in range(len(features) - sequence_length):
-            seq = features[i:i + sequence_length]
+            seq = features[i : i + sequence_length]
             target = targets[i + sequence_length]
 
             sequences.append(seq)

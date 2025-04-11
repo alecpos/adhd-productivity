@@ -40,12 +40,15 @@ class AnalyticsService:
             and_(
                 or_(
                     BodyDoublingSessionModel.user_id == user_id,
-                    BodyDoublingSessionModel.meta_data.cast(JSON).contains({"participants": [str(user_id)]})
+                    BodyDoublingSessionModel.meta_data.cast(JSON).contains(
+                        {"participants": [str(user_id)]}
+                    ),
                 ),
                 or_(
                     BodyDoublingSessionModel.status == SessionStatus.COMPLETED,
-                    BodyDoublingSessionModel.status == SessionStatus.ACTIVE  # Include ACTIVE sessions
-                )
+                    BodyDoublingSessionModel.status
+                    == SessionStatus.ACTIVE,  # Include ACTIVE sessions
+                ),
             )
         )
 
@@ -55,7 +58,9 @@ class AnalyticsService:
         # Add debug logging
         print(f"Found {len(sessions)} sessions for user {user_id}")
         for session in sessions:
-            print(f"Session {session.id} - Status: {session.status} - Metadata: {session.meta_data}")
+            print(
+                f"Session {session.id} - Status: {session.status} - Metadata: {session.meta_data}"
+            )
 
         if not sessions:
             return SessionAnalyticsSchema(
@@ -68,7 +73,7 @@ class AnalyticsService:
                 preferred_session_types=[],
                 average_focus_rating=0.0,
                 average_productivity_rating=0.0,
-                average_session_duration=0
+                average_session_duration=0,
             )
 
         # Calculate analytics
@@ -106,7 +111,9 @@ class AnalyticsService:
 
         # Calculate averages and preferences
         avg_focus = sum(focus_ratings) / len(focus_ratings) if focus_ratings else 0.0
-        avg_productivity = sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0.0
+        avg_productivity = (
+            sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0.0
+        )
         avg_duration = sum(session_durations) / len(session_durations) if session_durations else 0
 
         # Get most common activity and session types
@@ -118,21 +125,20 @@ class AnalyticsService:
         ]
 
         # Get most productive times
-        most_productive_times = [
-            hour for hour, _ in Counter(productive_hours).most_common(3)
-        ]
+        most_productive_times = [hour for hour, _ in Counter(productive_hours).most_common(3)]
 
         return SessionAnalyticsSchema(
             user_id=user_id,
             total_sessions=total_sessions,
             total_duration=int(total_duration),
-            completion_rate=total_sessions / (total_sessions + len([s for s in sessions if s.status == SessionStatus.CANCELLED])),
+            completion_rate=total_sessions
+            / (total_sessions + len([s for s in sessions if s.status == SessionStatus.CANCELLED])),
             most_productive_times=most_productive_times,
             preferred_activity_types=preferred_activity_types,
             preferred_session_types=preferred_session_types,
             average_focus_rating=avg_focus,
             average_productivity_rating=avg_productivity,
-            average_session_duration=int(avg_duration)
+            average_session_duration=int(avg_duration),
         )
 
     async def get_session_analytics(self, session_id: UUID) -> Dict[str, Any]:
@@ -157,7 +163,9 @@ class AnalyticsService:
         # Calculate duration
         total_duration = 0
         if session.start_time and session.end_time:
-            total_duration = (session.end_time - session.start_time).total_seconds() / 60  # in minutes
+            total_duration = (
+                session.end_time - session.start_time
+            ).total_seconds() / 60  # in minutes
 
         # Get feedback metrics
         feedback_points = []
@@ -166,7 +174,9 @@ class AnalyticsService:
 
         # Calculate averages
         focus_ratings = [f.get("focus_rating", 0) for f in feedback_points if "focus_rating" in f]
-        productivity_ratings = [f.get("productivity_rating", 0) for f in feedback_points if "productivity_rating" in f]
+        productivity_ratings = [
+            f.get("productivity_rating", 0) for f in feedback_points if "productivity_rating" in f
+        ]
 
         # Add session-level ratings if available
         if session.focus_rating is not None:
@@ -175,7 +185,9 @@ class AnalyticsService:
             productivity_ratings.append(session.productivity_rating)
 
         average_focus_rating = sum(focus_ratings) / len(focus_ratings) if focus_ratings else 0
-        average_productivity_rating = sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0
+        average_productivity_rating = (
+            sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0
+        )
 
         return {
             "total_duration": total_duration,
@@ -209,12 +221,20 @@ class AnalyticsService:
 
         # Calculate average focus level and productivity
         focus_ratings = [f["focus_rating"] for f in feedback_points if "focus_rating" in f]
-        productivity_ratings = [f["productivity_rating"] for f in feedback_points if "productivity_rating" in f]
-        distraction_ratings = [f["distraction_level"] for f in feedback_points if "distraction_level" in f]
+        productivity_ratings = [
+            f["productivity_rating"] for f in feedback_points if "productivity_rating" in f
+        ]
+        distraction_ratings = [
+            f["distraction_level"] for f in feedback_points if "distraction_level" in f
+        ]
 
         avg_focus = sum(focus_ratings) / len(focus_ratings) if focus_ratings else 0
-        avg_productivity = sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0
-        avg_distraction = sum(distraction_ratings) / len(distraction_ratings) if distraction_ratings else 0
+        avg_productivity = (
+            sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0
+        )
+        avg_distraction = (
+            sum(distraction_ratings) / len(distraction_ratings) if distraction_ratings else 0
+        )
 
         return SessionFeedbackSchema(
             session_id=str(session_id),
@@ -223,7 +243,7 @@ class AnalyticsService:
             average_focus_level=avg_focus,
             average_productivity=avg_productivity,
             average_distraction_level=avg_distraction,
-            final_rating=None  # This can be updated later if needed
+            final_rating=None,  # This can be updated later if needed
         )
 
     async def add_session_feedback(
@@ -255,17 +275,20 @@ class AnalyticsService:
         if session.meta_data and "participants" in session.meta_data:
             participants = session.meta_data["participants"]
 
-        if user_id_str not in participants and session.user_id != user_id and session.host_id != user_id:
+        if (
+            user_id_str not in participants
+            and session.user_id != user_id
+            and session.host_id != user_id
+        ):
             raise HTTPException(
-                status_code=403,
-                detail="Only session participants can provide feedback"
+                status_code=403, detail="Only session participants can provide feedback"
             )
 
         # Add user ID to feedback data
         feedback_entry = {
             "user_id": user_id_str,
             "timestamp": datetime.now().isoformat(),
-            **feedback_data
+            **feedback_data,
         }
 
         # Initialize meta_data if needed
@@ -305,9 +328,11 @@ class AnalyticsService:
             and_(
                 or_(
                     BodyDoublingSessionModel.user_id == user_id,
-                    BodyDoublingSessionModel.meta_data.cast(JSON).contains({"participants": [str(user_id)]})
+                    BodyDoublingSessionModel.meta_data.cast(JSON).contains(
+                        {"participants": [str(user_id)]}
+                    ),
                 ),
-                BodyDoublingSessionModel.status == SessionStatus.COMPLETED
+                BodyDoublingSessionModel.status == SessionStatus.COMPLETED,
             )
         )
 
@@ -350,37 +375,61 @@ class AnalyticsService:
 
         # Time of day insights
         if session_times:
-            most_productive_hour = max(range(24), key=lambda h: sum(1 for t in session_times if t == h))
-            insights.append({
-                "type": "time_of_day",
-                "insight": f"Your most frequent session time is {most_productive_hour}:00",
-                "confidence": "medium"
-            })
+            most_productive_hour = max(
+                range(24), key=lambda h: sum(1 for t in session_times if t == h)
+            )
+            insights.append(
+                {
+                    "type": "time_of_day",
+                    "insight": f"Your most frequent session time is {most_productive_hour}:00",
+                    "confidence": "medium",
+                }
+            )
 
         # Day of week insights
         if session_days:
-            day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-            most_frequent_day = max(range(7), key=lambda d: sum(1 for day in session_days if day == d))
-            insights.append({
-                "type": "day_of_week",
-                "insight": f"You most frequently schedule sessions on {day_names[most_frequent_day]}",
-                "confidence": "medium"
-            })
+            day_names = [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+            ]
+            most_frequent_day = max(
+                range(7), key=lambda d: sum(1 for day in session_days if day == d)
+            )
+            insights.append(
+                {
+                    "type": "day_of_week",
+                    "insight": f"You most frequently schedule sessions on {day_names[most_frequent_day]}",
+                    "confidence": "medium",
+                }
+            )
 
         # Duration insights
         if session_durations:
             avg_duration = sum(session_durations) / len(session_durations)
-            insights.append({
-                "type": "duration",
-                "insight": f"Your average session duration is {int(avg_duration)} minutes",
-                "confidence": "high"
-            })
+            insights.append(
+                {
+                    "type": "duration",
+                    "insight": f"Your average session duration is {int(avg_duration)} minutes",
+                    "confidence": "high",
+                }
+            )
 
         return {
             "insights": insights,
             "total_sessions": len(sessions),
-            "average_focus_rating": sum(focus_ratings) / len(focus_ratings) if focus_ratings else 0.0,
-            "average_productivity_rating": sum(productivity_ratings) / len(productivity_ratings) if productivity_ratings else 0.0,
+            "average_focus_rating": (
+                sum(focus_ratings) / len(focus_ratings) if focus_ratings else 0.0
+            ),
+            "average_productivity_rating": (
+                sum(productivity_ratings) / len(productivity_ratings)
+                if productivity_ratings
+                else 0.0
+            ),
         }
 
     def _calculate_trend(self, values: List[float]) -> str:
@@ -396,7 +445,7 @@ class AnalyticsService:
             return "stable"
 
         # Simple linear trend
-        changes = [values[i] - values[i-1] for i in range(1, len(values))]
+        changes = [values[i] - values[i - 1] for i in range(1, len(values))]
         avg_change = sum(changes) / len(changes)
 
         if avg_change > 0.1:  # Threshold for improvement

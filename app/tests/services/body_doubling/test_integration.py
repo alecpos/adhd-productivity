@@ -38,9 +38,7 @@ async def db_engine():
 @pytest_asyncio.fixture(scope="function")
 async def db_session(db_engine):
     """Create a database session for testing."""
-    async_session = sessionmaker(
-        db_engine, expire_on_commit=False, class_=AsyncSession
-    )
+    async_session = sessionmaker(db_engine, expire_on_commit=False, class_=AsyncSession)
     session = async_session()
     try:
         yield session
@@ -102,8 +100,8 @@ def group_session_data(user_1_id):
             temperature=22.0,
             location="Home Office",
             social_context="Professional",
-            distractions=["phone", "email"]
-        )
+            distractions=["phone", "email"],
+        ),
     )
 
 
@@ -143,7 +141,7 @@ async def body_doubling_service(db_session: AsyncSession):
         session_manager=session_manager,
         matching_engine=matching_engine,
         analytics_service=analytics_service,
-        notification_service=notification_service
+        notification_service=notification_service,
     )
 
 
@@ -152,7 +150,9 @@ class TestIntegration:
     """Integration tests for body doubling service components."""
 
     @pytest.mark.asyncio
-    async def test_create_and_retrieve_session(self, body_doubling_service, sample_session_data, user_1_id):
+    async def test_create_and_retrieve_session(
+        self, body_doubling_service, sample_session_data, user_1_id
+    ):
         """Test creating a session and then retrieving it."""
         # Create a session
         session = await body_doubling_service.create_session(sample_session_data)
@@ -176,7 +176,9 @@ class TestIntegration:
         assert retrieved_session.activity_type == session.activity_type
 
     @pytest.mark.asyncio
-    async def test_session_lifecycle(self, body_doubling_service, sample_session_data, user_1_id, user_2_id):
+    async def test_session_lifecycle(
+        self, body_doubling_service, sample_session_data, user_1_id, user_2_id
+    ):
         """Test the complete lifecycle of a session from creation to end."""
         # Create a session
         session = await body_doubling_service.create_session(sample_session_data)
@@ -197,7 +199,9 @@ class TestIntegration:
         assert ended_session.status == SessionStatus.COMPLETED
 
     @pytest.mark.asyncio
-    async def test_group_session_management(self, body_doubling_service, group_session_data, user_1_id, user_2_id):
+    async def test_group_session_management(
+        self, body_doubling_service, group_session_data, user_1_id, user_2_id
+    ):
         """Test creating and managing a group session."""
         # Create a group session
         session = await body_doubling_service.create_group_session(group_session_data)
@@ -247,17 +251,23 @@ class TestIntegration:
         )
 
         # Create a session directly using the session manager
-        pending_session = await body_doubling_service.session_manager.create_session(pending_session_data)
+        pending_session = await body_doubling_service.session_manager.create_session(
+            pending_session_data
+        )
 
         # Manually update the status to PENDING after creation
-        query = update(BodyDoublingSessionModel).where(
-            BodyDoublingSessionModel.id == pending_session.id
-        ).values(status=SessionStatus.PENDING)
+        query = (
+            update(BodyDoublingSessionModel)
+            .where(BodyDoublingSessionModel.id == pending_session.id)
+            .values(status=SessionStatus.PENDING)
+        )
         await body_doubling_service.session_manager.db.execute(query)
         await body_doubling_service.session_manager.db.commit()
 
         # Fetch the session again to get the updated status
-        pending_session = await body_doubling_service.session_manager.get_session_by_id(pending_session.id)
+        pending_session = await body_doubling_service.session_manager.get_session_by_id(
+            pending_session.id
+        )
 
         assert pending_session is not None
         assert pending_session.user_id == user_1_id
@@ -272,7 +282,11 @@ class TestIntegration:
         # Create a wrapper to add debugging
         async def debug_accept_match(partner_id, session_id):
             print(f"Calling accept_match with partner_id={partner_id}, session_id={session_id}")
-            request_session = await body_doubling_service.matching_engine.session_manager.get_session_by_id(session_id)
+            request_session = (
+                await body_doubling_service.matching_engine.session_manager.get_session_by_id(
+                    session_id
+                )
+            )
             print(f"Session metadata BEFORE processing: {request_session.meta_data}")
 
             # Call the original implementation
@@ -281,7 +295,11 @@ class TestIntegration:
             print(f"Session metadata AFTER processing but BEFORE refresh: {result.meta_data}")
 
             # Fetch again from DB to verify persistence
-            refreshed = await body_doubling_service.matching_engine.session_manager.get_session_by_id(session_id)
+            refreshed = (
+                await body_doubling_service.matching_engine.session_manager.get_session_by_id(
+                    session_id
+                )
+            )
             print(f"Session metadata AFTER refresh from DB: {refreshed.meta_data}")
 
             return result
@@ -289,7 +307,9 @@ class TestIntegration:
         # Replace the method temporarily
         body_doubling_service.matching_engine.accept_match = debug_accept_match
 
-        matched_session = await body_doubling_service.matching_engine.accept_match(user_2_id, pending_session.id)
+        matched_session = await body_doubling_service.matching_engine.accept_match(
+            user_2_id, pending_session.id
+        )
 
         # Print the participants in the session metadata
         print(f"Session metadata after match acceptance: {matched_session.meta_data}")
@@ -304,7 +324,9 @@ class TestIntegration:
         assert str(user_2_id) in matched_session.meta_data["participants"]
 
     @pytest.mark.asyncio
-    async def test_session_feedback_and_analytics(self, body_doubling_service, sample_session_data, user_1_id):
+    async def test_session_feedback_and_analytics(
+        self, body_doubling_service, sample_session_data, user_1_id
+    ):
         """Test adding feedback to a session and getting analytics."""
         # Create a session
         session = await body_doubling_service.create_session(sample_session_data)
@@ -316,7 +338,7 @@ class TestIntegration:
                 "focus_rating": 8,
                 "productivity_rating": 7,
                 "distraction_level": 2,
-                "user_id": str(user_1_id)  # Add user_id explicitly
+                "user_id": str(user_1_id),  # Add user_id explicitly
             }
         ]
 
@@ -375,6 +397,8 @@ class TestIntegration:
             "preferred_activity_types": ["study", "work"],
         }
 
-        updated_session = await body_doubling_service.update_preferences(session.id, new_preferences)
+        updated_session = await body_doubling_service.update_preferences(
+            session.id, new_preferences
+        )
         assert updated_session is not None
         assert updated_session.meta_data["preferences"] == new_preferences

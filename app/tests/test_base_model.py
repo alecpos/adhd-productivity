@@ -9,14 +9,18 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 # Create a completely independent base for testing
 Base = declarative_base()
 
+
 class IDMixin:
     """ID mixin for test models."""
+
     id = Column(String, primary_key=True, default=lambda: str(uuid4()))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
+
 class TestUser(IDMixin, Base):
     """Test user model."""
+
     __tablename__ = "test_users"
 
     username = Column(String, unique=True, nullable=False)
@@ -24,8 +28,10 @@ class TestUser(IDMixin, Base):
 
     tasks = relationship("TestTask", back_populates="user")
 
+
 class TestTask(IDMixin, Base):
     """Test task model."""
+
     __tablename__ = "test_tasks"
 
     title = Column(String, nullable=False)
@@ -33,10 +39,12 @@ class TestTask(IDMixin, Base):
 
     user = relationship("TestUser", back_populates="tasks")
 
+
 # Set up an in-memory SQLite test database
 TEST_DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -48,20 +56,18 @@ def db_session():
     session.close()
     Base.metadata.drop_all(bind=engine)
 
+
 def test_id_mixin():
     """Test ID mixin."""
-    assert hasattr(IDMixin, 'id')
-    assert hasattr(IDMixin, 'created_at')
-    assert hasattr(IDMixin, 'updated_at')
+    assert hasattr(IDMixin, "id")
+    assert hasattr(IDMixin, "created_at")
+    assert hasattr(IDMixin, "updated_at")
+
 
 def test_user_model_create(db_session):
     """Test creating a user."""
     user_id = str(uuid4())
-    user = TestUser(
-        id=user_id,
-        username="test_user",
-        email="test@example.com"
-    )
+    user = TestUser(id=user_id, username="test_user", email="test@example.com")
     db_session.add(user)
     db_session.commit()
 
@@ -72,20 +78,14 @@ def test_user_model_create(db_session):
     assert user_from_db.username == "test_user"
     assert user_from_db.email == "test@example.com"
 
+
 def test_relationship(db_session):
     """Test a relationship between user and task."""
     user_id = str(uuid4())
-    user = TestUser(
-        id=user_id,
-        username="test_user",
-        email="test@example.com"
-    )
+    user = TestUser(id=user_id, username="test_user", email="test@example.com")
     db_session.add(user)
 
-    task = TestTask(
-        title="Test Task",
-        user_id=user_id
-    )
+    task = TestTask(title="Test Task", user_id=user_id)
     db_session.add(task)
     db_session.commit()
 

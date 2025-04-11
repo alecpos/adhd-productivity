@@ -24,7 +24,12 @@ def extract_time_expressions(text: str) -> List[Dict]:
     for ent in doc.ents:
         if ent.label_ in ["TIME", "DATE"]:
             time_entities.append(
-                {"text": ent.text, "label": ent.label_, "start": ent.start_char, "end": ent.end_char}
+                {
+                    "text": ent.text,
+                    "label": ent.label_,
+                    "start": ent.start_char,
+                    "end": ent.end_char,
+                }
             )
 
     return time_entities
@@ -48,11 +53,7 @@ def parse_duration(text: str) -> Optional[timedelta]:
 def extract_task_metadata(text: str) -> Dict:
     """Extract metadata from task description."""
     doc = nlp(text)
-    metadata = {
-        "priority": "medium",
-        "category": "uncategorized",
-        "estimated_duration": None
-    }
+    metadata = {"priority": "medium", "category": "uncategorized", "estimated_duration": None}
 
     # Extract priority
     for token in doc:
@@ -93,16 +94,17 @@ def get_task_suggestions(task_history: List[Dict]) -> List[Dict]:
         if len(tasks) >= 3:  # Only suggest if we have enough data
             avg_duration = sum(t.get("duration", 0) for t in tasks) / len(tasks)
             common_time = max(
-                set(t.get("time_of_day", "") for t in tasks),
-                key=lambda x: list(tasks).count(x)
+                set(t.get("time_of_day", "") for t in tasks), key=lambda x: list(tasks).count(x)
             )
 
-            suggestions.append({
-                "category": category,
-                "suggested_duration": avg_duration,
-                "preferred_time": common_time,
-                "confidence": min(len(tasks) / 10, 1.0)  # Confidence based on sample size
-            })
+            suggestions.append(
+                {
+                    "category": category,
+                    "suggested_duration": avg_duration,
+                    "preferred_time": common_time,
+                    "confidence": min(len(tasks) / 10, 1.0),  # Confidence based on sample size
+                }
+            )
 
     return suggestions
 
@@ -113,7 +115,7 @@ def extract_event_category(text: str) -> Optional[str]:
     categories = {
         "meeting": ["meeting", "call", "conference"],
         "task": ["task", "todo", "work"],
-        "reminder": ["reminder", "alert", "notification"]
+        "reminder": ["reminder", "alert", "notification"],
     }
 
     for category, keywords in categories.items():

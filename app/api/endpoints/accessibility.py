@@ -15,8 +15,10 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
+
 class ColorTheme(str, Enum):
     """Color themes optimized for different needs."""
+
     STANDARD = "standard"
     HIGH_CONTRAST = "high_contrast"
     DARK = "dark"
@@ -26,12 +28,15 @@ class ColorTheme(str, Enum):
     FOCUS = "focus"
     CUSTOM = "custom"
 
+
 class AccessibilityPreferences(BaseModel):
     """User's accessibility preferences for UI customization."""
+
     user_id: str
     color_theme: ColorTheme = ColorTheme.STANDARD
     font_size: int = 16
     last_updated: datetime = Field(default_factory=datetime.utcnow)
+
 
 class AccessibilityService:
     """Service for managing UI accessibility features"""
@@ -40,7 +45,9 @@ class AccessibilityService:
         """Get accessibility preferences for a user"""
         return AccessibilityPreferences(user_id=user_id)
 
-    async def update_user_preferences(self, user_id: str, preferences: Dict[str, Any]) -> AccessibilityPreferences:
+    async def update_user_preferences(
+        self, user_id: str, preferences: Dict[str, Any]
+    ) -> AccessibilityPreferences:
         """Update accessibility preferences for a user"""
         return AccessibilityPreferences(user_id=user_id)
 
@@ -52,16 +59,16 @@ class AccessibilityService:
         """Get a WCAG compliance report"""
         return {"compliance_percentage": 95}
 
-    async def generate_adhd_optimized_ui_settings(self, user_id: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def generate_adhd_optimized_ui_settings(
+        self, user_id: str, context: Dict[str, Any] = None
+    ) -> Dict[str, Any]:
         """Generate UI settings based on preferences and context"""
         return {"css_variables": {"--focus-color": "blue"}}
 
+
 settings = get_config()
 
-router = APIRouter(
-    prefix="/accessibility",
-    tags=["Accessibility", "User Experience"]
-)
+router = APIRouter(prefix="/accessibility", tags=["Accessibility", "User Experience"])
 accessibility_service = AccessibilityService()
 
 

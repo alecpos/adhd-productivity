@@ -92,7 +92,11 @@ class TimePreferences(BaseModel):
     @classmethod
     def validate_preferred_end_time(cls, v: Optional[datetime], info: Any) -> Optional[datetime]:
         """Validate preferred end time is after preferred start time if both are provided."""
-        if v is not None and info.data.get("preferred_start_time") and v <= info.data["preferred_start_time"]:
+        if (
+            v is not None
+            and info.data.get("preferred_start_time")
+            and v <= info.data["preferred_start_time"]
+        ):
             raise ValueError("Preferred end time must be after preferred start time")
         return v
 

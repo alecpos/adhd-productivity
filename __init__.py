@@ -13,7 +13,7 @@ from app.services.body_doubling.body_doubling_types import (
     MatchCriteria,
     MatchResult,
     SessionParticipant,
-    SessionStats
+    SessionStats,
 )
 
 __all__ = [
@@ -25,5 +25,5 @@ __all__ = [
     "MatchCriteria",
     "MatchResult",
     "SessionParticipant",
-    "SessionStats"
+    "SessionStats",
 ]

@@ -18,6 +18,7 @@ from typing import Dict, List, Optional, Union, Any, Tuple, Set
 
 logger = logging.getLogger(__name__)
 
+
 class DebtSeverity(Enum):
     """Severity levels for technical debt items."""
 
@@ -149,13 +150,17 @@ class TechnicalDebtItem:
         self.resolution_plan = resolution_plan
         self.resolution_commit = resolution_commit
         self.impact = impact
-        self.history = [{
-            "timestamp": self.created_at.isoformat(),
-            "status": self.status.value,
-            "message": "Item created"
-        }]
+        self.history = [
+            {
+                "timestamp": self.created_at.isoformat(),
+                "status": self.status.value,
+                "message": "Item created",
+            }
+        ]
 
-    def update_status(self, new_status: Union[DebtStatus, str], message: Optional[str] = None) -> None:
+    def update_status(
+        self, new_status: Union[DebtStatus, str], message: Optional[str] = None
+    ) -> None:
         """Update the status of this debt item."""
         if isinstance(new_status, str):
             try:
@@ -166,22 +171,26 @@ class TechnicalDebtItem:
         self.status = new_status
         self.updated_at = datetime.now()
 
-        self.history.append({
-            "timestamp": self.updated_at.isoformat(),
-            "status": self.status.value,
-            "message": message or f"Status changed to {self.status.value}"
-        })
+        self.history.append(
+            {
+                "timestamp": self.updated_at.isoformat(),
+                "status": self.status.value,
+                "message": message or f"Status changed to {self.status.value}",
+            }
+        )
 
     def add_comment(self, comment: str, author: Optional[str] = None) -> None:
         """Add a comment to this debt item."""
         if not hasattr(self, "comments"):
             self.comments = []
 
-        self.comments.append({
-            "author": author or os.environ.get("USER", "unknown"),
-            "timestamp": datetime.now().isoformat(),
-            "text": comment
-        })
+        self.comments.append(
+            {
+                "author": author or os.environ.get("USER", "unknown"),
+                "timestamp": datetime.now().isoformat(),
+                "text": comment,
+            }
+        )
         self.updated_at = datetime.now()
 
     def update_resolution_plan(self, plan: str) -> None:
@@ -189,11 +198,13 @@ class TechnicalDebtItem:
         self.resolution_plan = plan
         self.updated_at = datetime.now()
 
-        self.history.append({
-            "timestamp": self.updated_at.isoformat(),
-            "status": self.status.value,
-            "message": "Resolution plan updated"
-        })
+        self.history.append(
+            {
+                "timestamp": self.updated_at.isoformat(),
+                "status": self.status.value,
+                "message": "Resolution plan updated",
+            }
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert the debt item to a dictionary for serialization."""
@@ -218,7 +229,7 @@ class TechnicalDebtItem:
             "resolution_commit": self.resolution_commit,
             "impact": self.impact,
             "history": self.history,
-            "comments": getattr(self, "comments", [])
+            "comments": getattr(self, "comments", []),
         }
 
     @classmethod
@@ -248,7 +259,7 @@ class TechnicalDebtItem:
             related_items=data.get("related_items", []),
             resolution_plan=data.get("resolution_plan"),
             resolution_commit=data.get("resolution_commit"),
-            impact=data.get("impact")
+            impact=data.get("impact"),
         )
 
         # Restore ID and history
@@ -269,7 +280,7 @@ class TechnicalDebtManager:
         """Initialize the technical debt manager."""
         self.db_path = db_path or os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-            "tech_debt.json"
+            "tech_debt.json",
         )
         self.debt_items: Dict[str, TechnicalDebtItem] = {}
         self._load_items()
@@ -298,7 +309,7 @@ class TechnicalDebtManager:
         try:
             data = {
                 "last_updated": datetime.now().isoformat(),
-                "items": [item.to_dict() for item in self.debt_items.values()]
+                "items": [item.to_dict() for item in self.debt_items.values()],
             }
 
             # Ensure directory exists
@@ -351,7 +362,7 @@ class TechnicalDebtManager:
         subcategory: Optional[Union[MLDebtSubcategory, str]] = None,
         tags: Optional[List[str]] = None,
         search_query: Optional[str] = None,
-        file_path: Optional[str] = None
+        file_path: Optional[str] = None,
     ) -> List[TechnicalDebtItem]:
         """List debt items with optional filtering."""
         items = list(self.debt_items.values())
@@ -394,10 +405,7 @@ class TechnicalDebtManager:
 
         # Filter by tags if provided
         if tags:
-            items = [
-                item for item in items
-                if any(tag in item.tags for tag in tags)
-            ]
+            items = [item for item in items if any(tag in item.tags for tag in tags)]
 
         # Filter by file path if provided
         if file_path:
@@ -407,11 +415,12 @@ class TechnicalDebtManager:
         if search_query:
             search_query = search_query.lower()
             items = [
-                item for item in items
+                item
+                for item in items
                 if (
-                    search_query in item.title.lower() or
-                    search_query in item.description.lower() or
-                    (item.resolution_plan and search_query in item.resolution_plan.lower())
+                    search_query in item.title.lower()
+                    or search_query in item.description.lower()
+                    or (item.resolution_plan and search_query in item.resolution_plan.lower())
                 )
             ]
 
@@ -421,7 +430,7 @@ class TechnicalDebtManager:
         self,
         output_format: str = "markdown",
         include_resolved: bool = False,
-        group_by: Optional[str] = None
+        group_by: Optional[str] = None,
     ) -> str:
         """Generate a report of technical debt items."""
         items = self.list_items()
@@ -435,24 +444,25 @@ class TechnicalDebtManager:
         if output_format == "markdown":
             return self._generate_markdown_report(items, group_by)
         elif output_format == "json":
-            return json.dumps({
-                "generated_at": datetime.now().isoformat(),
-                "items": [item.to_dict() for item in items]
-            }, indent=2)
+            return json.dumps(
+                {
+                    "generated_at": datetime.now().isoformat(),
+                    "items": [item.to_dict() for item in items],
+                },
+                indent=2,
+            )
         else:
             raise ValueError(f"Unsupported output format: {output_format}")
 
     def _generate_markdown_report(
-        self,
-        items: List[TechnicalDebtItem],
-        group_by: Optional[str] = None
+        self, items: List[TechnicalDebtItem], group_by: Optional[str] = None
     ) -> str:
         """Generate a markdown report of technical debt items."""
         report_parts = [
             "# Technical Debt Report",
             f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"Total items: {len(items)}",
-            ""
+            "",
         ]
 
         # Group items if requested
@@ -477,7 +487,7 @@ class TechnicalDebtManager:
                 DebtSeverity.CRITICAL: 0,
                 DebtSeverity.HIGH: 1,
                 DebtSeverity.MEDIUM: 2,
-                DebtSeverity.LOW: 3
+                DebtSeverity.LOW: 3,
             }
 
             by_severity: Dict[DebtSeverity, List[TechnicalDebtItem]] = {}
@@ -525,7 +535,7 @@ class TechnicalDebtManager:
             f"**Severity:** {item.severity.value.title()}",
             f"**Status:** {item.status.value.replace('_', ' ').title()}",
             f"**Category:** {item.category.value.replace('_', ' ').title()}",
-            ""
+            "",
         ]
 
         if item.subcategory:
@@ -566,7 +576,9 @@ class TechnicalDebtManager:
             parts.append("**Comments:**")
             parts.append("")
             for comment in item.comments:
-                parts.append(f"- **{comment['author']}** ({comment['timestamp']}): {comment['text']}")
+                parts.append(
+                    f"- **{comment['author']}** ({comment['timestamp']}): {comment['text']}"
+                )
 
         parts.append("")
         parts.append("---")
@@ -580,7 +592,7 @@ class TechnicalDebtManager:
             DebtSeverity.CRITICAL: 0,
             DebtSeverity.HIGH: 1,
             DebtSeverity.MEDIUM: 2,
-            DebtSeverity.LOW: 3
+            DebtSeverity.LOW: 3,
         }
         return (severity_order.get(item.severity, 999), item.title.lower())
 
@@ -600,17 +612,17 @@ class TechnicalDebtManager:
 
         # Regex patterns for different tech debt comment styles
         patterns = [
-            r'#\s*TODO\(tech-debt\):\s*(.*?)(?:\n|$)',  # Python-style TODO
-            r'#\s*FIXME\(tech-debt\):\s*(.*?)(?:\n|$)',  # Python-style FIXME
-            r'//\s*TODO\(tech-debt\):\s*(.*?)(?:\n|$)',  # JS/TS-style TODO
-            r'//\s*FIXME\(tech-debt\):\s*(.*?)(?:\n|$)',  # JS/TS-style FIXME
-            r'/\*\s*TECH-DEBT:\s*(.*?)\*/',  # C-style comment
-            r'<!--\s*TECH-DEBT:\s*(.*?)-->',  # HTML/XML comment
-            r'#\s*TECH-DEBT:\s*(.*?)(?:\n|$)',  # Hash comment
-            r'//\s*TECH-DEBT:\s*(.*?)(?:\n|$)',  # Double slash comment
+            r"#\s*TODO\(tech-debt\):\s*(.*?)(?:\n|$)",  # Python-style TODO
+            r"#\s*FIXME\(tech-debt\):\s*(.*?)(?:\n|$)",  # Python-style FIXME
+            r"//\s*TODO\(tech-debt\):\s*(.*?)(?:\n|$)",  # JS/TS-style TODO
+            r"//\s*FIXME\(tech-debt\):\s*(.*?)(?:\n|$)",  # JS/TS-style FIXME
+            r"/\*\s*TECH-DEBT:\s*(.*?)\*/",  # C-style comment
+            r"<!--\s*TECH-DEBT:\s*(.*?)-->",  # HTML/XML comment
+            r"#\s*TECH-DEBT:\s*(.*?)(?:\n|$)",  # Hash comment
+            r"//\s*TECH-DEBT:\s*(.*?)(?:\n|$)",  # Double slash comment
         ]
 
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         tags = []
@@ -619,14 +631,14 @@ class TechnicalDebtManager:
                 description = match.group(1).strip()
 
                 # Find line number
-                line_number = content[:match.start()].count('\n') + 1
+                line_number = content[: match.start()].count("\n") + 1
 
                 # Extract any severity indicator if present
                 severity = DebtSeverity.MEDIUM  # Default severity
                 severity_patterns = [
-                    (r'\[severity:(\w+)\]', 1),
-                    (r'severity:\s*(\w+)', 1),
-                    (r'priority:\s*(\w+)', 1),
+                    (r"\[severity:(\w+)\]", 1),
+                    (r"severity:\s*(\w+)", 1),
+                    (r"priority:\s*(\w+)", 1),
                 ]
 
                 for severity_pattern, group_idx in severity_patterns:
@@ -638,24 +650,25 @@ class TechnicalDebtManager:
                             if severity_str in [s.value for s in DebtSeverity]:
                                 severity = DebtSeverity(severity_str)
                             # Remove the severity indicator from description
-                            description = re.sub(severity_pattern, '', description, flags=re.IGNORECASE).strip()
+                            description = re.sub(
+                                severity_pattern, "", description, flags=re.IGNORECASE
+                            ).strip()
                         except (ValueError, IndexError):
                             pass
 
-                tags.append({
-                    'file_path': file_path,
-                    'line_number': line_number,
-                    'description': description,
-                    'severity': severity
-                })
+                tags.append(
+                    {
+                        "file_path": file_path,
+                        "line_number": line_number,
+                        "description": description,
+                        "severity": severity,
+                    }
+                )
 
         return tags
 
     def scan_directory_for_tech_debt(
-        self,
-        directory: str,
-        file_extensions: Optional[List[str]] = None,
-        auto_add: bool = False
+        self, directory: str, file_extensions: Optional[List[str]] = None, auto_add: bool = False
     ) -> List[Dict[str, Any]]:
         """
         Scan a directory for technical debt tags in code comments.
@@ -675,7 +688,22 @@ class TechnicalDebtManager:
 
         # Default extensions if none provided
         if file_extensions is None:
-            file_extensions = ['.py', '.js', '.ts', '.tsx', '.jsx', '.java', '.c', '.cpp', '.h', '.hpp', '.cs', '.go', '.rb', '.php']
+            file_extensions = [
+                ".py",
+                ".js",
+                ".ts",
+                ".tsx",
+                ".jsx",
+                ".java",
+                ".c",
+                ".cpp",
+                ".h",
+                ".hpp",
+                ".cs",
+                ".go",
+                ".rb",
+                ".php",
+            ]
 
         for root, _, files in os.walk(directory):
             for file in files:
@@ -688,11 +716,11 @@ class TechnicalDebtManager:
                             # Convert tag to TechnicalDebtItem and add to manager
                             item = TechnicalDebtItem(
                                 title=f"Tech debt in {os.path.basename(tag['file_path'])}",
-                                description=tag['description'],
+                                description=tag["description"],
                                 category=DebtCategory.CODE_QUALITY,
-                                severity=tag['severity'],
-                                file_path=tag['file_path'],
-                                line_numbers=[tag['line_number']]
+                                severity=tag["severity"],
+                                file_path=tag["file_path"],
+                                line_numbers=[tag["line_number"]],
                             )
                             self.add_item(item)
 
@@ -710,11 +738,7 @@ class TechnicalDebtManager:
         Returns:
             Dictionary with 'added', 'modified', and 'removed' lists of tech debt IDs
         """
-        result = {
-            'added': [],
-            'modified': [],
-            'removed': []
-        }
+        result = {"added": [], "modified": [], "removed": []}
 
         # Existing debt items by file path
         debt_by_file: Dict[str, List[TechnicalDebtItem]] = {}
@@ -725,18 +749,15 @@ class TechnicalDebtManager:
                 debt_by_file[item.file_path].append(item)
 
         # Check removed files
-        for file_path in commit_info.get('removed', []):
+        for file_path in commit_info.get("removed", []):
             if file_path in debt_by_file:
                 for item in debt_by_file[file_path]:
                     # Mark the item as resolved if the file was removed
-                    item.update_status(
-                        DebtStatus.RESOLVED,
-                        f"File was removed in commit"
-                    )
-                    result['removed'].append(item.id)
+                    item.update_status(DebtStatus.RESOLVED, f"File was removed in commit")
+                    result["removed"].append(item.id)
 
         # Check modified files
-        for file_path in commit_info.get('modified', []):
+        for file_path in commit_info.get("modified", []):
             # Look for tech debt tags in the modified file
             tags = self.find_tech_debt_tags(file_path)
 
@@ -745,34 +766,38 @@ class TechnicalDebtManager:
                 for item in debt_by_file[file_path]:
                     # Simple check: if the line number is in the modified file's tags
                     if item.line_numbers:
-                        line_numbers = item.line_numbers if isinstance(item.line_numbers, list) else list(range(item.line_numbers[0], item.line_numbers[1] + 1))
+                        line_numbers = (
+                            item.line_numbers
+                            if isinstance(item.line_numbers, list)
+                            else list(range(item.line_numbers[0], item.line_numbers[1] + 1))
+                        )
 
                         # Check if any tag matches this item's line numbers
-                        tag_lines = [tag['line_number'] for tag in tags]
+                        tag_lines = [tag["line_number"] for tag in tags]
                         if not any(line in tag_lines for line in line_numbers):
                             # The debt item's line numbers are not in the tags,
                             # which might mean it was resolved
                             item.update_status(
                                 DebtStatus.RESOLVED,
-                                f"Tech debt marker not found after file was modified"
+                                f"Tech debt marker not found after file was modified",
                             )
-                            result['removed'].append(item.id)
+                            result["removed"].append(item.id)
 
         # Check added files
-        for file_path in commit_info.get('added', []):
+        for file_path in commit_info.get("added", []):
             tags = self.find_tech_debt_tags(file_path)
             for tag in tags:
                 # Create a new tech debt item for each tag
                 item = TechnicalDebtItem(
                     title=f"Tech debt in new file {os.path.basename(file_path)}",
-                    description=tag['description'],
+                    description=tag["description"],
                     category=DebtCategory.CODE_QUALITY,
-                    severity=tag['severity'],
+                    severity=tag["severity"],
                     file_path=file_path,
-                    line_numbers=[tag['line_number']]
+                    line_numbers=[tag["line_number"]],
                 )
                 self.add_item(item)
-                result['added'].append(item.id)
+                result["added"].append(item.id)
 
         self._save_items()
         return result
@@ -805,40 +830,40 @@ class TechnicalDebtManager:
             DebtSeverity.LOW: 1,
             DebtSeverity.MEDIUM: 3,
             DebtSeverity.HIGH: 6,
-            DebtSeverity.CRITICAL: 10
+            DebtSeverity.CRITICAL: 10,
         }
 
         debt_score = sum(severity_weights[item.severity] for item in active_items)
 
         # Calculate trend if we have history
         trend = None
-        if hasattr(self, '_last_metrics'):
-            previous_score = self._last_metrics.get('debt_score', 0)
+        if hasattr(self, "_last_metrics"):
+            previous_score = self._last_metrics.get("debt_score", 0)
             trend = {
-                'score_change': debt_score - previous_score,
-                'percentage_change': (
-                    ((debt_score - previous_score) / previous_score) * 100
-                    if previous_score else 0
-                )
+                "score_change": debt_score - previous_score,
+                "percentage_change": (
+                    ((debt_score - previous_score) / previous_score) * 100 if previous_score else 0
+                ),
             }
 
         # Store metrics for trend calculation next time
-        self._last_metrics = {'debt_score': debt_score}
+        self._last_metrics = {"debt_score": debt_score}
 
         return {
-            'total_items': len(items),
-            'active_items': len(active_items),
-            'by_severity': by_severity,
-            'by_category': by_category,
-            'by_status': by_status,
-            'debt_score': debt_score,
-            'trend': trend,
-            'last_updated': datetime.now().isoformat()
+            "total_items": len(items),
+            "active_items": len(active_items),
+            "by_severity": by_severity,
+            "by_category": by_category,
+            "by_status": by_status,
+            "debt_score": debt_score,
+            "trend": trend,
+            "last_updated": datetime.now().isoformat(),
         }
 
 
 # Create a singleton instance
 debt_manager = TechnicalDebtManager()
+
 
 def get_debt_manager() -> TechnicalDebtManager:
     """Get the singleton instance of the debt manager."""

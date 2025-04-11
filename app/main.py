@@ -35,6 +35,7 @@ from app.schemas.base_schema import ErrorDetailSchema as ErrorDetail
 # Local application imports - utilities
 from app.utils.exceptions import AuthenticationError, ServiceError
 
+
 # Configure logging
 def configure_logging():
     """Configure application logging."""
@@ -47,12 +48,14 @@ def configure_logging():
     logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
     return logging.getLogger(__name__)
 
+
 # Initialize logger
 logger = configure_logging()
 logger.setLevel(logging.DEBUG)
 
 # Create API router
 app_router = APIRouter()
+
 
 def create_error_response_dict(
     code: str, message: str, details: Optional[Dict[str, Any]] = None
@@ -62,6 +65,7 @@ def create_error_response_dict(
         "success": False,
         "error": {"code": code, "message": message, "details": details or {}},
     }
+
 
 def setup_cors(app: FastAPI) -> None:
     """Configure CORS middleware for the application."""
@@ -75,6 +79,7 @@ def setup_cors(app: FastAPI) -> None:
         )
         logger.info("CORS middleware configured")
 
+
 def setup_routers(app: FastAPI) -> None:
     """Configure API routers for the application."""
     # Add legacy router
@@ -84,6 +89,7 @@ def setup_routers(app: FastAPI) -> None:
     # Add new router
     logger.info("Including the new API router")
     app.include_router(new_api_router, prefix=settings.API_V1_STR)
+
 
 def setup_middleware(app: FastAPI) -> None:
     """Configure middleware for the application."""
@@ -98,8 +104,10 @@ def setup_middleware(app: FastAPI) -> None:
         logger.info(f"Response: Status {response.status_code}")
         return response
 
+
 def setup_exception_handlers(app: FastAPI) -> None:
     """Configure exception handlers for the application."""
+
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
         """Handle all unhandled exceptions."""
@@ -112,8 +120,10 @@ def setup_exception_handlers(app: FastAPI) -> None:
             },
         )
 
+
 def setup_endpoints(app: FastAPI) -> None:
     """Configure basic endpoints for the application."""
+
     @app.get("/")
     async def root():
         """Root endpoint to provide a welcome message."""
@@ -130,8 +140,10 @@ def setup_endpoints(app: FastAPI) -> None:
         """Health check endpoint."""
         return {"status": "ok"}
 
+
 def setup_event_handlers(app: FastAPI) -> None:
     """Configure event handlers for the application."""
+
     @app.on_event("startup")
     async def startup_event():
         logger.info("Starting up and initializing database schema")
@@ -141,6 +153,7 @@ def setup_event_handlers(app: FastAPI) -> None:
     @app.on_event("shutdown")
     async def shutdown_event():
         logger.info("Shutting down FastAPI application")
+
 
 def create_app() -> FastAPI:
     """
@@ -166,8 +179,10 @@ def create_app() -> FastAPI:
 
     return app
 
+
 # Create the application instance
 app = create_app()
+
 
 def get_app() -> FastAPI:
     """Return the application instance for ASGI servers."""

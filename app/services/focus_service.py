@@ -102,9 +102,15 @@ class FocusService(BaseService[FocusSessionModel, FocusSessionSchema, FocusSessi
 
         total_sessions = len(sessions)
         total_duration = sum(s.duration for s in sessions)
-        total_actual_duration = sum(s.actual_focus_duration for s in sessions if s.actual_focus_duration)
-        avg_focus_level = sum(s.focus_level for s in sessions) / total_sessions if total_sessions else 0
-        avg_energy_level = sum(s.energy_level for s in sessions) / total_sessions if total_sessions else 0
+        total_actual_duration = sum(
+            s.actual_focus_duration for s in sessions if s.actual_focus_duration
+        )
+        avg_focus_level = (
+            sum(s.focus_level for s in sessions) / total_sessions if total_sessions else 0
+        )
+        avg_energy_level = (
+            sum(s.energy_level for s in sessions) / total_sessions if total_sessions else 0
+        )
         avg_productivity = (
             sum(s.productivity_score for s in sessions if s.productivity_score is not None)
             / len([s for s in sessions if s.productivity_score is not None])

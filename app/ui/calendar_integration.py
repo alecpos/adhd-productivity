@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class CalendarPlatform(str, Enum):
     """Supported calendar platforms for integration."""
+
     GOOGLE = "google"
     OUTLOOK = "outlook"
     APPLE = "apple"
@@ -31,6 +32,7 @@ class CalendarPlatform(str, Enum):
 
 class EventType(str, Enum):
     """Types of calendar events."""
+
     TASK = "task"
     APPOINTMENT = "appointment"
     MEETING = "meeting"
@@ -43,6 +45,7 @@ class EventType(str, Enum):
 
 class CalendarPermission(str, Enum):
     """Permission levels for calendar access."""
+
     READ_ONLY = "read_only"
     READ_WRITE = "read_write"
     OWNER = "owner"
@@ -51,6 +54,7 @@ class CalendarPermission(str, Enum):
 
 class CalendarIntegrationConfig(BaseModel):
     """Configuration for a specific calendar integration."""
+
     user_id: str
     platform: CalendarPlatform
     calendar_id: str  # External calendar identifier
@@ -70,6 +74,7 @@ class CalendarIntegrationConfig(BaseModel):
 
 class ExternalEvent(BaseModel):
     """Representation of an event from an external calendar platform."""
+
     event_id: str
     calendar_id: str
     title: str
@@ -94,6 +99,7 @@ class ExternalEvent(BaseModel):
 
 class CalendarSyncResult(BaseModel):
     """Result of a calendar synchronization operation."""
+
     success: bool
     platform: CalendarPlatform
     calendar_id: str
@@ -120,9 +126,7 @@ class CalendarIntegration(ABC):
         pass
 
     @abstractmethod
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[ExternalEvent]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[ExternalEvent]:
         """Fetch events from the external calendar service."""
         pass
 
@@ -183,7 +187,9 @@ class GoogleCalendarIntegration(CalendarIntegration):
                 await self._refresh_token()
 
             # In real implementation, we would verify token with a test API call
-            logger.info(f"Successfully authenticated with Google Calendar for user {self.config.user_id}")
+            logger.info(
+                f"Successfully authenticated with Google Calendar for user {self.config.user_id}"
+            )
             return True
         except Exception as e:
             logger.error(f"Failed to authenticate with Google Calendar: {str(e)}")
@@ -209,9 +215,7 @@ class GoogleCalendarIntegration(CalendarIntegration):
         # For this example, just simulate token refresh
         logger.info(f"Refreshed Google Calendar token for user {self.config.user_id}")
 
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[ExternalEvent]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[ExternalEvent]:
         """Fetch events from Google Calendar."""
         try:
             # In real implementation:
@@ -257,26 +261,32 @@ class GoogleCalendarIntegration(CalendarIntegration):
             result = []
             for event in mock_events:
                 # Parse Google event format to our ExternalEvent model
-                start_time = datetime.fromisoformat(event["start"]["dateTime"].replace("Z", "+00:00"))
+                start_time = datetime.fromisoformat(
+                    event["start"]["dateTime"].replace("Z", "+00:00")
+                )
                 end_time = datetime.fromisoformat(event["end"]["dateTime"].replace("Z", "+00:00"))
 
                 # Convert attendees format
                 attendees = []
                 for attendee in event.get("attendees", []):
-                    attendees.append({
-                        "email": attendee.get("email"),
-                        "name": attendee.get("displayName"),
-                        "status": attendee.get("responseStatus", "needsAction")
-                    })
+                    attendees.append(
+                        {
+                            "email": attendee.get("email"),
+                            "name": attendee.get("displayName"),
+                            "status": attendee.get("responseStatus", "needsAction"),
+                        }
+                    )
 
                 # Convert reminders format
                 reminders = []
                 if "reminders" in event and "overrides" in event["reminders"]:
                     for reminder in event["reminders"]["overrides"]:
-                        reminders.append({
-                            "method": reminder.get("method"),
-                            "minutes_before": reminder.get("minutes")
-                        })
+                        reminders.append(
+                            {
+                                "method": reminder.get("method"),
+                                "minutes_before": reminder.get("minutes"),
+                            }
+                        )
 
                 # Create ExternalEvent
                 external_event = ExternalEvent(
@@ -295,10 +305,18 @@ class GoogleCalendarIntegration(CalendarIntegration):
                     reminders=reminders,
                     color=event.get("colorId"),
                     transparency=event.get("transparency") == "transparent",
-                    created=datetime.fromisoformat(event["created"].replace("Z", "+00:00")) if "created" in event else None,
-                    updated=datetime.fromisoformat(event["updated"].replace("Z", "+00:00")) if "updated" in event else None,
+                    created=(
+                        datetime.fromisoformat(event["created"].replace("Z", "+00:00"))
+                        if "created" in event
+                        else None
+                    ),
+                    updated=(
+                        datetime.fromisoformat(event["updated"].replace("Z", "+00:00"))
+                        if "updated" in event
+                        else None
+                    ),
                     platform=CalendarPlatform.GOOGLE,
-                    additional_data={"etag": event.get("etag")}
+                    additional_data={"etag": event.get("etag")},
                 )
                 result.append(external_event)
 
@@ -556,18 +574,22 @@ class CalendarIntegrationService:
 
         result = []
         for key, integration in self.integrations[user_id].items():
-            result.append({
-                "platform": integration.config.platform.value,
-                "calendar_id": integration.config.calendar_id,
-                "display_name": integration.config.display_name,
-                "color": integration.config.color,
-                "sync_enabled": integration.config.sync_enabled,
-                "last_sync": integration.config.last_sync,
-            })
+            result.append(
+                {
+                    "platform": integration.config.platform.value,
+                    "calendar_id": integration.config.calendar_id,
+                    "display_name": integration.config.display_name,
+                    "color": integration.config.color,
+                    "sync_enabled": integration.config.sync_enabled,
+                    "last_sync": integration.config.last_sync,
+                }
+            )
 
         return result
 
-    async def remove_integration(self, user_id: str, calendar_id: str, platform: CalendarPlatform) -> bool:
+    async def remove_integration(
+        self, user_id: str, calendar_id: str, platform: CalendarPlatform
+    ) -> bool:
         """Remove a calendar integration for a user."""
         if user_id not in self.integrations:
             return False
@@ -584,7 +606,10 @@ class CalendarIntegrationService:
         return True
 
     async def sync_calendars(
-        self, user_id: str, platform: Optional[CalendarPlatform] = None, calendar_id: Optional[str] = None
+        self,
+        user_id: str,
+        platform: Optional[CalendarPlatform] = None,
+        calendar_id: Optional[str] = None,
     ) -> List[CalendarSyncResult]:
         """
         Synchronize calendars between ADHD Calendar and external services.
@@ -623,7 +648,7 @@ class CalendarIntegrationService:
         result = CalendarSyncResult(
             success=False,
             platform=integration.config.platform,
-            calendar_id=integration.config.calendar_id
+            calendar_id=integration.config.calendar_id,
         )
 
         try:
@@ -698,7 +723,12 @@ class CalendarIntegrationService:
             return None
 
     async def update_event_in_external_calendar(
-        self, user_id: str, platform: CalendarPlatform, calendar_id: str, event_id: str, event_data: Dict[str, Any]
+        self,
+        user_id: str,
+        platform: CalendarPlatform,
+        calendar_id: str,
+        event_id: str,
+        event_data: Dict[str, Any],
     ) -> Optional[ExternalEvent]:
         """Update an event directly in an external calendar."""
         integration_key = f"{platform.value}:{calendar_id}"

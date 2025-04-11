@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
+
 class ProjectToolType(str, Enum):
     JIRA = "jira"
     TRELLO = "trello"
@@ -23,16 +24,19 @@ class ProjectToolType(str, Enum):
     MONDAY = "monday"
     OTHER = "other"
 
+
 class SyncDirection(str, Enum):
     IMPORT = "import"
     EXPORT = "export"
     BIDIRECTIONAL = "bidirectional"
+
 
 class SyncFrequency(str, Enum):
     MANUAL = "manual"
     HOURLY = "hourly"
     DAILY = "daily"
     REALTIME = "realtime"
+
 
 class ProjectToolConfig(BaseModel):
     user_id: str
@@ -41,12 +45,14 @@ class ProjectToolConfig(BaseModel):
     sync_direction: SyncDirection = SyncDirection.IMPORT
     sync_frequency: SyncFrequency = SyncFrequency.MANUAL
 
+
 class SyncResult(BaseModel):
     tool_type: ProjectToolType
     tasks_synced: int
     success: bool
     timestamp: datetime
     error_message: Optional[str] = None
+
 
 class ExternalTask(BaseModel):
     id: str
@@ -59,6 +65,7 @@ class ExternalTask(BaseModel):
     tool_type: ProjectToolType
     url: Optional[str] = None
 
+
 class ProjectManagementService:
     async def get_user_integrations(self, user_id: str) -> List[ProjectToolConfig]:
         return [ProjectToolConfig(user_id=user_id, tool_type=ProjectToolType.JIRA)]
@@ -69,25 +76,31 @@ class ProjectManagementService:
     async def remove_integration(self, user_id: str, tool_type: ProjectToolType) -> bool:
         return True
 
-    async def sync_tasks(self, user_id: str, tool_types: Optional[List[ProjectToolType]] = None) -> Dict[ProjectToolType, int]:
+    async def sync_tasks(
+        self, user_id: str, tool_types: Optional[List[ProjectToolType]] = None
+    ) -> Dict[ProjectToolType, int]:
         return {ProjectToolType.JIRA: 5}
 
     async def get_sync_status(self, user_id: str) -> Dict[str, Any]:
         return {"last_sync": datetime.now().isoformat(), "status": "completed"}
 
-    async def get_available_projects(self, user_id: str, tool_type: ProjectToolType) -> List[Dict[str, Any]]:
+    async def get_available_projects(
+        self, user_id: str, tool_type: ProjectToolType
+    ) -> List[Dict[str, Any]]:
         return [{"id": "PROJ-1", "name": "Sample Project"}]
 
-    async def create_task(self, user_id: str, tool_type: ProjectToolType, task_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_task(
+        self, user_id: str, tool_type: ProjectToolType, task_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         return {"id": "TASK-123", "title": task_data.get("title", "New Task")}
 
-    async def update_task(self, user_id: str, tool_type: ProjectToolType, task_id: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def update_task(
+        self, user_id: str, tool_type: ProjectToolType, task_id: str, task_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         return {"id": task_id, "title": task_data.get("title", "Updated Task")}
 
-router = APIRouter(
-    prefix="/project-management",
-    tags=["Project Management", "Integration"]
-)
+
+router = APIRouter(prefix="/project-management", tags=["Project Management", "Integration"])
 project_management_service = ProjectManagementService()
 
 

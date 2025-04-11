@@ -6,7 +6,9 @@ from app.models.calendar_event_model import CalendarEventModel
 from app.schemas.calendar_event_schema import EventResponseSchema, EventCreateSchema
 
 
-class OutlookCalendarService(BaseService[CalendarEventModel, EventResponseSchema, EventCreateSchema]):
+class OutlookCalendarService(
+    BaseService[CalendarEventModel, EventResponseSchema, EventCreateSchema]
+):
     """Service for Outlook Calendar integration."""
 
     def __init__(self, db_session: AsyncSession):

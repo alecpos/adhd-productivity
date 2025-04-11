@@ -17,10 +17,10 @@ from app.utils.dependency_analyzer import DependencyAnalyzer, get_dependency_ana
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 def setup_parser() -> argparse.ArgumentParser:
     """Set up the argument parser."""
@@ -31,15 +31,12 @@ def setup_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # analyze-file command
-    analyze_file_parser = subparsers.add_parser(
-        "analyze-file", help="Analyze a single file"
-    )
+    analyze_file_parser = subparsers.add_parser("analyze-file", help="Analyze a single file")
     analyze_file_parser.add_argument(
         "file_path", type=str, help="Path to the Python file to analyze"
     )
     analyze_file_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the analysis output (JSON)"
+        "--output", "-o", type=str, help="Path to save the analysis output (JSON)"
     )
 
     # analyze-directory command
@@ -47,86 +44,77 @@ def setup_parser() -> argparse.ArgumentParser:
         "analyze-directory", help="Analyze all Python files in a directory"
     )
     analyze_dir_parser.add_argument(
-        "directory", type=str, nargs="?", default=".",
-        help="Directory to analyze (defaults to current directory)"
+        "directory",
+        type=str,
+        nargs="?",
+        default=".",
+        help="Directory to analyze (defaults to current directory)",
     )
     analyze_dir_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the analysis output (JSON)"
+        "--output", "-o", type=str, help="Path to save the analysis output (JSON)"
     )
 
     # dependency-graph command
-    graph_parser = subparsers.add_parser(
-        "dependency-graph", help="Generate a dependency graph"
+    graph_parser = subparsers.add_parser("dependency-graph", help="Generate a dependency graph")
+    graph_parser.add_argument(
+        "directory",
+        type=str,
+        nargs="?",
+        default=".",
+        help="Directory to analyze (defaults to current directory)",
     )
     graph_parser.add_argument(
-        "directory", type=str, nargs="?", default=".",
-        help="Directory to analyze (defaults to current directory)"
+        "--format",
+        "-f",
+        type=str,
+        choices=["json", "dot", "mermaid"],
+        default="json",
+        help="Output format (defaults to json)",
     )
-    graph_parser.add_argument(
-        "--format", "-f", type=str, choices=["json", "dot", "mermaid"],
-        default="json", help="Output format (defaults to json)"
-    )
-    graph_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the graph output"
-    )
+    graph_parser.add_argument("--output", "-o", type=str, help="Path to save the graph output")
 
     # trace-deps command
-    trace_parser = subparsers.add_parser(
-        "trace-deps", help="Trace dependencies using RAG"
-    )
-    trace_parser.add_argument(
-        "file_path", type=str, help="Path to the Python file to analyze"
-    )
-    trace_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the output (JSON)"
-    )
+    trace_parser = subparsers.add_parser("trace-deps", help="Trace dependencies using RAG")
+    trace_parser.add_argument("file_path", type=str, help="Path to the Python file to analyze")
+    trace_parser.add_argument("--output", "-o", type=str, help="Path to save the output (JSON)")
 
     # suggest command
-    suggest_parser = subparsers.add_parser(
-        "suggest", help="Get RAG-based suggestions for a file"
+    suggest_parser = subparsers.add_parser("suggest", help="Get RAG-based suggestions for a file")
+    suggest_parser.add_argument("file_path", type=str, help="Path to the Python file to analyze")
+    suggest_parser.add_argument(
+        "--query",
+        "-q",
+        type=str,
+        help="Query to send to the RAG system (defaults to dependency analysis query)",
     )
     suggest_parser.add_argument(
-        "file_path", type=str, help="Path to the Python file to analyze"
-    )
-    suggest_parser.add_argument(
-        "--query", "-q", type=str,
-        help="Query to send to the RAG system (defaults to dependency analysis query)"
-    )
-    suggest_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the suggestions (text)"
+        "--output", "-o", type=str, help="Path to save the suggestions (text)"
     )
 
     # circular command
-    circular_parser = subparsers.add_parser(
-        "circular", help="Find circular dependencies"
-    )
+    circular_parser = subparsers.add_parser("circular", help="Find circular dependencies")
     circular_parser.add_argument(
-        "directory", type=str, nargs="?", default=".",
-        help="Directory to analyze (defaults to current directory)"
+        "directory",
+        type=str,
+        nargs="?",
+        default=".",
+        help="Directory to analyze (defaults to current directory)",
     )
-    circular_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the output (JSON)"
-    )
+    circular_parser.add_argument("--output", "-o", type=str, help="Path to save the output (JSON)")
 
     # weekly-resampling command
     weekly_parser = subparsers.add_parser(
         "weekly-resampling", help="Analyze dependencies for weekly resampling feature"
     )
     weekly_parser.add_argument(
-        "file_path", type=str,
-        help="Path to the TimeBufferCalculator file to analyze"
+        "file_path", type=str, help="Path to the TimeBufferCalculator file to analyze"
     )
     weekly_parser.add_argument(
-        "--output", "-o", type=str,
-        help="Path to save the analysis output (JSON)"
+        "--output", "-o", type=str, help="Path to save the analysis output (JSON)"
     )
 
     return parser
+
 
 def handle_analyze_file(args):
     """Handle the analyze-file command."""
@@ -146,7 +134,7 @@ def handle_analyze_file(args):
         print(f"Classes: {len(results['classes'])}")
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(results, f, indent=2)
             print(f"Analysis saved to {args.output}")
 
@@ -155,6 +143,7 @@ def handle_analyze_file(args):
     except Exception as e:
         logger.error(f"Error analyzing file: {str(e)}")
         return 1
+
 
 def handle_analyze_directory(args):
     """Handle the analyze-directory command."""
@@ -168,7 +157,7 @@ def handle_analyze_directory(args):
         print(f"Errors: {len(results['errors'])}")
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(results, f, indent=2)
             print(f"Analysis saved to {args.output}")
 
@@ -177,6 +166,7 @@ def handle_analyze_directory(args):
     except Exception as e:
         logger.error(f"Error analyzing directory: {str(e)}")
         return 1
+
 
 def handle_dependency_graph(args):
     """Handle the dependency-graph command."""
@@ -190,7 +180,7 @@ def handle_dependency_graph(args):
         graph = analyzer.generate_dependency_graph(args.format)
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 f.write(graph)
             print(f"Dependency graph saved to {args.output}")
         else:
@@ -201,6 +191,7 @@ def handle_dependency_graph(args):
     except Exception as e:
         logger.error(f"Error generating dependency graph: {str(e)}")
         return 1
+
 
 def handle_trace_deps(args):
     """Handle the trace-deps command."""
@@ -228,7 +219,7 @@ def handle_trace_deps(args):
                 print(f"{i}. {dep_name} (source: {dep_source})")
 
         if args.output and not os.path.exists(args.output):
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(results, f, indent=2)
             print(f"Dependency trace saved to {args.output}")
 
@@ -237,6 +228,7 @@ def handle_trace_deps(args):
     except Exception as e:
         logger.error(f"Error tracing dependencies: {str(e)}")
         return 1
+
 
 def handle_suggest(args):
     """Handle the suggest command."""
@@ -255,7 +247,7 @@ def handle_suggest(args):
         print(results.get("suggestion", "No suggestion generated"))
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 f.write(results.get("suggestion", "No suggestion generated"))
             print(f"Suggestion saved to {args.output}")
 
@@ -264,6 +256,7 @@ def handle_suggest(args):
     except Exception as e:
         logger.error(f"Error generating suggestions: {str(e)}")
         return 1
+
 
 def handle_circular(args):
     """Handle the circular command."""
@@ -283,7 +276,7 @@ def handle_circular(args):
             print(f"{i}. {' -> '.join(cycle)}")
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(cycles, f, indent=2)
             print(f"Circular dependencies saved to {args.output}")
 
@@ -292,6 +285,7 @@ def handle_circular(args):
     except Exception as e:
         logger.error(f"Error finding circular dependencies: {str(e)}")
         return 1
+
 
 def handle_weekly_resampling(args):
     """Handle the weekly-resampling command."""
@@ -317,7 +311,7 @@ def handle_weekly_resampling(args):
         print(results.get("weekly_resampling_suggestion", "No suggestion generated"))
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(results, f, indent=2)
             print(f"Analysis saved to {args.output}")
 
@@ -326,6 +320,7 @@ def handle_weekly_resampling(args):
     except Exception as e:
         logger.error(f"Error analyzing weekly resampling: {str(e)}")
         return 1
+
 
 def main():
     """Main entry point."""
@@ -349,6 +344,7 @@ def main():
     else:
         parser.print_help()
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -25,20 +25,23 @@ from app.utils.knowledge_graph import (
     DocumentationEdge,
     NodeType,
     EdgeType,
-    get_knowledge_graph
+    get_knowledge_graph,
 )
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     """Custom JSON encoder for handling dates and other complex objects."""
+
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
         if isinstance(obj, set):
             return list(obj)
         try:
-            return obj.to_dict() if hasattr(obj, 'to_dict') else super().default(obj)
+            return obj.to_dict() if hasattr(obj, "to_dict") else super().default(obj)
         except TypeError:
             return str(obj)
+
 
 class KnowledgeGraphCLI:
     """Command-line interface for the documentation knowledge graph."""
@@ -101,7 +104,9 @@ class KnowledgeGraphCLI:
             if node.file_path:
                 print(f"File: {node.file_path}")
             if node.content_summary:
-                print(f"Summary: {textwrap.shorten(node.content_summary, width=60, placeholder='...')}")
+                print(
+                    f"Summary: {textwrap.shorten(node.content_summary, width=60, placeholder='...')}"
+                )
             print("-" * 80)
 
     def get_related(self, node_id: str, max_depth: int = 1) -> None:
@@ -112,7 +117,7 @@ class KnowledgeGraphCLI:
             print(f"Node with ID {node_id} not found.")
             return
 
-        print(f"Related nodes for \"{node.name}\" (ID: {node.id}):")
+        print(f'Related nodes for "{node.name}" (ID: {node.id}):')
         print("-" * 80)
 
         related = self.graph.get_related_nodes(node_id, max_depth)
@@ -124,8 +129,14 @@ class KnowledgeGraphCLI:
                     edge_type = edge.edge_type
                     print(f"  - {related_node.name} ({related_node.node_type}) - {edge_type}")
 
-    def add_node(self, name: str, node_type: str, file_path: str = None,
-                tags: List[str] = None, content_summary: str = None) -> None:
+    def add_node(
+        self,
+        name: str,
+        node_type: str,
+        file_path: str = None,
+        tags: List[str] = None,
+        content_summary: str = None,
+    ) -> None:
         """Add a new node to the knowledge graph."""
         # Generate a unique ID
         node_id = f"{node_type}_{name.lower().replace(' ', '_')}"
@@ -137,7 +148,7 @@ class KnowledgeGraphCLI:
             node_type=node_type,
             file_path=file_path,
             tags=tags,
-            content_summary=content_summary
+            content_summary=content_summary,
         )
 
         # Add to the graph
@@ -159,11 +170,7 @@ class KnowledgeGraphCLI:
             return
 
         # Create the edge
-        edge = DocumentationEdge(
-            source_id=source_id,
-            target_id=target_id,
-            edge_type=edge_type
-        )
+        edge = DocumentationEdge(source_id=source_id, target_id=target_id, edge_type=edge_type)
 
         # Add to the graph
         self.graph.add_edge(edge)
@@ -177,7 +184,7 @@ class KnowledgeGraphCLI:
         # Prepare data for export
         export_data = {
             "nodes": [node.to_dict() for node in self.graph.nodes.values()],
-            "edges": [edge.to_dict() for edge in self.graph.edges]
+            "edges": [edge.to_dict() for edge in self.graph.edges],
         }
 
         # Write to file
@@ -221,8 +228,7 @@ class KnowledgeGraphCLI:
         """Generate an ML-specific subgraph focusing on ML techniques and models."""
         # Find all ML-related nodes
         ml_nodes = self.graph.search_nodes(
-            query=None,
-            node_types=[NodeType.ML_TECHNIQUE, NodeType.ALGORITHM, NodeType.MODEL]
+            query=None, node_types=[NodeType.ML_TECHNIQUE, NodeType.ALGORITHM, NodeType.MODEL]
         )
 
         if not ml_nodes:
@@ -244,7 +250,7 @@ class KnowledgeGraphCLI:
         # Prepare data for export
         export_data = {
             "nodes": [node.to_dict() for node in ml_nodes],
-            "edges": [edge.to_dict() for edge in ml_edges]
+            "edges": [edge.to_dict() for edge in ml_edges],
         }
 
         # Write to file
@@ -283,7 +289,9 @@ class KnowledgeGraphCLI:
                 isolated_nodes.append(node)
 
         # Check for documentation coverage gaps
-        implementation_nodes = [n for n in self.graph.nodes.values() if n.node_type == NodeType.IMPLEMENTATION]
+        implementation_nodes = [
+            n for n in self.graph.nodes.values() if n.node_type == NodeType.IMPLEMENTATION
+        ]
         documented_impl_ids = set()
 
         for edge in self.graph.edges:
@@ -341,9 +349,11 @@ class KnowledgeGraphCLI:
         # Find potential connections (simplified heuristic approach)
         # In a real implementation, use text similarity or ML-based recommendation
         for other_id, other_node in self.graph.nodes.items():
-            if (other_id != node_id and
-                other_id not in existing_connections and
-                other_node.node_type in relevant_types):
+            if (
+                other_id != node_id
+                and other_id not in existing_connections
+                and other_node.node_type in relevant_types
+            ):
 
                 # Simple heuristic: check for shared words in name or content
                 similarity_score = 0
@@ -369,16 +379,20 @@ class KnowledgeGraphCLI:
         top_suggestions = potential_connections[:max_suggestions]
 
         # Print recommendations
-        print(f"Connection recommendations for \"{node.name}\" (ID: {node.id}):")
+        print(f'Connection recommendations for "{node.name}" (ID: {node.id}):')
 
         if not top_suggestions:
             print("No relevant connection suggestions found.")
             return
 
         for suggested_node, score in top_suggestions:
-            print(f"  - {suggested_node.name} ({suggested_node.node_type}) - similarity: {score:.2f}")
+            print(
+                f"  - {suggested_node.name} ({suggested_node.node_type}) - similarity: {score:.2f}"
+            )
             print(f"    Suggested relationship: {EdgeType.RELATED_TO}")
-            print(f"    Command to add: add-edge {node.id} {suggested_node.id} {EdgeType.RELATED_TO}")
+            print(
+                f"    Command to add: add-edge {node.id} {suggested_node.id} {EdgeType.RELATED_TO}"
+            )
             print()
 
 
@@ -392,12 +406,18 @@ def setup_parser() -> argparse.ArgumentParser:
     scan_parser.add_argument("--dir", help="Directory to scan (defaults to docs/)")
 
     # Create relationships
-    subparsers.add_parser("create-relationships", help="Create relationships between documentation nodes")
+    subparsers.add_parser(
+        "create-relationships", help="Create relationships between documentation nodes"
+    )
 
     # Visualize
-    visualize_parser = subparsers.add_parser("visualize", help="Generate knowledge graph visualization")
+    visualize_parser = subparsers.add_parser(
+        "visualize", help="Generate knowledge graph visualization"
+    )
     visualize_parser.add_argument("--output", help="Output file path")
-    visualize_parser.add_argument("--format", choices=["graphviz", "d3"], default="graphviz", help="Visualization format")
+    visualize_parser.add_argument(
+        "--format", choices=["graphviz", "d3"], default="graphviz", help="Visualization format"
+    )
 
     # Generate report
     report_parser = subparsers.add_parser("report", help="Generate knowledge graph report")
@@ -412,7 +432,9 @@ def setup_parser() -> argparse.ArgumentParser:
     # Get related nodes
     related_parser = subparsers.add_parser("related", help="Get related nodes")
     related_parser.add_argument("node_id", help="Node ID to get related nodes for")
-    related_parser.add_argument("--depth", type=int, default=1, help="Maximum depth to search for related nodes")
+    related_parser.add_argument(
+        "--depth", type=int, default=1, help="Maximum depth to search for related nodes"
+    )
 
     # Add node
     add_node_parser = subparsers.add_parser("add-node", help="Add a new node")
@@ -452,7 +474,9 @@ def setup_parser() -> argparse.ArgumentParser:
     # Recommend connections
     recommend_parser = subparsers.add_parser("recommend", help="Recommend connections for a node")
     recommend_parser.add_argument("node_id", help="Node ID to get recommendations for")
-    recommend_parser.add_argument("--max", type=int, default=5, help="Maximum number of recommendations")
+    recommend_parser.add_argument(
+        "--max", type=int, default=5, help="Maximum number of recommendations"
+    )
 
     return parser
 

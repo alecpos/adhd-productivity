@@ -34,7 +34,7 @@ class ModelTrainer:
         batch_size: int = 32,
         validation_split: float = 0.2,
         early_stopping_patience: int = 5,
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train a productivity pattern LSTM model.
 
@@ -55,9 +55,7 @@ class ModelTrainer:
         # Preprocess data
         preprocessor = ProductivityPatternPreprocessor(sequence_length=sequence_length)
         features, targets = preprocessor.preprocess(
-            time_blocks=time_blocks,
-            energy_logs=energy_logs,
-            mental_health_logs=mental_health_logs
+            time_blocks=time_blocks, energy_logs=energy_logs, mental_health_logs=mental_health_logs
         )
 
         if len(features) == 0:
@@ -71,33 +69,28 @@ class ModelTrainer:
         # Create model
         n_features = X_train.shape[2]
         model = self.model_factory.create_productivity_pattern_lstm(
-            sequence_length=sequence_length,
-            n_features=n_features
+            sequence_length=sequence_length, n_features=n_features
         )
 
         # Define callbacks
         callbacks = [
             tf.keras.callbacks.EarlyStopping(
-                monitor='val_loss',
-                patience=early_stopping_patience,
-                restore_best_weights=True
+                monitor="val_loss", patience=early_stopping_patience, restore_best_weights=True
             ),
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_loss',
-                factor=0.5,
-                patience=3,
-                min_lr=0.0001
-            )
+                monitor="val_loss", factor=0.5, patience=3, min_lr=0.0001
+            ),
         ]
 
         # Train model
         history = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             epochs=epochs,
             batch_size=batch_size,
             validation_data=(X_val, y_val),
             callbacks=callbacks,
-            verbose=verbose
+            verbose=verbose,
         )
 
         return model, history.history
@@ -108,7 +101,7 @@ class ModelTrainer:
         epochs: int = 50,
         batch_size: int = 32,
         validation_split: float = 0.2,
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train a mental health prediction model.
 
@@ -124,10 +117,7 @@ class ModelTrainer:
         """
         # Preprocess data
         preprocessor = DataPreprocessor(
-            mental_health_data=mental_health_data,
-            energy_data=[],
-            task_data=[],
-            calendar_data=[]
+            mental_health_data=mental_health_data, energy_data=[], task_data=[], calendar_data=[]
         )
         features, targets = preprocessor.prepare_mental_health_features(mental_health_data)
 
@@ -145,11 +135,12 @@ class ModelTrainer:
 
         # Train model
         history = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             epochs=epochs,
             batch_size=batch_size,
             validation_data=(X_val, y_val),
-            verbose=verbose
+            verbose=verbose,
         )
 
         return model, history.history
@@ -160,7 +151,7 @@ class ModelTrainer:
         epochs: int = 50,
         batch_size: int = 32,
         validation_split: float = 0.2,
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train a mood prediction model.
 
@@ -176,10 +167,7 @@ class ModelTrainer:
         """
         # Preprocess data
         preprocessor = DataPreprocessor(
-            mental_health_data=mental_health_data,
-            energy_data=[],
-            task_data=[],
-            calendar_data=[]
+            mental_health_data=mental_health_data, energy_data=[], task_data=[], calendar_data=[]
         )
         features, targets = preprocessor.prepare_mental_health_features(mental_health_data)
 
@@ -197,11 +185,12 @@ class ModelTrainer:
 
         # Train model
         history = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             epochs=epochs,
             batch_size=batch_size,
             validation_data=(X_val, y_val),
-            verbose=verbose
+            verbose=verbose,
         )
 
         return model, history.history
@@ -212,7 +201,7 @@ class ModelTrainer:
         epochs: int = 50,
         batch_size: int = 32,
         validation_split: float = 0.2,
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train an energy level prediction model.
 
@@ -228,10 +217,7 @@ class ModelTrainer:
         """
         # Preprocess data
         preprocessor = DataPreprocessor(
-            mental_health_data=[],
-            energy_data=energy_data,
-            task_data=[],
-            calendar_data=[]
+            mental_health_data=[], energy_data=energy_data, task_data=[], calendar_data=[]
         )
         features, targets = preprocessor.prepare_energy_features(energy_data)
 
@@ -249,11 +235,12 @@ class ModelTrainer:
 
         # Train model
         history = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             epochs=epochs,
             batch_size=batch_size,
             validation_data=(X_val, y_val),
-            verbose=verbose
+            verbose=verbose,
         )
 
         return model, history.history
@@ -264,15 +251,12 @@ class ModelTrainer:
         epochs: int = 50,
         batch_size: int = 32,
         validation_split: float = 0.2,
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train a model to predict task completion times and success rates."""
         # Initialize data preprocessor
         preprocessor = DataPreprocessor(
-            mental_health_data=[],
-            energy_data=[],
-            task_data=task_data,
-            calendar_data=[]
+            mental_health_data=[], energy_data=[], task_data=task_data, calendar_data=[]
         )
 
         # Prepare features and targets
@@ -291,11 +275,12 @@ class ModelTrainer:
 
         # Train model
         history = model.fit(
-            X, y,
+            X,
+            y,
             epochs=epochs,
             batch_size=batch_size,
             validation_split=validation_split,
-            verbose=verbose
+            verbose=verbose,
         )
 
         # Save model (optional)
@@ -313,7 +298,7 @@ class ModelTrainer:
         batch_size: int = 32,
         embedding_dim: int = 32,
         hidden_units: List[int] = [64, 32],
-        verbose: int = 1
+        verbose: int = 1,
     ) -> Tuple[tf.keras.Model, Dict[str, Any]]:
         """Train a model to optimize task scheduling based on energy patterns and work hours.
 
@@ -338,8 +323,7 @@ class ModelTrainer:
 
         # Create and compile model
         model = self.model_factory.create_schedule_optimizer(
-            embedding_dim=embedding_dim,
-            hidden_units=hidden_units
+            embedding_dim=embedding_dim, hidden_units=hidden_units
         )
 
         # Train model
@@ -348,17 +332,12 @@ class ModelTrainer:
             epochs=epochs,
             batch_size=batch_size,
             validation_split=validation_split,
-            verbose=verbose
+            verbose=verbose,
         )
 
         return model, history.history
 
-    def save_model(
-        self,
-        model: tf.keras.Model,
-        model_type: str,
-        version: str = None
-    ) -> str:
+    def save_model(self, model: tf.keras.Model, model_type: str, version: str = None) -> str:
         """Save model to disk.
 
         Args:

@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.services.auth_service import get_current_user
-from app.schemas.energy_schema import EnergyPatternsSchema, EnergyLogCreateSchema, EnergyLogResponseSchema
+from app.schemas.energy_schema import (
+    EnergyPatternsSchema,
+    EnergyLogCreateSchema,
+    EnergyLogResponseSchema,
+)
 from app.services.energy_service import EnergyService
 
 logger = logging.getLogger(__name__)

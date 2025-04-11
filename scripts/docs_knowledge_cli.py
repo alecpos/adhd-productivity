@@ -20,7 +20,7 @@ from app.utils.knowledge_graph import (
     NodeType,
     EdgeType,
     DocumentationNode,
-    DocumentationEdge
+    DocumentationEdge,
 )
 
 
@@ -28,7 +28,7 @@ def setup_parser() -> argparse.ArgumentParser:
     """Set up command line argument parser."""
     parser = argparse.ArgumentParser(
         description="Documentation Knowledge Graph CLI Tool",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
@@ -36,40 +36,29 @@ def setup_parser() -> argparse.ArgumentParser:
     # Scan command
     scan_parser = subparsers.add_parser("scan", help="Scan documentation directory")
     scan_parser.add_argument(
-        "directory",
-        nargs="?",
-        default="docs",
-        help="Directory to scan (defaults to docs)"
+        "directory", nargs="?", default="docs", help="Directory to scan (defaults to docs)"
     )
 
     # Visualize command
-    visualize_parser = subparsers.add_parser("visualize", help="Generate knowledge graph visualization")
-    visualize_parser.add_argument(
-        "--output",
-        default="docs_knowledge_graph",
-        help="Output file path (without extension)"
+    visualize_parser = subparsers.add_parser(
+        "visualize", help="Generate knowledge graph visualization"
     )
     visualize_parser.add_argument(
-        "--format",
-        choices=["graphviz"],
-        default="graphviz",
-        help="Visualization format"
+        "--output", default="docs_knowledge_graph", help="Output file path (without extension)"
+    )
+    visualize_parser.add_argument(
+        "--format", choices=["graphviz"], default="graphviz", help="Visualization format"
     )
 
     # Report command
     report_parser = subparsers.add_parser("report", help="Generate knowledge graph report")
     report_parser.add_argument(
-        "--output",
-        default="docs/knowledge_graph_report.md",
-        help="Output file path"
+        "--output", default="docs/knowledge_graph_report.md", help="Output file path"
     )
 
     # Query command
     query_parser = subparsers.add_parser("query", help="Query the knowledge graph")
-    query_parser.add_argument(
-        "--search",
-        help="Text to search for"
-    )
+    query_parser.add_argument("--search", help="Text to search for")
     query_parser.add_argument(
         "--node-type",
         choices=[
@@ -79,34 +68,22 @@ def setup_parser() -> argparse.ArgumentParser:
             NodeType.EPIC,
             NodeType.API,
             NodeType.IMPLEMENTATION,
-            NodeType.USER_GUIDE
+            NodeType.USER_GUIDE,
         ],
-        help="Filter by node type"
+        help="Filter by node type",
     )
-    query_parser.add_argument(
-        "--tags",
-        help="Filter by comma-separated list of tags"
-    )
+    query_parser.add_argument("--tags", help="Filter by comma-separated list of tags")
 
     # Find related nodes command
     related_parser = subparsers.add_parser("related", help="Find related nodes")
+    related_parser.add_argument("node_id", help="ID of the node to find related nodes for")
     related_parser.add_argument(
-        "node_id",
-        help="ID of the node to find related nodes for"
-    )
-    related_parser.add_argument(
-        "--depth",
-        type=int,
-        default=1,
-        help="Maximum depth to search for related nodes"
+        "--depth", type=int, default=1, help="Maximum depth to search for related nodes"
     )
 
     # Node info command
     info_parser = subparsers.add_parser("info", help="Get information about a node")
-    info_parser.add_argument(
-        "node_id",
-        help="ID of the node to get information about"
-    )
+    info_parser.add_argument("node_id", help="ID of the node to get information about")
 
     # Stats command
     subparsers.add_parser("stats", help="Show knowledge graph statistics")
@@ -166,11 +143,7 @@ def handle_query(args) -> None:
         node_types = [args.node_type]
 
     # Perform the search
-    results = kg.search_nodes(
-        query=args.search,
-        node_types=node_types,
-        tags=tags
-    )
+    results = kg.search_nodes(query=args.search, node_types=node_types, tags=tags)
 
     if not results:
         print("No nodes found matching the query.")
@@ -327,7 +300,7 @@ def main() -> None:
         "query": handle_query,
         "related": handle_related,
         "info": handle_info,
-        "stats": handle_stats
+        "stats": handle_stats,
     }
 
     handler = handlers.get(args.command)

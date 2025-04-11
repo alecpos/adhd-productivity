@@ -1,4 +1,5 @@
 """Time management routes."""
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
@@ -12,7 +13,7 @@ from app.routes.base_routes import BaseRouter
 from app.schemas.time_block_schema import (
     TimeBlockCreate,  # Create schema
     TimeBlockUpdate,  # Update schema
-    TimeBlockResponse  # Response schema
+    TimeBlockResponse,  # Response schema
 )
 from app.schemas.time_block_schema import (
     TimePreferences,
@@ -34,16 +35,14 @@ class TimeManagementRouter(BaseRouter[TimeBlockModel, TimeManagementService, Tim
             tags=["time-management"],
             schema_class=TimeBlockResponse,
             service_class=TimeManagementService,
-            model_class=TimeBlockModel
+            model_class=TimeBlockModel,
         )
         self._register_custom_routes()
 
     def _register_custom_routes(self):
         @self.router.post("/blocks", response_model=APIResponse[TimeBlockResponse])
         @handle_service_error
-        async def create_time_block(
-            block: TimeBlockCreate, db: AsyncSession = Depends(get_db)
-        ):
+        async def create_time_block(block: TimeBlockCreate, db: AsyncSession = Depends(get_db)):
             """Create a new time block."""
             service = self.service_class(db)
             time_block = await service.create_block(block)

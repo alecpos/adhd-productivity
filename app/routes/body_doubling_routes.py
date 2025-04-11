@@ -6,7 +6,7 @@ from app.database import get_db
 from app.schemas.body_doubling_schema import (
     BodyDoublingSchema,
     CreateBodyDoublingSchema,
-    BodyDoublingResponseSchema
+    BodyDoublingResponseSchema,
 )
 from app.services.body_doubling_service import BodyDoublingService
 

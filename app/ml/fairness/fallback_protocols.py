@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class FallbackReason(str, Enum):
     """Reasons for triggering a fallback protocol."""
+
     LOW_CONFIDENCE = "low_confidence"
     MODEL_ERROR = "model_error"
     OUT_OF_DISTRIBUTION = "out_of_distribution"
@@ -32,6 +33,7 @@ class FallbackReason(str, Enum):
 
 class FallbackAction(str, Enum):
     """Possible fallback actions when a model's prediction cannot be used."""
+
     ASK_USER = "ask_user"
     USE_DEFAULT = "use_default"
     USE_HEURISTIC = "use_heuristic"
@@ -44,6 +46,7 @@ class FallbackAction(str, Enum):
 @dataclass
 class FallbackEvent:
     """Record of a fallback protocol being triggered."""
+
     timestamp: float
     model_id: str
     reason: FallbackReason
@@ -116,7 +119,9 @@ class FallbackProtocol(abc.ABC):
             self.telemetry[event_type] = []
 
         self.telemetry[event_type].append(details)
-        logging.info(f"Fallback event: {event_type} - Protocol: {self.protocol_id} - Details: {details}")
+        logging.info(
+            f"Fallback event: {event_type} - Protocol: {self.protocol_id} - Details: {details}"
+        )
 
     def get_telemetry(self) -> Dict[str, List[Dict[str, Any]]]:
         """
@@ -134,8 +139,9 @@ class ProgressiveFallbackProtocol(FallbackProtocol):
     as confidence decreases.
     """
 
-    def __init__(self, protocol_id: str, confidence_threshold: float,
-                 fallback_stages: List[Dict[str, Any]]):
+    def __init__(
+        self, protocol_id: str, confidence_threshold: float, fallback_stages: List[Dict[str, Any]]
+    ):
         """
         Initialize a progressive fallback protocol.
 
@@ -194,10 +200,7 @@ class ProgressiveFallbackProtocol(FallbackProtocol):
             return prediction
 
         # Apply the appropriate stage
-        result = {
-            "original_prediction": prediction,
-            "action": appropriate_stage["action"]
-        }
+        result = {"original_prediction": prediction, "action": appropriate_stage["action"]}
 
         # Add stage-specific information
         if appropriate_stage["action"] == "notify":
@@ -215,8 +218,8 @@ class ProgressiveFallbackProtocol(FallbackProtocol):
             {
                 "confidence": confidence,
                 "stage": appropriate_stage["action"],
-                "threshold": appropriate_stage["threshold"]
-            }
+                "threshold": appropriate_stage["threshold"],
+            },
         )
 
         return result
@@ -227,8 +230,9 @@ class RuleBased(FallbackProtocol):
     A fallback protocol that applies rules to determine when and how to fall back.
     """
 
-    def __init__(self, protocol_id: str, confidence_threshold: float,
-                 rules: List[Dict[str, Callable]]):
+    def __init__(
+        self, protocol_id: str, confidence_threshold: float, rules: List[Dict[str, Callable]]
+    ):
         """
         Initialize a rule-based fallback protocol.
 
@@ -283,10 +287,10 @@ class RuleBased(FallbackProtocol):
                 result.update(rule_result)
 
                 # Log the fallback event
-                self.log_fallback_event("rule_based_fallback", {
-                    "rule_result": rule_result,
-                    "prediction_value": prediction.get("value")
-                })
+                self.log_fallback_event(
+                    "rule_based_fallback",
+                    {"rule_result": rule_result, "prediction_value": prediction.get("value")},
+                )
 
                 return result
 
@@ -300,8 +304,13 @@ class UserPreferenceBased(FallbackProtocol):
     A fallback protocol that respects user preferences for handling low-confidence predictions.
     """
 
-    def __init__(self, protocol_id: str, confidence_threshold: float,
-                 user_preferences_service: Any, default_fallback: str = "notification"):
+    def __init__(
+        self,
+        protocol_id: str,
+        confidence_threshold: float,
+        user_preferences_service: Any,
+        default_fallback: str = "notification",
+    ):
         """
         Initialize a user preference-based fallback protocol.
 
@@ -337,7 +346,11 @@ class UserPreferenceBased(FallbackProtocol):
         preferences = self.user_preferences_service.get_user_fallback_preferences(user_id)
 
         # Use user's threshold if available, otherwise use default
-        user_threshold = preferences.get("confidence_threshold", self.confidence_threshold) if preferences else self.confidence_threshold
+        user_threshold = (
+            preferences.get("confidence_threshold", self.confidence_threshold)
+            if preferences
+            else self.confidence_threshold
+        )
 
         return confidence < user_threshold
 
@@ -355,10 +368,7 @@ class UserPreferenceBased(FallbackProtocol):
         user_id = context.get("user_id")
 
         # Start with basic result structure
-        result = {
-            "original_prediction": prediction,
-            "fallback_type": self.default_fallback
-        }
+        result = {"original_prediction": prediction, "fallback_type": self.default_fallback}
 
         # Get user preferences if user_id is available
         if user_id:
@@ -366,18 +376,23 @@ class UserPreferenceBased(FallbackProtocol):
 
             if preferences:
                 # Use user's preferred fallback approach
-                result["fallback_type"] = preferences.get("preferred_fallback", self.default_fallback)
+                result["fallback_type"] = preferences.get(
+                    "preferred_fallback", self.default_fallback
+                )
 
                 # Include notification channel if available
                 if "notification_channel" in preferences:
                     result["notification_channel"] = preferences["notification_channel"]
 
         # Log the fallback event
-        self.log_fallback_event("user_preference_fallback", {
-            "user_id": user_id,
-            "fallback_type": result["fallback_type"],
-            "prediction_value": prediction.get("value")
-        })
+        self.log_fallback_event(
+            "user_preference_fallback",
+            {
+                "user_id": user_id,
+                "fallback_type": result["fallback_type"],
+                "prediction_value": prediction.get("value"),
+            },
+        )
 
         return result
 
@@ -387,9 +402,13 @@ class HybridFallback(FallbackProtocol):
     A fallback protocol that combines multiple protocols using a selection strategy.
     """
 
-    def __init__(self, protocol_id: str, confidence_threshold: float,
-                 protocols: List[FallbackProtocol],
-                 selection_strategy: str = "first_applicable"):
+    def __init__(
+        self,
+        protocol_id: str,
+        confidence_threshold: float,
+        protocols: List[FallbackProtocol],
+        selection_strategy: str = "first_applicable",
+    ):
         """
         Initialize a hybrid fallback protocol.
 
@@ -453,7 +472,7 @@ class HybridFallback(FallbackProtocol):
         return {
             "original_prediction": prediction,
             "protocol_id": self.protocol_id,
-            "message": "No fallback needed"
+            "message": "No fallback needed",
         }
 
 
@@ -504,10 +523,13 @@ class FallbackProtocolManager:
         elif self.default_protocol:
             return self.default_protocol
         else:
-            raise ValueError(f"No fallback protocol registered for prediction type: {prediction_type}")
+            raise ValueError(
+                f"No fallback protocol registered for prediction type: {prediction_type}"
+            )
 
-    def apply_protocol(self, prediction_type: str, prediction: Dict[str, Any],
-                      context: Dict[str, Any]) -> Dict[str, Any]:
+    def apply_protocol(
+        self, prediction_type: str, prediction: Dict[str, Any], context: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Apply the appropriate fallback protocol for a prediction.
 
@@ -559,7 +581,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
         self,
         confidence_threshold: float = 0.65,
         enable_gradual_fallback: bool = True,
-        user_preference_key: str = "reminder_fallback_preference"
+        user_preference_key: str = "reminder_fallback_preference",
     ):
         """
         Initialize the reminder fallback protocol.
@@ -570,9 +592,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
             user_preference_key: Key for storing user preferences
         """
         super().__init__(
-            name="reminder_fallback",
-            confidence_threshold=confidence_threshold,
-            timeout_seconds=3.0
+            name="reminder_fallback", confidence_threshold=confidence_threshold, timeout_seconds=3.0
         )
         self.enable_gradual_fallback = enable_gradual_fallback
         self.user_preference_key = user_preference_key
@@ -586,7 +606,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
         confidence: float,
         model_id: str,
         input_data: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> Tuple[Dict[str, Any], bool, Optional[FallbackEvent]]:
         """
         Check a reminder prediction for fallback conditions.
@@ -608,9 +628,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
         # Check for user override of fallback threshold
         user_threshold = None
         if user_id and user_preferences:
-            user_threshold = user_preferences.get(
-                f"{user_id}_{self.user_preference_key}_threshold"
-            )
+            user_threshold = user_preferences.get(f"{user_id}_{self.user_preference_key}_threshold")
 
         # Use user threshold if available
         threshold = user_threshold if user_threshold is not None else self.confidence_threshold
@@ -623,7 +641,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
                 model_id=model_id,
                 input_data=input_data,
                 context=context,
-                confidence=confidence
+                confidence=confidence,
             )
 
         # Check for out-of-distribution inputs
@@ -634,7 +652,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
                 model_id=model_id,
                 input_data=input_data,
                 context=context,
-                confidence=confidence
+                confidence=confidence,
             )
 
         # Store successful prediction for potential future fallbacks
@@ -645,10 +663,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
         return prediction, False, None
 
     def _get_fallback_action(
-        self,
-        reason: FallbackReason,
-        prediction: Dict[str, Any],
-        context: Optional[Dict[str, Any]]
+        self, reason: FallbackReason, prediction: Dict[str, Any], context: Optional[Dict[str, Any]]
     ) -> Tuple[FallbackAction, Dict[str, Any]]:
         """
         Determine the appropriate fallback action for reminders.
@@ -704,7 +719,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
                     "fallback_reason": reason,
                     "fallback_mode": "standard_schedule",
                     "reminder_time": "09:00",  # Default morning reminder
-                    "needs_confirmation": True
+                    "needs_confirmation": True,
                 }
 
         elif reason == FallbackReason.MODEL_ERROR:
@@ -718,7 +733,7 @@ class ReminderFallbackProtocol(FallbackProtocol):
                     "fallback_reason": reason,
                     "fallback_mode": "error_recovery",
                     "user_message": "I encountered an issue with your reminders. Would you like to set them manually?",
-                    "needs_input": True
+                    "needs_input": True,
                 }
 
         return action, modified_prediction
@@ -736,7 +751,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         self,
         confidence_threshold: float = 0.7,
         max_suggestions: int = 3,
-        allow_partial_results: bool = True
+        allow_partial_results: bool = True,
     ):
         """
         Initialize the schedule fallback protocol.
@@ -749,7 +764,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         super().__init__(
             name="schedule_fallback",
             confidence_threshold=confidence_threshold,
-            timeout_seconds=10.0
+            timeout_seconds=10.0,
         )
         self.max_suggestions = max_suggestions
         self.allow_partial_results = allow_partial_results
@@ -763,7 +778,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         confidence: float,
         model_id: str,
         input_data: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> Tuple[Dict[str, Any], bool, Optional[FallbackEvent]]:
         """
         Check a schedule prediction for fallback conditions.
@@ -786,7 +801,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
                 model_id=model_id,
                 input_data=input_data,
                 context=context,
-                confidence=confidence
+                confidence=confidence,
             )
 
         # Check for conflicting predictions
@@ -798,7 +813,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
                     model_id=model_id,
                     input_data=input_data,
                     context=context,
-                    confidence=confidence
+                    confidence=confidence,
                 )
 
         # Check for missing essential data
@@ -809,7 +824,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
                 model_id=model_id,
                 input_data=input_data,
                 context=context,
-                confidence=confidence
+                confidence=confidence,
             )
 
         # Store alternative schedules if available
@@ -820,10 +835,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         return prediction, False, None
 
     def _get_fallback_action(
-        self,
-        reason: FallbackReason,
-        prediction: Dict[str, Any],
-        context: Optional[Dict[str, Any]]
+        self, reason: FallbackReason, prediction: Dict[str, Any], context: Optional[Dict[str, Any]]
     ) -> Tuple[FallbackAction, Dict[str, Any]]:
         """
         Determine the appropriate fallback action for schedules.
@@ -853,7 +865,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
                 if alternatives:
                     action = FallbackAction.SUGGEST_ALTERNATIVES
                     modified_prediction["fallback_mode"] = "alternative_suggestions"
-                    modified_prediction["alternatives"] = alternatives[:self.max_suggestions]
+                    modified_prediction["alternatives"] = alternatives[: self.max_suggestions]
                     return action, modified_prediction
 
             # If no alternatives, use a heuristic
@@ -901,8 +913,7 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         return action, modified_prediction
 
     def _generate_heuristic_schedule(
-        self,
-        context: Optional[Dict[str, Any]]
+        self, context: Optional[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         """
         Generate a simple heuristic schedule when ML model fails.
@@ -930,19 +941,18 @@ class ScheduleFallbackProtocol(FallbackProtocol):
         # Evenly distribute tasks
         for i, task in enumerate(tasks[:total_hours]):  # Limit to available hours
             hour = start_hour + i
-            schedule.append({
-                "task_id": task.get("id", f"task_{i}"),
-                "start_time": f"{hour:02d}:00",
-                "end_time": f"{hour+1:02d}:00",
-                "is_heuristic": True
-            })
+            schedule.append(
+                {
+                    "task_id": task.get("id", f"task_{i}"),
+                    "start_time": f"{hour:02d}:00",
+                    "end_time": f"{hour+1:02d}:00",
+                    "is_heuristic": True,
+                }
+            )
 
         return schedule
 
-    def _highlight_conflicts(
-        self,
-        conflicts: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _highlight_conflicts(self, conflicts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Highlight conflicts for user resolution.
 
@@ -960,11 +970,17 @@ class ScheduleFallbackProtocol(FallbackProtocol):
             # Add a simple resolution suggestion
             if "type" in conflict:
                 if conflict["type"] == "overlap":
-                    highlighted_conflict["suggestion"] = "These tasks overlap. Consider rescheduling one of them."
+                    highlighted_conflict["suggestion"] = (
+                        "These tasks overlap. Consider rescheduling one of them."
+                    )
                 elif conflict["type"] == "adjacency":
-                    highlighted_conflict["suggestion"] = "These tasks are back-to-back with no transition time."
+                    highlighted_conflict["suggestion"] = (
+                        "These tasks are back-to-back with no transition time."
+                    )
                 elif conflict["type"] == "energy":
-                    highlighted_conflict["suggestion"] = "This task may require more energy than you typically have at this time."
+                    highlighted_conflict["suggestion"] = (
+                        "This task may require more energy than you typically have at this time."
+                    )
 
             highlighted.append(highlighted_conflict)
 

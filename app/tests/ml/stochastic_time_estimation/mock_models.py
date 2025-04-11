@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 
 class MockBaseModel:
     """Base class for mock models"""
+
     id = None
     created_at = datetime.now()
     updated_at = datetime.now()
@@ -20,6 +21,7 @@ class MockBaseModel:
 
 class MockMentalHealthModel(MockBaseModel):
     """Mock implementation of MentalHealthModel"""
+
     __tablename__ = "mental_health"
 
     id = "mh-test-123"
@@ -51,12 +53,13 @@ class MockMentalHealthModel(MockBaseModel):
             "exercise_minutes": self.exercise_minutes,
             "notes": self.notes,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "updated_at": self.updated_at,
         }
 
 
 class MockEnergyModel(MockBaseModel):
     """Mock implementation of EnergyModel"""
+
     __tablename__ = "energy_levels"
 
     id = "energy-test-123"
@@ -80,7 +83,7 @@ class MockEnergyModel(MockBaseModel):
             "overall_energy": self.overall_energy,
             "notes": self.notes,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "updated_at": self.updated_at,
         }
 
 

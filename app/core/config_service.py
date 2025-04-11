@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pydantic import BaseModel
 
+
 # Using BaseModel instead of BaseSettings due to Pydantic v2 migration
 class ConfigService(BaseModel):
     APP_NAME: str = "ADHD CalendarModelSchemaSchema"

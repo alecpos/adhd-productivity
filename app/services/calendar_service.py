@@ -15,11 +15,13 @@ from app.models.calendar_model import CalendarEventModel
 from app.schemas.calendar_schema import (
     CalendarEventSchema,
     CalendarEventCreateSchema,
-    CalendarEventUpdateSchema
+    CalendarEventUpdateSchema,
 )
 
 
-class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, CalendarEventCreateSchema]):
+class CalendarService(
+    BaseService[CalendarEventModel, CalendarEventSchema, CalendarEventCreateSchema]
+):
     """Service for managing calendar events."""
 
     def __init__(self, db: AsyncSession):
@@ -30,17 +32,21 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
         self.outlook = OutlookCalendarService(db)
         self.sync = CalendarSyncService(db)
 
-    async def create_event(self, event_data: CalendarEventCreateSchema, user_id: UUID) -> CalendarEventSchema:
+    async def create_event(
+        self, event_data: CalendarEventCreateSchema, user_id: UUID
+    ) -> CalendarEventSchema:
         """Create a new calendar event."""
         event_dict = event_data.model_dump()
         event_dict["user_id"] = user_id
         event = await self.create(event_dict)
         return CalendarEventSchema.model_validate(event)
 
-    async def get_events(self, user_id: UUID, skip: int = 0, limit: int = 10) -> List[CalendarEventSchema]:
+    async def get_events(
+        self, user_id: UUID, skip: int = 0, limit: int = 10
+    ) -> List[CalendarEventSchema]:
         """Get calendar events for a user."""
         events = await self.get_many_by_field("user_id", user_id)
-        return [CalendarEventSchema.model_validate(event) for event in events[skip:skip + limit]]
+        return [CalendarEventSchema.model_validate(event) for event in events[skip : skip + limit]]
 
     async def get_event(self, event_id: str, user_id: UUID) -> Optional[CalendarEventSchema]:
         """Get a specific calendar event."""
@@ -69,9 +75,7 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
         return await self.delete(UUID(event_id))
 
     async def apply_circadian_optimization(
-        self,
-        user_id: UUID,
-        optimization_results: List[dict]
+        self, user_id: UUID, optimization_results: List[dict]
     ) -> Dict[str, Any]:
         """Apply circadian optimization results to calendar events.
 
@@ -125,7 +129,7 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
                         "suitability_score": result.get("suitability_score", 0.5),
                         "cognitive_category": result.get("cognitive_category", "unknown"),
                         "energy_level": result.get("energy_level", 5.0),
-                    }
+                    },
                 }
 
                 # Update the event
@@ -145,5 +149,5 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
             "applied_count": applied_count,
             "skipped_count": skipped_count,
             "errors": errors,
-            "updated_events": updated_events
+            "updated_events": updated_events,
         }

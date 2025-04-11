@@ -22,7 +22,7 @@ from app.utils.tech_debt import (
     DebtSeverity,
     DebtStatus,
     MLDebtSubcategory,
-    get_debt_manager
+    get_debt_manager,
 )
 
 
@@ -30,7 +30,7 @@ def setup_parser() -> argparse.ArgumentParser:
     """Set up command line argument parser."""
     parser = argparse.ArgumentParser(
         description="Technical Debt Management CLI Tool",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
@@ -43,64 +43,66 @@ def setup_parser() -> argparse.ArgumentParser:
         "--category",
         choices=[c.value for c in DebtCategory],
         default=DebtCategory.CODE_QUALITY.value,
-        help="Category of the debt item"
+        help="Category of the debt item",
     )
     add_parser.add_argument(
         "--severity",
         choices=[s.value for s in DebtSeverity],
         default=DebtSeverity.MEDIUM.value,
-        help="Severity of the debt item"
+        help="Severity of the debt item",
     )
     add_parser.add_argument(
         "--status",
         choices=[s.value for s in DebtStatus],
         default=DebtStatus.IDENTIFIED.value,
-        help="Status of the debt item"
+        help="Status of the debt item",
     )
     add_parser.add_argument("--file-path", help="File path associated with the debt item")
-    add_parser.add_argument("--line-number", type=int, help="Line number associated with the debt item")
+    add_parser.add_argument(
+        "--line-number", type=int, help="Line number associated with the debt item"
+    )
     add_parser.add_argument("--author", help="Author of the debt item (defaults to current user)")
     add_parser.add_argument("--tags", help="Comma-separated list of tags")
     add_parser.add_argument("--resolution-plan", help="Plan for resolving the debt")
-    add_parser.add_argument("--effort", help="Estimated effort to resolve the debt (e.g., '2 days')")
+    add_parser.add_argument(
+        "--effort", help="Estimated effort to resolve the debt (e.g., '2 days')"
+    )
     add_parser.add_argument("--impact", help="Impact of the debt on the project")
     add_parser.add_argument(
         "--subcategory",
         choices=[s.value for s in MLDebtSubcategory],
-        help="ML-specific subcategory of the debt item"
+        help="ML-specific subcategory of the debt item",
     )
 
     # List command
     list_parser = subparsers.add_parser("list", help="List technical debt items")
     list_parser.add_argument(
-        "--status",
-        choices=[s.value for s in DebtStatus],
-        help="Filter by status"
+        "--status", choices=[s.value for s in DebtStatus], help="Filter by status"
     )
     list_parser.add_argument(
-        "--category",
-        choices=[c.value for c in DebtCategory],
-        help="Filter by category"
+        "--category", choices=[c.value for c in DebtCategory], help="Filter by category"
     )
     list_parser.add_argument(
-        "--severity",
-        choices=[s.value for s in DebtSeverity],
-        help="Filter by severity"
+        "--severity", choices=[s.value for s in DebtSeverity], help="Filter by severity"
     )
     list_parser.add_argument(
         "--subcategory",
         choices=[s.value for s in MLDebtSubcategory],
-        help="Filter by ML subcategory"
+        help="Filter by ML subcategory",
     )
     list_parser.add_argument("--tags", help="Filter by comma-separated list of tags")
     list_parser.add_argument("--search", help="Search query for filtering items")
     list_parser.add_argument("--file-path", help="Filter by file path")
-    list_parser.add_argument("--format", choices=["json", "human"], default="human", help="Output format")
+    list_parser.add_argument(
+        "--format", choices=["json", "human"], default="human", help="Output format"
+    )
 
     # Show command
     show_parser = subparsers.add_parser("show", help="Show details of a technical debt item")
     show_parser.add_argument("item_id", help="ID of the debt item to show")
-    show_parser.add_argument("--format", choices=["json", "human"], default="human", help="Output format")
+    show_parser.add_argument(
+        "--format", choices=["json", "human"], default="human", help="Output format"
+    )
 
     # Update command
     update_parser = subparsers.add_parser("update", help="Update a technical debt item")
@@ -108,91 +110,75 @@ def setup_parser() -> argparse.ArgumentParser:
     update_parser.add_argument("--title", help="Title of the debt item")
     update_parser.add_argument("--description", help="Description of the debt item")
     update_parser.add_argument(
-        "--category",
-        choices=[c.value for c in DebtCategory],
-        help="Category of the debt item"
+        "--category", choices=[c.value for c in DebtCategory], help="Category of the debt item"
     )
     update_parser.add_argument(
-        "--severity",
-        choices=[s.value for s in DebtSeverity],
-        help="Severity of the debt item"
+        "--severity", choices=[s.value for s in DebtSeverity], help="Severity of the debt item"
     )
     update_parser.add_argument(
-        "--status",
-        choices=[s.value for s in DebtStatus],
-        help="Status of the debt item"
+        "--status", choices=[s.value for s in DebtStatus], help="Status of the debt item"
     )
     update_parser.add_argument("--file-path", help="File path associated with the debt item")
-    update_parser.add_argument("--line-number", type=int, help="Line number associated with the debt item")
+    update_parser.add_argument(
+        "--line-number", type=int, help="Line number associated with the debt item"
+    )
     update_parser.add_argument("--tags", help="Comma-separated list of tags")
     update_parser.add_argument("--resolution-plan", help="Plan for resolving the debt")
-    update_parser.add_argument("--effort", help="Estimated effort to resolve the debt (e.g., '2 days')")
+    update_parser.add_argument(
+        "--effort", help="Estimated effort to resolve the debt (e.g., '2 days')"
+    )
     update_parser.add_argument("--impact", help="Impact of the debt on the project")
     update_parser.add_argument(
         "--subcategory",
         choices=[s.value for s in MLDebtSubcategory],
-        help="ML-specific subcategory of the debt item"
+        help="ML-specific subcategory of the debt item",
     )
 
     # Delete command
     delete_parser = subparsers.add_parser("delete", help="Delete a technical debt item")
     delete_parser.add_argument("item_id", help="ID of the debt item to delete")
-    delete_parser.add_argument("--confirm", action="store_true", help="Confirm deletion without prompting")
+    delete_parser.add_argument(
+        "--confirm", action="store_true", help="Confirm deletion without prompting"
+    )
 
     # Report command
     report_parser = subparsers.add_parser("report", help="Generate a technical debt report")
     report_parser.add_argument(
-        "--format",
-        choices=["markdown", "json"],
-        default="markdown",
-        help="Output format"
+        "--format", choices=["markdown", "json"], default="markdown", help="Output format"
     )
     report_parser.add_argument(
-        "--group-by",
-        choices=["category", "severity", "status"],
-        help="Group items in the report"
+        "--group-by", choices=["category", "severity", "status"], help="Group items in the report"
     )
     report_parser.add_argument(
-        "--include-resolved",
-        action="store_true",
-        help="Include resolved items in the report"
+        "--include-resolved", action="store_true", help="Include resolved items in the report"
     )
-    report_parser.add_argument(
-        "--output",
-        help="Output file path (defaults to stdout)"
-    )
+    report_parser.add_argument("--output", help="Output file path (defaults to stdout)")
 
     # Scan command
-    scan_parser = subparsers.add_parser("scan", help="Scan a directory for technical debt comments in code")
+    scan_parser = subparsers.add_parser(
+        "scan", help="Scan a directory for technical debt comments in code"
+    )
     scan_parser.add_argument(
         "directory",
         nargs="?",
         default=".",
-        help="Directory to scan (defaults to current directory)"
+        help="Directory to scan (defaults to current directory)",
     )
     scan_parser.add_argument(
         "--extensions",
-        help="Comma-separated list of file extensions to scan (defaults to common source code extensions)"
+        help="Comma-separated list of file extensions to scan (defaults to common source code extensions)",
     )
     scan_parser.add_argument(
-        "--auto-add",
-        action="store_true",
-        help="Automatically add found items to the database"
+        "--auto-add", action="store_true", help="Automatically add found items to the database"
     )
     scan_parser.add_argument(
-        "--format",
-        choices=["json", "human"],
-        default="human",
-        help="Output format"
+        "--format", choices=["json", "human"], default="human", help="Output format"
     )
 
     # Metrics command
     metrics_parser = subparsers.add_parser("metrics", help="Get technical debt metrics")
     metrics_parser.add_argument(
-        "--format",
-        choices=["json", "human"],
-        default="human",
-        help="Output format"
+        "--format", choices=["json", "human"], default="human", help="Output format"
     )
 
     # Add comment command
@@ -232,7 +218,7 @@ def handle_add(args) -> None:
         resolution_plan=args.resolution_plan,
         estimated_effort=args.effort,
         impact=args.impact,
-        subcategory=args.subcategory
+        subcategory=args.subcategory,
     )
 
     item_id = manager.add_item(item)
@@ -303,7 +289,7 @@ def handle_list(args) -> None:
         subcategory=args.subcategory,
         tags=tags,
         search_query=args.search,
-        file_path=args.file_path
+        file_path=args.file_path,
     )
 
     if not items:
@@ -312,9 +298,7 @@ def handle_list(args) -> None:
 
     if args.format == "json":
         # Output as JSON
-        result = {
-            "items": [item.to_dict() for item in items]
-        }
+        result = {"items": [item.to_dict() for item in items]}
         print(json.dumps(result, indent=2))
     else:
         # Output in human-readable format
@@ -326,7 +310,7 @@ def handle_list(args) -> None:
             DebtSeverity.CRITICAL: 0,
             DebtSeverity.HIGH: 1,
             DebtSeverity.MEDIUM: 2,
-            DebtSeverity.LOW: 3
+            DebtSeverity.LOW: 3,
         }
 
         items.sort(key=lambda item: (severity_order.get(item.severity, 999), item.title))
@@ -442,9 +426,7 @@ def handle_report(args) -> None:
     manager = get_debt_manager()
 
     report = manager.generate_report(
-        output_format=args.format,
-        include_resolved=args.include_resolved,
-        group_by=args.group_by
+        output_format=args.format, include_resolved=args.include_resolved, group_by=args.group_by
     )
 
     if args.output:
@@ -463,14 +445,14 @@ def handle_scan(args) -> None:
     # Parse extensions
     extensions = None
     if args.extensions:
-        extensions = [ext.strip() if ext.strip().startswith(".") else f".{ext.strip()}"
-                     for ext in args.extensions.split(",")]
+        extensions = [
+            ext.strip() if ext.strip().startswith(".") else f".{ext.strip()}"
+            for ext in args.extensions.split(",")
+        ]
 
     try:
         tags = manager.scan_directory_for_tech_debt(
-            directory=args.directory,
-            file_extensions=extensions,
-            auto_add=args.auto_add
+            directory=args.directory, file_extensions=extensions, auto_add=args.auto_add
         )
 
         if not tags:
@@ -486,7 +468,9 @@ def handle_scan(args) -> None:
             print()
 
             for i, tag in enumerate(tags, 1):
-                print(f"{i}. [{tag['severity'].value.upper()}] {tag['file_path']}:{tag['line_number']}")
+                print(
+                    f"{i}. [{tag['severity'].value.upper()}] {tag['file_path']}:{tag['line_number']}"
+                )
                 print(f"   {tag['description']}")
                 print()
 
@@ -513,25 +497,29 @@ def handle_metrics(args) -> None:
         print(f"Active Items: {metrics['active_items']}")
         print(f"Debt Score: {metrics['debt_score']}")
 
-        if metrics.get('trend'):
-            trend = metrics['trend']
-            change_symbol = "↑" if trend['score_change'] > 0 else "↓" if trend['score_change'] < 0 else "→"
-            print(f"Trend: {change_symbol} {abs(trend['score_change'])} ({trend['percentage_change']:.1f}%)")
+        if metrics.get("trend"):
+            trend = metrics["trend"]
+            change_symbol = (
+                "↑" if trend["score_change"] > 0 else "↓" if trend["score_change"] < 0 else "→"
+            )
+            print(
+                f"Trend: {change_symbol} {abs(trend['score_change'])} ({trend['percentage_change']:.1f}%)"
+            )
 
         print()
         print("By Severity:")
-        for severity, count in metrics['by_severity'].items():
+        for severity, count in metrics["by_severity"].items():
             print(f"  {severity.title()}: {count}")
 
         print()
         print("By Category:")
-        for category, count in metrics['by_category'].items():
+        for category, count in metrics["by_category"].items():
             if count > 0:
                 print(f"  {category.replace('_', ' ').title()}: {count}")
 
         print()
         print("By Status:")
-        for status, count in metrics['by_status'].items():
+        for status, count in metrics["by_status"].items():
             if count > 0:
                 print(f"  {status.replace('_', ' ').title()}: {count}")
 
@@ -570,7 +558,7 @@ def main() -> None:
         "report": handle_report,
         "scan": handle_scan,
         "metrics": handle_metrics,
-        "comment": handle_comment
+        "comment": handle_comment,
     }
 
     handler = handlers.get(args.command)

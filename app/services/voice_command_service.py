@@ -1,4 +1,5 @@
 """Voice command service module."""
+
 import logging
 from datetime import datetime
 from typing import Dict, Any
@@ -52,17 +53,10 @@ class VoiceCommandService:
             self.db.add(task)
             await self.db.commit()
             await self.db.refresh(task)
-            return {
-                "success": True,
-                "message": "Task created successfully",
-                "task": task
-            }
+            return {"success": True, "message": "Task created successfully", "task": task}
         except Exception as e:
             logger.error(f"Error creating task: {str(e)}")
-            return {
-                "success": False,
-                "message": f"Error creating task: {str(e)}"
-            }
+            return {"success": False, "message": f"Error creating task: {str(e)}"}
 
     async def create_reminder(self, reminder_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a reminder from parsed command data."""
@@ -72,7 +66,7 @@ class VoiceCommandService:
                 due_date=reminder_data.get("reminder_time"),
                 priority=reminder_data.get("priority", 1),
                 user_id=reminder_data.get("user_id"),
-                is_reminder=True
+                is_reminder=True,
             )
             self.db.add(reminder)
             await self.db.commit()
@@ -80,11 +74,8 @@ class VoiceCommandService:
             return {
                 "success": True,
                 "message": "Reminder created successfully",
-                "reminder": reminder
+                "reminder": reminder,
             }
         except Exception as e:
             logger.error(f"Error creating reminder: {str(e)}")
-            return {
-                "success": False,
-                "message": f"Error creating reminder: {str(e)}"
-            }
+            return {"success": False, "message": f"Error creating reminder: {str(e)}"}

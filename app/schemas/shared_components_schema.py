@@ -58,7 +58,9 @@ class SessionAnalytics(BaseSchema):
     total_focus_time: int = Field(..., description="Total focus time in minutes", ge=0)
     total_break_time: int = Field(..., description="Total break time in minutes", ge=0)
     actual_duration: Optional[int] = Field(None, description="Actual duration in minutes", ge=0)
-    estimated_duration: Optional[int] = Field(None, description="Estimated duration in minutes", ge=0)
+    estimated_duration: Optional[int] = Field(
+        None, description="Estimated duration in minutes", ge=0
+    )
     time_efficiency: Optional[float] = Field(None, ge=0, le=1)
 
     # Break and interruption analysis

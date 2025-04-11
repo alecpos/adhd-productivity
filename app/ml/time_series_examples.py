@@ -15,11 +15,13 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Add the project root to the Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -57,7 +59,7 @@ def generate_sample_transition_data(user_id, num_days=60, transitions_per_day=5)
         3: 0.9,  # Thursday
         4: 0.8,  # Friday
         5: 1.2,  # Saturday
-        6: 1.1   # Sunday
+        6: 1.1,  # Sunday
     }
 
     # Create a pattern where transitions get better over time
@@ -81,7 +83,7 @@ def generate_sample_transition_data(user_id, num_days=60, transitions_per_day=5)
 
         # Calculate improvement based on how many days have passed
         days_passed = (current_date - start_date).days
-        time_improvement = improvement_factor ** days_passed
+        time_improvement = improvement_factor**days_passed
 
         for _ in range(day_transitions):
             # Randomly select tasks
@@ -110,7 +112,7 @@ def generate_sample_transition_data(user_id, num_days=60, transitions_per_day=5)
                 "actual_minutes": actual_minutes,
                 "timestamp": timestamp.isoformat(),
                 "context_score": random.uniform(0.5, 1.5),
-                "difficulty_level": random.choice(["easy", "moderate", "difficult"])
+                "difficulty_level": random.choice(["easy", "moderate", "difficult"]),
             }
 
             transitions.append(transition)
@@ -180,10 +182,7 @@ async def run_example():
     # Run the weekly resampling analysis
     logger.info("Running weekly resampling analysis...")
     result = await calculator.weekly_resampling(
-        user_id=user_id,
-        lookback_days=90,
-        rolling_window_days=7,
-        include_weekends=True
+        user_id=user_id, lookback_days=90, rolling_window_days=7, include_weekends=True
     )
 
     # Display the results
@@ -192,14 +191,16 @@ async def run_example():
     # Display summary statistics
     print("\n=== Weekly Transition Time Analysis ===")
     print(f"Total weeks analyzed: {result['weekly_stats']['total_weeks']}")
-    print(f"Average transitions per week: {result['weekly_stats']['average_transitions_per_week']:.2f}")
+    print(
+        f"Average transitions per week: {result['weekly_stats']['average_transitions_per_week']:.2f}"
+    )
     print(f"Most efficient week: {result['weekly_stats']['most_efficient_week']}")
     print(f"Least efficient week: {result['weekly_stats']['least_efficient_week']}")
 
     # Display the first week of data
-    if result['weekly_transitions']:
+    if result["weekly_transitions"]:
         print("\n=== First Week Data ===")
-        first_week = result['weekly_transitions'][0]
+        first_week = result["weekly_transitions"][0]
         for key, value in first_week.items():
             if isinstance(value, (int, float)):
                 print(f"{key}: {value:.2f}")
@@ -207,15 +208,15 @@ async def run_example():
                 print(f"{key}: {value}")
 
     # Display day of week patterns
-    if 'actual_minutes' in result['patterns']['day_of_week']:
+    if "actual_minutes" in result["patterns"]["day_of_week"]:
         print("\n=== Day of Week Patterns (Actual Minutes) ===")
-        day_patterns = result['patterns']['day_of_week']['actual_minutes']
-        for day, stats in day_patterns['mean'].items():
+        day_patterns = result["patterns"]["day_of_week"]["actual_minutes"]
+        for day, stats in day_patterns["mean"].items():
             print(f"{day}: {stats:.2f} minutes")
 
     # Display weekly trend for actual minutes
-    if 'actual_minutes_mean' in result['patterns']['weekly_trend']:
-        trend = result['patterns']['weekly_trend']['actual_minutes_mean']
+    if "actual_minutes_mean" in result["patterns"]["weekly_trend"]:
+        trend = result["patterns"]["weekly_trend"]["actual_minutes_mean"]
         print("\n=== Weekly Trend (Actual Minutes) ===")
         print(f"First Week Average: {trend['first_value']:.2f} minutes")
         print(f"Last Week Average: {trend['last_value']:.2f} minutes")

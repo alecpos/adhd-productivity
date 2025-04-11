@@ -18,16 +18,16 @@ import logging
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 def extract_method_from_file(file_path, class_name, method_name):
     """Extract a method from a file using regex instead of importing."""
     try:
         logger.info(f"Reading file {file_path}")
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             content = f.read()
 
         # Find the class definition
@@ -53,7 +53,7 @@ def extract_method_from_file(file_path, class_name, method_name):
 
         # Find the end of the method by looking for the next def at the same indent level
         # First, determine indentation of the method
-        method_line_end = content.find('\n', method_start)
+        method_line_end = content.find("\n", method_start)
         next_line_start = method_line_end + 1
         indentation = 0
 
@@ -76,18 +76,20 @@ def extract_method_from_file(file_path, class_name, method_name):
         return {
             "code": method_code,
             "parameters": extract_parameters(method_code),
-            "docstring": extract_docstring(method_code)
+            "docstring": extract_docstring(method_code),
         }
 
     except Exception as e:
         logger.error(f"Error extracting method: {str(e)}")
         import traceback
+
         logger.error(traceback.format_exc())
         return None
 
+
 def extract_parameters(method_code):
     """Extract parameters from method signature."""
-    signature_match = re.search(r'def\s+\w+\s*\((.*?)\):', method_code, re.DOTALL)
+    signature_match = re.search(r"def\s+\w+\s*\((.*?)\):", method_code, re.DOTALL)
     if not signature_match:
         return []
 
@@ -101,14 +103,14 @@ def extract_parameters(method_code):
     paren_count = 0
 
     for char in signature:
-        if char == ',' and paren_count == 0:
+        if char == "," and paren_count == 0:
             params.append(curr_param.strip())
             curr_param = ""
         else:
             curr_param += char
-            if char == '(':
+            if char == "(":
                 paren_count += 1
-            elif char == ')':
+            elif char == ")":
                 paren_count -= 1
 
     if curr_param:
@@ -117,10 +119,11 @@ def extract_parameters(method_code):
     # Clean up parameters (remove annotations and default values)
     clean_params = []
     for p in params:
-        param_name = p.split(':')[0].split('=')[0].strip()
+        param_name = p.split(":")[0].split("=")[0].strip()
         clean_params.append(param_name)
 
     return clean_params
+
 
 def extract_docstring(method_code):
     """Extract docstring from method code."""
@@ -130,11 +133,14 @@ def extract_docstring(method_code):
 
     return None
 
+
 def analyze_weekly_resampling(file_path):
     """Analyze the weekly_resampling method from the TimeBufferCalculator."""
     try:
         # Extract method code
-        method_info = extract_method_from_file(file_path, "TimeBufferCalculator", "weekly_resampling")
+        method_info = extract_method_from_file(
+            file_path, "TimeBufferCalculator", "weekly_resampling"
+        )
 
         if not method_info:
             return None
@@ -148,10 +154,10 @@ def analyze_weekly_resampling(file_path):
             "source_file": file_path,
             "parameters": method_info["parameters"],
             "docstring": method_info["docstring"],
-            "source_code_length": len(method_info["code"].split('\n')),
+            "source_code_length": len(method_info["code"].split("\n")),
             "dependencies": extract_dependencies(method_info["code"]),
             "sample_data_analysis": analyze_with_sample_data(sample_data),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         return analysis
@@ -159,8 +165,10 @@ def analyze_weekly_resampling(file_path):
     except Exception as e:
         logger.error(f"Error analyzing weekly_resampling: {str(e)}")
         import traceback
+
         logger.error(traceback.format_exc())
         return None
+
 
 def extract_dependencies(source_code):
     """Extract likely dependencies from the source code."""
@@ -172,7 +180,7 @@ def extract_dependencies(source_code):
         ("numpy", ["np.", "numpy."]),
         ("datetime", ["datetime.", "timedelta"]),
         ("logging", ["logger.", "logging."]),
-        ("SQLAlchemy", ["session.", "query(", "filter("])
+        ("SQLAlchemy", ["session.", "query(", "filter("]),
     ]
 
     for lib, patterns in patterns:
@@ -184,12 +192,13 @@ def extract_dependencies(source_code):
 
     return dependencies
 
+
 def generate_sample_data():
     """Generate sample transition data for analysis."""
     # Create date range for the past 30 days
     end_date = datetime.now()
     start_date = end_date - timedelta(days=30)
-    date_range = pd.date_range(start=start_date, end=end_date, freq='H')
+    date_range = pd.date_range(start=start_date, end=end_date, freq="H")
 
     # Generate random transition times
     np.random.seed(42)  # For reproducibility
@@ -204,56 +213,72 @@ def generate_sample_data():
 
                 # Create more transitions on weekdays
                 if date.weekday() < 5:  # 0-4 are Monday to Friday
-                    data.append({
-                        'user_id': 'user123',
-                        'transition_timestamp': date,
-                        'transition_time_minutes': transition_time,
-                        'from_task_id': f'task_{np.random.randint(1, 10)}',
-                        'to_task_id': f'task_{np.random.randint(1, 10)}'
-                    })
+                    data.append(
+                        {
+                            "user_id": "user123",
+                            "transition_timestamp": date,
+                            "transition_time_minutes": transition_time,
+                            "from_task_id": f"task_{np.random.randint(1, 10)}",
+                            "to_task_id": f"task_{np.random.randint(1, 10)}",
+                        }
+                    )
 
     # Convert to DataFrame
     df = pd.DataFrame(data)
     return df
 
+
 def analyze_with_sample_data(sample_data):
     """Perform a simple weekly resampling analysis on sample data."""
     try:
         # Group by day of week
-        sample_data['day_of_week'] = sample_data['transition_timestamp'].dt.dayofweek
-        sample_data['day_name'] = sample_data['transition_timestamp'].dt.day_name()
+        sample_data["day_of_week"] = sample_data["transition_timestamp"].dt.dayofweek
+        sample_data["day_name"] = sample_data["transition_timestamp"].dt.day_name()
 
         # Calculate weekly statistics
-        weekly_stats = sample_data.groupby('day_name')['transition_time_minutes'].agg([
-            'count', 'mean', 'std', 'min', 'max'
-        ]).reset_index()
-
-        # Add time of day analysis
-        sample_data['hour'] = sample_data['transition_timestamp'].dt.hour
-        sample_data['time_of_day'] = pd.cut(
-            sample_data['hour'],
-            bins=[0, 6, 12, 18, 24],
-            labels=['Night', 'Morning', 'Afternoon', 'Evening']
+        weekly_stats = (
+            sample_data.groupby("day_name")["transition_time_minutes"]
+            .agg(["count", "mean", "std", "min", "max"])
+            .reset_index()
         )
 
-        time_of_day_stats = sample_data.groupby('time_of_day')['transition_time_minutes'].mean()
+        # Add time of day analysis
+        sample_data["hour"] = sample_data["transition_timestamp"].dt.hour
+        sample_data["time_of_day"] = pd.cut(
+            sample_data["hour"],
+            bins=[0, 6, 12, 18, 24],
+            labels=["Night", "Morning", "Afternoon", "Evening"],
+        )
+
+        time_of_day_stats = sample_data.groupby("time_of_day")["transition_time_minutes"].mean()
 
         return {
-            "weekly_pattern": weekly_stats.to_dict('records'),
+            "weekly_pattern": weekly_stats.to_dict("records"),
             "time_of_day_pattern": time_of_day_stats.to_dict(),
             "data_points": len(sample_data),
             "date_range": {
-                "start": sample_data['transition_timestamp'].min().isoformat() if not sample_data.empty else None,
-                "end": sample_data['transition_timestamp'].max().isoformat() if not sample_data.empty else None
-            }
+                "start": (
+                    sample_data["transition_timestamp"].min().isoformat()
+                    if not sample_data.empty
+                    else None
+                ),
+                "end": (
+                    sample_data["transition_timestamp"].max().isoformat()
+                    if not sample_data.empty
+                    else None
+                ),
+            },
         }
     except Exception as e:
         logger.error(f"Error in sample data analysis: {str(e)}")
         return {"error": str(e)}
 
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python simple_resampling_analysis.py <path_to_time_buffer_calculator.py> [output_file]")
+        print(
+            "Usage: python simple_resampling_analysis.py <path_to_time_buffer_calculator.py> [output_file]"
+        )
         sys.exit(1)
 
     file_path = sys.argv[1]
@@ -266,12 +291,13 @@ def main():
     analysis = analyze_weekly_resampling(file_path)
 
     if analysis:
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(analysis, f, indent=2)
         print(f"Analysis saved to {output_file}")
     else:
         print("Analysis failed")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

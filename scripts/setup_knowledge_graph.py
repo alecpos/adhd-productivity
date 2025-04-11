@@ -28,7 +28,9 @@ except ImportError:
 def create_directories() -> None:
     """Create necessary directories for the knowledge graph system."""
     # Directory for knowledge graph reports
-    reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports", "knowledge_graph")
+    reports_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports", "knowledge_graph"
+    )
     os.makedirs(reports_dir, exist_ok=True)
     print(f"Created directory: {reports_dir}")
 
@@ -46,19 +48,20 @@ def scan_documentation() -> None:
 
         # Add app directory if it has markdown files
         app_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app")
-        if os.path.exists(app_dir) and any(f.endswith(".md") for f in os.listdir(app_dir) if os.path.isfile(os.path.join(app_dir, f))):
+        if os.path.exists(app_dir) and any(
+            f.endswith(".md")
+            for f in os.listdir(app_dir)
+            if os.path.isfile(os.path.join(app_dir, f))
+        ):
             directories.append("app")
 
         # Scan each directory
         for directory in directories:
             cmd = [
                 sys.executable,
-                os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    "docs_knowledge_cli.py"
-                ),
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs_knowledge_cli.py"),
                 "scan",
-                directory
+                directory,
             ]
 
             print(f"Scanning documentation directory: {directory}")
@@ -80,18 +83,19 @@ def generate_visualization() -> None:
         # Path to visualization
         vis_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "reports", "knowledge_graph", "visualizations", "docs_knowledge_graph"
+            "reports",
+            "knowledge_graph",
+            "visualizations",
+            "docs_knowledge_graph",
         )
 
         # Run docs_knowledge_cli.py visualize
         cmd = [
             sys.executable,
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "docs_knowledge_cli.py"
-            ),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs_knowledge_cli.py"),
             "visualize",
-            "--output", vis_path
+            "--output",
+            vis_path,
         ]
 
         print("Generating knowledge graph visualization...")
@@ -111,18 +115,18 @@ def generate_report() -> None:
         # Path to report
         report_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "reports", "knowledge_graph", "knowledge_graph_report.md"
+            "reports",
+            "knowledge_graph",
+            "knowledge_graph_report.md",
         )
 
         # Run docs_knowledge_cli.py report
         cmd = [
             sys.executable,
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "docs_knowledge_cli.py"
-            ),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs_knowledge_cli.py"),
             "report",
-            "--output", report_path
+            "--output",
+            report_path,
         ]
 
         print("Generating knowledge graph report...")
@@ -142,11 +146,8 @@ def print_stats() -> None:
         # Run docs_knowledge_cli.py stats
         cmd = [
             sys.executable,
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "docs_knowledge_cli.py"
-            ),
-            "stats"
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs_knowledge_cli.py"),
+            "stats",
         ]
 
         print("Knowledge graph statistics:")
@@ -162,7 +163,9 @@ def print_stats() -> None:
 
 def main() -> None:
     """Main entry point for the setup script."""
-    parser = argparse.ArgumentParser(description="Setup script for the documentation knowledge graph system")
+    parser = argparse.ArgumentParser(
+        description="Setup script for the documentation knowledge graph system"
+    )
     parser.add_argument("--no-visualize", action="store_true", help="Skip visualization generation")
     parser.add_argument("--no-report", action="store_true", help="Skip report generation")
 
@@ -188,7 +191,7 @@ def main() -> None:
     print("")
     print("Quick start:")
     print("  - Scan documentation: python scripts/docs_knowledge_cli.py scan <directory>")
-    print("  - Search the graph: python scripts/docs_knowledge_cli.py query --search \"<query>\"")
+    print('  - Search the graph: python scripts/docs_knowledge_cli.py query --search "<query>"')
     print("  - Find related documents: python scripts/docs_knowledge_cli.py related <node_id>")
     print("  - Generate visualization: python scripts/docs_knowledge_cli.py visualize")
     print("  - Generate report: python scripts/docs_knowledge_cli.py report")

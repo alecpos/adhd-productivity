@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from app.schemas.schema_factory_schema import SchemaFactory
 
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
 
 
 class SchemaRegistry(BaseModel):
@@ -16,28 +16,19 @@ class SchemaRegistry(BaseModel):
 
     factory: SchemaFactory = Field(default_factory=SchemaFactory)
     validation_rules: Dict[str, List[tuple[Callable[[Any], bool], str]]] = Field(
-        default_factory=dict,
-        description="Validation rules for each schema"
+        default_factory=dict, description="Validation rules for each schema"
     )
     schema_versions: Dict[str, str] = Field(
-        default_factory=dict,
-        description="Version information for each schema"
+        default_factory=dict, description="Version information for each schema"
     )
     schema_dependencies: Dict[str, List[str]] = Field(
-        default_factory=dict,
-        description="Dependencies between schemas"
+        default_factory=dict, description="Dependencies between schemas"
     )
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        from_attributes=True
-    )
+    model_config = ConfigDict(arbitrary_types_allowed=True, from_attributes=True)
 
     def register_validation_rule(
-        self,
-        schema_name: str,
-        rule: Callable[[Any], bool],
-        error_message: str
+        self, schema_name: str, rule: Callable[[Any], bool], error_message: str
     ) -> None:
         """Register a validation rule for a specific schema.
 
@@ -59,11 +50,7 @@ class SchemaRegistry(BaseModel):
         """
         self.schema_versions[schema_name] = version
 
-    def register_schema_dependencies(
-        self,
-        schema_name: str,
-        dependencies: List[str]
-    ) -> None:
+    def register_schema_dependencies(self, schema_name: str, dependencies: List[str]) -> None:
         """Register dependencies for a schema.
 
         Args:
@@ -109,11 +96,7 @@ class SchemaRegistry(BaseModel):
 
         return True
 
-    def create_schema_instance(
-        self,
-        schema_name: str,
-        data: dict
-    ) -> T:
+    def create_schema_instance(self, schema_name: str, data: dict) -> T:
         """Create and validate a schema instance.
 
         Args:

@@ -1,4 +1,5 @@
 """Scheduling schemas."""
+
 from datetime import datetime, time, timedelta
 from typing import Any, Dict, List, Optional
 from uuid import UUID
@@ -9,16 +10,20 @@ from app.schemas.shared_components_schema import (
     Break,
     EnvironmentalFactors,
     Interruption,
-    SessionAnalytics
+    SessionAnalytics,
 )
 from enum import Enum
+
 
 class WorkHours(BaseModel):
     """Work hours schema."""
 
     start_time: time = Field(..., description="Start time of work hours")
     end_time: time = Field(..., description="End time of work hours")
-    days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
+    days_of_week: List[int] = Field(
+        default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)"
+    )
+
 
 # Add WorkHoursSchema that inherits from BaseSchema for compatibility
 class WorkHoursSchema(BaseSchema):
@@ -26,13 +31,17 @@ class WorkHoursSchema(BaseSchema):
 
     start_time: time = Field(..., description="Start time of work hours")
     end_time: time = Field(..., description="End time of work hours")
-    days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
+    days_of_week: List[int] = Field(
+        default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)"
+    )
+
 
 class EnergyLevel(str, Enum):
     day_of_week: int = Field(..., ge=0, le=6)
     start_time: time
     end_time: time
     productivity_rating: Optional[int] = Field(None, ge=1, le=10)
+
 
 # Add BreakSchema that wraps the Break class from shared_components_schema
 class BreakSchema(BaseSchema):
@@ -44,6 +53,7 @@ class BreakSchema(BaseSchema):
     type: str = Field(..., min_length=1, max_length=50)
     effectiveness: Optional[int] = Field(None, ge=1, le=10)
 
+
 # Add InterruptionSchema that wraps the Interruption class
 class InterruptionSchema(BaseSchema):
     """Interruption schema with BaseSchema inheritance."""
@@ -53,21 +63,27 @@ class InterruptionSchema(BaseSchema):
     duration: int = Field(..., description="Duration in minutes", ge=1)
     impact: Optional[int] = Field(None, ge=-5, le=5)
 
+
 class TimeBlockInput(BaseSchema):
     """Input schema for time blocks used by energy optimizer."""
+
     id: str = Field(..., description="Unique identifier for the time block")
     title: str = Field(..., description="Title of the time block")
     start_time: datetime = Field(..., description="Start time of the block")
     end_time: datetime = Field(..., description="End time of the block")
     block_type: BlockType = Field(default=BlockType.TASK, description="Type of block")
-    priority: BlockPriority = Field(default=BlockPriority.MEDIUM, description="Priority of the block")
+    priority: BlockPriority = Field(
+        default=BlockPriority.MEDIUM, description="Priority of the block"
+    )
     is_flexible: bool = Field(default=True, description="Whether the block can be moved")
     energy_required: Optional[int] = Field(None, ge=1, le=10, description="Energy level required")
     focus_required: Optional[int] = Field(None, ge=1, le=10, description="Focus level required")
     user_id: Optional[str] = Field(None, description="ID of the user")
 
+
 class EnergySchedulingPattern(BaseSchema):
     """Energy pattern model for schedule optimization."""
+
     time_of_day: time
     average_energy: int = Field(..., ge=1, le=10)
     average_focus: int = Field(..., ge=1, le=10)
@@ -75,9 +91,16 @@ class EnergySchedulingPattern(BaseSchema):
     effective_breaks: List[Break] = Field(default_factory=list)
     optimal_recovery_activities: List[str] = Field(default_factory=list)
     environmental_preferences: Optional[EnvironmentalFactors] = None
-    peak_hours: List[int] = Field(default_factory=list, description="Hours of the day with peak energy levels")
-    trough_hours: List[int] = Field(default_factory=list, description="Hours of the day with low energy levels")
-    hourly_energy_levels: Dict[int, float] = Field(default_factory=dict, description="Energy levels by hour")
+    peak_hours: List[int] = Field(
+        default_factory=list, description="Hours of the day with peak energy levels"
+    )
+    trough_hours: List[int] = Field(
+        default_factory=list, description="Hours of the day with low energy levels"
+    )
+    hourly_energy_levels: Dict[int, float] = Field(
+        default_factory=dict, description="Energy levels by hour"
+    )
+
 
 # Add SchedulePreferencesSchema that wraps the SchedulePreferences class
 class SchedulePreferencesSchema(BaseSchema):
@@ -93,8 +116,10 @@ class SchedulePreferencesSchema(BaseSchema):
     location_preferences: Optional[Dict[str, List[str]]] = None
     environmental_preferences: Optional[EnvironmentalFactors] = None
 
+
 class SchedulePreferences(BaseSchema):
     """Schedule preferences model."""
+
     preferred_start_time: time = Field(default=time(9, 0))
     preferred_end_time: time = Field(default=time(17, 0))
     preferred_break_duration: int = Field(default=15, ge=5)  # minutes
@@ -105,8 +130,10 @@ class SchedulePreferences(BaseSchema):
     location_preferences: Optional[Dict[str, List[str]]] = None
     environmental_preferences: Optional[EnvironmentalFactors] = None
 
+
 class ScheduleBlock(BaseSchema):
     """Schedule block model."""
+
     start_time: datetime
     end_time: datetime
     block_type: BlockType
@@ -132,17 +159,23 @@ class ScheduleBlock(BaseSchema):
 
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class ScheduleOptimizationRequest(BaseSchema):
     """Schedule optimization request model."""
+
     start_date: datetime
     end_date: datetime
     blocks: List[ScheduleBlock]
     preferences: SchedulePreferences
     existing_commitments: Optional[List[ScheduleBlock]] = None
-    optimization_goals: Optional[Dict[str, float]] = None  # weights for different optimization criteria
+    optimization_goals: Optional[Dict[str, float]] = (
+        None  # weights for different optimization criteria
+    )
+
 
 class OptimizedSchedule(BaseSchema):
     """Optimized schedule model."""
+
     blocks: List[ScheduleBlock]
     score: float = Field(..., ge=0, le=1)
     energy_distribution: Dict[str, float]
@@ -152,8 +185,10 @@ class OptimizedSchedule(BaseSchema):
     alternative_slots: Dict[str, List[Dict[str, Any]]]
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class ScheduleAnalytics(BaseSchema):
     """Schedule analytics model."""
+
     total_focus_time: int  # minutes
     total_break_time: int  # minutes
     energy_utilization: float = Field(..., ge=0, le=1)
@@ -168,15 +203,19 @@ class ScheduleAnalytics(BaseSchema):
     period_end: datetime
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class ScheduleSuggestion(BaseSchema):
     """Schedule suggestion model."""
+
     blocks: List[ScheduleBlock]
     score: float = Field(..., ge=0, le=1)
     reason: Optional[str] = None
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class TimeBlockBaseSchema(BaseSchema):
     """Base schema for time blocks."""
+
     start_time: datetime
     end_time: datetime
     title: str = Field(..., min_length=1, max_length=200)
@@ -187,8 +226,10 @@ class TimeBlockBaseSchema(BaseSchema):
     energy_required: Optional[int] = Field(None, ge=1, le=10)
     location: Optional[str] = None
 
+
 class SchedulingRequest(BaseSchema):
     """Schema for scheduling request."""
+
     start_date: datetime
     end_date: datetime
     blocks: List[TimeBlockBaseSchema]
@@ -196,8 +237,10 @@ class SchedulingRequest(BaseSchema):
     existing_commitments: Optional[List[TimeBlockBaseSchema]] = None
     optimization_goals: Optional[Dict[str, float]] = None
 
+
 class SchedulingSuggestion(BaseSchema):
     """Schema for scheduling suggestions."""
+
     suggested_blocks: List[TimeBlockBaseSchema]
     score: float = Field(..., ge=0, le=1)
     reason: Optional[str] = None
@@ -205,21 +248,27 @@ class SchedulingSuggestion(BaseSchema):
     energy_distribution: Optional[Dict[str, float]] = None
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class ScheduleResponseSchema(BaseSchema):
     """Schema for schedule response."""
+
     blocks: List[ScheduleBlock]
     total_focus_time: int = Field(..., description="Total focus time in minutes")
     total_breaks: int = Field(..., description="Total number of breaks")
     meta_data: Optional[Dict[str, Any]] = None
 
+
 class CircadianCalendarOptimizationRequest(BaseSchema):
     """Schema for circadian calendar optimization request."""
+
     start_date: datetime
     end_date: datetime
     only_flexible_events: bool = True
 
+
 class CircadianOptimizationResult(BaseSchema):
     """Schema for single circadian optimization result."""
+
     event_id: UUID
     title: str
     original_start: datetime
@@ -231,26 +280,33 @@ class CircadianOptimizationResult(BaseSchema):
     cognitive_category: str
     energy_level: float
 
+
 class CircadianCalendarOptimizationResponse(BaseSchema):
     """Schema for circadian calendar optimization response."""
+
     optimized_schedule: List[CircadianOptimizationResult]
     energy_curve: List[Dict[str, Any]]
     events_analyzed: int
     events_optimized: int
     message: str
 
+
 class ApplyCircadianOptimizationRequest(BaseSchema):
     """Schema for applying circadian optimizations."""
+
     optimization_results: List[CircadianOptimizationResult]
+
 
 class ApplyCircadianOptimizationResponse(BaseSchema):
     """Schema for the response after applying circadian optimizations."""
+
     success: bool
     message: str
     applied_count: int
     skipped_count: int
     errors: List[str]
     total_errors: int
+
 
 # Add GenerateScheduleRequest class
 class GenerateScheduleRequest(BaseSchema):
@@ -259,11 +315,18 @@ class GenerateScheduleRequest(BaseSchema):
     user_id: UUID
     start_date: datetime
     end_date: datetime
-    include_tasks: bool = Field(default=True, description="Whether to include tasks in the schedule")
-    include_breaks: bool = Field(default=True, description="Whether to include breaks in the schedule")
+    include_tasks: bool = Field(
+        default=True, description="Whether to include tasks in the schedule"
+    )
+    include_breaks: bool = Field(
+        default=True, description="Whether to include breaks in the schedule"
+    )
     preferences: Optional[SchedulePreferencesSchema] = None
-    optimization_type: Optional[str] = Field(default="energy", description="Type of optimization to use")
+    optimization_type: Optional[str] = Field(
+        default="energy", description="Type of optimization to use"
+    )
     meta_data: Optional[Dict[str, Any]] = None
+
 
 __all__ = [
     "EnergySchedulingPattern",
@@ -288,5 +351,5 @@ __all__ = [
     "BreakSchema",
     "InterruptionSchema",
     "SchedulePreferencesSchema",
-    "GenerateScheduleRequest"
+    "GenerateScheduleRequest",
 ]

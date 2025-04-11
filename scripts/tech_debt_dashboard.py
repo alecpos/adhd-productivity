@@ -29,8 +29,9 @@ from app.utils.tech_debt import (
     DebtCategory,
     DebtStatus,
     MLDebtSubcategory,
-    get_debt_manager
+    get_debt_manager,
 )
+
 
 class TechnicalDebtDashboard:
     """Generate technical debt dashboards and reports."""
@@ -47,16 +48,16 @@ class TechnicalDebtDashboard:
         self.today = datetime.datetime.now()
         self.date_str = self.today.strftime("%Y-%m-%d")
 
-    def generate_dashboard(self,
-                          include_charts: bool = True,
-                          output_format: str = "markdown",
-                          include_resolved: bool = False) -> str:
+    def generate_dashboard(
+        self,
+        include_charts: bool = True,
+        output_format: str = "markdown",
+        include_resolved: bool = False,
+    ) -> str:
         """Generate the technical debt dashboard."""
         # Generate the debt report from the manager
         report = self.debt_manager.generate_report(
-            output_format=output_format,
-            include_resolved=include_resolved,
-            group_by="category"
+            output_format=output_format, include_resolved=include_resolved, group_by="category"
         )
 
         # Get debt metrics for charts
@@ -72,8 +73,7 @@ class TechnicalDebtDashboard:
 
         # Save the dashboard
         output_path = os.path.join(
-            self.output_dir,
-            f"technical_debt_dashboard_{self.date_str}.{output_format}"
+            self.output_dir, f"technical_debt_dashboard_{self.date_str}.{output_format}"
         )
 
         with open(output_path, "w") as f:
@@ -82,10 +82,9 @@ class TechnicalDebtDashboard:
         print(f"Dashboard generated at {output_path}")
         return dashboard
 
-    def _generate_markdown_dashboard(self,
-                                    basic_report: str,
-                                    metrics: Dict[str, Any],
-                                    include_charts: bool) -> str:
+    def _generate_markdown_dashboard(
+        self, basic_report: str, metrics: Dict[str, Any], include_charts: bool
+    ) -> str:
         """Generate a markdown dashboard with charts and prioritization."""
         # Start with a header
         lines = [
@@ -93,7 +92,7 @@ class TechnicalDebtDashboard:
             f"**Generated on:** {self.date_str}",
             "",
             "## Summary Metrics",
-            ""
+            "",
         ]
 
         # Add summary metrics in a table
@@ -102,7 +101,7 @@ class TechnicalDebtDashboard:
             ["Critical Items", metrics.get("by_severity", {}).get("critical", 0)],
             ["High Severity Items", metrics.get("by_severity", {}).get("high", 0)],
             ["Debt Density", f"{metrics.get('debt_density', 0.0):.2f}%"],
-            ["ML-Specific Items", metrics.get("by_category", {}).get("ml_specific", 0)]
+            ["ML-Specific Items", metrics.get("by_category", {}).get("ml_specific", 0)],
         ]
 
         lines.append(tabulate(metrics_table, tablefmt="pipe", headers=["Metric", "Value"]))
@@ -110,7 +109,9 @@ class TechnicalDebtDashboard:
 
         # Calculate and add debt score
         debt_score = self._calculate_project_debt_score(metrics)
-        lines.append(f"**Project Debt Score:** {debt_score:.2f}/10.0 ({self._get_debt_score_assessment(debt_score)})")
+        lines.append(
+            f"**Project Debt Score:** {debt_score:.2f}/10.0 ({self._get_debt_score_assessment(debt_score)})"
+        )
         lines.append("")
 
         # Add prioritized items section
@@ -122,7 +123,9 @@ class TechnicalDebtDashboard:
             lines.append("|---|-------|----------------|----------|----------|--------|")
 
             for item in prioritized_items[:10]:  # Show top 10
-                lines.append(f"| {item['id']} | {item['title']} | {item['priority_score']:.2f} | {item['category']} | {item['severity']} | {item['status']} |")
+                lines.append(
+                    f"| {item['id']} | {item['title']} | {item['priority_score']:.2f} | {item['category']} | {item['severity']} | {item['status']} |"
+                )
 
             lines.append("")
 
@@ -162,18 +165,21 @@ class TechnicalDebtDashboard:
         lines.append("|---|-------|------------------|----------|----------|")
 
         for item in sprint_items:
-            lines.append(f"| {item['id']} | {item['title']} | {item['estimated_effort'] or 'Medium'} | {item['category']} | {item['severity']} |")
+            lines.append(
+                f"| {item['id']} | {item['title']} | {item['estimated_effort'] or 'Medium'} | {item['category']} | {item['severity']} |"
+            )
 
         return "\n".join(lines)
 
-    def _generate_html_dashboard(self,
-                               basic_report: str,
-                               metrics: Dict[str, Any],
-                               include_charts: bool) -> str:
+    def _generate_html_dashboard(
+        self, basic_report: str, metrics: Dict[str, Any], include_charts: bool
+    ) -> str:
         """Generate an HTML dashboard (simplified version)."""
         # This would be a more elaborate HTML version
         # For now, we'll just convert the markdown to basic HTML
-        markdown_dashboard = self._generate_markdown_dashboard(basic_report, metrics, include_charts)
+        markdown_dashboard = self._generate_markdown_dashboard(
+            basic_report, metrics, include_charts
+        )
 
         # Basic conversion to HTML (in a real implementation, use a proper markdown to HTML converter)
         html_lines = [
@@ -197,7 +203,7 @@ class TechnicalDebtDashboard:
         ]
 
         # Basic conversion of markdown headings and content
-        for line in markdown_dashboard.split('\n'):
+        for line in markdown_dashboard.split("\n"):
             if line.startswith("# "):
                 html_lines.append(f"<h1>{line[2:]}</h1>")
             elif line.startswith("## "):
@@ -208,7 +214,9 @@ class TechnicalDebtDashboard:
                 # Extract image info
                 img_text = line[2:].split("](")[0]
                 img_path = line.split("](")[1][:-1]
-                html_lines.append(f'<img src="{img_path}" alt="{img_text}" style="max-width:800px;"/>')
+                html_lines.append(
+                    f'<img src="{img_path}" alt="{img_text}" style="max-width:800px;"/>'
+                )
             elif line.startswith("| "):
                 # This is a table row, already handled in markdown
                 html_lines.append(line)
@@ -237,19 +245,16 @@ class TechnicalDebtDashboard:
         if total_items == 0:
             return 0.0
 
-        severity_weights = {
-            "critical": 10,
-            "high": 7,
-            "medium": 4,
-            "low": 1
-        }
+        severity_weights = {"critical": 10, "high": 7, "medium": 4, "low": 1}
 
         by_severity = metrics.get("by_severity", {})
         severity_score = sum(
             count * severity_weights[severity]
             for severity, count in by_severity.items()
             if severity in severity_weights
-        ) / (total_items * 10)  # Normalize to 0-1
+        ) / (
+            total_items * 10
+        )  # Normalize to 0-1
         severity_score = min(severity_score * 10, 10)  # Scale to 0-10
 
         # Debt density score (0-10)
@@ -301,7 +306,7 @@ class TechnicalDebtDashboard:
             DebtSeverity.CRITICAL: 1.0,
             DebtSeverity.HIGH: 0.8,
             DebtSeverity.MEDIUM: 0.5,
-            DebtSeverity.LOW: 0.2
+            DebtSeverity.LOW: 0.2,
         }
 
         # Category impact weights (especially important for ML projects)
@@ -317,7 +322,7 @@ class TechnicalDebtDashboard:
             DebtCategory.DEPLOYMENT: 0.3,
             DebtCategory.DEPENDENCY: 0.3,
             DebtCategory.ACCESSIBILITY: 0.2,
-            DebtCategory.MONITORING: 0.2
+            DebtCategory.MONITORING: 0.2,
         }
 
         # Calculate priority scores
@@ -350,17 +355,29 @@ class TechnicalDebtDashboard:
             priority_score = (0.4 * severity_weight) + (0.3 * category_weight) + (0.3 * age_weight)
 
             # Format the item for output
-            prioritized.append({
-                "id": item.id,
-                "title": item.title,
-                "priority_score": priority_score * 10,  # Scale to 0-10
-                "severity": item.severity.value if isinstance(item.severity, DebtSeverity) else item.severity,
-                "category": item.category.value if isinstance(item.category, DebtCategory) else item.category,
-                "status": item.status.value if isinstance(item.status, DebtStatus) else item.status,
-                "created_at": item.created_at,
-                "description": item.description,
-                "estimated_effort": item.estimated_effort
-            })
+            prioritized.append(
+                {
+                    "id": item.id,
+                    "title": item.title,
+                    "priority_score": priority_score * 10,  # Scale to 0-10
+                    "severity": (
+                        item.severity.value
+                        if isinstance(item.severity, DebtSeverity)
+                        else item.severity
+                    ),
+                    "category": (
+                        item.category.value
+                        if isinstance(item.category, DebtCategory)
+                        else item.category
+                    ),
+                    "status": (
+                        item.status.value if isinstance(item.status, DebtStatus) else item.status
+                    ),
+                    "created_at": item.created_at,
+                    "description": item.description,
+                    "estimated_effort": item.estimated_effort,
+                }
+            )
 
         # Sort by priority score (descending)
         return sorted(prioritized, key=lambda x: x["priority_score"], reverse=True)
@@ -383,7 +400,9 @@ class TechnicalDebtDashboard:
             severity_labels = list(severity_data.keys())
             severity_values = list(severity_data.values())
 
-            plt.bar(severity_labels, severity_values, color=['#d62728', '#ff7f0e', '#ffbb78', '#98df8a'])
+            plt.bar(
+                severity_labels, severity_values, color=["#d62728", "#ff7f0e", "#ffbb78", "#98df8a"]
+            )
             plt.title("Technical Debt by Severity")
             plt.xlabel("Severity")
             plt.ylabel("Number of Items")
@@ -402,7 +421,7 @@ class TechnicalDebtDashboard:
             category_labels = list(category_data.keys())
             category_values = list(category_data.values())
 
-            plt.barh(category_labels, category_values, color='#2ca02c')
+            plt.barh(category_labels, category_values, color="#2ca02c")
             plt.title("Technical Debt by Category")
             plt.xlabel("Number of Items")
             plt.ylabel("Category")
@@ -421,9 +440,9 @@ class TechnicalDebtDashboard:
             ml_labels = list(ml_data.keys())
             ml_values = list(ml_data.values())
 
-            plt.pie(ml_values, labels=ml_labels, autopct='%1.1f%%', startangle=90)
+            plt.pie(ml_values, labels=ml_labels, autopct="%1.1f%%", startangle=90)
             plt.title("ML-Specific Technical Debt Breakdown")
-            plt.axis('equal')
+            plt.axis("equal")
             plt.tight_layout()
 
             chart_path = os.path.join(charts_dir, f"ml_debt_chart_{self.date_str}.png")
@@ -455,7 +474,9 @@ class TechnicalDebtDashboard:
         ml_debt_count = metrics.get("by_category", {}).get("ml_specific", 0)
         if ml_debt_count > 0:
             ml_subcategories = metrics.get("by_ml_subcategory", {})
-            highest_subcategory = max(ml_subcategories.items(), key=lambda x: x[1]) if ml_subcategories else (None, 0)
+            highest_subcategory = (
+                max(ml_subcategories.items(), key=lambda x: x[1]) if ml_subcategories else (None, 0)
+            )
 
             if highest_subcategory[0]:
                 recommendations.append(
@@ -503,9 +524,10 @@ class TechnicalDebtDashboard:
 
         # Add a couple of quick wins (medium or low severity items)
         quick_wins = [
-            item for item in prioritized_items[3:]
-            if item["severity"] in ["medium", "low"] and
-               item["estimated_effort"] in ["low", "medium", None]
+            item
+            for item in prioritized_items[3:]
+            if item["severity"] in ["medium", "low"]
+            and item["estimated_effort"] in ["low", "medium", None]
         ]
 
         sprint_items.extend(quick_wins[:2])
@@ -517,16 +539,17 @@ def main():
     """Main function."""
     parser = argparse.ArgumentParser(description="Generate technical debt dashboard.")
     parser.add_argument("--output-dir", help="Directory to store the dashboard output")
-    parser.add_argument("--format", choices=["markdown", "html"], default="markdown", help="Output format")
+    parser.add_argument(
+        "--format", choices=["markdown", "html"], default="markdown", help="Output format"
+    )
     parser.add_argument("--include-resolved", action="store_true", help="Include resolved items")
     args = parser.parse_args()
 
     dashboard = TechnicalDebtDashboard(output_dir=args.output_dir)
     dashboard.generate_dashboard(
-        include_charts=True,
-        output_format=args.format,
-        include_resolved=args.include_resolved
+        include_charts=True, output_format=args.format, include_resolved=args.include_resolved
     )
+
 
 if __name__ == "__main__":
     main()

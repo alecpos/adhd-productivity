@@ -16,7 +16,7 @@ from app.schemas.scheduling_schema import (
     TimeBlockInput,
     OptimizeScheduleRequest,
     ScheduleParams,
-    ScheduleOptimizer
+    ScheduleOptimizer,
 )
 from app.services.schedule_optimizer_service import ScheduleOptimizerService
 from app.services.service_factory_service import ServiceFactory

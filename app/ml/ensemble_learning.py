@@ -15,17 +15,14 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 
+
 class EnsembleModel:
     def __init__(self, n_estimators: int = 100, max_depth: int = 10):
         self.rf_model = RandomForestClassifier(
-            n_estimators=n_estimators,
-            max_depth=max_depth,
-            random_state=RANDOM_SEED
+            n_estimators=n_estimators, max_depth=max_depth, random_state=RANDOM_SEED
         )
         self.gb_model = GradientBoostingClassifier(
-            n_estimators=n_estimators,
-            max_depth=max_depth,
-            random_state=RANDOM_SEED
+            n_estimators=n_estimators, max_depth=max_depth, random_state=RANDOM_SEED
         )
 
 

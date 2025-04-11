@@ -13,19 +13,20 @@ import time
 from typing import Dict, Any
 
 # Add the parent directory to the path to allow importing app modules
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()],
 )
 logger = logging.getLogger("resilience_test")
 
 # Import decorators from BaseService
 from app.services.base_service import OPEN, CLOSED, HALF_OPEN
 from app.services.base_service import CircuitBreaker
+
 
 class SimpleService:
     """Simple service to test resilience patterns."""
@@ -36,9 +37,7 @@ class SimpleService:
         self.failure_count = 0
         # Create circuit breaker instance directly for testing
         self.test_circuit = CircuitBreaker(
-            name="test_circuit",
-            failure_threshold=3,
-            recovery_timeout=3
+            name="test_circuit", failure_threshold=3, recovery_timeout=3
         )
 
     # Don't use the decorator from BaseService, implement directly
@@ -96,7 +95,9 @@ class SimpleService:
 
     async def test_bulkhead(self, should_fail=False, delay=0.5):
         """Test method for bulkhead pattern."""
-        self.logger.info(f"test_bulkhead inner method called with should_fail={should_fail}, delay={delay}")
+        self.logger.info(
+            f"test_bulkhead inner method called with should_fail={should_fail}, delay={delay}"
+        )
 
         # Simulate work
         await asyncio.sleep(delay)
@@ -113,10 +114,7 @@ class SimpleService:
         self.logger.info(f"Calling with bulkhead, timeout={timeout}")
         try:
             result = await self.bulkhead(
-                self.test_bulkhead,
-                should_fail=should_fail,
-                delay=0.5,
-                timeout=timeout
+                self.test_bulkhead, should_fail=should_fail, delay=0.5, timeout=timeout
             )
             self.logger.info("Bulkhead call succeeded")
             return result
@@ -134,11 +132,10 @@ class SimpleService:
             "status": "healthy",
             "details": {
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "circuits": {
-                    "test_circuit": self.test_circuit.state  # Get actual circuit state
-                }
-            }
+                "circuits": {"test_circuit": self.test_circuit.state},  # Get actual circuit state
+            },
         }
+
 
 async def test_retry_pattern():
     """Test the retry pattern."""
@@ -156,6 +153,7 @@ async def test_retry_pattern():
     except Exception as e:
         logger.error(f"❌ Retry pattern test failed: {str(e)}")
         return False
+
 
 async def test_circuit_breaker_pattern():
     """Test the circuit breaker pattern."""
@@ -202,12 +200,15 @@ async def test_circuit_breaker_pattern():
             logger.info("✅ Circuit breaker opened successfully")
             return True
         else:
-            logger.error(f"❌ Circuit breaker did not open as expected (state: {service.test_circuit.state})")
+            logger.error(
+                f"❌ Circuit breaker did not open as expected (state: {service.test_circuit.state})"
+            )
             return False
 
     except Exception as e:
         logger.error(f"❌ Circuit breaker test failed unexpectedly: {str(e)}")
         return False
+
 
 # The bulkhead test is working well, so we'll keep it as is
 async def test_bulkhead_pattern():
@@ -238,6 +239,7 @@ async def test_bulkhead_pattern():
         logger.error(f"❌ Bulkhead pattern test failed: {str(e)}")
         return False
 
+
 async def test_health_check():
     """Test the health check implementation."""
     logger.info("=== Testing Health Check ===")
@@ -265,15 +267,17 @@ async def test_health_check():
         health2 = await service.health_check()
         logger.info(f"Health after circuit open: {health2}")
         # The real check - does the health report match the actual circuit state?
-        assert health2["details"]["circuits"]["test_circuit"] == service.test_circuit.state, \
-               f"Circuit state mismatch: reported {health2['details']['circuits']['test_circuit']} " \
-               f"but actual is {service.test_circuit.state}"
+        assert health2["details"]["circuits"]["test_circuit"] == service.test_circuit.state, (
+            f"Circuit state mismatch: reported {health2['details']['circuits']['test_circuit']} "
+            f"but actual is {service.test_circuit.state}"
+        )
 
         logger.info("✅ Health check works correctly")
         return True
     except Exception as e:
         logger.error(f"❌ Health check test failed: {str(e)}")
         return False
+
 
 async def run_tests():
     """Run all tests."""
@@ -297,6 +301,7 @@ async def run_tests():
     logger.info(f"\nOverall status: {'PASSED' if all_passed else 'FAILED'}")
 
     return all_passed
+
 
 if __name__ == "__main__":
     asyncio.run(run_tests())

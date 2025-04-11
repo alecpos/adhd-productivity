@@ -10,12 +10,15 @@ def get_new_name(filepath: str) -> str:
     basename = os.path.basename(filepath)
 
     # Skip files that should be ignored
-    if any(pattern in filepath for pattern in [
-        "__init__.py",
-        "__pycache__",
-        ".pyc",
-        "conftest.py",  # Special pytest file
-    ]):
+    if any(
+        pattern in filepath
+        for pattern in [
+            "__init__.py",
+            "__pycache__",
+            ".pyc",
+            "conftest.py",  # Special pytest file
+        ]
+    ):
         return None
 
     # Models
@@ -59,7 +62,7 @@ def main():
     renames = []
     for root, _, files in os.walk("app"):
         for file in files:
-            if file.endswith('.py'):
+            if file.endswith(".py"):
                 filepath = os.path.join(root, file)
                 new_name = get_new_name(filepath)
                 if new_name:
@@ -76,7 +79,7 @@ def main():
 
     # Confirm with user
     response = input("\nProceed with renaming? [y/N] ")
-    if response.lower() != 'y':
+    if response.lower() != "y":
         print("Aborting.")
         return 1
 

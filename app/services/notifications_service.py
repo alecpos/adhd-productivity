@@ -4,6 +4,7 @@ Notifications Service for ADHD Calendar.
 This service provides functionality to send notifications to users,
 including task reminders, energy updates, and commitment reminders.
 """
+
 import logging
 from datetime import datetime
 from typing import Dict, Any, Optional, List
@@ -27,7 +28,7 @@ class NotificationsService:
         title: str,
         message: str,
         notification_type: str = "general",
-        data: Optional[Dict[str, Any]] = None
+        data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Send a notification to a user.
@@ -45,8 +46,7 @@ class NotificationsService:
         # In a real implementation, this would send to FCM, email, etc.
         # For now, just log the notification
         logger.info(
-            f"Notification sent to user {user_id}: "
-            f"[{notification_type}] {title} - {message}"
+            f"Notification sent to user {user_id}: " f"[{notification_type}] {title} - {message}"
         )
 
         if data:
@@ -57,14 +57,11 @@ class NotificationsService:
             "title": title,
             "message": message,
             "type": notification_type,
-            "status": "sent"
+            "status": "sent",
         }
 
     def send_task_reminder(
-        self,
-        user_id: UUID,
-        task_title: str,
-        due_time: datetime
+        self, user_id: UUID, task_title: str, due_time: datetime
     ) -> Dict[str, Any]:
         """
         Send a reminder about an upcoming task.
@@ -85,14 +82,10 @@ class NotificationsService:
             title=title,
             message=message,
             notification_type="task_reminder",
-            data={"task_title": task_title, "due_time": due_time.isoformat()}
+            data={"task_title": task_title, "due_time": due_time.isoformat()},
         )
 
-    def notify_upcoming_deadlines(
-        self,
-        user_id: UUID,
-        tasks: List[Any]
-    ) -> List[Dict[str, Any]]:
+    def notify_upcoming_deadlines(self, user_id: UUID, tasks: List[Any]) -> List[Dict[str, Any]]:
         """
         Notify users of tasks nearing their deadlines.
 
@@ -115,7 +108,7 @@ class NotificationsService:
                     title=title,
                     message=message,
                     notification_type="deadline_alert",
-                    data={"task_id": task.id, "task_title": task.title}
+                    data={"task_id": task.id, "task_title": task.title},
                 )
 
                 notifications.append(notification)
@@ -123,10 +116,7 @@ class NotificationsService:
         return notifications
 
     def notify_energy_peak(
-        self,
-        user_id: UUID,
-        energy_level: str = "high",
-        duration_minutes: int = 60
+        self, user_id: UUID, energy_level: str = "high", duration_minutes: int = 60
     ) -> Dict[str, Any]:
         """
         Notify the user during their peak productivity hours.
@@ -147,15 +137,11 @@ class NotificationsService:
             title=title,
             message=message,
             notification_type="energy_notification",
-            data={"energy_level": energy_level, "duration_minutes": duration_minutes}
+            data={"energy_level": energy_level, "duration_minutes": duration_minutes},
         )
 
     def send_commitment_reminder(
-        self,
-        user_id: UUID,
-        commitment_id: int,
-        commitment_text: str,
-        priority: str = "medium"
+        self, user_id: UUID, commitment_id: int, commitment_text: str, priority: str = "medium"
     ) -> Dict[str, Any]:
         """
         Send a commitment reminder notification.
@@ -177,5 +163,5 @@ class NotificationsService:
             title=title,
             message=message,
             notification_type="commitment_reminder",
-            data={"commitment_id": commitment_id, "priority": priority}
+            data={"commitment_id": commitment_id, "priority": priority},
         )

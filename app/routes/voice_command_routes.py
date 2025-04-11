@@ -14,10 +14,13 @@ from app.schemas.voice_command_schema import (
     TaskCreationCommandSchema,
     ReminderCreationCommandSchema,
     VoiceCommandLogSchema,
-    VoicePreferencesSchema
+    VoicePreferencesSchema,
 )
 
-class VoiceCommandRouter(BaseRouter[VoiceCommandModel, VoiceCommandRequestSchema, VoiceCommandResponseSchema]):
+
+class VoiceCommandRouter(
+    BaseRouter[VoiceCommandModel, VoiceCommandRequestSchema, VoiceCommandResponseSchema]
+):
     """Voice command router."""
 
     def __init__(self):

@@ -18,8 +18,10 @@ from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
+
 class NodeType:
     """Types of nodes in the knowledge graph."""
+
     DOCUMENT = "document"
     CONCEPT = "concept"
     MODEL = "model"
@@ -35,6 +37,7 @@ class NodeType:
 
 class EdgeType:
     """Types of edges (relationships) in the knowledge graph."""
+
     REFERENCES = "references"
     IMPLEMENTS = "implements"
     EXPLAINS = "explains"
@@ -62,7 +65,7 @@ class DocumentationNode:
         metadata: Optional[Dict[str, Any]] = None,
         content_summary: Optional[str] = None,
         created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        updated_at: Optional[datetime] = None,
     ):
         """Initialize a documentation node."""
         self.id = id
@@ -108,7 +111,7 @@ class DocumentationNode:
             metadata=data.get("metadata", {}),
             content_summary=data.get("content_summary"),
             created_at=created_at,
-            updated_at=updated_at
+            updated_at=updated_at,
         )
 
 
@@ -122,7 +125,7 @@ class DocumentationEdge:
         edge_type: str,
         weight: float = 1.0,
         metadata: Optional[Dict[str, Any]] = None,
-        created_at: Optional[datetime] = None
+        created_at: Optional[datetime] = None,
     ):
         """Initialize a documentation edge."""
         self.source_id = source_id
@@ -155,7 +158,7 @@ class DocumentationEdge:
             edge_type=data["edge_type"],
             weight=data.get("weight", 1.0),
             metadata=data.get("metadata", {}),
-            created_at=created_at
+            created_at=created_at,
         )
 
     def __hash__(self):
@@ -167,9 +170,9 @@ class DocumentationEdge:
         if not isinstance(other, DocumentationEdge):
             return False
         return (
-            self.source_id == other.source_id and
-            self.target_id == other.target_id and
-            self.edge_type == other.edge_type
+            self.source_id == other.source_id
+            and self.target_id == other.target_id
+            and self.edge_type == other.edge_type
         )
 
 
@@ -180,7 +183,7 @@ class DocumentationKnowledgeGraph:
         """Initialize the knowledge graph."""
         self.db_path = db_path or os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-            "docs_knowledge_graph.json"
+            "docs_knowledge_graph.json",
         )
         self.nodes: Dict[str, DocumentationNode] = {}
         self.edges: Set[DocumentationEdge] = set()
@@ -213,7 +216,9 @@ class DocumentationKnowledgeGraph:
                 self.edges_by_target[edge.target_id].append(edge)
                 self.edges_by_type[edge.edge_type].append(edge)
 
-            logger.info(f"Loaded knowledge graph with {len(self.nodes)} nodes and {len(self.edges)} edges")
+            logger.info(
+                f"Loaded knowledge graph with {len(self.nodes)} nodes and {len(self.edges)} edges"
+            )
         except Exception as e:
             logger.error(f"Error loading knowledge graph: {e}")
 
@@ -223,7 +228,7 @@ class DocumentationKnowledgeGraph:
             data = {
                 "last_updated": datetime.now().isoformat(),
                 "nodes": [node.to_dict() for node in self.nodes.values()],
-                "edges": [edge.to_dict() for edge in self.edges]
+                "edges": [edge.to_dict() for edge in self.edges],
             }
 
             # Ensure directory exists
@@ -232,7 +237,9 @@ class DocumentationKnowledgeGraph:
             with open(self.db_path, "w") as f:
                 json.dump(data, f, indent=2)
 
-            logger.info(f"Saved knowledge graph with {len(self.nodes)} nodes and {len(self.edges)} edges")
+            logger.info(
+                f"Saved knowledge graph with {len(self.nodes)} nodes and {len(self.edges)} edges"
+            )
         except Exception as e:
             logger.error(f"Error saving knowledge graph: {e}")
 
@@ -270,8 +277,7 @@ class DocumentationKnowledgeGraph:
 
         # Remove edges connected to this node
         self.edges = {
-            edge for edge in self.edges
-            if edge.source_id != node_id and edge.target_id != node_id
+            edge for edge in self.edges if edge.source_id != node_id and edge.target_id != node_id
         }
 
         # Update edge indexes
@@ -284,7 +290,8 @@ class DocumentationKnowledgeGraph:
         # Update edge_by_type index
         for edge_type in self.edges_by_type:
             self.edges_by_type[edge_type] = [
-                edge for edge in self.edges_by_type[edge_type]
+                edge
+                for edge in self.edges_by_type[edge_type]
                 if edge.source_id != node_id and edge.target_id != node_id
             ]
 
@@ -313,7 +320,11 @@ class DocumentationKnowledgeGraph:
         # Find the edge
         edge_to_remove = None
         for edge in self.edges:
-            if edge.source_id == source_id and edge.target_id == target_id and edge.edge_type == edge_type:
+            if (
+                edge.source_id == source_id
+                and edge.target_id == target_id
+                and edge.edge_type == edge_type
+            ):
                 edge_to_remove = edge
                 break
 
@@ -323,16 +334,13 @@ class DocumentationKnowledgeGraph:
         # Remove the edge
         self.edges.remove(edge_to_remove)
         self.edges_by_source[source_id] = [
-            edge for edge in self.edges_by_source[source_id]
-            if edge != edge_to_remove
+            edge for edge in self.edges_by_source[source_id] if edge != edge_to_remove
         ]
         self.edges_by_target[target_id] = [
-            edge for edge in self.edges_by_target[target_id]
-            if edge != edge_to_remove
+            edge for edge in self.edges_by_target[target_id] if edge != edge_to_remove
         ]
         self.edges_by_type[edge_type] = [
-            edge for edge in self.edges_by_type[edge_type]
-            if edge != edge_to_remove
+            edge for edge in self.edges_by_type[edge_type] if edge != edge_to_remove
         ]
 
         self._save_graph()
@@ -350,7 +358,9 @@ class DocumentationKnowledgeGraph:
         """Get all edges of a specific type."""
         return self.edges_by_type.get(edge_type, [])
 
-    def get_neighbors(self, node_id: str, edge_types: Optional[List[str]] = None) -> List[Tuple[DocumentationNode, DocumentationEdge]]:
+    def get_neighbors(
+        self, node_id: str, edge_types: Optional[List[str]] = None
+    ) -> List[Tuple[DocumentationNode, DocumentationEdge]]:
         """Get all neighbors of a node, optionally filtered by edge types."""
         outgoing_edges = self.get_outgoing_edges(node_id)
         if edge_types:
@@ -364,7 +374,9 @@ class DocumentationKnowledgeGraph:
 
         return neighbors
 
-    def get_related_nodes(self, node_id: str, max_depth: int = 1) -> Dict[str, List[Tuple[DocumentationNode, DocumentationEdge, int]]]:
+    def get_related_nodes(
+        self, node_id: str, max_depth: int = 1
+    ) -> Dict[str, List[Tuple[DocumentationNode, DocumentationEdge, int]]]:
         """Get all nodes related to a node up to a certain depth."""
         if node_id not in self.nodes:
             return {}
@@ -372,7 +384,9 @@ class DocumentationKnowledgeGraph:
         # BFS to find related nodes
         queue = [(node_id, 0)]  # (node_id, depth)
         visited = set([node_id])
-        relations: Dict[str, List[Tuple[DocumentationNode, DocumentationEdge, int]]] = defaultdict(list)
+        relations: Dict[str, List[Tuple[DocumentationNode, DocumentationEdge, int]]] = defaultdict(
+            list
+        )
 
         while queue:
             current_id, depth = queue.pop(0)
@@ -406,7 +420,7 @@ class DocumentationKnowledgeGraph:
         self,
         query: Optional[str] = None,
         node_types: Optional[List[str]] = None,
-        tags: Optional[List[str]] = None
+        tags: Optional[List[str]] = None,
     ) -> List[DocumentationNode]:
         """Search for nodes by text, type, or tags."""
         results = list(self.nodes.values())
@@ -417,20 +431,18 @@ class DocumentationKnowledgeGraph:
 
         # Filter by tags
         if tags:
-            results = [
-                node for node in results
-                if any(tag in node.tags for tag in tags)
-            ]
+            results = [node for node in results if any(tag in node.tags for tag in tags)]
 
         # Filter by query text
         if query:
             query = query.lower()
             results = [
-                node for node in results
+                node
+                for node in results
                 if (
-                    query in node.name.lower() or
-                    (node.content_summary and query in node.content_summary.lower()) or
-                    any(query in tag.lower() for tag in node.tags)
+                    query in node.name.lower()
+                    or (node.content_summary and query in node.content_summary.lower())
+                    or any(query in tag.lower() for tag in node.tags)
                 )
             ]
 
@@ -460,10 +472,14 @@ class DocumentationKnowledgeGraph:
                 metadata["title"] = title_match.group(1).strip()
 
             # Extract tags (look for "Tags:" or "Keywords:" sections)
-            tags_match = re.search(r"(?:Tags|Keywords):\s*(.+?)(?:\n\n|\Z)", content, re.MULTILINE | re.DOTALL)
+            tags_match = re.search(
+                r"(?:Tags|Keywords):\s*(.+?)(?:\n\n|\Z)", content, re.MULTILINE | re.DOTALL
+            )
             if tags_match:
                 tags_text = tags_match.group(1).strip()
-                metadata["tags"] = [tag.strip() for tag in re.split(r"[,;]", tags_text) if tag.strip()]
+                metadata["tags"] = [
+                    tag.strip() for tag in re.split(r"[,;]", tags_text) if tag.strip()
+                ]
 
             # Extract epic information
             epic_match = re.search(r"Epic(?:\s+|:|-)([0-9]+)", content, re.IGNORECASE)
@@ -481,7 +497,9 @@ class DocumentationKnowledgeGraph:
                 metadata["concepts"] = list(set(concepts))
 
             # Extract model references
-            model_refs = re.findall(r"(?:Model|model|MODEL):\s*(`?)([A-Za-z0-9_]+(?:Model|model))(`?)", content)
+            model_refs = re.findall(
+                r"(?:Model|model|MODEL):\s*(`?)([A-Za-z0-9_]+(?:Model|model))(`?)", content
+            )
             if model_refs:
                 metadata["models"] = [ref[1] for ref in model_refs]
 
@@ -528,7 +546,10 @@ class DocumentationKnowledgeGraph:
                     node_type = NodeType.EPIC
 
                 # Create or update the node
-                title = metadata.get("title") or os.path.basename(file_path).replace(".md", "").replace("_", " ").title()
+                title = (
+                    metadata.get("title")
+                    or os.path.basename(file_path).replace(".md", "").replace("_", " ").title()
+                )
 
                 existing_node = self.get_node(node_id)
                 if existing_node:
@@ -543,7 +564,7 @@ class DocumentationKnowledgeGraph:
                             "concepts": metadata.get("concepts", []),
                             "models": metadata.get("models", []),
                         },
-                        updated_at=datetime.now()
+                        updated_at=datetime.now(),
                     )
                 else:
                     node = DocumentationNode(
@@ -558,7 +579,7 @@ class DocumentationKnowledgeGraph:
                             "related_files": metadata.get("related_files", []),
                             "concepts": metadata.get("concepts", []),
                             "models": metadata.get("models", []),
-                        }
+                        },
                     )
                     self.add_node(node)
 
@@ -570,15 +591,13 @@ class DocumentationKnowledgeGraph:
                             id=concept_id,
                             name=concept,
                             node_type=NodeType.CONCEPT,
-                            tags=["concept"]
+                            tags=["concept"],
                         )
                         self.add_node(concept_node)
 
                     # Add edge from document to concept
                     edge = DocumentationEdge(
-                        source_id=node_id,
-                        target_id=concept_id,
-                        edge_type=EdgeType.REFERENCES
+                        source_id=node_id, target_id=concept_id, edge_type=EdgeType.REFERENCES
                     )
                     try:
                         self.add_edge(edge)
@@ -591,18 +610,13 @@ class DocumentationKnowledgeGraph:
                     model_id = f"model_{model.lower()}"
                     if model_id not in self.nodes:
                         model_node = DocumentationNode(
-                            id=model_id,
-                            name=model,
-                            node_type=NodeType.MODEL,
-                            tags=["model"]
+                            id=model_id, name=model, node_type=NodeType.MODEL, tags=["model"]
                         )
                         self.add_node(model_node)
 
                     # Add edge from document to model
                     edge = DocumentationEdge(
-                        source_id=node_id,
-                        target_id=model_id,
-                        edge_type=EdgeType.DOCUMENTS
+                        source_id=node_id, target_id=model_id, edge_type=EdgeType.DOCUMENTS
                     )
                     try:
                         self.add_edge(edge)
@@ -618,15 +632,13 @@ class DocumentationKnowledgeGraph:
                             id=epic_id,
                             name=metadata["epic"],
                             node_type=NodeType.EPIC,
-                            tags=["epic"]
+                            tags=["epic"],
                         )
                         self.add_node(epic_node)
 
                     # Add edge from document to epic
                     edge = DocumentationEdge(
-                        source_id=node_id,
-                        target_id=epic_id,
-                        edge_type=EdgeType.PART_OF
+                        source_id=node_id, target_id=epic_id, edge_type=EdgeType.PART_OF
                     )
                     try:
                         self.add_edge(edge)
@@ -654,12 +666,13 @@ class DocumentationKnowledgeGraph:
                     if other_id == node_id:
                         continue
 
-                    if other_node.file_path and os.path.basename(other_node.file_path) == related_file:
+                    if (
+                        other_node.file_path
+                        and os.path.basename(other_node.file_path) == related_file
+                    ):
                         # Create a relationship
                         edge = DocumentationEdge(
-                            source_id=node_id,
-                            target_id=other_id,
-                            edge_type=EdgeType.REFERENCES
+                            source_id=node_id, target_id=other_id, edge_type=EdgeType.REFERENCES
                         )
                         try:
                             self.add_edge(edge)
@@ -683,7 +696,8 @@ class DocumentationKnowledgeGraph:
                             source_id=node_id,
                             target_id=other_id,
                             edge_type=EdgeType.RELATED_TO,
-                            weight=len(common_concepts) / max(len(node_concepts), len(other_concepts))
+                            weight=len(common_concepts)
+                            / max(len(node_concepts), len(other_concepts)),
                         )
                         try:
                             self.add_edge(edge)
@@ -705,10 +719,7 @@ class DocumentationKnowledgeGraph:
             # Add nodes
             for node_id, node in self.nodes.items():
                 # Define node attributes based on node type
-                attrs = {
-                    "label": node.name,
-                    "shape": "box"
-                }
+                attrs = {"label": node.name, "shape": "box"}
 
                 if node.node_type == NodeType.DOCUMENT:
                     attrs["color"] = "blue"
@@ -742,9 +753,7 @@ class DocumentationKnowledgeGraph:
             # Add edges
             for edge in self.edges:
                 # Define edge attributes based on edge type
-                attrs = {
-                    "label": edge.edge_type
-                }
+                attrs = {"label": edge.edge_type}
 
                 if edge.edge_type == EdgeType.REFERENCES:
                     attrs["color"] = "blue"
@@ -790,7 +799,9 @@ class DocumentationKnowledgeGraph:
                     node_types[node.node_type] += 1
 
                 f.write("### Node Types\n\n")
-                for node_type, count in sorted(node_types.items(), key=lambda x: x[1], reverse=True):
+                for node_type, count in sorted(
+                    node_types.items(), key=lambda x: x[1], reverse=True
+                ):
                     f.write(f"- **{node_type}**: {count}\n")
                 f.write("\n")
 
@@ -802,14 +813,18 @@ class DocumentationKnowledgeGraph:
                     edge_types[edge.edge_type] += 1
 
                 f.write("### Edge Types\n\n")
-                for edge_type, count in sorted(edge_types.items(), key=lambda x: x[1], reverse=True):
+                for edge_type, count in sorted(
+                    edge_types.items(), key=lambda x: x[1], reverse=True
+                ):
                     f.write(f"- **{edge_type}**: {count}\n")
                 f.write("\n")
 
                 # Document sections
                 if NodeType.DOCUMENT in node_types:
                     f.write("## Documents\n\n")
-                    documents = [node for node in self.nodes.values() if node.node_type == NodeType.DOCUMENT]
+                    documents = [
+                        node for node in self.nodes.values() if node.node_type == NodeType.DOCUMENT
+                    ]
                     for doc in sorted(documents, key=lambda x: x.name):
                         f.write(f"### {doc.name}\n\n")
 
@@ -829,13 +844,17 @@ class DocumentationKnowledgeGraph:
                             for edge in outgoing:
                                 target = self.get_node(edge.target_id)
                                 if target:
-                                    f.write(f"- {edge.edge_type.replace('_', ' ').title()} [{target.name}]\n")
+                                    f.write(
+                                        f"- {edge.edge_type.replace('_', ' ').title()} [{target.name}]\n"
+                                    )
                             f.write("\n")
 
                 # Concept sections
                 if NodeType.CONCEPT in node_types:
                     f.write("## Concepts\n\n")
-                    concepts = [node for node in self.nodes.values() if node.node_type == NodeType.CONCEPT]
+                    concepts = [
+                        node for node in self.nodes.values() if node.node_type == NodeType.CONCEPT
+                    ]
                     for concept in sorted(concepts, key=lambda x: x.name):
                         f.write(f"### {concept.name}\n\n")
 
@@ -846,13 +865,17 @@ class DocumentationKnowledgeGraph:
                             for edge in incoming:
                                 source = self.get_node(edge.source_id)
                                 if source and source.node_type == NodeType.DOCUMENT:
-                                    f.write(f"- [{source.name}]({os.path.relpath(source.file_path) if source.file_path else '#'})\n")
+                                    f.write(
+                                        f"- [{source.name}]({os.path.relpath(source.file_path) if source.file_path else '#'})\n"
+                                    )
                             f.write("\n")
 
                 # Epic sections
                 if NodeType.EPIC in node_types:
                     f.write("## Epics\n\n")
-                    epics = [node for node in self.nodes.values() if node.node_type == NodeType.EPIC]
+                    epics = [
+                        node for node in self.nodes.values() if node.node_type == NodeType.EPIC
+                    ]
                     for epic in sorted(epics, key=lambda x: x.name):
                         f.write(f"### {epic.name}\n\n")
 
@@ -867,7 +890,9 @@ class DocumentationKnowledgeGraph:
                         if related_docs:
                             f.write("**Documents**:\n\n")
                             for doc in sorted(related_docs, key=lambda x: x.name):
-                                f.write(f"- [{doc.name}]({os.path.relpath(doc.file_path) if doc.file_path else '#'})\n")
+                                f.write(
+                                    f"- [{doc.name}]({os.path.relpath(doc.file_path) if doc.file_path else '#'})\n"
+                                )
                             f.write("\n")
 
                 logger.info(f"Generated markdown report at {output_file}")
@@ -878,6 +903,7 @@ class DocumentationKnowledgeGraph:
 
 # Create a singleton instance
 knowledge_graph = DocumentationKnowledgeGraph()
+
 
 def get_knowledge_graph() -> DocumentationKnowledgeGraph:
     """Get the singleton instance of the knowledge graph."""

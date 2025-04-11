@@ -34,7 +34,7 @@ class AdversarialDebiasingModel(nn.Module):
         protected_dim: int,
         adversary_hidden_dim: int = 64,
         lambda_param: float = 1.0,
-        dropout: float = 0.2
+        dropout: float = 0.2,
     ):
         """
         Initialize the adversarial debiasing model.
@@ -64,7 +64,7 @@ class AdversarialDebiasingModel(nn.Module):
             nn.Linear(hidden_dim, hidden_dim // 2),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_dim // 2, output_dim)
+            nn.Linear(hidden_dim // 2, output_dim),
         )
 
         # Adversarial network to predict protected attributes
@@ -72,7 +72,7 @@ class AdversarialDebiasingModel(nn.Module):
             nn.Linear(output_dim, adversary_hidden_dim),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(adversary_hidden_dim, protected_dim)
+            nn.Linear(adversary_hidden_dim, protected_dim),
         )
 
         # Separate optimizers for predictor and adversary
@@ -81,7 +81,9 @@ class AdversarialDebiasingModel(nn.Module):
 
         # Loss functions
         self.predictor_criterion = nn.MSELoss() if output_dim == 1 else nn.CrossEntropyLoss()
-        self.adversary_criterion = nn.BCEWithLogitsLoss() if protected_dim == 1 else nn.CrossEntropyLoss()
+        self.adversary_criterion = (
+            nn.BCEWithLogitsLoss() if protected_dim == 1 else nn.CrossEntropyLoss()
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -110,7 +112,9 @@ class AdversarialDebiasingModel(nn.Module):
         """
         return self.predictor_criterion(predictions, targets)
 
-    def adversary_loss(self, protected_predictions: torch.Tensor, protected_targets: torch.Tensor) -> torch.Tensor:
+    def adversary_loss(
+        self, protected_predictions: torch.Tensor, protected_targets: torch.Tensor
+    ) -> torch.Tensor:
         """
         Calculate loss for the adversary network.
 
@@ -123,9 +127,12 @@ class AdversarialDebiasingModel(nn.Module):
         """
         return self.adversary_criterion(protected_predictions, protected_targets)
 
-    def training_step(self, batch: Dict[str, torch.Tensor],
-                     predictor_optimizer: torch.optim.Optimizer,
-                     adversary_optimizer: torch.optim.Optimizer) -> Tuple[torch.Tensor, torch.Tensor]:
+    def training_step(
+        self,
+        batch: Dict[str, torch.Tensor],
+        predictor_optimizer: torch.optim.Optimizer,
+        adversary_optimizer: torch.optim.Optimizer,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Perform one training step with adversarial debiasing.
 
@@ -165,7 +172,9 @@ class AdversarialDebiasingModel(nn.Module):
 
         # Negative adversary loss encourages predictor to make it harder for adversary
         pred_loss_2 = self.predictor_criterion(new_predictor_output, targets)
-        fool_loss = -self.lambda_param * self.adversary_criterion(new_adversary_output, protected_attributes)
+        fool_loss = -self.lambda_param * self.adversary_criterion(
+            new_adversary_output, protected_attributes
+        )
         combined_loss = pred_loss_2 + fool_loss
         combined_loss.backward()
         predictor_optimizer.step()
@@ -201,14 +210,20 @@ class AdversarialDebiasingModel(nn.Module):
             }
 
             # Calculate fairness metrics
-            demographics = torch.argmax(protected_attributes, dim=1) if protected_attributes.dim() > 1 else protected_attributes
-            metrics.update(self._calculate_fairness_metrics(predictor_output, targets, demographics))
+            demographics = (
+                torch.argmax(protected_attributes, dim=1)
+                if protected_attributes.dim() > 1
+                else protected_attributes
+            )
+            metrics.update(
+                self._calculate_fairness_metrics(predictor_output, targets, demographics)
+            )
 
         return metrics
 
-    def _calculate_fairness_metrics(self, predictions: torch.Tensor,
-                                   targets: torch.Tensor,
-                                   demographics: torch.Tensor) -> Dict[str, float]:
+    def _calculate_fairness_metrics(
+        self, predictions: torch.Tensor, targets: torch.Tensor, demographics: torch.Tensor
+    ) -> Dict[str, float]:
         """
         Calculate fairness metrics across demographic groups.
 
@@ -221,7 +236,11 @@ class AdversarialDebiasingModel(nn.Module):
             Dictionary with fairness metrics
         """
         # Convert to binary predictions if needed
-        binary_preds = (predictions > 0.5).float() if predictions.dim() == targets.dim() else torch.argmax(predictions, dim=1)
+        binary_preds = (
+            (predictions > 0.5).float()
+            if predictions.dim() == targets.dim()
+            else torch.argmax(predictions, dim=1)
+        )
         binary_targets = (targets > 0.5).float() if targets.dim() > 1 else targets
 
         # Get unique demographic groups
@@ -234,9 +253,11 @@ class AdversarialDebiasingModel(nn.Module):
         # Per-group metrics
         accuracies = []
         for group in unique_groups:
-            group_mask = (demographics == group)
+            group_mask = demographics == group
             if group_mask.sum() > 0:
-                group_acc = (binary_preds[group_mask] == binary_targets[group_mask]).float().mean().item()
+                group_acc = (
+                    (binary_preds[group_mask] == binary_targets[group_mask]).float().mean().item()
+                )
                 accuracies.append(group_acc)
                 group_metrics[f"group_{int(group)}_accuracy"] = group_acc
 
@@ -260,18 +281,21 @@ class AdversarialDebiasingModel(nn.Module):
         Args:
             path: Path to save the model
         """
-        torch.save({
-            "predictor_state": self.predictor.state_dict(),
-            "adversary_state": self.adversary.state_dict(),
-            "config": {
-                "input_dim": self.input_dim,
-                "hidden_dim": self.hidden_dim,
-                "output_dim": self.output_dim,
-                "protected_dim": self.protected_dim,
-                "dropout": self.dropout if hasattr(self, 'dropout') else 0.2,
-                "lambda_param": self.lambda_param
-            }
-        }, path)
+        torch.save(
+            {
+                "predictor_state": self.predictor.state_dict(),
+                "adversary_state": self.adversary.state_dict(),
+                "config": {
+                    "input_dim": self.input_dim,
+                    "hidden_dim": self.hidden_dim,
+                    "output_dim": self.output_dim,
+                    "protected_dim": self.protected_dim,
+                    "dropout": self.dropout if hasattr(self, "dropout") else 0.2,
+                    "lambda_param": self.lambda_param,
+                },
+            },
+            path,
+        )
 
     @classmethod
     def load(cls, path: str, device: str = "cpu") -> "AdversarialDebiasingModel":
@@ -286,7 +310,7 @@ class AdversarialDebiasingModel(nn.Module):
             output_dim=config["output_dim"],
             protected_dim=config["protected_dim"],
             dropout=config["dropout"],
-            lambda_param=config["lambda_param"]
+            lambda_param=config["lambda_param"],
         )
 
         # Load state dictionaries
@@ -310,7 +334,7 @@ class ReminderDebiasingModel(AdversarialDebiasingModel):
         feature_extractor: nn.Module,
         protected_attributes: List[str],
         hidden_dim: int = 128,
-        lambda_param: float = 1.0
+        lambda_param: float = 1.0,
     ):
         """
         Initialize the reminder debiasing model.
@@ -335,7 +359,7 @@ class ReminderDebiasingModel(AdversarialDebiasingModel):
             hidden_dim=hidden_dim,
             output_dim=output_dim,
             protected_dim=protected_dim,
-            lambda_param=lambda_param
+            lambda_param=lambda_param,
         )
 
         # Store the feature extractor
@@ -367,7 +391,7 @@ class ReminderDebiasingModel(AdversarialDebiasingModel):
         self,
         test_data: List[Dict[str, Any]],
         protected_groups: Dict[str, List[int]],
-        fairness_metrics: List[str] = ["demographic_parity", "equal_opportunity"]
+        fairness_metrics: List[str] = ["demographic_parity", "equal_opportunity"],
     ) -> Dict[str, float]:
         """
         Evaluate fairness metrics across protected groups.
@@ -445,7 +469,8 @@ class ReminderDebiasingModel(AdversarialDebiasingModel):
 
         # Overall equity score (lower is better)
         equity_scores = [
-            value for key, value in results.items()
+            value
+            for key, value in results.items()
             if key.startswith("demographic_parity") or key.startswith("equal_opportunity")
         ]
         if equity_scores:
@@ -469,7 +494,7 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
         num_task_types: int,
         protected_attributes: List[str],
         hidden_dim: int = 128,
-        lambda_param: float = 1.0
+        lambda_param: float = 1.0,
     ):
         """
         Initialize the suggestion debiasing model.
@@ -492,7 +517,7 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
             hidden_dim=hidden_dim,
             output_dim=output_dim,
             protected_dim=protected_dim,
-            lambda_param=lambda_param
+            lambda_param=lambda_param,
         )
 
         self.protected_attributes = protected_attributes
@@ -502,7 +527,7 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
         self,
         user_features: Dict[str, Any],
         tasks: List[Dict[str, Any]],
-        time_slots: List[Dict[str, Any]]
+        time_slots: List[Dict[str, Any]],
     ) -> List[Dict[str, Any]]:
         """
         Generate debiased scheduling suggestions.
@@ -545,21 +570,27 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
                     predictor_output, _ = self.forward(combined_features)
 
                     # Extract the score (first element if it's a batch)
-                    score = predictor_output[0][0].item() if predictor_output.dim() > 1 else predictor_output.item()
+                    score = (
+                        predictor_output[0][0].item()
+                        if predictor_output.dim() > 1
+                        else predictor_output.item()
+                    )
                     task_scores.append((task, score))
 
                 if task_scores:
                     # Select best task for this slot
                     best_task, best_score = max(task_scores, key=lambda x: x[1])
 
-                    suggestions.append({
-                        "task_id": best_task.get("id", "unknown"),
-                        "slot_id": slot.get("id", "unknown"),
-                        "start_time": slot.get("start_time"),
-                        "end_time": slot.get("end_time"),
-                        "confidence": best_score,
-                        "debiased": True
-                    })
+                    suggestions.append(
+                        {
+                            "task_id": best_task.get("id", "unknown"),
+                            "slot_id": slot.get("id", "unknown"),
+                            "start_time": slot.get("start_time"),
+                            "end_time": slot.get("end_time"),
+                            "confidence": best_score,
+                            "debiased": True,
+                        }
+                    )
 
         self.train()
         return suggestions
@@ -587,7 +618,7 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
             slot.get("day_of_week", 0) / 7.0,  # Normalize day to 0-1
             1.0 if slot.get("is_morning", False) else 0.0,
             1.0 if slot.get("is_afternoon", False) else 0.0,
-            1.0 if slot.get("is_evening", False) else 0.0
+            1.0 if slot.get("is_evening", False) else 0.0,
         ]
         return torch.tensor(features).float()
 
@@ -595,11 +626,12 @@ class SuggestionDebiasingModel(AdversarialDebiasingModel):
         """Extract features from a task."""
         # Simplified implementation
         features = [
-            task.get("estimated_duration", 60) / 480.0,  # Normalize duration to 0-1 (assumes max 8 hours)
+            task.get("estimated_duration", 60)
+            / 480.0,  # Normalize duration to 0-1 (assumes max 8 hours)
             task.get("priority", 0) / 5.0,  # Normalize priority to 0-1
             1.0 if task.get("requires_focus", False) else 0.0,
             1.0 if task.get("is_creative", False) else 0.0,
-            1.0 if task.get("is_routine", False) else 0.0
+            1.0 if task.get("is_routine", False) else 0.0,
         ]
         return torch.tensor(features).float()
 
@@ -616,18 +648,17 @@ class DebiasingService:
         """Initialize the debiasing service."""
         self.reminder_debiasing_model = None
         self.suggestion_debiasing_model = None
-        self.protected_attributes = settings.PROTECTED_ATTRIBUTES if hasattr(settings, 'PROTECTED_ATTRIBUTES') else [
-            "neurotype",
-            "gender",
-            "age_group",
-            "socioeconomic_status"
-        ]
+        self.protected_attributes = (
+            settings.PROTECTED_ATTRIBUTES
+            if hasattr(settings, "PROTECTED_ATTRIBUTES")
+            else ["neurotype", "gender", "age_group", "socioeconomic_status"]
+        )
 
     def initialize_models(
         self,
         reminder_feature_extractor: nn.Module = None,
         suggestion_input_dim: int = None,
-        num_task_types: int = None
+        num_task_types: int = None,
     ) -> None:
         """
         Initialize debiasing models.
@@ -641,7 +672,7 @@ class DebiasingService:
         if reminder_feature_extractor is not None:
             self.reminder_debiasing_model = ReminderDebiasingModel(
                 feature_extractor=reminder_feature_extractor,
-                protected_attributes=self.protected_attributes
+                protected_attributes=self.protected_attributes,
             )
             logger.info("Initialized reminder debiasing model")
 
@@ -650,7 +681,7 @@ class DebiasingService:
             self.suggestion_debiasing_model = SuggestionDebiasingModel(
                 input_dim=suggestion_input_dim,
                 num_task_types=num_task_types,
-                protected_attributes=self.protected_attributes
+                protected_attributes=self.protected_attributes,
             )
             logger.info("Initialized suggestion debiasing model")
 
@@ -676,7 +707,9 @@ class DebiasingService:
             except Exception as e:
                 logger.error(f"Failed to load suggestion debiasing model: {e}")
 
-    def get_debiased_reminders(self, reminders: List[Dict[str, Any]], user_profile: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def get_debiased_reminders(
+        self, reminders: List[Dict[str, Any]], user_profile: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """
         Apply debiasing to a list of reminders.
 
@@ -692,7 +725,9 @@ class DebiasingService:
             return reminders
 
         # Check if it's a list-like structure containing dictionaries
-        if not isinstance(reminders, list) or not all(isinstance(item, dict) for item in reminders if item is not None):
+        if not isinstance(reminders, list) or not all(
+            isinstance(item, dict) for item in reminders if item is not None
+        ):
             return reminders
 
         if self.reminder_debiasing_model is None:
@@ -705,10 +740,7 @@ class DebiasingService:
             debiased_reminder = reminder.copy()
 
             # Create input for the model containing task and user info
-            model_input = {
-                "task": reminder["task"],
-                "user": user_profile
-            }
+            model_input = {"task": reminder["task"], "user": user_profile}
 
             # Get debiased score from model
             try:
@@ -728,7 +760,7 @@ class DebiasingService:
         self,
         user_features: Dict[str, Any],
         tasks: List[Dict[str, Any]],
-        time_slots: List[Dict[str, Any]]
+        time_slots: List[Dict[str, Any]],
     ) -> List[Dict[str, Any]]:
         """
         Get debiased scheduling suggestions.
@@ -746,16 +778,14 @@ class DebiasingService:
             return []
 
         return self.suggestion_debiasing_model.get_debiased_suggestions(
-            user_features=user_features,
-            tasks=tasks,
-            time_slots=time_slots
+            user_features=user_features, tasks=tasks, time_slots=time_slots
         )
 
     def audit_fairness(
         self,
         model_type: str,
         test_data: List[Dict[str, Any]],
-        protected_groups: Dict[str, List[int]] = None
+        protected_groups: Dict[str, List[int]] = None,
     ) -> Dict[str, float]:
         """
         Audit a model for fairness across protected groups.
@@ -770,8 +800,7 @@ class DebiasingService:
         """
         if model_type == "reminder" and self.reminder_debiasing_model is not None:
             return self.reminder_debiasing_model.evaluate_equity(
-                test_data=test_data,
-                protected_groups=protected_groups or {}
+                test_data=test_data, protected_groups=protected_groups or {}
             )
         elif model_type == "suggestion" and self.suggestion_debiasing_model is not None:
             # Implement suggestion fairness audit if needed
@@ -783,6 +812,7 @@ class DebiasingService:
 
 # Singleton instance
 debiasing_service = DebiasingService()
+
 
 def get_debiasing_service() -> DebiasingService:
     """Get the debiasing service singleton instance."""

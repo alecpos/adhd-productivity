@@ -60,7 +60,7 @@ class TestAccessibilityPreferences:
             animation_level=AnimationLevel.NONE,
             reduced_motion=True,
             high_contrast=True,
-            custom_css="body { font-family: 'Comic Sans MS'; }"
+            custom_css="body { font-family: 'Comic Sans MS'; }",
         )
 
         assert prefs.user_id == "test_user"
@@ -102,8 +102,7 @@ class TestAccessibilityService:
         """Test getting preferences for an existing user."""
         # Create preferences for user
         existing_prefs = AccessibilityPreferences(
-            user_id="existing_user",
-            color_theme=ColorTheme.DARK
+            user_id="existing_user", color_theme=ColorTheme.DARK
         )
         service.user_preferences["existing_user"] = existing_prefs
 
@@ -127,11 +126,9 @@ class TestAccessibilityService:
         await asyncio.sleep(0.001)  # 1 millisecond delay
 
         # Update preferences
-        updated_prefs = await service.update_user_preferences("update_user", {
-            "color_theme": ColorTheme.DARK,
-            "font_size": 24,
-            "reduced_motion": True
-        })
+        updated_prefs = await service.update_user_preferences(
+            "update_user", {"color_theme": ColorTheme.DARK, "font_size": 24, "reduced_motion": True}
+        )
 
         assert updated_prefs.color_theme == ColorTheme.DARK
         assert updated_prefs.font_size == 24
@@ -150,7 +147,7 @@ class TestAccessibilityService:
             color_theme=ColorTheme.DARK,
             font_style=FontStyle.COMIC_SANS,
             font_size=20,
-            layout_density=LayoutDensity.SPACIOUS
+            layout_density=LayoutDensity.SPACIOUS,
         )
 
         # Get CSS
@@ -232,7 +229,7 @@ class TestAccessibilityService:
             user_id="ui_user",
             color_theme=ColorTheme.STANDARD,
             notification_style=NotificationStyle.PERSISTENT,
-            focus_assist_level=FocusAssistLevel.MEDIUM
+            focus_assist_level=FocusAssistLevel.MEDIUM,
         )
 
         # Get UI settings with no context
@@ -257,14 +254,11 @@ class TestAccessibilityService:
     async def test_generate_adhd_optimized_ui_settings_with_context(self, service):
         """Test UI settings generation with specific context variables."""
         # Create preferences
-        service.user_preferences["context_user"] = AccessibilityPreferences(
-            user_id="context_user"
-        )
+        service.user_preferences["context_user"] = AccessibilityPreferences(user_id="context_user")
 
         # Get UI settings with night time context
         night_settings = await service.generate_adhd_optimized_ui_settings(
-            "context_user",
-            {"current_hour": 22}  # 10pm
+            "context_user", {"current_hour": 22}  # 10pm
         )
 
         # Should have blue light filter at night
@@ -272,8 +266,7 @@ class TestAccessibilityService:
 
         # Get UI settings with low energy
         low_energy_settings = await service.generate_adhd_optimized_ui_settings(
-            "context_user",
-            {"energy_level": 0.2}
+            "context_user", {"energy_level": 0.2}
         )
 
         # Should have contrast enhancement for low energy
@@ -281,8 +274,7 @@ class TestAccessibilityService:
 
         # Get UI settings with high importance task
         high_importance_settings = await service.generate_adhd_optimized_ui_settings(
-            "context_user",
-            {"task_importance": 0.8}
+            "context_user", {"task_importance": 0.8}
         )
 
         # Should have higher focus assistance for important tasks

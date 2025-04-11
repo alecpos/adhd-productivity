@@ -12,7 +12,12 @@ from fastapi import HTTPException
 from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
 from app.models.task_model import TaskModel, TaskPriority
 from app.schemas.task_schema import TaskResponse, TaskCreate, TaskStatsSchema, TaskUpdate
-from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema, TaskCategory, TaskState
+from app.models.enums_model import (
+    TaskStatus as TaskStatusSchema,
+    BlockPriority as TaskPrioritySchema,
+    TaskCategory,
+    TaskState,
+)
 from app.utils.decorators import handle_service_error
 from app.services.task_analyzer_service import TaskAnalyzerService
 
@@ -28,9 +33,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         self.analyzer = TaskAnalyzerService(db)
         # Initialize bulkhead for task analysis
         self._task_analysis_bulkhead = self.with_bulkhead(
-            name="task_analysis",
-            max_concurrent_calls=5,
-            max_queue_size=10
+            name="task_analysis", max_concurrent_calls=5, max_queue_size=10
         )
 
     @handle_service_error
@@ -39,13 +42,9 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         initial_delay=0.1,
         max_delay=1.0,
         backoff_factor=2.0,
-        error_message="Failed to create task"
+        error_message="Failed to create task",
     )
-    @BaseService.with_circuit_breaker(
-        name="task_create",
-        failure_threshold=5,
-        recovery_timeout=30
-    )
+    @BaseService.with_circuit_breaker(name="task_create", failure_threshold=5, recovery_timeout=30)
     async def create_task(self, task_data: TaskCreate) -> TaskModel:
         """Create a new task with resilience patterns."""
         logger.info(f"Creating new task with data: {task_data}")
@@ -137,10 +136,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     @handle_service_error
     @BaseService.with_retry(
-        max_retries=3,
-        initial_delay=0.1,
-        max_delay=1.0,
-        error_message="Failed to get user tasks"
+        max_retries=3, initial_delay=0.1, max_delay=1.0, error_message="Failed to get user tasks"
     )
     async def get_user_tasks(
         self,
@@ -201,9 +197,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     @handle_service_error
     @BaseService.with_retry(
-        max_retries=2,
-        initial_delay=0.1,
-        error_message="Failed to get task by ID"
+        max_retries=2, initial_delay=0.1, error_message="Failed to get task by ID"
     )
     async def get_task(self, task_id: UUID, user_id: UUID) -> Optional[TaskModel]:
         """Get a specific task by ID."""
@@ -213,16 +207,8 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         return None
 
     @handle_service_error
-    @BaseService.with_retry(
-        max_retries=3,
-        initial_delay=0.1,
-        error_message="Failed to update task"
-    )
-    @BaseService.with_circuit_breaker(
-        name="task_update",
-        failure_threshold=5,
-        recovery_timeout=30
-    )
+    @BaseService.with_retry(max_retries=3, initial_delay=0.1, error_message="Failed to update task")
+    @BaseService.with_circuit_breaker(name="task_update", failure_threshold=5, recovery_timeout=30)
     async def update_task(self, task_id: UUID, update_data: Dict[str, Any]) -> TaskModel:
         """Update a task with resilience patterns."""
         task = await self.get_task(task_id, task_id)
@@ -244,11 +230,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         return task
 
     @handle_service_error
-    @BaseService.with_retry(
-        max_retries=3,
-        initial_delay=0.1,
-        error_message="Failed to delete task"
-    )
+    @BaseService.with_retry(max_retries=3, initial_delay=0.1, error_message="Failed to delete task")
     async def delete_task(self, task_id: UUID, user_id: UUID) -> bool:
         """Delete a task."""
         task = await self.get_task(task_id, user_id)
@@ -260,9 +242,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     @handle_service_error
     @BaseService.with_retry(
-        max_retries=3,
-        initial_delay=0.1,
-        error_message="Failed to complete task"
+        max_retries=3, initial_delay=0.1, error_message="Failed to complete task"
     )
     async def complete_task(self, task_id: UUID, user_id: UUID) -> Optional[TaskModel]:
         """Mark a task as completed."""
@@ -284,9 +264,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     @handle_service_error
     @BaseService.with_retry(
-        max_retries=2,
-        initial_delay=0.1,
-        error_message="Failed to get task statistics"
+        max_retries=2, initial_delay=0.1, error_message="Failed to get task statistics"
     )
     async def get_task_statistics(self, user_id: UUID) -> Dict[str, Any]:
         """Get statistics about tasks for a user."""
@@ -305,7 +283,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             and_(
                 self.model.user_id == user_id,
                 self.model.due_date < now,
-                self.model.status != TaskStatus.COMPLETED
+                self.model.status != TaskStatus.COMPLETED,
             )
         )
         overdue_result = await self.db.execute(overdue_query)
@@ -319,7 +297,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                 self.model.user_id == user_id,
                 self.model.due_date >= today_start,
                 self.model.due_date < today_end,
-                self.model.status != TaskStatus.COMPLETED
+                self.model.status != TaskStatus.COMPLETED,
             )
         )
         today_result = await self.db.execute(today_query)
@@ -339,7 +317,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             "due_today": today_count,
             "total_count": total_count,
             "completed_count": completed_count,
-            "completion_rate": round(completion_rate, 2)
+            "completion_rate": round(completion_rate, 2),
         }
 
     async def health_check(self) -> Dict[str, Any]:
@@ -355,7 +333,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         bulkhead_state = {
             "task_analysis": {
                 "max_concurrent": 5,  # From initialization
-                "max_queue": 10       # From initialization
+                "max_queue": 10,  # From initialization
             }
         }
 
@@ -370,8 +348,8 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             "details": {
                 "circuits": circuit_states,
                 "bulkheads": bulkhead_state,
-                "analyzer": analyzer_health
-            }
+                "analyzer": analyzer_health,
+            },
         }
 
     def _get_analyzer_health(self) -> Dict[str, Any]:
@@ -379,8 +357,12 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         # In a real implementation, this would check the actual service
         analyzer_circuit = self._get_circuit_state("task_analyzer")
         return {
-            "status": "healthy" if analyzer_circuit == CLOSED else "degraded" if analyzer_circuit == HALF_OPEN else "unhealthy",
-            "circuit": analyzer_circuit
+            "status": (
+                "healthy"
+                if analyzer_circuit == CLOSED
+                else "degraded" if analyzer_circuit == HALF_OPEN else "unhealthy"
+            ),
+            "circuit": analyzer_circuit,
         }
 
     def _get_circuit_state(self, circuit_name: str) -> str:
@@ -405,19 +387,22 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             difficulty=task.difficulty,
             energy_required=task.energy_required,
             focus_required=task.focus_required,
-            status=TaskState.TODO.value  # Initialize with TODO state
+            status=TaskState.TODO.value,  # Initialize with TODO state
         )
         self.db.add(db_task)
         self.db.commit()
         self.db.refresh(db_task)
         return db_task
 
-    def update_task_status(self, task_id: str, new_status: str, user_id: str) -> Optional[TaskModel]:
+    def update_task_status(
+        self, task_id: str, new_status: str, user_id: str
+    ) -> Optional[TaskModel]:
         """Update task status with validation."""
-        task = self.db.query(self.model).filter(
-            self.model.id == task_id,
-            self.model.user_id == user_id
-        ).first()
+        task = (
+            self.db.query(self.model)
+            .filter(self.model.id == task_id, self.model.user_id == user_id)
+            .first()
+        )
 
         if not task:
             return None
@@ -430,10 +415,11 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     def get_task(self, task_id: str, user_id: str) -> Optional[TaskModel]:
         """Get a task by ID with next states."""
-        task = self.db.query(self.model).filter(
-            self.model.id == task_id,
-            self.model.user_id == user_id
-        ).first()
+        task = (
+            self.db.query(self.model)
+            .filter(self.model.id == task_id, self.model.user_id == user_id)
+            .first()
+        )
 
         if task:
             task.next_states = task.get_next_states()
@@ -441,20 +427,21 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     def get_user_tasks(self, user_id: str) -> List[TaskModel]:
         """Get all tasks for a user with next states."""
-        tasks = self.db.query(self.model).filter(
-            self.model.user_id == user_id
-        ).all()
+        tasks = self.db.query(self.model).filter(self.model.user_id == user_id).all()
 
         for task in tasks:
             task.next_states = task.get_next_states()
         return tasks
 
-    def update_task(self, task_id: str, task_update: TaskUpdate, user_id: str) -> Optional[TaskModel]:
+    def update_task(
+        self, task_id: str, task_update: TaskUpdate, user_id: str
+    ) -> Optional[TaskModel]:
         """Update task with status transition validation."""
-        task = self.db.query(self.model).filter(
-            self.model.id == task_id,
-            self.model.user_id == user_id
-        ).first()
+        task = (
+            self.db.query(self.model)
+            .filter(self.model.id == task_id, self.model.user_id == user_id)
+            .first()
+        )
 
         if not task:
             return None
@@ -465,7 +452,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                 return None
 
         # Update other fields
-        for field, value in task_update.dict(exclude={'status'}).items():
+        for field, value in task_update.dict(exclude={"status"}).items():
             if value is not None:
                 setattr(task, field, value)
 
@@ -476,10 +463,11 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
 
     def delete_task(self, task_id: str, user_id: str) -> bool:
         """Delete a task."""
-        task = self.db.query(self.model).filter(
-            self.model.id == task_id,
-            self.model.user_id == user_id
-        ).first()
+        task = (
+            self.db.query(self.model)
+            .filter(self.model.id == task_id, self.model.user_id == user_id)
+            .first()
+        )
 
         if task:
             self.db.delete(task)

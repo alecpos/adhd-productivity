@@ -4,6 +4,7 @@ Commitment Detection API Endpoints for ADHD Calendar.
 This module defines FastAPI endpoints for the commitment detection and
 proactive forgetfulness mitigation system.
 """
+
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Path
@@ -20,7 +21,7 @@ from app.schemas.commitment_schema import (
     CommitmentDetectionRequest,
     CommitmentDetectionResponse,
     DialogueRequest,
-    DialogueResponse
+    DialogueResponse,
 )
 from app.services.commitment_detection_service import CommitmentDetectionService
 from app.services.dialogue_system_service import DialogueSystemService
@@ -34,7 +35,7 @@ router = APIRouter()
 def detect_commitments(
     request: CommitmentDetectionRequest,
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Detect commitments in text.
@@ -47,8 +48,7 @@ def detect_commitments(
     # Make sure the user ID in the request matches the current user
     if str(request.user_id) != str(current_user.id):
         raise HTTPException(
-            status_code=403,
-            detail="User ID in request does not match authenticated user"
+            status_code=403, detail="User ID in request does not match authenticated user"
         )
 
     detection_response = service.detect_commitments(request)
@@ -59,7 +59,7 @@ def detect_commitments(
 def create_commitment(
     commitment: CommitmentCreate,
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Create a new commitment.
@@ -71,8 +71,7 @@ def create_commitment(
     # Make sure the user ID in the request matches the current user
     if str(commitment.user_id) != str(current_user.id):
         raise HTTPException(
-            status_code=403,
-            detail="User ID in request does not match authenticated user"
+            status_code=403, detail="User ID in request does not match authenticated user"
         )
 
     db_commitment = service.create_commitment(commitment)
@@ -89,7 +88,7 @@ def get_commitments(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Get commitments for the current user.
@@ -104,30 +103,21 @@ def get_commitments(
         try:
             status_enum = CommitmentStatus(status)
         except ValueError:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid status: {status}"
-            )
+            raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
 
     source_enum = None
     if source:
         try:
             source_enum = CommitmentSource(source)
         except ValueError:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid source: {source}"
-            )
+            raise HTTPException(status_code=400, detail=f"Invalid source: {source}")
 
     priority_enum = None
     if priority:
         try:
             priority_enum = CommitmentPriority(priority)
         except ValueError:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid priority: {priority}"
-            )
+            raise HTTPException(status_code=400, detail=f"Invalid priority: {priority}")
 
     commitments, total = service.get_user_commitments(
         user_id=current_user.id,
@@ -137,14 +127,14 @@ def get_commitments(
         source=source_enum,
         priority=priority_enum,
         skip=skip,
-        limit=limit
+        limit=limit,
     )
 
     return CommitmentsList(
         items=[CommitmentResponse.from_orm(c) for c in commitments],
         total=total,
         page=skip // limit + 1,
-        size=limit
+        size=limit,
     )
 
 
@@ -152,7 +142,7 @@ def get_commitments(
 def get_commitment(
     commitment_id: int = Path(..., gt=0),
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Get a specific commitment.
@@ -167,17 +157,13 @@ def get_commitment(
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
-                status_code=403,
-                detail="This commitment does not belong to the current user"
+                status_code=403, detail="This commitment does not belong to the current user"
             )
 
         return CommitmentResponse.from_orm(commitment)
 
     except Exception as e:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Commitment not found: {str(e)}"
-        )
+        raise HTTPException(status_code=404, detail=f"Commitment not found: {str(e)}")
 
 
 @router.put("/commitments/{commitment_id}", response_model=CommitmentResponse)
@@ -185,7 +171,7 @@ def update_commitment(
     commitment_id: int = Path(..., gt=0),
     update_data: CommitmentUpdate = None,
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Update a commitment.
@@ -201,8 +187,7 @@ def update_commitment(
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
-                status_code=403,
-                detail="This commitment does not belong to the current user"
+                status_code=403, detail="This commitment does not belong to the current user"
             )
 
         # Update the commitment
@@ -211,8 +196,7 @@ def update_commitment(
 
     except Exception as e:
         raise HTTPException(
-            status_code=404,
-            detail=f"Commitment not found or could not be updated: {str(e)}"
+            status_code=404, detail=f"Commitment not found or could not be updated: {str(e)}"
         )
 
 
@@ -220,7 +204,7 @@ def update_commitment(
 def delete_commitment(
     commitment_id: int = Path(..., gt=0),
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Delete a commitment.
@@ -236,8 +220,7 @@ def delete_commitment(
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
-                status_code=403,
-                detail="This commitment does not belong to the current user"
+                status_code=403, detail="This commitment does not belong to the current user"
             )
 
         # Delete the commitment
@@ -245,8 +228,7 @@ def delete_commitment(
 
     except Exception as e:
         raise HTTPException(
-            status_code=404,
-            detail=f"Commitment not found or could not be deleted: {str(e)}"
+            status_code=404, detail=f"Commitment not found or could not be deleted: {str(e)}"
         )
 
 
@@ -254,7 +236,7 @@ def delete_commitment(
 def confirm_commitment(
     commitment_id: int = Path(..., gt=0),
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Confirm a commitment.
@@ -270,8 +252,7 @@ def confirm_commitment(
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
-                status_code=403,
-                detail="This commitment does not belong to the current user"
+                status_code=403, detail="This commitment does not belong to the current user"
             )
 
         # Confirm the commitment
@@ -280,8 +261,7 @@ def confirm_commitment(
 
     except Exception as e:
         raise HTTPException(
-            status_code=404,
-            detail=f"Commitment not found or could not be confirmed: {str(e)}"
+            status_code=404, detail=f"Commitment not found or could not be confirmed: {str(e)}"
         )
 
 
@@ -289,7 +269,7 @@ def confirm_commitment(
 def reject_commitment(
     commitment_id: int = Path(..., gt=0),
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Reject a commitment.
@@ -305,8 +285,7 @@ def reject_commitment(
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
-                status_code=403,
-                detail="This commitment does not belong to the current user"
+                status_code=403, detail="This commitment does not belong to the current user"
             )
 
         # Reject the commitment
@@ -315,8 +294,7 @@ def reject_commitment(
 
     except Exception as e:
         raise HTTPException(
-            status_code=404,
-            detail=f"Commitment not found or could not be rejected: {str(e)}"
+            status_code=404, detail=f"Commitment not found or could not be rejected: {str(e)}"
         )
 
 
@@ -324,7 +302,7 @@ def reject_commitment(
 def process_dialogue(
     request: DialogueRequest,
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_current_user),
 ):
     """
     Process a dialogue message.
@@ -340,9 +318,7 @@ def process_dialogue(
 
 @router.post("/analyze/journal", response_model=List[CommitmentResponse])
 def analyze_journal_entry(
-    text: str,
-    db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    text: str, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_user)
 ):
     """
     Analyze a journal entry for commitments.
@@ -358,8 +334,7 @@ def analyze_journal_entry(
 
 @router.post("/reminders/process", response_model=Dict[str, Any])
 def process_smart_reminders(
-    db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_user)
+    db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_user)
 ):
     """
     Process smart reminders.

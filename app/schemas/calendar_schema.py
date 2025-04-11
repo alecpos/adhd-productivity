@@ -12,6 +12,7 @@ from app.schemas.base_schema import BaseSchema, TimestampedSchema
 
 class CalendarType(str, Enum):
     """Calendar type enum."""
+
     PERSONAL = "personal"
     WORK = "work"
     SHARED = "shared"
@@ -19,6 +20,7 @@ class CalendarType(str, Enum):
 
 class EventType(str, Enum):
     """Event type enum."""
+
     MEETING = "meeting"
     TASK = "task"
     REMINDER = "reminder"
@@ -29,6 +31,7 @@ class EventType(str, Enum):
 
 class EventPriority(str, Enum):
     """Event priority enum."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -37,6 +40,7 @@ class EventPriority(str, Enum):
 
 class EventStatus(str, Enum):
     """Event status enum."""
+
     SCHEDULED = "scheduled"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -45,6 +49,7 @@ class EventStatus(str, Enum):
 
 class RecurrencePattern(str, Enum):
     """Event recurrence patterns."""
+
     DAILY = "daily"
     WEEKLY = "weekly"
     BIWEEKLY = "biweekly"
@@ -55,6 +60,7 @@ class RecurrencePattern(str, Enum):
 
 class CalendarSchema(BaseSchema):
     """Base schema for calendar."""
+
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
     type: CalendarType = Field(default=CalendarType.PERSONAL)
@@ -66,6 +72,7 @@ class CalendarSchema(BaseSchema):
 
 class WorkingHoursSchema(BaseSchema):
     """Schema for working hours."""
+
     start: time
     end: time
     time_zone: str = "UTC"
@@ -75,6 +82,7 @@ class WorkingHoursSchema(BaseSchema):
 
 class CalendarEventSchema(TimestampedSchema):
     """Base schema for calendar events."""
+
     id: UUID
     user_id: UUID
     title: str = Field(..., min_length=1, max_length=200)
@@ -95,6 +103,7 @@ class CalendarEventSchema(TimestampedSchema):
 
 class CalendarEventCreateSchema(BaseSchema):
     """Schema for creating calendar events."""
+
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     start_time: datetime
@@ -112,6 +121,7 @@ class CalendarEventCreateSchema(BaseSchema):
 
 class CalendarEventUpdateSchema(BaseSchema):
     """Schema for updating calendar events."""
+
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     start_time: Optional[datetime] = None
@@ -130,6 +140,7 @@ class CalendarEventUpdateSchema(BaseSchema):
 
 class CalendarEventResponseSchema(BaseSchema):
     """Schema for calendar event responses."""
+
     success: bool
     message: str
     data: CalendarEventSchema
@@ -139,6 +150,7 @@ class CalendarEventResponseSchema(BaseSchema):
 
 class CalendarEventListResponseSchema(BaseSchema):
     """Schema for calendar event list responses."""
+
     success: bool
     message: str
     data: List[CalendarEventSchema]
@@ -148,6 +160,7 @@ class CalendarEventListResponseSchema(BaseSchema):
 
 class CalendarStatsSchema(BaseSchema):
     """Schema for calendar statistics."""
+
     total_events: int
     upcoming_events: int
     events_this_week: int
@@ -159,6 +172,7 @@ class CalendarStatsSchema(BaseSchema):
 
 class CalendarSettingsSchema(BaseSchema):
     """Schema for calendar settings."""
+
     default_view: str = "week"
     start_of_week: int = Field(0, ge=0, le=6)  # 0 = Sunday, 6 = Saturday
     working_hours: WorkingHoursSchema

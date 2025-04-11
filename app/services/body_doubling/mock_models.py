@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 from typing import Optional
 from datetime import datetime
 
+
 # Mock base model
 class MockBaseModel:
     """Base model for all mock models."""
@@ -15,6 +16,7 @@ class MockBaseModel:
     id: UUID = uuid4()
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
+
 
 # Mock TaskCategoryModel
 class MockTaskCategoryModel(MockBaseModel):

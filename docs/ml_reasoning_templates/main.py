@@ -15,58 +15,41 @@ from typing import Dict, List, Optional
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml_reasoning_templates.template_selector import MLTemplateSelector, MLTaskType
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate ML reasoning templates for Epic 4 components"
     )
 
-    parser.add_argument(
-        "story_id",
-        help="The story ID (e.g., ADHD-17)",
-        type=str
-    )
+    parser.add_argument("story_id", help="The story ID (e.g., ADHD-17)", type=str)
 
     parser.add_argument(
         "task_type",
         help=f"ML task type (one of: {', '.join(MLTaskType.get_epic4_domains())})",
         type=str,
-        choices=MLTaskType.get_epic4_domains()
+        choices=MLTaskType.get_epic4_domains(),
     )
 
-    parser.add_argument(
-        "--title",
-        help="Story title",
-        type=str,
-        default=""
-    )
+    parser.add_argument("--title", help="Story title", type=str, default="")
 
-    parser.add_argument(
-        "--description",
-        help="Task description",
-        type=str,
-        default=""
-    )
+    parser.add_argument("--description", help="Task description", type=str, default="")
 
     parser.add_argument(
         "--complexity",
         help="Task complexity (low, medium, high)",
         type=str,
         choices=["low", "medium", "high"],
-        default="medium"
+        default="medium",
     )
 
     parser.add_argument(
         "--output",
         help="Output file path (default: ./STORY_ID_reasoning.md)",
         type=str,
-        default=None
+        default=None,
     )
 
-    parser.add_argument(
-        "--research",
-        help="Include research insights",
-        action="store_true"
-    )
+    parser.add_argument("--research", help="Include research insights", action="store_true")
 
     args = parser.parse_args()
 
@@ -79,7 +62,7 @@ def main():
         "title": args.title,
         "complexity": args.complexity,
         "task_description": args.description,
-        "epic": "Epic 4: Dynamic Schedule Rebalancing"
+        "epic": "Epic 4: Dynamic Schedule Rebalancing",
     }
 
     # Select template
@@ -101,6 +84,7 @@ def main():
     print(f"Story ID: {args.story_id}")
     if args.research:
         print("Research insights included")
+
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,8 @@ from unittest.mock import MagicMock, patch, AsyncMock
 
 # Fix numpy bool issue
 import numpy as np
-if not hasattr(np, 'bool_'):
+
+if not hasattr(np, "bool_"):
     np.bool_ = bool
 
 # Create mock modules for all dependencies
@@ -19,9 +20,11 @@ mock_theano = MagicMock()
 mock_theano_tensor = MagicMock()
 mock_pymc3 = MagicMock()
 
+
 # Mock MentalHealthModel
 class MockMentalHealthModel:
     """Mock implementation of MentalHealthModel for testing."""
+
     id = "mh-test-123"
     user_id = "user-test-123"
     mood_score = 7
@@ -41,12 +44,14 @@ class MockMentalHealthModel:
             "focus_level": self.focus_level,
             "energy_level": self.energy_level,
             "stress_level": self.stress_level,
-            "sleep_hours": self.sleep_hours
+            "sleep_hours": self.sleep_hours,
         }
+
 
 # Mock EnergyModel
 class MockEnergyModel:
     """Mock implementation of EnergyModel for testing."""
+
     id = "energy-test-123"
     user_id = "user-test-123"
     morning_energy = 7
@@ -62,8 +67,9 @@ class MockEnergyModel:
             "morning_energy": self.morning_energy,
             "afternoon_energy": self.afternoon_energy,
             "evening_energy": self.evening_energy,
-            "overall_energy": self.overall_energy
+            "overall_energy": self.overall_energy,
         }
+
 
 # Mock BaseMLModel
 class MockBaseMLModel:
@@ -90,6 +96,7 @@ class MockBaseMLModel:
         """Mock implementation of load method."""
         return cls(model_path=filepath)
 
+
 # Mock FeatureEngineer
 class MockFeatureEngineer:
     """Mock implementation of FeatureEngineer."""
@@ -102,30 +109,31 @@ class MockFeatureEngineer:
         """Mock implementation of transform method."""
         return features
 
+
 # Create mock modules
-sys.modules['theano'] = mock_theano
-sys.modules['theano.tensor'] = mock_theano_tensor
-sys.modules['pymc3'] = mock_pymc3
+sys.modules["theano"] = mock_theano
+sys.modules["theano.tensor"] = mock_theano_tensor
+sys.modules["pymc3"] = mock_pymc3
 
 # Patch MentalHealthModel
 mental_health_module = MagicMock()
 mental_health_module.MentalHealthModel = MockMentalHealthModel
-sys.modules['app.models.mental_health_model'] = mental_health_module
+sys.modules["app.models.mental_health_model"] = mental_health_module
 
 # Patch EnergyModel
 energy_module = MagicMock()
 energy_module.EnergyModel = MockEnergyModel
-sys.modules['app.models.energy_model'] = energy_module
+sys.modules["app.models.energy_model"] = energy_module
 
 # Patch BaseMLModel
 ml_models_module = MagicMock()
 ml_models_module.BaseMLModel = MockBaseMLModel
-sys.modules['app.ml.models'] = ml_models_module
+sys.modules["app.ml.models"] = ml_models_module
 
 # Patch FeatureEngineer
 feature_eng_module = MagicMock()
 feature_eng_module.FeatureEngineer = MockFeatureEngineer
-sys.modules['app.ml.feature_engineering'] = feature_eng_module
+sys.modules["app.ml.feature_engineering"] = feature_eng_module
 
 # Now import the rest
 import pytest
@@ -140,10 +148,14 @@ import uuid
 from app.ml.stochastic_time_estimation.time_buffer_calculator import (
     TimeBufferCalculator,
     TransitionDifficulty,
-    ContextChangeType
+    ContextChangeType,
 )
 from app.tests.ml.stochastic_time_estimation.test_utils import (
-    create_mock_task_model, create_mock_user, create_mock_health_metrics, mock_db, run_async_test
+    create_mock_task_model,
+    create_mock_user,
+    create_mock_health_metrics,
+    mock_db,
+    run_async_test,
 )
 
 
@@ -161,15 +173,15 @@ class TestTimeBufferCalculator:
                 "easy": 10,
                 "moderate": 15,
                 "difficult": 20,
-                "severe": 30
+                "severe": 30,
             },
             context_change_weights={
                 "location": 1.5,
                 "tools": 1.2,
                 "mental_context": 1.3,
-                "energy_level": 1.4
+                "energy_level": 1.4,
             },
-            adaptation_rate=0.2
+            adaptation_rate=0.2,
         )
 
     @pytest.mark.asyncio
@@ -188,7 +200,7 @@ class TestTimeBufferCalculator:
         buffer = await calculator.calculate_buffer("task-1", "task-2")
         assert buffer == {
             "error": "No database connection available",
-            "buffer_minutes": calculator.min_buffer_minutes
+            "buffer_minutes": calculator.min_buffer_minutes,
         }
 
     @pytest.mark.asyncio
@@ -222,16 +234,13 @@ class TestTimeBufferCalculator:
         """Test buffer calculation with no transition history."""
         # Mock _get_task to return different tasks
         task1 = create_mock_task_model(
-            task_id="task-1",
-            location="home",
-            tools_needed=["computer"],
-            energy_required=3
+            task_id="task-1", location="home", tools_needed=["computer"], energy_required=3
         )
         task2 = create_mock_task_model(
             task_id="task-2",
             location="office",
             tools_needed=["phone", "notepad"],
-            energy_required=4
+            energy_required=4,
         )
 
         # Use AsyncMock with side_effect to handle different task IDs
@@ -248,16 +257,18 @@ class TestTimeBufferCalculator:
         calculator._get_transition_stats = AsyncMock(return_value=None)
 
         # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string
-        calculator._analyze_transition_difficulty = AsyncMock(return_value=(
-            TransitionDifficulty.MODERATE,  # Use enum instead of string
-            {
-                "location_change": True,
-                "tools_needed": True,
-                "mental_context": True,
-                "energy_shift": True,
-                "difficulty_score": 4.4
-            }
-        ))
+        calculator._analyze_transition_difficulty = AsyncMock(
+            return_value=(
+                TransitionDifficulty.MODERATE,  # Use enum instead of string
+                {
+                    "location_change": True,
+                    "tools_needed": True,
+                    "mental_context": True,
+                    "energy_shift": True,
+                    "difficulty_score": 4.4,
+                },
+            )
+        )
 
         # Calculate buffer
         buffer = await calculator.calculate_buffer("task-1", "task-2")
@@ -273,16 +284,13 @@ class TestTimeBufferCalculator:
         """Test buffer calculation with transition history."""
         # Mock _get_task to return different tasks
         task1 = create_mock_task_model(
-            task_id="task-1",
-            location="home",
-            tools_needed=["computer"],
-            energy_required=3
+            task_id="task-1", location="home", tools_needed=["computer"], energy_required=3
         )
         task2 = create_mock_task_model(
             task_id="task-2",
             location="office",
             tools_needed=["phone", "notepad"],
-            energy_required=4
+            energy_required=4,
         )
 
         # Use AsyncMock with side_effect to handle different task IDs
@@ -303,22 +311,24 @@ class TestTimeBufferCalculator:
             "max_actual_minutes": 20,
             "recent_observations": [
                 {"actual_minutes": 15, "predicted_minutes": 12},
-                {"actual_minutes": 18, "predicted_minutes": 15}
-            ]
+                {"actual_minutes": 18, "predicted_minutes": 15},
+            ],
         }
         calculator._get_transition_stats = AsyncMock(return_value=transition_stats)
 
         # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string
-        calculator._analyze_transition_difficulty = AsyncMock(return_value=(
-            TransitionDifficulty.MODERATE,  # Use enum instead of string
-            {
-                "location_change": True,
-                "tools_needed": True,
-                "mental_context": True,
-                "energy_shift": True,
-                "difficulty_score": 4.4
-            }
-        ))
+        calculator._analyze_transition_difficulty = AsyncMock(
+            return_value=(
+                TransitionDifficulty.MODERATE,  # Use enum instead of string
+                {
+                    "location_change": True,
+                    "tools_needed": True,
+                    "mental_context": True,
+                    "energy_shift": True,
+                    "difficulty_score": 4.4,
+                },
+            )
+        )
 
         # Calculate buffer
         buffer = await calculator.calculate_buffer("task-1", "task-2")
@@ -340,15 +350,9 @@ class TestTimeBufferCalculator:
 
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
-                return create_mock_task_model(
-                    task_id="task-1",
-                    user_id="test-user-1"
-                )
+                return create_mock_task_model(task_id="task-1", user_id="test-user-1")
             elif task_id == "task-2":
-                return create_mock_task_model(
-                    task_id="task-2",
-                    user_id="test-user-1"
-                )
+                return create_mock_task_model(task_id="task-2", user_id="test-user-1")
             return None
 
         calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)
@@ -381,7 +385,7 @@ class TestTimeBufferCalculator:
         calculator.calculate_buffer.side_effect = [
             {"buffer_minutes": 10.0},
             {"buffer_minutes": 15.0},
-            {"buffer_minutes": 12.0}
+            {"buffer_minutes": 12.0},
         ]
 
         # Custom implementation of calculate_buffers_for_task_sequence
@@ -404,17 +408,14 @@ class TestTimeBufferCalculator:
         """Test analyzing transition difficulty."""
         # Create tasks with different characteristics
         task1 = create_mock_task_model(
-            location="home",
-            tools_needed=["computer"],
-            energy_required=2,
-            focus_required=3
+            location="home", tools_needed=["computer"], energy_required=2, focus_required=3
         )
 
         task2 = create_mock_task_model(
             location="office",
             tools_needed=["whiteboard", "projector"],
             energy_required=4,
-            focus_required=5
+            focus_required=5,
         )
 
         # Create async function to call _analyze_transition_difficulty
@@ -437,16 +438,12 @@ class TestTimeBufferCalculator:
     def test_calculate_context_changes(self, calculator):
         """Test analyzing context changes between tasks."""
         # Create tasks with different characteristics
-        task1 = create_mock_task_model(
-            location="home",
-            tools_needed=["computer"],
-            category="work"
-        )
+        task1 = create_mock_task_model(location="home", tools_needed=["computer"], category="work")
 
         task2 = create_mock_task_model(
             location="home",  # Same location
             tools_needed=["computer", "notebook"],  # Different tools
-            category="personal"  # Different category
+            category="personal",  # Different category
         )
 
         # Create async function to call _calculate_context_changes
@@ -484,14 +481,8 @@ class TestTimeBufferCalculator:
     def test_calculate_mental_context_impact(self, calculator):
         """Test calculating mental context shift between tasks."""
         # Create tasks with different focus types
-        task1 = create_mock_task_model(
-            focus_type="analytical",
-            category="work"
-        )
-        task2 = create_mock_task_model(
-            focus_type="creative",
-            category="personal"
-        )
+        task1 = create_mock_task_model(focus_type="analytical", category="work")
+        task2 = create_mock_task_model(focus_type="creative", category="personal")
 
         # Create async function to call _calculate_context_changes
         async def run_analysis():
@@ -509,13 +500,10 @@ class TestTimeBufferCalculator:
         """Test retrieving tasks from the database."""
 
         # Mock up a task directly in the db fixture
-        if hasattr(calculator.db, 'tasks'):
+        if hasattr(calculator.db, "tasks"):
             # Use the mock db's tasks dictionary directly if it exists
             calculator.db.tasks = {
-                "task-1": create_mock_task_model(
-                    task_id="task-1",
-                    user_id="test-user-1"
-                )
+                "task-1": create_mock_task_model(task_id="task-1", user_id="test-user-1")
             }
 
         # Directly mock the _get_task method just for this test
@@ -523,10 +511,7 @@ class TestTimeBufferCalculator:
 
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
-                return create_mock_task_model(
-                    task_id="task-1",
-                    user_id="test-user-1"
-                )
+                return create_mock_task_model(task_id="task-1", user_id="test-user-1")
             return None
 
         calculator._get_task = mock_get_task_side_effect
@@ -554,14 +539,8 @@ class TestTimeBufferCalculator:
         # Setup
         user_id = "test-user-1"
         transitions = [
-            {
-                "actual_minutes": 15,
-                "predicted_minutes": 10
-            },
-            {
-                "actual_minutes": 20,
-                "predicted_minutes": 15
-            }
+            {"actual_minutes": 15, "predicted_minutes": 10},
+            {"actual_minutes": 20, "predicted_minutes": 15},
         ]
 
         # Create an async method that simulates the internal method that gets transition history
@@ -592,15 +571,9 @@ class TestTimeBufferCalculator:
 
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
-                return create_mock_task_model(
-                    task_id="task-1",
-                    user_id="test-user-1"
-                )
+                return create_mock_task_model(task_id="task-1", user_id="test-user-1")
             elif task_id == "task-2":
-                return create_mock_task_model(
-                    task_id="task-2",
-                    user_id="test-user-1"
-                )
+                return create_mock_task_model(task_id="task-2", user_id="test-user-1")
             return None
 
         calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)
@@ -614,7 +587,7 @@ class TestTimeBufferCalculator:
                 current_task_id=current_task_id,
                 next_task_id=next_task_id,
                 actual_transition_minutes=actual_minutes,
-                user_id=user_id
+                user_id=user_id,
             )
 
             # Verify the method completed successfully
@@ -639,13 +612,13 @@ class TestTimeBufferCalculator:
             "easy": 10,
             "moderate": 15,
             "difficult": 20,
-            "severe": 30
+            "severe": 30,
         }
         calculator.context_change_weights = {
             "location": 1.5,
             "tools": 1.2,
             "mental_context": 1.3,
-            "energy_level": 1.4
+            "energy_level": 1.4,
         }
         calculator.adaptation_rate = 0.2
 
@@ -686,7 +659,7 @@ class TestTimeBufferCalculator:
             "location": {"change_factor": 1.0, "details": {}},
             "tools": {"change_factor": 0.5, "details": {}},
             "mental_context": {"change_factor": 0.0, "details": {}},
-            "energy_level": {"change_factor": 0.0, "details": {}}
+            "energy_level": {"change_factor": 0.0, "details": {}},
         }
 
         # Should increase the factor based on the changes
@@ -718,7 +691,7 @@ class TestTimeBufferCalculator:
             tools_needed=["laptop", "notebook"],
             energy_required=4,
             focus_required=5,
-            focus_type="analytical"
+            focus_type="analytical",
         )
 
         to_task = create_mock_task_model(
@@ -728,7 +701,7 @@ class TestTimeBufferCalculator:
             tools_needed=["phone", "headphones"],
             energy_required=2,
             focus_required=3,
-            focus_type="creative"
+            focus_type="creative",
         )
 
         # Run analysis synchronously through an async wrapper
@@ -748,7 +721,9 @@ class TestTimeBufferCalculator:
         # Verify sensible values
         assert result[ContextChangeType.LOCATION.value]["change_factor"] > 0  # Different locations
         assert result[ContextChangeType.TOOLS.value]["change_factor"] > 0  # Different tools
-        assert result[ContextChangeType.MENTAL_CONTEXT.value]["change_factor"] > 0  # Different categories
+        assert (
+            result[ContextChangeType.MENTAL_CONTEXT.value]["change_factor"] > 0
+        )  # Different categories
         assert result["total_context_change_score"] > 0
 
         # Test with identical tasks (should have minimal context change)

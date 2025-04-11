@@ -26,13 +26,13 @@ class HealthService(BaseService[HealthCheckSchema, HealthCheckSchema, HealthChec
         """Get overall system health status."""
         try:
             return {
-                'status': 'healthy',
-                'timestamp': datetime.utcnow(),
-                'details': {
-                    'system': 'operational',
-                    'database': await self.get_database_health(),
-                    'services': await self.get_services_health()
-                }
+                "status": "healthy",
+                "timestamp": datetime.utcnow(),
+                "details": {
+                    "system": "operational",
+                    "database": await self.get_database_health(),
+                    "services": await self.get_services_health(),
+                },
             }
         except Exception as e:
             logger.error(f"Error getting system status: {str(e)}")
@@ -41,35 +41,25 @@ class HealthService(BaseService[HealthCheckSchema, HealthCheckSchema, HealthChec
     async def get_database_health(self) -> Dict[str, Any]:
         """Check database health."""
         try:
-            await self.db.execute(text('SELECT 1'))
-            return {
-                'status': 'connected',
-                'latency': 'normal'
-            }
+            await self.db.execute(text("SELECT 1"))
+            return {"status": "connected", "latency": "normal"}
         except Exception as e:
             logger.error(f"Database health check failed: {str(e)}")
-            return {
-                'status': 'error',
-                'error': str(e)
-            }
+            return {"status": "error", "error": str(e)}
 
     async def get_services_health(self) -> Dict[str, Any]:
         """Check health of dependent services."""
-        return {
-            'api': 'operational',
-            'background_tasks': 'operational',
-            'cache': 'operational'
-        }
+        return {"api": "operational", "background_tasks": "operational", "cache": "operational"}
 
     async def get_health_metrics(self) -> Dict[str, Any]:
         """Get system health metrics."""
         try:
             return {
-                'cpu_usage': psutil.cpu_percent(),
-                'memory_usage': psutil.virtual_memory().percent,
-                'disk_usage': psutil.disk_usage('/').percent,
-                'uptime': psutil.boot_time(),
-                'last_check': datetime.utcnow()
+                "cpu_usage": psutil.cpu_percent(),
+                "memory_usage": psutil.virtual_memory().percent,
+                "disk_usage": psutil.disk_usage("/").percent,
+                "uptime": psutil.boot_time(),
+                "last_check": datetime.utcnow(),
             }
         except Exception as e:
             logger.error(f"Error getting health metrics: {str(e)}")

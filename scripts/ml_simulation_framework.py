@@ -30,19 +30,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    mean_squared_error, mean_absolute_error, r2_score
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
 )
+
 
 # Custom exceptions
 class SimulationError(Exception):
     """Exception raised for errors in the simulation framework."""
+
     pass
+
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("ml_simulation")
 
@@ -50,17 +57,18 @@ logger = logging.getLogger("ml_simulation")
 # Configuration Management
 # -----------------------------------------------------------------------------
 
+
 class SimulationConfigEncoder(json.JSONEncoder):
     """Custom JSON encoder for simulation configuration objects."""
 
     def default(self, obj):
-        if hasattr(obj, 'to_dict'):
+        if hasattr(obj, "to_dict"):
             return obj.to_dict()
         if isinstance(obj, Enum):
             return obj.name
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-        if hasattr(obj, '__dict__'):
+        if hasattr(obj, "__dict__"):
             return obj.__dict__
         return super().default(obj)
 
@@ -89,15 +97,15 @@ class SimulationConfig:
         if filepath is None:
             filepath = os.path.join(self.output_dir, f"{self.name}_config.json")
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(self.to_dict(), f, cls=SimulationConfigEncoder, indent=2)
 
         return filepath
 
     @classmethod
-    def load(cls, filepath: str) -> 'SimulationConfig':
+    def load(cls, filepath: str) -> "SimulationConfig":
         """Load configuration from a JSON file."""
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             config_dict = json.load(f)
 
         return cls(**config_dict)
@@ -141,6 +149,7 @@ class PipelineSimulationConfig(SimulationConfig):
 # -----------------------------------------------------------------------------
 # Simulation Environment
 # -----------------------------------------------------------------------------
+
 
 class SimulationEnvironment(ABC):
     """Base class for all simulation environments."""
@@ -197,12 +206,13 @@ class SimulationEnvironment(ABC):
             artifact.savefig(filepath)
         elif isinstance(artifact, dict):
             filepath += ".json"
-            with open(filepath, 'w') as f:
+            with open(filepath, "w") as f:
                 json.dump(artifact, f, cls=SimulationConfigEncoder, indent=2)
         else:
             filepath += ".pkl"
             import pickle
-            with open(filepath, 'wb') as f:
+
+            with open(filepath, "wb") as f:
                 pickle.dump(artifact, f)
 
         self.artifacts[name] = filepath
@@ -215,13 +225,17 @@ class SimulationEnvironment(ABC):
             "config": self.config.to_dict(),
             "start_time": self.start_time.isoformat() if self.start_time else None,
             "end_time": self.end_time.isoformat() if self.end_time else None,
-            "duration": (self.end_time - self.start_time).total_seconds() if self.start_time and self.end_time else None,
+            "duration": (
+                (self.end_time - self.start_time).total_seconds()
+                if self.start_time and self.end_time
+                else None
+            ),
             "metrics": self.metrics,
-            "artifacts": self.artifacts
+            "artifacts": self.artifacts,
         }
 
         report_path = os.path.join(self.config.output_dir, f"{self.config.name}_report.json")
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             json.dump(report, f, cls=SimulationConfigEncoder, indent=2)
 
         return report
@@ -259,7 +273,7 @@ class TabularDataEnvironment(SimulationEnvironment):
 
             # Make features somewhat predictive of classes
             for c in range(n_classes):
-                mask = (y == c)
+                mask = y == c
                 class_mean = np.random.randn(n_features) * 2
                 X[mask] += class_mean
         else:  # Regression
@@ -270,7 +284,7 @@ class TabularDataEnvironment(SimulationEnvironment):
         # Convert to DataFrame
         feature_names = [f"feature_{i}" for i in range(n_features)]
         df = pd.DataFrame(X, columns=feature_names)
-        df['target'] = y
+        df["target"] = y
 
         # Add missing values if specified
         if config.missing_data_prob > 0:
@@ -283,19 +297,20 @@ class TabularDataEnvironment(SimulationEnvironment):
             outlier_indices = np.where(outlier_mask)[0]
             for idx in outlier_indices:
                 feature_idx = np.random.randint(0, n_features)
-                df.iloc[idx, feature_idx] = df.iloc[:, feature_idx].mean() + \
-                                           df.iloc[:, feature_idx].std() * np.random.choice([-10, 10])
+                df.iloc[idx, feature_idx] = df.iloc[:, feature_idx].mean() + df.iloc[
+                    :, feature_idx
+                ].std() * np.random.choice([-10, 10])
 
         # Add temporal patterns if specified
         if config.temporal_dependency:
             # Assuming the data has a natural order (e.g., time series)
-            df['time_idx'] = np.arange(n_samples)
+            df["time_idx"] = np.arange(n_samples)
             # Add some temporal trends
-            df['seasonal'] = np.sin(df['time_idx'] * 2 * np.pi / (n_samples / 4))
-            df['trend'] = df['time_idx'] / n_samples * 2
+            df["seasonal"] = np.sin(df["time_idx"] * 2 * np.pi / (n_samples / 4))
+            df["trend"] = df["time_idx"] / n_samples * 2
             # Make target partially dependent on temporal features
             if n_classes == 0:  # only for regression
-                df['target'] += df['seasonal'] + df['trend']
+                df["target"] += df["seasonal"] + df["trend"]
 
         self.data = df
         return df
@@ -313,29 +328,26 @@ class TabularDataEnvironment(SimulationEnvironment):
         drifted_data = self.data.copy()
 
         # Select random samples to apply drift
-        drift_indices = np.random.choice(
-            len(drifted_data), drift_samples, replace=False
-        )
+        drift_indices = np.random.choice(len(drifted_data), drift_samples, replace=False)
 
         # Apply different kinds of drift based on target type
-        if np.issubdtype(drifted_data['target'].dtype, np.integer):
+        if np.issubdtype(drifted_data["target"].dtype, np.integer):
             # Classification - swap some labels
-            unique_labels = drifted_data['target'].unique()
+            unique_labels = drifted_data["target"].unique()
             if len(unique_labels) > 1:
                 for idx in drift_indices:
-                    current_label = drifted_data.loc[idx, 'target']
+                    current_label = drifted_data.loc[idx, "target"]
                     other_labels = [l for l in unique_labels if l != current_label]
-                    drifted_data.loc[idx, 'target'] = np.random.choice(other_labels)
+                    drifted_data.loc[idx, "target"] = np.random.choice(other_labels)
         else:
             # Regression - add systematic shift
-            drift_magnitude = drifted_data['target'].std() * self.config.drift_rate
-            drifted_data.loc[drift_indices, 'target'] += drift_magnitude
+            drift_magnitude = drifted_data["target"].std() * self.config.drift_rate
+            drifted_data.loc[drift_indices, "target"] += drift_magnitude
 
         return drifted_data
 
     def generate_train_test_sets(
-        self, test_size: float = 0.2,
-        add_drift_to_test: bool = False
+        self, test_size: float = 0.2, add_drift_to_test: bool = False
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Generate train and test datasets with optional drift in test set."""
         if self.data is None:
@@ -360,7 +372,7 @@ class TabularDataEnvironment(SimulationEnvironment):
                 dataset_size=len(test_data),
                 feature_count=self.config.feature_count,
                 class_count=self.config.class_count,
-                drift_rate=self.config.drift_rate
+                drift_rate=self.config.drift_rate,
             )
             test_env = TabularDataEnvironment(test_config)
             test_env.data = test_data
@@ -393,7 +405,7 @@ class TabularDataEnvironment(SimulationEnvironment):
 
         # Visualize data distributions
         fig, ax = plt.subplots(figsize=(10, 6))
-        data.drop(columns=['target']).boxplot(ax=ax)
+        data.drop(columns=["target"]).boxplot(ax=ax)
         plt.xticks(rotation=90)
         plt.title("Feature Distributions")
         self.save_artifact("feature_distributions", fig)
@@ -411,10 +423,7 @@ class TimeSeriesEnvironment(SimulationEnvironment):
         self.data = None
 
     def generate_data(
-        self,
-        start_date: str = "2022-01-01",
-        freq: str = "D",
-        n_series: int = 1
+        self, start_date: str = "2022-01-01", freq: str = "D", n_series: int = 1
     ) -> pd.DataFrame:
         """Generate synthetic time series data."""
         config = self.config
@@ -424,7 +433,7 @@ class TimeSeriesEnvironment(SimulationEnvironment):
         date_rng = pd.date_range(start=start_date, periods=n_samples, freq=freq)
 
         # Initialize DataFrame
-        df = pd.DataFrame(date_rng, columns=['date'])
+        df = pd.DataFrame(date_rng, columns=["date"])
 
         # Generate multiple time series if needed
         for i in range(n_series):
@@ -434,8 +443,12 @@ class TimeSeriesEnvironment(SimulationEnvironment):
             trend = np.linspace(0, 1, n_samples) * np.random.uniform(0, 5)
 
             # Multiple seasonality components with different frequencies
-            season1 = np.sin(np.linspace(0, n_samples/10*2*np.pi, n_samples)) * np.random.uniform(1, 3)
-            season2 = np.sin(np.linspace(0, n_samples/100*2*np.pi, n_samples)) * np.random.uniform(0.5, 2)
+            season1 = np.sin(
+                np.linspace(0, n_samples / 10 * 2 * np.pi, n_samples)
+            ) * np.random.uniform(1, 3)
+            season2 = np.sin(
+                np.linspace(0, n_samples / 100 * 2 * np.pi, n_samples)
+            ) * np.random.uniform(0.5, 2)
 
             # Random noise
             noise_level = config.noise_level
@@ -452,7 +465,9 @@ class TimeSeriesEnvironment(SimulationEnvironment):
                 outlier_mask = np.random.random(n_samples) < config.outlier_prob
                 outlier_indices = np.where(outlier_mask)[0]
                 for idx in outlier_indices:
-                    df.loc[idx, series_name] = signal.mean() + signal.std() * np.random.choice([-10, 10])
+                    df.loc[idx, series_name] = signal.mean() + signal.std() * np.random.choice(
+                        [-10, 10]
+                    )
 
             # Add missing values if specified
             if config.missing_data_prob > 0:
@@ -493,8 +508,8 @@ class TimeSeriesEnvironment(SimulationEnvironment):
         # Visualize the time series
         fig, ax = plt.subplots(figsize=(12, 6))
         for col in data.columns:
-            if col != 'date':
-                ax.plot(data['date'], data[col], label=col)
+            if col != "date":
+                ax.plot(data["date"], data[col], label=col)
 
         ax.set_title("Simulated Time Series")
         ax.set_xlabel("Date")
@@ -527,7 +542,7 @@ class NLPEnvironment(SimulationEnvironment):
         def random_word(length=None):
             if length is None:
                 length = random.randint(3, 10)
-            return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
+            return "".join(random.choice(string.ascii_lowercase) for _ in range(length))
 
         vocabulary = [random_word() for _ in range(vocab_size)]
 
@@ -568,7 +583,7 @@ class NLPEnvironment(SimulationEnvironment):
             else:
                 text_words = [random.choice(vocabulary) for _ in range(length)]
 
-            text = ' '.join(text_words)
+            text = " ".join(text_words)
 
             # Add noise if specified
             if config.noise_level > 0:
@@ -576,26 +591,23 @@ class NLPEnvironment(SimulationEnvironment):
                 chars = list(text)
                 n_errors = int(len(chars) * config.noise_level)
                 for _ in range(n_errors):
-                    error_type = random.choice(['typo', 'deletion', 'insertion'])
+                    error_type = random.choice(["typo", "deletion", "insertion"])
                     pos = random.randint(0, len(chars) - 1)
 
-                    if error_type == 'typo' and chars[pos] != ' ':
+                    if error_type == "typo" and chars[pos] != " ":
                         chars[pos] = random.choice(string.ascii_lowercase)
-                    elif error_type == 'deletion':
+                    elif error_type == "deletion":
                         chars.pop(pos)
-                    elif error_type == 'insertion':
+                    elif error_type == "insertion":
                         chars.insert(pos, random.choice(string.ascii_lowercase))
 
-                text = ''.join(chars)
+                text = "".join(chars)
 
             texts.append(text)
             labels.append(label)
 
         # Create DataFrame
-        df = pd.DataFrame({
-            'text': texts,
-            'target': labels
-        })
+        df = pd.DataFrame({"text": texts, "target": labels})
 
         self.data = df
         return df
@@ -610,8 +622,8 @@ class NLPEnvironment(SimulationEnvironment):
 
         # Split into train/test
         indices = np.random.permutation(len(data))
-        train_idx = indices[:int(0.8 * len(indices))]
-        test_idx = indices[int(0.8 * len(indices)):]
+        train_idx = indices[: int(0.8 * len(indices))]
+        test_idx = indices[int(0.8 * len(indices)) :]
 
         train_data = data.iloc[train_idx].reset_index(drop=True)
         test_data = data.iloc[test_idx].reset_index(drop=True)
@@ -623,13 +635,13 @@ class NLPEnvironment(SimulationEnvironment):
 
         # Log metrics
         self.log_metric("dataset_size", len(data))
-        self.log_metric("avg_text_length", data['text'].str.len().mean())
-        self.log_metric("unique_words", len(set(' '.join(data['text']).split())))
+        self.log_metric("avg_text_length", data["text"].str.len().mean())
+        self.log_metric("unique_words", len(set(" ".join(data["text"]).split())))
 
         # Visualize text length distribution
         fig, ax = plt.subplots(figsize=(10, 6))
-        data['text_length'] = data['text'].str.len()
-        sns.histplot(data['text_length'], ax=ax)
+        data["text_length"] = data["text"].str.len()
+        sns.histplot(data["text_length"], ax=ax)
         ax.set_title("Text Length Distribution")
         ax.set_xlabel("Length (characters)")
         self.save_artifact("text_length_dist", fig)
@@ -643,20 +655,23 @@ class NLPEnvironment(SimulationEnvironment):
 # Model Simulation Framework
 # -----------------------------------------------------------------------------
 
+
 class ModelSimulator:
     """Simulates model performance under various conditions."""
 
-    def __init__(self,
-                 model_factory: Callable,
-                 environment: SimulationEnvironment,
-                 config: ModelSimulationConfig):
+    def __init__(
+        self,
+        model_factory: Callable,
+        environment: SimulationEnvironment,
+        config: ModelSimulationConfig,
+    ):
         self.model_factory = model_factory
         self.environment = environment
         self.config = config
         self.model = None
         self.logger = logging.getLogger(f"model_simulator.{self.__class__.__name__}")
 
-    def train_model(self, train_data: pd.DataFrame, target_col: str = 'target') -> Any:
+    def train_model(self, train_data: pd.DataFrame, target_col: str = "target") -> Any:
         """Train a model on the given data."""
         X = train_data.drop(columns=[target_col])
         y = train_data[target_col]
@@ -668,7 +683,9 @@ class ModelSimulator:
         self.model = model
         return model
 
-    def evaluate_model(self, test_data: pd.DataFrame, target_col: str = 'target') -> Dict[str, float]:
+    def evaluate_model(
+        self, test_data: pd.DataFrame, target_col: str = "target"
+    ) -> Dict[str, float]:
         """Evaluate the model on test data."""
         if self.model is None:
             raise ValueError("Model must be trained before evaluation")
@@ -684,26 +701,26 @@ class ModelSimulator:
         # Calculate metrics based on problem type
         metrics = {}
 
-        if self.config.model_type == 'classifier':
+        if self.config.model_type == "classifier":
             # Classification metrics
-            metrics['accuracy'] = accuracy_score(y_test, y_pred)
-            metrics['precision'] = precision_score(y_test, y_pred, average='weighted')
-            metrics['recall'] = recall_score(y_test, y_pred, average='weighted')
-            metrics['f1'] = f1_score(y_test, y_pred, average='weighted')
+            metrics["accuracy"] = accuracy_score(y_test, y_pred)
+            metrics["precision"] = precision_score(y_test, y_pred, average="weighted")
+            metrics["recall"] = recall_score(y_test, y_pred, average="weighted")
+            metrics["f1"] = f1_score(y_test, y_pred, average="weighted")
         else:
             # Regression metrics
-            metrics['mse'] = mean_squared_error(y_test, y_pred)
-            metrics['mae'] = mean_absolute_error(y_test, y_pred)
-            metrics['r2'] = r2_score(y_test, y_pred)
+            metrics["mse"] = mean_squared_error(y_test, y_pred)
+            metrics["mae"] = mean_absolute_error(y_test, y_pred)
+            metrics["r2"] = r2_score(y_test, y_pred)
 
         return metrics
 
     def simulate_performance_degradation(
         self,
         test_data: pd.DataFrame,
-        target_col: str = 'target',
-        degradation_types: List[str] = ['noise', 'missing', 'drift'],
-        severity_levels: List[float] = [0.1, 0.3, 0.5]
+        target_col: str = "target",
+        degradation_types: List[str] = ["noise", "missing", "drift"],
+        severity_levels: List[float] = [0.1, 0.3, 0.5],
     ) -> Dict[str, Dict[str, float]]:
         """Simulate model performance under various degradation scenarios."""
         if self.model is None:
@@ -713,7 +730,7 @@ class ModelSimulator:
 
         # Baseline performance (no degradation)
         baseline_metrics = self.evaluate_model(test_data, target_col)
-        results['baseline'] = baseline_metrics
+        results["baseline"] = baseline_metrics
 
         X_test = test_data.drop(columns=[target_col])
         y_test = test_data[target_col]
@@ -725,15 +742,17 @@ class ModelSimulator:
                 self.logger.info(f"Simulating {scenario_name} degradation")
 
                 # Create degraded test set based on type
-                if deg_type == 'noise':
+                if deg_type == "noise":
                     # Add noise to features
                     X_degraded = X_test.copy()
                     for col in X_degraded.columns:
                         if np.issubdtype(X_degraded[col].dtype, np.number):
-                            noise = np.random.normal(0, X_degraded[col].std() * severity, size=len(X_degraded))
+                            noise = np.random.normal(
+                                0, X_degraded[col].std() * severity, size=len(X_degraded)
+                            )
                             X_degraded[col] += noise
 
-                elif deg_type == 'missing':
+                elif deg_type == "missing":
                     # Introduce missing values
                     X_degraded = X_test.copy()
                     mask = np.random.random(X_degraded.shape) < severity
@@ -747,7 +766,7 @@ class ModelSimulator:
                             else:
                                 X_degraded[col].fillna(X_degraded[col].mode()[0], inplace=True)
 
-                elif deg_type == 'drift':
+                elif deg_type == "drift":
                     # Concept drift - shift in feature distributions
                     X_degraded = X_test.copy()
                     for col in X_degraded.columns:
@@ -764,25 +783,22 @@ class ModelSimulator:
 
                 # Calculate metrics
                 metrics = {}
-                if self.config.model_type == 'classifier':
-                    metrics['accuracy'] = accuracy_score(y_test, y_pred)
-                    metrics['precision'] = precision_score(y_test, y_pred, average='weighted')
-                    metrics['recall'] = recall_score(y_test, y_pred, average='weighted')
-                    metrics['f1'] = f1_score(y_test, y_pred, average='weighted')
+                if self.config.model_type == "classifier":
+                    metrics["accuracy"] = accuracy_score(y_test, y_pred)
+                    metrics["precision"] = precision_score(y_test, y_pred, average="weighted")
+                    metrics["recall"] = recall_score(y_test, y_pred, average="weighted")
+                    metrics["f1"] = f1_score(y_test, y_pred, average="weighted")
                 else:
-                    metrics['mse'] = mean_squared_error(y_test, y_pred)
-                    metrics['mae'] = mean_absolute_error(y_test, y_pred)
-                    metrics['r2'] = r2_score(y_test, y_pred)
+                    metrics["mse"] = mean_squared_error(y_test, y_pred)
+                    metrics["mae"] = mean_absolute_error(y_test, y_pred)
+                    metrics["r2"] = r2_score(y_test, y_pred)
 
                 results[scenario_name] = metrics
 
         return results
 
     def simulate_adversarial_cases(
-        self,
-        test_data: pd.DataFrame,
-        target_col: str = 'target',
-        epsilon: float = 0.1
+        self, test_data: pd.DataFrame, target_col: str = "target", epsilon: float = 0.1
     ) -> Dict[str, float]:
         """Simulate simple adversarial attacks on the model."""
         if self.model is None:
@@ -795,7 +811,7 @@ class ModelSimulator:
 
         # Get baseline predictions
         y_pred_baseline = self.model.predict(X_test)
-        baseline_correct = (y_pred_baseline == y_test)
+        baseline_correct = y_pred_baseline == y_test
         correct_indices = np.where(baseline_correct)[0]
 
         if len(correct_indices) == 0:
@@ -816,35 +832,38 @@ class ModelSimulator:
             if np.issubdtype(X_adversarial[col].dtype, np.number):
                 # Apply small perturbation scaled by feature standard deviation
                 std = X_test[col].std()
-                perturbation = np.random.uniform(-epsilon * std, epsilon * std, size=len(X_adversarial))
+                perturbation = np.random.uniform(
+                    -epsilon * std, epsilon * std, size=len(X_adversarial)
+                )
                 X_adversarial[col] += perturbation
 
         # Evaluate on adversarial examples
         y_pred_adversarial = self.model.predict(X_adversarial)
 
         # Calculate adversarial success rate (how often predictions changed)
-        changed_predictions = (y_pred_adversarial != y_selected)
+        changed_predictions = y_pred_adversarial != y_selected
         adversarial_success_rate = changed_predictions.mean()
 
         # Calculate metrics on adversarial examples
-        if self.config.model_type == 'classifier':
+        if self.config.model_type == "classifier":
             adv_accuracy = accuracy_score(y_selected, y_pred_adversarial)
-            adv_f1 = f1_score(y_selected, y_pred_adversarial, average='weighted')
+            adv_f1 = f1_score(y_selected, y_pred_adversarial, average="weighted")
 
             metrics = {
-                'adversarial_success_rate': adversarial_success_rate,
-                'adversarial_accuracy': adv_accuracy,
-                'adversarial_f1': adv_f1,
-                'accuracy_drop': 1.0 - adv_accuracy  # Since we started with 100% accuracy on this subset
+                "adversarial_success_rate": adversarial_success_rate,
+                "adversarial_accuracy": adv_accuracy,
+                "adversarial_f1": adv_f1,
+                "accuracy_drop": 1.0
+                - adv_accuracy,  # Since we started with 100% accuracy on this subset
             }
         else:
             adv_mse = mean_squared_error(y_selected, y_pred_adversarial)
             baseline_mse = mean_squared_error(y_selected, y_selected)  # Should be 0
 
             metrics = {
-                'adversarial_success_rate': adversarial_success_rate,
-                'adversarial_mse': adv_mse,
-                'mse_increase': adv_mse - baseline_mse
+                "adversarial_success_rate": adversarial_success_rate,
+                "adversarial_mse": adv_mse,
+                "mse_increase": adv_mse - baseline_mse,
             }
 
         return metrics
@@ -858,12 +877,14 @@ class ModelSimulator:
             "config": self.config.to_dict(),
             "metrics": {},
             "degradation_results": {},
-            "adversarial_results": {}
+            "adversarial_results": {},
         }
 
         # Generate or get data from environment
-        if hasattr(self.environment, 'generate_train_test_sets'):
-            train_data, test_data = self.environment.generate_train_test_sets(add_drift_to_test=False)
+        if hasattr(self.environment, "generate_train_test_sets"):
+            train_data, test_data = self.environment.generate_train_test_sets(
+                add_drift_to_test=False
+            )
         else:
             # Assume data is already available in the environment
             train_size = int(0.8 * len(self.environment.data))
@@ -882,7 +903,7 @@ class ModelSimulator:
         results["degradation_results"] = degradation_results
 
         # Adversarial testing
-        if self.config.model_type == 'classifier':
+        if self.config.model_type == "classifier":
             adversarial_results = self.simulate_adversarial_cases(test_data)
             results["adversarial_results"] = adversarial_results
 
@@ -897,6 +918,7 @@ class ModelSimulator:
 # -----------------------------------------------------------------------------
 # Data Pipeline Simulation
 # -----------------------------------------------------------------------------
+
 
 class PipelineStage:
     """Base class for a stage in a data pipeline simulation."""
@@ -931,7 +953,7 @@ class PipelineStage:
         return {
             "failure_rate": self.metrics["failures"] / max(1, self.metrics["calls"]),
             "avg_latency": np.mean(self.metrics["latency"]),
-            "max_latency": max(self.metrics["latency"])
+            "max_latency": max(self.metrics["latency"]),
         }
 
 
@@ -959,13 +981,11 @@ class DataLoadStage(PipelineStage):
             else:
                 y = np.random.randn(n_samples)
 
-            data = {
-                "X": X,
-                "y": y,
-                "feature_names": [f"feature_{i}" for i in range(n_features)]
-            }
+            data = {"X": X, "y": y, "feature_names": [f"feature_{i}" for i in range(n_features)]}
 
-            self.logger.info(f"Generated synthetic dataset with {n_samples} samples and {n_features} features")
+            self.logger.info(
+                f"Generated synthetic dataset with {n_samples} samples and {n_features} features"
+            )
 
         # Record data loading time in context
         context["data_loaded_at"] = datetime.now().isoformat()
@@ -1006,10 +1026,7 @@ class DataPreprocessStage(PipelineStage):
             X = (X - mean) / std
 
             # Store normalization params for later use
-            data["preprocessing"] = {
-                "mean": mean,
-                "std": std
-            }
+            data["preprocessing"] = {"mean": mean, "std": std}
 
         # Update the data
         data["X"] = X
@@ -1024,7 +1041,14 @@ class DataPreprocessStage(PipelineStage):
 class ModelTrainStage(PipelineStage):
     """Pipeline stage for training a model."""
 
-    def __init__(self, name: str, failure_prob: float = 0.0, latency_mean: float = 0.1, model_factory: Callable = None, model_params: Dict = None):
+    def __init__(
+        self,
+        name: str,
+        failure_prob: float = 0.0,
+        latency_mean: float = 0.1,
+        model_factory: Callable = None,
+        model_params: Dict = None,
+    ):
         super().__init__(name, failure_prob, latency_mean)
         self.model_factory = model_factory
         self.model_params = model_params or {}
@@ -1120,9 +1144,9 @@ class ModelEvaluationStage(PipelineStage):
             # Classification metrics
             metrics["accuracy"] = accuracy_score(y_test, y_pred)
             try:
-                metrics["precision"] = precision_score(y_test, y_pred, average='weighted')
-                metrics["recall"] = recall_score(y_test, y_pred, average='weighted')
-                metrics["f1"] = f1_score(y_test, y_pred, average='weighted')
+                metrics["precision"] = precision_score(y_test, y_pred, average="weighted")
+                metrics["recall"] = recall_score(y_test, y_pred, average="weighted")
+                metrics["f1"] = f1_score(y_test, y_pred, average="weighted")
             except Exception as e:
                 self.logger.warning(f"Could not calculate all classification metrics: {str(e)}")
         else:
@@ -1215,7 +1239,7 @@ class PipelineSimulator:
             "pipeline_success": "pipeline_error" not in context,
             "stages_completed": i + 1 if "pipeline_error" not in context else i,
             "total_stages": len(self.stages),
-            "stage_metrics": {stage.name: stage.get_metrics() for stage in self.stages}
+            "stage_metrics": {stage.name: stage.get_metrics() for stage in self.stages},
         }
 
         context["pipeline_metrics"] = self.metrics
@@ -1228,6 +1252,7 @@ class PipelineSimulator:
 # End-to-End System Testing
 # -----------------------------------------------------------------------------
 
+
 class MLSystemSimulator:
     """Simulates an end-to-end ML system with data, training, and serving components."""
 
@@ -1238,14 +1263,16 @@ class MLSystemSimulator:
         self.environment = None
         self.model_simulator = None
 
-    def configure_data_environment(self, environment_type: str = "tabular", **kwargs) -> SimulationEnvironment:
+    def configure_data_environment(
+        self, environment_type: str = "tabular", **kwargs
+    ) -> SimulationEnvironment:
         """Configure the data environment for the simulation."""
         config_dict = {
             "name": f"{self.config.name}_data_env",
             "description": f"Data environment for {self.config.name}",
             "seed": self.config.seed,
             "output_dir": os.path.join(self.config.output_dir, "data_environment"),
-            **kwargs
+            **kwargs,
         }
 
         data_config = DataSimulationConfig(**config_dict)
@@ -1271,7 +1298,7 @@ class MLSystemSimulator:
             "description": f"Model simulator for {self.config.name}",
             "seed": self.config.seed,
             "output_dir": os.path.join(self.config.output_dir, "model_simulator"),
-            **kwargs
+            **kwargs,
         }
 
         model_config = ModelSimulationConfig(**config_dict)
@@ -1286,7 +1313,7 @@ class MLSystemSimulator:
             "description": f"Pipeline simulator for {self.config.name}",
             "seed": self.config.seed,
             "output_dir": os.path.join(self.config.output_dir, "pipeline_simulator"),
-            "stages": [cfg.get("name", f"stage_{i}") for i, cfg in enumerate(stage_configs or [])]
+            "stages": [cfg.get("name", f"stage_{i}") for i, cfg in enumerate(stage_configs or [])],
         }
 
         pipeline_config = PipelineSimulationConfig(**config_dict)
@@ -1319,7 +1346,7 @@ class MLSystemSimulator:
         results = {
             "config": self.config.to_dict(),
             "timestamp": datetime.now().isoformat(),
-            "components": {}
+            "components": {},
         }
 
         # 1. Generate data if environment is configured
@@ -1340,16 +1367,20 @@ class MLSystemSimulator:
 
             # Initialize with data from environment if available
             initial_data = None
-            if self.environment and hasattr(self.environment, 'data') and self.environment.data is not None:
+            if (
+                self.environment
+                and hasattr(self.environment, "data")
+                and self.environment.data is not None
+            ):
                 # Convert DataFrame to the format expected by pipeline
                 df = self.environment.data
-                X = df.drop(columns=['target']).values
-                y = df['target'].values
+                X = df.drop(columns=["target"]).values
+                y = df["target"].values
 
                 initial_data = {
                     "X": X,
                     "y": y,
-                    "feature_names": df.drop(columns=['target']).columns.tolist()
+                    "feature_names": df.drop(columns=["target"]).columns.tolist(),
                 }
 
             # Run the pipeline
@@ -1358,7 +1389,7 @@ class MLSystemSimulator:
             # Collect results
             pipeline_results = {
                 "pipeline_metrics": self.pipeline_simulator.metrics,
-                "context": context
+                "context": context,
             }
 
             if "evaluation_metrics" in final_data:
@@ -1368,8 +1399,7 @@ class MLSystemSimulator:
 
         # Generate overall success/failure status
         results["success"] = all(
-            comp.get("success", True)
-            for comp in results["components"].values()
+            comp.get("success", True) for comp in results["components"].values()
         )
 
         return results
@@ -1378,6 +1408,7 @@ class MLSystemSimulator:
 # -----------------------------------------------------------------------------
 # Reporting and Visualization
 # -----------------------------------------------------------------------------
+
 
 class SimulationReporter:
     """Generates reports and visualizations for simulation results."""
@@ -1392,7 +1423,7 @@ class SimulationReporter:
         report = {
             "baseline_metrics": model_results.get("metrics", {}),
             "degradation_impact": {},
-            "adversarial_impact": model_results.get("adversarial_results", {})
+            "adversarial_impact": model_results.get("adversarial_results", {}),
         }
 
         # Calculate impact of each degradation scenario
@@ -1439,26 +1470,26 @@ class SimulationReporter:
             fig, ax = plt.subplots(figsize=(10, 6))
 
             # Group by degradation type
-            degradation_types = set(s.split('_')[0] for s in scenarios)
+            degradation_types = set(s.split("_")[0] for s in scenarios)
 
             for deg_type in degradation_types:
                 # Get scenarios of this type
                 type_scenarios = [s for s in scenarios if s.startswith(deg_type)]
 
                 # Sort by severity
-                type_scenarios.sort(key=lambda s: float(s.split('_')[1]))
+                type_scenarios.sort(key=lambda s: float(s.split("_")[1]))
 
                 # Extract severity levels and corresponding metric values
-                severities = [float(s.split('_')[1]) for s in type_scenarios]
+                severities = [float(s.split("_")[1]) for s in type_scenarios]
                 values = [degradation_results[s][metric] for s in type_scenarios]
 
                 # Plot this degradation type
-                ax.plot(severities, values, marker='o', label=deg_type)
+                ax.plot(severities, values, marker="o", label=deg_type)
 
             # Add baseline as horizontal line
             if "baseline" in degradation_results and metric in degradation_results["baseline"]:
                 baseline_value = degradation_results["baseline"][metric]
-                ax.axhline(y=baseline_value, color='r', linestyle='--', label='baseline')
+                ax.axhline(y=baseline_value, color="r", linestyle="--", label="baseline")
 
             # Add labels and legend
             ax.set_xlabel("Degradation Severity")
@@ -1479,9 +1510,9 @@ class SimulationReporter:
             "success_rate": pipeline_metrics.get("pipeline_success", False),
             "stages_completed": pipeline_metrics.get("stages_completed", 0),
             "total_stages": pipeline_metrics.get("total_stages", 0),
-            "completion_rate": pipeline_metrics.get("stages_completed", 0) /
-                               max(1, pipeline_metrics.get("total_stages", 1)),
-            "stage_metrics": {}
+            "completion_rate": pipeline_metrics.get("stages_completed", 0)
+            / max(1, pipeline_metrics.get("total_stages", 1)),
+            "stage_metrics": {},
         }
 
         # Process stage metrics
@@ -1489,7 +1520,7 @@ class SimulationReporter:
             report["stage_metrics"][stage_name] = {
                 "failure_rate": metrics.get("failure_rate", 0),
                 "avg_latency": metrics.get("avg_latency", 0),
-                "max_latency": metrics.get("max_latency", 0)
+                "max_latency": metrics.get("max_latency", 0),
             }
 
         # Visualize pipeline performance
@@ -1515,14 +1546,14 @@ class SimulationReporter:
         x = np.arange(len(stages))
         width = 0.35
 
-        ax.bar(x - width/2, avg_latencies, width, label='Average Latency')
-        ax.bar(x + width/2, max_latencies, width, label='Max Latency')
+        ax.bar(x - width / 2, avg_latencies, width, label="Average Latency")
+        ax.bar(x + width / 2, max_latencies, width, label="Max Latency")
 
-        ax.set_xlabel('Pipeline Stage')
-        ax.set_ylabel('Latency (seconds)')
-        ax.set_title('Pipeline Stage Latencies')
+        ax.set_xlabel("Pipeline Stage")
+        ax.set_ylabel("Latency (seconds)")
+        ax.set_title("Pipeline Stage Latencies")
         ax.set_xticks(x)
-        ax.set_xticklabels(stages, rotation=45, ha='right')
+        ax.set_xticklabels(stages, rotation=45, ha="right")
         ax.legend()
 
         fig.tight_layout()
@@ -1537,11 +1568,11 @@ class SimulationReporter:
 
         ax.bar(x, failure_rates)
 
-        ax.set_xlabel('Pipeline Stage')
-        ax.set_ylabel('Failure Rate')
-        ax.set_title('Pipeline Stage Failure Rates')
+        ax.set_xlabel("Pipeline Stage")
+        ax.set_ylabel("Failure Rate")
+        ax.set_title("Pipeline Stage Failure Rates")
         ax.set_xticks(x)
-        ax.set_xticklabels(stages, rotation=45, ha='right')
+        ax.set_xticklabels(stages, rotation=45, ha="right")
 
         fig.tight_layout()
         filepath = os.path.join(self.output_dir, "pipeline_failure_rates.png")
@@ -1554,7 +1585,7 @@ class SimulationReporter:
             "system_name": system_results.get("config", {}).get("name", "Unknown"),
             "timestamp": system_results.get("timestamp", datetime.now().isoformat()),
             "success": system_results.get("success", False),
-            "components": {}
+            "components": {},
         }
 
         # Process each component's results
@@ -1565,7 +1596,7 @@ class SimulationReporter:
             data_env = components["data_environment"]
             report["components"]["data_environment"] = {
                 "metrics": data_env.get("metrics", {}),
-                "artifacts": data_env.get("artifacts", {})
+                "artifacts": data_env.get("artifacts", {}),
             }
 
         # Model simulator report
@@ -1582,7 +1613,7 @@ class SimulationReporter:
 
         # Save the report
         report_path = os.path.join(self.output_dir, f"{report['system_name']}_report.json")
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             json.dump(report, f, cls=SimulationConfigEncoder, indent=2)
 
         return report
@@ -1591,6 +1622,7 @@ class SimulationReporter:
 # -----------------------------------------------------------------------------
 # Integration Components
 # -----------------------------------------------------------------------------
+
 
 class CIIntegration:
     """Integration with CI/CD workflows for ML simulation."""
@@ -1623,8 +1655,10 @@ class CIIntegration:
             class DummyModel:
                 def fit(self, X, y):
                     return self
+
                 def predict(self, X):
                     return np.zeros(len(X))
+
             return DummyModel()
 
         simulator.configure_model_simulator(dummy_model_factory)
@@ -1636,10 +1670,7 @@ class CIIntegration:
         ci_status = "passed" if results.get("success", False) else "failed"
         self.logger.info(f"CI simulation {ci_status}")
 
-        return {
-            "ci_status": ci_status,
-            "results": results
-        }
+        return {"ci_status": ci_status, "results": results}
 
 
 class PreCommitHook:
@@ -1655,11 +1686,7 @@ class PreCommitHook:
         run_model_check = any(f.endswith(".py") and "model" in f for f in changed_files)
         run_pipeline_check = any(f.endswith(".py") and "pipeline" in f for f in changed_files)
 
-        results = {
-            "changed_files": changed_files,
-            "checks_run": [],
-            "passed": True
-        }
+        results = {"changed_files": changed_files, "checks_run": [], "passed": True}
 
         if run_model_check:
             self.logger.info("Running model robustness check")
@@ -1683,25 +1710,24 @@ class PreCommitHook:
         config = DataSimulationConfig(
             name="precommit_model_check",
             dataset_size=500,  # Small dataset for speed
-            feature_count=5
+            feature_count=5,
         )
 
         env = TabularDataEnvironment(config)
         env.generate_data()
 
         # Create a simple model simulator
-        model_config = ModelSimulationConfig(
-            name="precommit_model",
-            model_type="classifier"
-        )
+        model_config = ModelSimulationConfig(name="precommit_model", model_type="classifier")
 
         # Dummy model factory
         def dummy_model_factory(**kwargs):
             class DummyModel:
                 def fit(self, X, y):
                     return self
+
                 def predict(self, X):
                     return np.zeros(len(X))
+
             return DummyModel()
 
         simulator = ModelSimulator(dummy_model_factory, env, model_config)
@@ -1711,24 +1737,22 @@ class PreCommitHook:
         simulator.train_model(train_data)
 
         degradation_results = simulator.simulate_performance_degradation(
-            test_data,
-            degradation_types=['noise'],
-            severity_levels=[0.5]
+            test_data, degradation_types=["noise"], severity_levels=[0.5]
         )
 
         # Check if degradation is acceptable
-        if 'noise_0.5' in degradation_results:
-            baseline_acc = degradation_results.get('baseline', {}).get('accuracy', 1.0)
-            degraded_acc = degradation_results.get('noise_0.5', {}).get('accuracy', 0.0)
+        if "noise_0.5" in degradation_results:
+            baseline_acc = degradation_results.get("baseline", {}).get("accuracy", 1.0)
+            degraded_acc = degradation_results.get("noise_0.5", {}).get("accuracy", 0.0)
 
             # Define passing threshold
-            passed = (degraded_acc >= baseline_acc * 0.7)  # Allow 30% degradation
+            passed = degraded_acc >= baseline_acc * 0.7  # Allow 30% degradation
 
             return {
                 "passed": passed,
                 "baseline_accuracy": baseline_acc,
                 "degraded_accuracy": degraded_acc,
-                "acceptable_threshold": baseline_acc * 0.7
+                "acceptable_threshold": baseline_acc * 0.7,
             }
 
         return {"passed": False, "error": "Failed to compute degradation metrics"}
@@ -1737,15 +1761,14 @@ class PreCommitHook:
         """Run a quick pipeline simulation check."""
         # Create a simple pipeline configuration
         config = PipelineSimulationConfig(
-            name="precommit_pipeline_check",
-            stages=["load", "preprocess", "train"]
+            name="precommit_pipeline_check", stages=["load", "preprocess", "train"]
         )
 
         # Create simple pipeline stages
         stages = [
             DataLoadStage("load", failure_prob=0.0),
             DataPreprocessStage("preprocess", failure_prob=0.1),
-            ModelTrainStage("train", failure_prob=0.1)
+            ModelTrainStage("train", failure_prob=0.1),
         ]
 
         simulator = PipelineSimulator(config, stages)
@@ -1760,7 +1783,7 @@ class PreCommitHook:
             "passed": passed,
             "pipeline_completed": simulator.metrics.get("stages_completed", 0),
             "total_stages": simulator.metrics.get("total_stages", 0),
-            "error": context.get("pipeline_error")
+            "error": context.get("pipeline_error"),
         }
 
 
@@ -1768,12 +1791,12 @@ class PreCommitHook:
 # Example usage
 # -----------------------------------------------------------------------------
 
+
 def run_example_simulation():
     """Run an example simulation to demonstrate the framework."""
     # Create configuration
     config = SimulationConfig(
-        name="example_simulation",
-        description="Example simulation to demonstrate the framework"
+        name="example_simulation", description="Example simulation to demonstrate the framework"
     )
 
     # Create system simulator
@@ -1785,7 +1808,7 @@ def run_example_simulation():
         dataset_size=5000,
         feature_count=10,
         noise_level=0.1,
-        drift_rate=0.2
+        drift_rate=0.2,
     )
 
     # Configure model simulator
@@ -1794,7 +1817,7 @@ def run_example_simulation():
     model_sim = system.configure_model_simulator(
         model_factory=RandomForestClassifier,
         model_type="classifier",
-        model_params={"n_estimators": 100, "max_depth": 5}
+        model_params={"n_estimators": 100, "max_depth": 5},
     )
 
     # Configure pipeline simulator
@@ -1802,7 +1825,7 @@ def run_example_simulation():
         {"type": "data_load", "name": "load_data", "failure_prob": 0.0},
         {"type": "preprocess", "name": "preprocess", "failure_prob": 0.1},
         {"type": "train", "name": "train_model", "failure_prob": 0.1},
-        {"type": "evaluate", "name": "evaluate_model", "failure_prob": 0.0}
+        {"type": "evaluate", "name": "evaluate_model", "failure_prob": 0.0},
     ]
 
     pipeline_sim = system.configure_pipeline_simulator(pipeline_stages)

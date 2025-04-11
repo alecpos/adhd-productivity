@@ -5,24 +5,26 @@ from unittest.mock import patch, MagicMock, Mock
 import tensorflow as tf
 from datetime import datetime, timedelta
 
+
 # Mock the TimeBlockInput class that's causing import errors
 class MockTimeBlockInput:
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 # Create mock for the scheduling schema imports
 @pytest.fixture(autouse=True)
 def mock_imports():
     """Mock the imports that are causing issues."""
     modules = {
-        'app.schemas.scheduling_schema': Mock(),
-        'app.schemas.scheduling_schema.TimeBlockInput': MockTimeBlockInput,
-        'app.schemas.scheduling_schema.EnergySchedulingPattern': Mock(),
-        'app.schemas.scheduling_schema.WorkHours': Mock(),
+        "app.schemas.scheduling_schema": Mock(),
+        "app.schemas.scheduling_schema.TimeBlockInput": MockTimeBlockInput,
+        "app.schemas.scheduling_schema.EnergySchedulingPattern": Mock(),
+        "app.schemas.scheduling_schema.WorkHours": Mock(),
     }
 
-    with patch.dict('sys.modules', modules):
+    with patch.dict("sys.modules", modules):
         yield
 
 
@@ -39,10 +41,10 @@ class MockCircadianRhythmModel:
         """Build the model."""
         # Create a simple Keras model for testing
         inputs = tf.keras.layers.Input(shape=(self.time_features,))
-        x = tf.keras.layers.Dense(10, activation='relu')(inputs)
+        x = tf.keras.layers.Dense(10, activation="relu")(inputs)
         outputs = tf.keras.layers.Dense(1)(x)
         self.model = tf.keras.Model(inputs=inputs, outputs=outputs)
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(), loss='mse')
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(), loss="mse")
 
     def preprocess_energy_data(self, energy_data):
         """Process energy data for model input."""
@@ -76,10 +78,10 @@ class MockCircadianRhythmModel:
             if energy >= energy_threshold:
                 if current_window is None:
                     # Start a new window
-                    current_window = (hour, hour+1)
+                    current_window = (hour, hour + 1)
                 else:
                     # Extend the current window
-                    current_window = (current_window[0], hour+1)
+                    current_window = (current_window[0], hour + 1)
             else:
                 if current_window is not None:
                     # Check if the window meets the minimum duration
@@ -100,7 +102,7 @@ class MockCircadianRhythmModel:
         # Create a schedule matching tasks to best energy periods
         schedule = []
         for i, task in enumerate(tasks):
-            energy_required = task.get('energy_required', 5)
+            energy_required = task.get("energy_required", 5)
 
             # Find best time for this task
             best_hour = 0
@@ -113,11 +115,9 @@ class MockCircadianRhythmModel:
                     best_hour = hour
 
             # Add task to schedule
-            schedule.append({
-                'id': task['id'],
-                'title': task.get('title', f'Task {i}'),
-                'start_hour': best_hour
-            })
+            schedule.append(
+                {"id": task["id"], "title": task.get("title", f"Task {i}"), "start_hour": best_hour}
+            )
 
         return schedule
 
@@ -125,10 +125,10 @@ class MockCircadianRhythmModel:
         """Analyze completed tasks against energy levels."""
         # Return mock analysis
         return {
-            'optimal_completion_rate': 0.75,
-            'suboptimal_completion_rate': 0.5,
-            'average_success_optimal': 4.2,
-            'average_success_suboptimal': 3.1
+            "optimal_completion_rate": 0.75,
+            "suboptimal_completion_rate": 0.5,
+            "average_success_optimal": 4.2,
+            "average_success_suboptimal": 3.1,
         }
 
 
@@ -137,8 +137,7 @@ class MockCircadianRhythmModel:
 def patch_circadian_rhythm_model(monkeypatch):
     """Patch the CircadianRhythmModel with our mock implementation."""
     monkeypatch.setattr(
-        'app.ml.models.energy_optimizer_model.CircadianRhythmModel',
-        MockCircadianRhythmModel
+        "app.ml.models.energy_optimizer_model.CircadianRhythmModel", MockCircadianRhythmModel
     )
 
 
@@ -168,10 +167,7 @@ def sample_energy_data():
             energy_levels.append(energy)
 
     # Create DataFrame
-    data = {
-        'timestamp': timestamps,
-        'energy_level': energy_levels
-    }
+    data = {"timestamp": timestamps, "energy_level": energy_levels}
 
     return pd.DataFrame(data)
 
@@ -184,18 +180,17 @@ def sample_task_data():
 
     for i in range(20):  # Create 20 sample tasks
         completion_time = start_date + timedelta(
-            days=np.random.randint(0, 7),
-            hours=np.random.randint(7, 22)
+            days=np.random.randint(0, 7), hours=np.random.randint(7, 22)
         )
 
         task = {
-            'id': i,
-            'title': f"Task {i}",
-            'completion_time': completion_time,
-            'energy_required': np.random.uniform(3, 8),
-            'duration': np.random.randint(15, 120),  # Duration in minutes
-            'completed': True,
-            'success_rating': np.random.randint(1, 6)  # Rating 1-5
+            "id": i,
+            "title": f"Task {i}",
+            "completion_time": completion_time,
+            "energy_required": np.random.uniform(3, 8),
+            "duration": np.random.randint(15, 120),  # Duration in minutes
+            "completed": True,
+            "success_rating": np.random.randint(1, 6),  # Rating 1-5
         }
         data.append(task)
 
@@ -217,7 +212,7 @@ def test_model_initialization():
     assert custom_model.time_features == 5
 
     # Verify model attributes
-    assert hasattr(model, 'model')
+    assert hasattr(model, "model")
     assert model.model is None  # Model should be None until built
 
 
@@ -314,9 +309,9 @@ def test_optimize_task_schedule(sample_task_data):
 
     # Sample tasks needing scheduling
     tasks_to_schedule = [
-        {'id': 1, 'title': 'High Energy Task', 'energy_required': 8, 'duration': 60},
-        {'id': 2, 'title': 'Medium Energy Task', 'energy_required': 5, 'duration': 30},
-        {'id': 3, 'title': 'Low Energy Task', 'energy_required': 3, 'duration': 45}
+        {"id": 1, "title": "High Energy Task", "energy_required": 8, "duration": 60},
+        {"id": 2, "title": "Medium Energy Task", "energy_required": 5, "duration": 30},
+        {"id": 3, "title": "Low Energy Task", "energy_required": 3, "duration": 45},
     ]
 
     # Get optimized schedule
@@ -328,9 +323,9 @@ def test_optimize_task_schedule(sample_task_data):
 
     # Check that each task has been assigned a start time
     for task_schedule in schedule:
-        assert 'id' in task_schedule
-        assert 'start_hour' in task_schedule
-        assert 0 <= task_schedule['start_hour'] < 24
+        assert "id" in task_schedule
+        assert "start_hour" in task_schedule
+        assert 0 <= task_schedule["start_hour"] < 24
 
 
 def test_analyze_completed_tasks(sample_task_data, sample_energy_data):
@@ -344,11 +339,11 @@ def test_analyze_completed_tasks(sample_task_data, sample_energy_data):
 
     # Verify analysis results
     assert isinstance(analysis, dict)
-    assert 'optimal_completion_rate' in analysis
-    assert 'suboptimal_completion_rate' in analysis
-    assert 'average_success_optimal' in analysis
-    assert 'average_success_suboptimal' in analysis
+    assert "optimal_completion_rate" in analysis
+    assert "suboptimal_completion_rate" in analysis
+    assert "average_success_optimal" in analysis
+    assert "average_success_suboptimal" in analysis
 
     # Rates should be between 0 and 1
-    assert 0 <= analysis['optimal_completion_rate'] <= 1
-    assert 0 <= analysis['suboptimal_completion_rate'] <= 1
+    assert 0 <= analysis["optimal_completion_rate"] <= 1
+    assert 0 <= analysis["suboptimal_completion_rate"] <= 1

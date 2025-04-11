@@ -44,7 +44,9 @@ class PomodoroSchema(BaseModel):
     id: Optional[UUID] = None
     user_id: Optional[UUID] = None
     duration: int = Field(default=25, ge=10, le=60, description="Focus time duration in minutes")
-    break_duration: int = Field(default=5, ge=3, le=30, description="Break time duration in minutes")
+    break_duration: int = Field(
+        default=5, ge=3, le=30, description="Break time duration in minutes"
+    )
     cycles: int = Field(default=4, ge=1, le=10, description="Number of Pomodoro rounds")
     current_cycle: int = Field(default=1)
     status: PomodoroStatus = Field(default=PomodoroStatus.PENDING)
@@ -112,10 +114,18 @@ class PomodoroResponseSchema(PomodoroSchema):
     id: UUID
     user_id: UUID
     task_id: Optional[UUID] = None
-    work_duration: int = Field(default=25, ge=10, le=60, description="Focus time duration in minutes")
-    short_break_duration: int = Field(default=5, ge=3, le=30, description="Break time duration in minutes")
-    long_break_duration: int = Field(default=15, ge=10, le=45, description="Long break duration in minutes")
-    sessions_until_long_break: int = Field(default=4, ge=1, le=10, description="Number of sessions until long break")
+    work_duration: int = Field(
+        default=25, ge=10, le=60, description="Focus time duration in minutes"
+    )
+    short_break_duration: int = Field(
+        default=5, ge=3, le=30, description="Break time duration in minutes"
+    )
+    long_break_duration: int = Field(
+        default=15, ge=10, le=45, description="Long break duration in minutes"
+    )
+    sessions_until_long_break: int = Field(
+        default=4, ge=1, le=10, description="Number of sessions until long break"
+    )
     status: str = PomodoroStatus.PENDING.value
     created_at: datetime
     updated_at: datetime
@@ -180,11 +190,19 @@ class DetailedAnalyticsSchema(BaseModel):
 class PomodoroSettingsSchema(BaseModel):
     """Schema for customizing default Pomodoro settings."""
 
-    default_duration: Optional[int] = Field(None, ge=10, le=60, description="Default focus time in minutes")
-    default_break_duration: Optional[int] = Field(None, ge=3, le=30, description="Default break time in minutes")
+    default_duration: Optional[int] = Field(
+        None, ge=10, le=60, description="Default focus time in minutes"
+    )
+    default_break_duration: Optional[int] = Field(
+        None, ge=3, le=30, description="Default break time in minutes"
+    )
     default_cycles: Optional[int] = Field(None, ge=1, le=10, description="Default number of rounds")
-    long_break_interval: Optional[int] = Field(None, ge=2, le=6, description="Number of cycles before long break")
-    long_break_duration: Optional[int] = Field(None, ge=10, le=45, description="Long break duration in minutes")
+    long_break_interval: Optional[int] = Field(
+        None, ge=2, le=6, description="Number of cycles before long break"
+    )
+    long_break_duration: Optional[int] = Field(
+        None, ge=10, le=45, description="Long break duration in minutes"
+    )
 
     model_config = ConfigDict(from_attributes=True)
 

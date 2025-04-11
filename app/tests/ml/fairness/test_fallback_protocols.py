@@ -11,7 +11,7 @@ from app.ml.fairness.fallback_protocols import (
     RuleBased,
     UserPreferenceBased,
     HybridFallback,
-    FallbackProtocolManager
+    FallbackProtocolManager,
 )
 
 
@@ -20,6 +20,7 @@ class TestFallbackProtocol:
 
     def test_init(self):
         """Test initialization of FallbackProtocol."""
+
         # Create concrete subclass for testing abstract base class
         class ConcreteFallback(FallbackProtocol):
             def should_fallback(self, prediction, context):
@@ -38,6 +39,7 @@ class TestFallbackProtocol:
     @patch("app.ml.fairness.fallback_protocols.logging.info")
     def test_log_fallback_event(self, mock_log_info):
         """Test logging a fallback event."""
+
         # Create concrete subclass for testing
         class ConcreteFallback(FallbackProtocol):
             def should_fallback(self, prediction, context):
@@ -64,6 +66,7 @@ class TestFallbackProtocol:
 
     def test_get_telemetry(self):
         """Test getting telemetry data."""
+
         # Create concrete subclass for testing
         class ConcreteFallback(FallbackProtocol):
             def should_fallback(self, prediction, context):
@@ -77,7 +80,7 @@ class TestFallbackProtocol:
         # Add some telemetry data
         protocol.telemetry = {
             "low_confidence": [{"confidence": 0.5}],
-            "user_override": [{"user_id": "user123"}]
+            "user_override": [{"user_id": "user123"}],
         }
 
         # Get telemetry
@@ -98,22 +101,14 @@ class TestProgressiveFallbackProtocol:
             protocol_id="progressive_test",
             confidence_threshold=0.7,
             fallback_stages=[
-                {
-                    "threshold": 0.7,
-                    "action": "notify",
-                    "message": "Low confidence prediction"
-                },
+                {"threshold": 0.7, "action": "notify", "message": "Low confidence prediction"},
                 {
                     "threshold": 0.5,
                     "action": "alternative",
-                    "alternatives": ["option_A", "option_B"]
+                    "alternatives": ["option_A", "option_B"],
                 },
-                {
-                    "threshold": 0.3,
-                    "action": "default",
-                    "default_value": "safe_option"
-                }
-            ]
+                {"threshold": 0.3, "action": "default", "default_value": "safe_option"},
+            ],
         )
 
     def test_init(self):
@@ -202,18 +197,19 @@ class TestRuleBased:
         self.rules = [
             {
                 "condition": lambda pred, ctx: pred["confidence"] < 0.6,
-                "action": lambda pred, ctx: {"result": "fallback_1", "reason": "low confidence"}
+                "action": lambda pred, ctx: {"result": "fallback_1", "reason": "low confidence"},
             },
             {
                 "condition": lambda pred, ctx: "high_risk" in ctx and ctx["high_risk"],
-                "action": lambda pred, ctx: {"result": "safe_default", "reason": "high risk context"}
-            }
+                "action": lambda pred, ctx: {
+                    "result": "safe_default",
+                    "reason": "high risk context",
+                },
+            },
         ]
 
         self.protocol = RuleBased(
-            protocol_id="rule_based_test",
-            confidence_threshold=0.7,
-            rules=self.rules
+            protocol_id="rule_based_test", confidence_threshold=0.7, rules=self.rules
         )
 
     def test_init(self):
@@ -292,14 +288,14 @@ class TestUserPreferenceBased:
         self.user_preferences_service.get_user_fallback_preferences.return_value = {
             "confidence_threshold": 0.65,
             "preferred_fallback": "manual_decision",
-            "notification_channel": "email"
+            "notification_channel": "email",
         }
 
         self.protocol = UserPreferenceBased(
             protocol_id="user_pref_test",
             confidence_threshold=0.7,
             user_preferences_service=self.user_preferences_service,
-            default_fallback="notification"
+            default_fallback="notification",
         )
 
     def test_init(self):
@@ -319,7 +315,9 @@ class TestUserPreferenceBased:
         result = self.protocol.should_fallback(prediction, context)
 
         # Should check user preferences
-        self.user_preferences_service.get_user_fallback_preferences.assert_called_once_with("user123")
+        self.user_preferences_service.get_user_fallback_preferences.assert_called_once_with(
+            "user123"
+        )
 
         # Should not fallback as confidence (0.66) > user threshold (0.65)
         assert result is False
@@ -332,7 +330,9 @@ class TestUserPreferenceBased:
         result = self.protocol.apply_fallback(prediction, context)
 
         # Check user preferences were retrieved
-        self.user_preferences_service.get_user_fallback_preferences.assert_called_once_with("user123")
+        self.user_preferences_service.get_user_fallback_preferences.assert_called_once_with(
+            "user123"
+        )
 
         assert result is not None
         assert "original_prediction" in result
@@ -390,7 +390,7 @@ class TestHybridFallback:
             protocol_id="hybrid_test",
             confidence_threshold=0.7,
             protocols=[self.protocol1, self.protocol2],
-            selection_strategy="first_applicable"
+            selection_strategy="first_applicable",
         )
 
     def test_init(self):
@@ -455,7 +455,11 @@ class TestHybridFallback:
         self.protocol2.apply_fallback.assert_not_called()
 
         # Should return original prediction
-        assert result == {"original_prediction": prediction, "protocol_id": "hybrid_test", "message": "No fallback needed"}
+        assert result == {
+            "original_prediction": prediction,
+            "protocol_id": "hybrid_test",
+            "message": "No fallback needed",
+        }
 
     def test_vote_based_strategy(self):
         """Test voting-based selection strategy."""
@@ -464,7 +468,7 @@ class TestHybridFallback:
             protocol_id="voting_test",
             confidence_threshold=0.7,
             protocols=[self.protocol1, self.protocol2, MagicMock()],  # Add a third protocol
-            selection_strategy="voting"
+            selection_strategy="voting",
         )
 
         # Configure mock returns for should_fallback
@@ -635,6 +639,7 @@ class TestFallbackProtocolEdgeCases:
 
     def test_fallback_with_empty_context(self):
         """Test fallback with empty context data."""
+
         # Create concrete subclass for testing
         class ConcreteFallback(FallbackProtocol):
             def should_fallback(self, prediction, context):
@@ -644,7 +649,11 @@ class TestFallbackProtocolEdgeCases:
                 # Should handle None or empty context gracefully
                 if context is None:
                     context = {}
-                return {"action": "default", "prediction": "safe_value", "context_provided": bool(context)}
+                return {
+                    "action": "default",
+                    "prediction": "safe_value",
+                    "context_provided": bool(context),
+                }
 
         protocol = ConcreteFallback("empty_context_test", 0.5)
 
@@ -662,6 +671,7 @@ class TestFallbackProtocolEdgeCases:
 
     def test_fallback_with_invalid_confidence(self):
         """Test fallback with invalid confidence values."""
+
         # Create concrete subclass for testing
         class ConcreteFallback(FallbackProtocol):
             def should_fallback(self, prediction, context):
@@ -676,7 +686,11 @@ class TestFallbackProtocolEdgeCases:
                 elif confidence > 1:
                     confidence = 1.0
 
-                return {"action": "default", "prediction": "safe_value", "normalized_confidence": confidence}
+                return {
+                    "action": "default",
+                    "prediction": "safe_value",
+                    "normalized_confidence": confidence,
+                }
 
         protocol = ConcreteFallback("invalid_confidence_test", 0.5)
 
@@ -727,21 +741,21 @@ class TestFallbackProtocolEdgeCases:
 
             # Test with missing threshold in stage
             with pytest.raises(ValueError, match="Missing required field 'threshold'"):
-                ProgressiveFallbackProtocol("missing_threshold", 0.7, [
-                    {"action": "notify", "message": "Low confidence"}
-                ])
+                ProgressiveFallbackProtocol(
+                    "missing_threshold", 0.7, [{"action": "notify", "message": "Low confidence"}]
+                )
 
             # Test with missing action in stage
             with pytest.raises(ValueError, match="Missing required field 'action'"):
-                ProgressiveFallbackProtocol("missing_action", 0.7, [
-                    {"threshold": 0.5, "message": "Low confidence"}
-                ])
+                ProgressiveFallbackProtocol(
+                    "missing_action", 0.7, [{"threshold": 0.5, "message": "Low confidence"}]
+                )
 
             # Test with unsupported action
             with pytest.raises(ValueError, match="Unsupported action"):
-                ProgressiveFallbackProtocol("invalid_action", 0.7, [
-                    {"threshold": 0.5, "action": "invalid_action_type"}
-                ])
+                ProgressiveFallbackProtocol(
+                    "invalid_action", 0.7, [{"threshold": 0.5, "action": "invalid_action_type"}]
+                )
         finally:
             # Restore original init
             ProgressiveFallbackProtocol.__init__ = original_init
@@ -760,14 +774,19 @@ class TestFallbackProtocolEdgeCases:
 
         def patched_apply(prediction_type, prediction, context=None):
             if prediction_type not in manager.protocols and manager.default_protocol is None:
-                raise ValueError(f"No fallback protocol registered for prediction type: {prediction_type}")
+                raise ValueError(
+                    f"No fallback protocol registered for prediction type: {prediction_type}"
+                )
             return original_apply(prediction_type, prediction, context)
 
         # Apply the patch
         manager.apply_protocol = patched_apply
 
         # Test with non-existent prediction type
-        with pytest.raises(ValueError, match=f"No fallback protocol registered for prediction type: {prediction_type}"):
+        with pytest.raises(
+            ValueError,
+            match=f"No fallback protocol registered for prediction type: {prediction_type}",
+        ):
             manager.apply_protocol(prediction_type, prediction, context)
 
 
@@ -776,6 +795,7 @@ class TestRuleBasedAdvanced:
 
     def setup_method(self):
         """Set up test fixtures."""
+
         # Define condition functions
         def confidence_below_06(prediction, context):
             return prediction.get("confidence", 1.0) < 0.6
@@ -791,35 +811,27 @@ class TestRuleBasedAdvanced:
 
         # Define action functions
         def provide_alternatives(prediction, context):
-            return {
-                "action": "alternative",
-                "alternatives": ["option1", "option2"]
-            }
+            return {"action": "alternative", "alternatives": ["option1", "option2"]}
 
         def provide_default(prediction, context):
-            return {
-                "action": "default",
-                "prediction": "safe_default"
-            }
+            return {"action": "default", "prediction": "safe_default"}
 
         # Create complex rules with condition and action functions
         self.complex_rules = [
             {
                 "name": "complex_rule_1",
                 "condition": lambda p, c: confidence_below_06(p, c) and importance_is_high(p, c),
-                "action": provide_alternatives
+                "action": provide_alternatives,
             },
             {
                 "name": "complex_rule_2",
                 "condition": lambda p, c: confidence_below_03(p, c) and type_is_critical(p, c),
-                "action": provide_default
-            }
+                "action": provide_default,
+            },
         ]
 
         self.protocol = RuleBased(
-            protocol_id="complex_rule_test",
-            confidence_threshold=0.8,
-            rules=self.complex_rules
+            protocol_id="complex_rule_test", confidence_threshold=0.8, rules=self.complex_rules
         )
 
     def test_complex_rule_all_conditions_match(self):
@@ -863,6 +875,7 @@ class TestHybridFallbackIntegration:
 
     def setup_method(self):
         """Set up test fixtures."""
+
         # Define condition functions for rule-based protocol
         def risk_is_high(prediction, context):
             return context.get("risk") == "high"
@@ -876,30 +889,30 @@ class TestHybridFallbackIntegration:
             confidence_threshold=0.7,
             fallback_stages=[
                 {"threshold": 0.7, "action": "notify", "message": "Lower confidence"},
-                {"threshold": 0.4, "action": "default", "default_value": "prog_default"}
-            ]
+                {"threshold": 0.4, "action": "default", "default_value": "prog_default"},
+            ],
         )
 
         self.rule_based = RuleBased(
             protocol_id="hybrid_rule",
             confidence_threshold=0.8,
             rules=[
-                {
-                    "name": "high_risk",
-                    "condition": risk_is_high,
-                    "action": provide_rule_default
-                }
-            ]
+                {"name": "high_risk", "condition": risk_is_high, "action": provide_rule_default}
+            ],
         )
 
         # Create a mock user preferences service
         mock_user_prefs = MagicMock()
-        mock_user_prefs.get_user_fallback_preferences = lambda user_id: {"confidence_threshold": 0.6, "fallback_type": "manual_decision"} if user_id == "user123" else None
+        mock_user_prefs.get_user_fallback_preferences = lambda user_id: (
+            {"confidence_threshold": 0.6, "fallback_type": "manual_decision"}
+            if user_id == "user123"
+            else None
+        )
 
         self.user_pref = UserPreferenceBased(
             protocol_id="hybrid_user",
             confidence_threshold=0.5,
-            user_preferences_service=mock_user_prefs
+            user_preferences_service=mock_user_prefs,
         )
 
         # Create hybrid protocol
@@ -907,13 +920,16 @@ class TestHybridFallbackIntegration:
             protocol_id="complex_hybrid",
             confidence_threshold=0.9,
             protocols=[self.progressive, self.rule_based, self.user_pref],
-            selection_strategy="first_applicable"  # Use the correct parameter name
+            selection_strategy="first_applicable",  # Use the correct parameter name
         )
 
     def test_hybrid_progressive_takes_precedence(self):
         """Test hybrid where progressive protocol condition matches first."""
         # Include confidence inside the prediction object
-        prediction = {"value": "test_value", "confidence": 0.5}  # Below progressive but above user_pref
+        prediction = {
+            "value": "test_value",
+            "confidence": 0.5,
+        }  # Below progressive but above user_pref
         context = {"user_id": "user123", "risk": "low"}
 
         result = self.hybrid.apply_fallback(prediction, context)
@@ -925,7 +941,10 @@ class TestHybridFallbackIntegration:
     def test_hybrid_rule_based_takes_precedence(self):
         """Test hybrid where rule condition matches first."""
         # Include confidence inside the prediction object
-        prediction = {"value": "test_value", "confidence": 0.85}  # Above progressive and user_pref but rule has condition
+        prediction = {
+            "value": "test_value",
+            "confidence": 0.85,
+        }  # Above progressive and user_pref but rule has condition
         context = {"user_id": "other_user", "risk": "high"}
 
         result = self.hybrid.apply_fallback(prediction, context)
@@ -941,12 +960,15 @@ class TestHybridFallbackIntegration:
             protocol_id="weighted_hybrid",
             confidence_threshold=0.9,
             protocols=[self.progressive, self.rule_based, self.user_pref],
-            selection_strategy="voting"  # Use the correct parameter name
+            selection_strategy="voting",  # Use the correct parameter name
         )
 
         # All protocols match but with different actions
         # Include confidence inside the prediction object
-        prediction = {"value": "test_value", "confidence": 0.3}  # Low enough to trigger all protocols
+        prediction = {
+            "value": "test_value",
+            "confidence": 0.3,
+        }  # Low enough to trigger all protocols
         context = {"user_id": "user123", "risk": "high"}
 
         result = weighted_hybrid.apply_fallback(prediction, context)
@@ -964,29 +986,21 @@ class TestFallbackIntegrationWithExplainability:
             protocol_id="explainable_fallback",
             confidence_threshold=0.7,
             fallback_stages=[
-                {
-                    "threshold": 0.7,
-                    "action": "notify",
-                    "message": "Low confidence prediction"
-                },
+                {"threshold": 0.7, "action": "notify", "message": "Low confidence prediction"},
                 {
                     "threshold": 0.5,
                     "action": "alternative",
-                    "alternatives": ["option_A", "option_B"]
+                    "alternatives": ["option_A", "option_B"],
                 },
-                {
-                    "threshold": 0.3,
-                    "action": "default",
-                    "default_value": "safe_option"
-                }
-            ]
+                {"threshold": 0.3, "action": "default", "default_value": "safe_option"},
+            ],
         )
 
         # Mock explainer
         self.mock_explainer = MagicMock()
         self.mock_explainer.explain.return_value = {
             "feature_importance": {"feature1": 0.3, "feature2": 0.7},
-            "explanation": "Feature2 was the most important factor."
+            "explanation": "Feature2 was the most important factor.",
         }
 
     def test_fallback_with_explanation(self):
@@ -995,14 +1009,11 @@ class TestFallbackIntegrationWithExplainability:
         prediction = {
             "value": "task_A",
             "confidence": 0.4,
-            "features": {"feature1": 10, "feature2": 20}
+            "features": {"feature1": 10, "feature2": 20},
         }
 
         # Create context with explainer
-        context = {
-            "user_id": "user123",
-            "explainer": self.mock_explainer
-        }
+        context = {"user_id": "user123", "explainer": self.mock_explainer}
 
         # Apply fallback
         result = self.protocol.apply_fallback(prediction, context)
@@ -1017,7 +1028,7 @@ class TestFallbackIntegrationWithExplainability:
         explanation = self.mock_explainer.explain(
             model_input=prediction["features"],
             prediction=result,
-            confidence=prediction["confidence"]
+            confidence=prediction["confidence"],
         )
 
         # Verify explainer was called

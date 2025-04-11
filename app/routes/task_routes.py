@@ -19,14 +19,14 @@ from app.schemas.task_schema import (
     TaskCreate,
     TaskUpdate,
     TaskStatsSchema,
-    TaskListResponse
+    TaskListResponse,
 )
 from app.services.task_service import TaskService
 from app.utils.api_responses import (
     create_response,
     create_collection_response,
     not_found_response,
-    forbidden_response
+    forbidden_response,
 )
 from app.utils.route_utils import (
     error_responses,
@@ -34,7 +34,7 @@ from app.utils.route_utils import (
     id_path_param,
     validate_resource_access,
     not_found_error,
-    forbidden_error
+    forbidden_error,
 )
 from app.utils.exceptions import ResourceNotFoundError
 from app.models.enums_model import TaskState
@@ -48,15 +48,19 @@ task_router = APIRouter(prefix="/tasks", tags=["tasks"])
     response_model=TaskListResponse,
     summary="Get all tasks for the current user",
     description="Retrieve all tasks belonging to the currently authenticated user with pagination.",
-    responses=error_responses()
+    responses=error_responses(),
 )
 async def get_user_tasks(
     current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     status: Optional[TaskState] = Query(None, description="Filter tasks by status"),
     priority: Optional[str] = Query(None, description="Filter tasks by priority"),
-    due_before: Optional[str] = Query(None, description="Filter tasks due before this date (ISO format)"),
-    due_after: Optional[str] = Query(None, description="Filter tasks due after this date (ISO format)"),
+    due_before: Optional[str] = Query(
+        None, description="Filter tasks due before this date (ISO format)"
+    ),
+    due_after: Optional[str] = Query(
+        None, description="Filter tasks due after this date (ISO format)"
+    ),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
 ):
@@ -93,10 +97,7 @@ async def get_user_tasks(
             filters["due_after"] = due_after
 
         tasks, total = await task_service.get_user_tasks_paginated(
-            str(current_user.id),
-            page=page,
-            page_size=page_size,
-            filters=filters
+            str(current_user.id), page=page, page_size=page_size, filters=filters
         )
 
         # Get basic stats
@@ -112,7 +113,7 @@ async def get_user_tasks(
             page=page,
             page_size=page_size,
             wrapper_class=TaskListResponse,
-            extra={"stats": stats}
+            extra={"stats": stats},
         )
 
     except Exception as e:
@@ -125,7 +126,7 @@ async def get_user_tasks(
     response_model=TaskResponse,
     summary="Get a specific task",
     description="Retrieve a specific task by its ID. The user must be the owner of the task.",
-    responses=error_responses(403, 404)
+    responses=error_responses(403, 404),
 )
 async def get_task(
     task_id: UUID = id_path_param("task"),
@@ -176,7 +177,7 @@ async def get_task(
     status_code=201,
     summary="Create a new task",
     description="Create a new task for the authenticated user.",
-    responses=error_responses()
+    responses=error_responses(),
 )
 async def create_task(
     task: TaskCreate,
@@ -214,7 +215,7 @@ async def create_task(
     response_model=TaskResponse,
     summary="Update a task",
     description="Update an existing task. The user must be the owner of the task.",
-    responses=error_responses(403, 404)
+    responses=error_responses(403, 404),
 )
 async def update_task(
     task_update: TaskUpdate,
@@ -274,7 +275,7 @@ async def update_task(
     status_code=204,
     summary="Delete a task",
     description="Delete an existing task. The user must be the owner of the task.",
-    responses=error_responses(403, 404)
+    responses=error_responses(403, 404),
 )
 async def delete_task(
     task_id: UUID = id_path_param("task"),
@@ -329,7 +330,7 @@ async def delete_task(
     response_model=TaskResponse,
     summary="Mark a task as complete",
     description="Mark an existing task as complete. The user must be the owner of the task.",
-    responses=error_responses(403, 404)
+    responses=error_responses(403, 404),
 )
 async def complete_task(
     task_id: UUID = id_path_param("task"),
@@ -384,7 +385,7 @@ async def complete_task(
     response_model=TaskStatsSchema,
     summary="Get task statistics",
     description="Get statistics about tasks for the authenticated user.",
-    responses=error_responses()
+    responses=error_responses(),
 )
 async def get_task_statistics(
     current_user: UserModel = Depends(get_current_user),
@@ -416,10 +417,7 @@ async def get_task_statistics(
         if period_end:
             filters["period_end"] = period_end
 
-        stats = await task_service.get_task_statistics(
-            str(current_user.id),
-            filters=filters
-        )
+        stats = await task_service.get_task_statistics(str(current_user.id), filters=filters)
 
         logger.info(f"Successfully fetched task statistics for user {current_user.id}")
         return create_response(stats)

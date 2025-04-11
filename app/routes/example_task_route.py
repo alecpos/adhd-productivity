@@ -15,7 +15,7 @@ from app.schemas.task_schema import (
     TaskResponse,
     TaskUpdate,
     TaskListResponse,
-    TaskStatsSchema
+    TaskStatsSchema,
 )
 from app.services.task_service import TaskService
 from app.core.security import get_current_user
@@ -44,9 +44,11 @@ router = APIRouter(
     responses=error_responses(401),  # Add default 401 response to all routes
 )
 
+
 async def get_task_service(db: AsyncSession = Depends(get_db)) -> TaskService:
     """Get task service instance."""
     return TaskService(db)
+
 
 @router.get(
     "/user/{user_id}",
@@ -55,8 +57,8 @@ async def get_task_service(db: AsyncSession = Depends(get_db)) -> TaskService:
     description="Get all tasks for a specific user with optional filters",
     responses={
         404: {"description": "User not found"},
-        403: {"description": "Not authorized to view these tasks"}
-    }
+        403: {"description": "Not authorized to view these tasks"},
+    },
 )
 async def get_user_tasks(
     user_id: UUID = Depends(id_path_param("user")),

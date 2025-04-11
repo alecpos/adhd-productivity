@@ -185,7 +185,9 @@ class JiraIntegration(ProjectToolIntegration):
             self.error_handler.handle_error(f"Error fetching Jira task {external_id}", e)
             return None
 
-    def _create_external_task_from_result(self, result: Dict[str, Any], task_data: Dict[str, Any]) -> ExternalTask:
+    def _create_external_task_from_result(
+        self, result: Dict[str, Any], task_data: Dict[str, Any]
+    ) -> ExternalTask:
         """
         Create an ExternalTask from Jira API result and task data.
 
@@ -214,7 +216,7 @@ class JiraIntegration(ProjectToolIntegration):
             project_id=project_id,
             url=f"{self.config.api_url}/browse/{result['key']}",
             tool_type=ProjectToolType.JIRA,
-            additional_data={"key": result["key"]}
+            additional_data={"key": result["key"]},
         )
 
     def get_health_metrics(self) -> Dict[str, Any]:
@@ -230,5 +232,5 @@ class JiraIntegration(ProjectToolIntegration):
                 "api_url": self.config.api_url,
                 "project_ids": self.config.project_ids,
                 "last_sync": self.config.last_sync.isoformat() if self.config.last_sync else None,
-            }
+            },
         }

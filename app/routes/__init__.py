@@ -50,9 +50,32 @@ api_router.include_router(pomodoro_router, prefix="/api/pomodoro", tags=["pomodo
 api_router.include_router(scheduling_router, prefix="/api/scheduling", tags=["scheduling"])
 api_router.include_router(subscriptions_router, prefix="/api/subscriptions", tags=["subscriptions"])
 api_router.include_router(task_router, prefix="/api/tasks", tags=["tasks"])
-api_router.include_router(time_management_router, prefix="/api/time-management", tags=["time-management"])
+api_router.include_router(
+    time_management_router, prefix="/api/time-management", tags=["time-management"]
+)
 api_router.include_router(user_router, prefix="/api/user", tags=["user"])
 api_router.include_router(voice_command_router, prefix="/api/voice", tags=["voice"])
 
 # Export the main router
-__all__ = ["api_router", "analytics_router", "auth_router", "body_doubling_router", "calendar_router", "energy_mapping_router", "focus_router", "gamification_router", "health_router", "hyperfocus_router", "mental_health_router", "mindfulness_router", "nlp_router", "pomodoro_router", "scheduling_router", "subscriptions_router", "task_router", "time_management_router", "user_router", "voice_command_router"]
+__all__ = [
+    "api_router",
+    "analytics_router",
+    "auth_router",
+    "body_doubling_router",
+    "calendar_router",
+    "energy_mapping_router",
+    "focus_router",
+    "gamification_router",
+    "health_router",
+    "hyperfocus_router",
+    "mental_health_router",
+    "mindfulness_router",
+    "nlp_router",
+    "pomodoro_router",
+    "scheduling_router",
+    "subscriptions_router",
+    "task_router",
+    "time_management_router",
+    "user_router",
+    "voice_command_router",
+]

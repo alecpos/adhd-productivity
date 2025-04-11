@@ -12,12 +12,12 @@ from app.schemas.shared_components_schema import (
     Break,
     EnvironmentalFactors,
     Interruption,
-    SessionAnalytics
+    SessionAnalytics,
 )
 from app.utils.validation import (
     BaseModelWithValidators,
     validate_dependent_fields,
-    validate_at_least_one_field_present
+    validate_at_least_one_field_present,
 )
 
 
@@ -64,21 +64,14 @@ class TaskSchema(BaseModelWithValidators):
 
     # Validation: If status is "COMPLETED", completion_date should be present
     _validate_completion = validate_dependent_fields(
-        "status",
-        ["completion_date"],
-        check_value=TaskStatus.COMPLETED
+        "status", ["completion_date"], check_value=TaskStatus.COMPLETED
     )
 
     # Validation: If breaks are specified, analytics should also be present
-    _validate_analytics = validate_dependent_fields(
-        "breaks",
-        ["analytics"]
-    )
+    _validate_analytics = validate_dependent_fields("breaks", ["analytics"])
 
     # Validation: Either preferred_time or is_flexible must be provided
-    _validate_scheduling = validate_at_least_one_field_present(
-        ["preferred_time", "is_flexible"]
-    )
+    _validate_scheduling = validate_at_least_one_field_present(["preferred_time", "is_flexible"])
 
 
 class TaskCreate(TaskSchema):
@@ -134,16 +127,11 @@ class TaskUpdate(BaseModelWithValidators):
 
     # Validation: If status is updated to "COMPLETED", completion_date should be present
     _validate_completion = validate_dependent_fields(
-        "status",
-        ["completion_date"],
-        check_value=TaskStatus.COMPLETED
+        "status", ["completion_date"], check_value=TaskStatus.COMPLETED
     )
 
     # Validation: If breaks are specified, analytics should also be present
-    _validate_analytics = validate_dependent_fields(
-        "breaks",
-        ["analytics"]
-    )
+    _validate_analytics = validate_dependent_fields("breaks", ["analytics"])
 
 
 class TaskResponse(TaskSchema):
@@ -191,5 +179,5 @@ __all__ = [
     "TaskUpdate",
     "TaskResponse",
     "TaskStatsSchema",
-    "TaskListResponse"
+    "TaskListResponse",
 ]

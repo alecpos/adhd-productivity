@@ -1,6 +1,7 @@
 import csv
 import os
 
+
 def create_jira_csv():
     # Your email for assignments
     your_email = "alec@apintegrations.com"
@@ -21,7 +22,7 @@ def create_jira_csv():
                     "- Maintain all existing functionality\n"
                     "- Add comprehensive tests for the refactored code\n\n"
                     "References: IEEE Software Engineering Standards, Code Quality Metrics"
-                )
+                ),
             },
             {
                 "summary": "Refactor main.py to reduce complexity and nesting",
@@ -34,7 +35,7 @@ def create_jira_csv():
                     "- Maintain all existing functionality\n"
                     "- Document the refactoring approach\n\n"
                     "References: IEEE Software Engineering Standards"
-                )
+                ),
             },
             {
                 "summary": "Improve UI component structure in app/ui directory",
@@ -47,7 +48,7 @@ def create_jira_csv():
                     "- Create unit tests for refactored components\n"
                     "- Document the new component architecture\n\n"
                     "References: Code Quality Metrics (nesting depth < 4 levels)"
-                )
+                ),
             },
             {
                 "summary": "Simplify recursive functions in ML models",
@@ -60,8 +61,8 @@ def create_jira_csv():
                     "- Document the algorithm changes\n"
                     "- Maintain or improve model performance\n\n"
                     "References: IEEE Software Engineering Standards, Cognitive Complexity < 15"
-                )
-            }
+                ),
+            },
         ],
         "Epic 2: Task State Machine Improvements": [
             {
@@ -76,7 +77,7 @@ def create_jira_csv():
                     "- Create comprehensive documentation\n"
                     "- Add unit tests for all transition scenarios\n\n"
                     "References: TaskModel is listed as high priority (🟠) in the debt tracker"
-                )
+                ),
             },
             {
                 "summary": "Implement TaskState visualization for documentation",
@@ -89,7 +90,7 @@ def create_jira_csv():
                     "- Document any potential future states\n"
                     "- Ensure alignment with implementation\n\n"
                     "References: Documentation Standards (80% coverage target)"
-                )
+                ),
             },
             {
                 "summary": "Refactor task-related services to use new state machine",
@@ -102,8 +103,8 @@ def create_jira_csv():
                     "- Add appropriate error handling for invalid transitions\n"
                     "- Write integration tests for task state transitions\n\n"
                     "References: 'TaskModel' in Technical Debt Tracker"
-                )
-            }
+                ),
+            },
         ],
         "Epic 3: ML Model Performance Optimization": [
             {
@@ -118,7 +119,7 @@ def create_jira_csv():
                     "- Maintain prediction accuracy within 5% of original\n"
                     "- Document optimization approach\n\n"
                     "References: ML Models section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Reduce memory consumption in ContextualStressorDetector",
@@ -132,7 +133,7 @@ def create_jira_csv():
                     "- Maintain or improve detection accuracy\n"
                     "- Document memory optimization approach\n\n"
                     "References: ML Models section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Simplify TimeBufferCalculator logic",
@@ -145,8 +146,8 @@ def create_jira_csv():
                     "- Create comprehensive tests\n"
                     "- Maintain buffer calculation accuracy\n\n"
                     "References: ML Models section in Technical Debt Tracker"
-                )
-            }
+                ),
+            },
         ],
         "Epic 4: Test Improvements": [
             {
@@ -161,7 +162,7 @@ def create_jira_csv():
                     "- Maintain or improve test coverage\n"
                     "- Document test organization\n\n"
                     "References: Testing section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Refactor test_schemas.py to reduce complexity",
@@ -175,7 +176,7 @@ def create_jira_csv():
                     "- Use test fixtures to reduce duplication\n"
                     "- Document test organization\n\n"
                     "References: Testing section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Fix flaky API tests",
@@ -189,7 +190,7 @@ def create_jira_csv():
                     "- Document testing best practices\n"
                     "- Achieve 95% consistent test runs\n\n"
                     "References: Testing section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Implement load testing for critical endpoints",
@@ -203,8 +204,8 @@ def create_jira_csv():
                     "- Document performance requirements\n"
                     "- Integrate load tests into CI pipeline\n\n"
                     "References: Testing section in Technical Debt Tracker"
-                )
-            }
+                ),
+            },
         ],
         "Epic 5: API Performance and Security": [
             {
@@ -219,7 +220,7 @@ def create_jira_csv():
                     "- Reduce response time to < 200ms\n"
                     "- Document optimization approach\n\n"
                     "References: Performance Debt section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Add missing security headers",
@@ -233,7 +234,7 @@ def create_jira_csv():
                     "- Add Strict-Transport-Security headers\n"
                     "- Document security header implementation\n\n"
                     "References: Infrastructure section in Technical Debt Tracker, OWASP Guidelines"
-                )
+                ),
             },
             {
                 "summary": "Implement rate limiting for API endpoints",
@@ -247,8 +248,8 @@ def create_jira_csv():
                     "- Document rate limiting policy\n"
                     "- Test with high-volume requests\n\n"
                     "References: API Routes section in Technical Debt Tracker, OWASP Guidelines"
-                )
-            }
+                ),
+            },
         ],
         "Epic 6: Model Evolution and Documentation": [
             {
@@ -263,7 +264,7 @@ def create_jira_csv():
                     "- Document architecture of TimeBufferCalculator\n"
                     "- Include diagrams and implementation details\n\n"
                     "References: Documentation section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Address model purpose drift in TaskModel",
@@ -277,7 +278,7 @@ def create_jira_csv():
                     "- Document model purpose and evolution\n"
                     "- Create migration plan if needed\n\n"
                     "References: Model Evolution section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Address redundancy between TaskModel and CalendarEventModel",
@@ -291,7 +292,7 @@ def create_jira_csv():
                     "- Write migration scripts if needed\n"
                     "- Document the new model relationship\n\n"
                     "References: Database Models section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Update API documentation",
@@ -305,8 +306,8 @@ def create_jira_csv():
                     "- Include examples and response formats\n"
                     "- Implement automatic API documentation generation\n\n"
                     "References: Documentation section in Technical Debt Tracker"
-                )
-            }
+                ),
+            },
         ],
         "Epic 7: Monitoring and Logging": [
             {
@@ -321,7 +322,7 @@ def create_jira_csv():
                     "- Ensure proper error logging\n"
                     "- Document logging approach\n\n"
                     "References: Infrastructure section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Set up performance monitoring",
@@ -334,7 +335,7 @@ def create_jira_csv():
                     "- Create dashboards for key metrics\n"
                     "- Configure alerts for performance degradation\n\n"
                     "References: Performance Debt section in Technical Debt Tracker"
-                )
+                ),
             },
             {
                 "summary": "Implement automated technical debt tracking",
@@ -347,22 +348,32 @@ def create_jira_csv():
                     "- Create dashboards for technical debt trends\n"
                     "- Document the technical debt tracking process\n\n"
                     "References: Automation & Tools section in Technical Debt Tracker"
-                )
-            }
-        ]
+                ),
+            },
+        ],
     }
 
     # Create CSV file
     csv_file = "technical_debt_jira.csv"
 
-    with open(csv_file, 'w', newline='') as file:
+    with open(csv_file, "w", newline="") as file:
         writer = csv.writer(file)
 
         # Write header row
-        writer.writerow([
-            'Summary', 'Issue Type', 'Description', 'Priority',
-            'Labels', 'Epic Link', 'Issue ID', 'Parent', 'Assignee', 'Reporter'
-        ])
+        writer.writerow(
+            [
+                "Summary",
+                "Issue Type",
+                "Description",
+                "Priority",
+                "Labels",
+                "Epic Link",
+                "Issue ID",
+                "Parent",
+                "Assignee",
+                "Reporter",
+            ]
+        )
 
         epic_count = 0
         story_count = 0
@@ -372,37 +383,43 @@ def create_jira_csv():
             epic_id = f"TECHDEBT-{epic_count}"
 
             # Add the epic
-            writer.writerow([
-                epic,  # Summary
-                'Epic',
-                (f"Technical debt reduction focused on improving code quality, performance, "
-                 f"and maintainability based on analysis results.\n\n{epic}"),  # Epic description
-                'High',
-                'TechnicalDebt,Refactoring,CodeQuality',
-                '',  # Epic Link
-                epic_id,
-                '',  # Parent
-                your_email,
-                your_email
-            ])
+            writer.writerow(
+                [
+                    epic,  # Summary
+                    "Epic",
+                    (
+                        f"Technical debt reduction focused on improving code quality, performance, "
+                        f"and maintainability based on analysis results.\n\n{epic}"
+                    ),  # Epic description
+                    "High",
+                    "TechnicalDebt,Refactoring,CodeQuality",
+                    "",  # Epic Link
+                    epic_id,
+                    "",  # Parent
+                    your_email,
+                    your_email,
+                ]
+            )
 
             # Add the stories for this epic
             for story in stories:
                 story_count += 1
                 story_id = f"TECHDEBT-TASK-{story_count}"
 
-                writer.writerow([
-                    story["summary"],
-                    'Story',
-                    story["description"],
-                    'Medium',
-                    'TechnicalDebt,Refactoring',
-                    epic,
-                    story_id,
-                    epic_id,
-                    your_email,
-                    your_email
-                ])
+                writer.writerow(
+                    [
+                        story["summary"],
+                        "Story",
+                        story["description"],
+                        "Medium",
+                        "TechnicalDebt,Refactoring",
+                        epic,
+                        story_id,
+                        epic_id,
+                        your_email,
+                        your_email,
+                    ]
+                )
 
     print(f"CSV file created: {os.path.abspath(csv_file)}")
     print(f"All tasks assigned to: {your_email}")
@@ -414,7 +431,9 @@ def create_jira_csv():
     print("5. Map the Assignee and Reporter fields during the import")
     print("\nImplementation Strategy:")
     print("- Begin with Epic 1 (Code Structure Improvements) to establish a solid foundation")
-    print("- Continue with Epic 2 (Task State Machine Improvements) to address high-priority model debt")
+    print(
+        "- Continue with Epic 2 (Task State Machine Improvements) to address high-priority model debt"
+    )
     print("- Then tackle Epic 3 (ML Model Performance) to improve user experience")
     print("- Follow with remaining epics based on resource availability and priority")
     print("- Re-run technical debt analysis after each epic to measure progress")

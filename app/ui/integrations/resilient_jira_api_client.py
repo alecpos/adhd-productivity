@@ -28,7 +28,7 @@ class ResilientJiraApiClient(JiraApiClient):
         retry_count: int = 3,
         backoff_factor: float = 1.5,
         circuit_breaker_threshold: int = 5,
-        circuit_breaker_reset_time: int = 60
+        circuit_breaker_reset_time: int = 60,
     ):
         """
         Initialize the resilient Jira API client.
@@ -60,7 +60,7 @@ class ResilientJiraApiClient(JiraApiClient):
         method: str = "GET",
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
-        json: Optional[Dict[str, Any]] = None
+        json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Make HTTP request to Jira API with retry and circuit breaker patterns.
@@ -121,8 +121,10 @@ class ResilientJiraApiClient(JiraApiClient):
                     raise
 
                 # Exponential backoff
-                backoff_time = self.backoff_factor ** attempt
-                logger.warning(f"Retrying request in {backoff_time:.2f} seconds (attempt {attempt+1}/{self.retry_count})")
+                backoff_time = self.backoff_factor**attempt
+                logger.warning(
+                    f"Retrying request in {backoff_time:.2f} seconds (attempt {attempt+1}/{self.retry_count})"
+                )
                 await asyncio.sleep(backoff_time)
                 attempt += 1
 
@@ -131,7 +133,7 @@ class ResilientJiraApiClient(JiraApiClient):
         self.error_handler.handle_error(
             f"All {self.retry_count} retry attempts failed for {method} request to {url}",
             last_exception,
-            reraise=True
+            reraise=True,
         )
 
     def _should_retry(self, exception, attempt_number):
@@ -150,40 +152,42 @@ class ResilientJiraApiClient(JiraApiClient):
             return False
 
         # Check if exception is in retryable categories
-        return (self._is_connection_error(exception) or
-                self._is_rate_limit_error(exception) or
-                self._is_server_error(exception) or
-                self._is_timeout_error(exception))
+        return (
+            self._is_connection_error(exception)
+            or self._is_rate_limit_error(exception)
+            or self._is_server_error(exception)
+            or self._is_timeout_error(exception)
+        )
 
     def _is_connection_error(self, exception):
         """Check if the exception is a connection error."""
         error_str = str(exception).lower()
         return (
-            'connection' in error_str or
-            'connecttimeout' in error_str or
-            isinstance(exception, ConnectionError)
+            "connection" in error_str
+            or "connecttimeout" in error_str
+            or isinstance(exception, ConnectionError)
         )
 
     def _is_rate_limit_error(self, exception):
         """Check if the exception is a rate limit error."""
-        if hasattr(exception, 'status_code') and exception.status_code == 429:
+        if hasattr(exception, "status_code") and exception.status_code == 429:
             return True
 
         error_str = str(exception).lower()
-        return 'rate limit' in error_str or 'too many requests' in error_str
+        return "rate limit" in error_str or "too many requests" in error_str
 
     def _is_server_error(self, exception):
         """Check if the exception is a server error (5xx)."""
-        if hasattr(exception, 'status_code') and 500 <= exception.status_code < 600:
+        if hasattr(exception, "status_code") and 500 <= exception.status_code < 600:
             return True
 
         error_str = str(exception).lower()
-        return 'server error' in error_str or 'internal server error' in error_str
+        return "server error" in error_str or "internal server error" in error_str
 
     def _is_timeout_error(self, exception):
         """Check if the exception is a timeout error."""
         error_str = str(exception).lower()
-        return 'timeout' in error_str or 'timed out' in error_str
+        return "timeout" in error_str or "timed out" in error_str
 
     def _is_circuit_open(self) -> bool:
         """
@@ -209,11 +213,15 @@ class ResilientJiraApiClient(JiraApiClient):
         Increment the circuit breaker failure counter and open if threshold exceeded.
         """
         self.circuit_breaker_failures += 1
-        logger.debug(f"Circuit breaker failure count: {self.circuit_breaker_failures}/{self.circuit_breaker_threshold}")
+        logger.debug(
+            f"Circuit breaker failure count: {self.circuit_breaker_failures}/{self.circuit_breaker_threshold}"
+        )
 
         if self.circuit_breaker_failures >= self.circuit_breaker_threshold:
             # Open the circuit for the configured reset time
-            self.circuit_open_until = datetime.utcnow() + timedelta(seconds=self.circuit_breaker_reset_time)
+            self.circuit_open_until = datetime.utcnow() + timedelta(
+                seconds=self.circuit_breaker_reset_time
+            )
             logger.warning(
                 f"Circuit breaker opened for Jira API due to {self.circuit_breaker_failures} "
                 f"consecutive failures. Will reset at {self.circuit_open_until}"
@@ -234,7 +242,9 @@ class ResilientJiraApiClient(JiraApiClient):
             wait_time = 60 - (now - oldest_call).total_seconds()
 
             if wait_time > 0:
-                logger.warning(f"Rate limit reached. Waiting {wait_time:.2f} seconds before next request")
+                logger.warning(
+                    f"Rate limit reached. Waiting {wait_time:.2f} seconds before next request"
+                )
                 await asyncio.sleep(wait_time)
 
     def get_health_metrics(self) -> Dict[str, Any]:
@@ -249,5 +259,5 @@ class ResilientJiraApiClient(JiraApiClient):
             "circuit_breaker_threshold": self.circuit_breaker_threshold,
             "circuit_open_until": self.circuit_open_until,
             "api_calls_last_minute": len(self.api_call_history),
-            "error_stats": self.error_handler.get_error_stats()
+            "error_stats": self.error_handler.get_error_stats(),
         }

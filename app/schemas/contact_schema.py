@@ -3,12 +3,15 @@ from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 
+
 class ContactType(Enum):
     """Contact type enum."""
+
     FAMILY = "FAMILY"
     FRIEND = "FRIEND"
     WORK = "WORK"
     OTHER = "OTHER"
+
 
 class ContactBaseSchema(BaseModel):
     name: str

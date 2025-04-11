@@ -64,9 +64,9 @@ def sample_session():
                 "productivity_rating": 4,
                 "distraction_level": 2,
                 "notes": "Good session",
-                "timestamp": (now - timedelta(minutes=65)).isoformat()
+                "timestamp": (now - timedelta(minutes=65)).isoformat(),
             }
-        ]
+        ],
     }
     session.focus_rating = None
     session.productivity_rating = None
@@ -130,9 +130,9 @@ async def test_get_user_analytics_with_sessions(mock_session_manager, sample_ses
                 "user_id": str(user_id),
                 "focus_rating": 3,
                 "productivity_rating": 3,
-                "timestamp": (datetime.now() - timedelta(days=1, hours=2, minutes=5)).isoformat()
+                "timestamp": (datetime.now() - timedelta(days=1, hours=2, minutes=5)).isoformat(),
             }
-        ]
+        ],
     }
     session2.focus_rating = None
     session2.productivity_rating = None
@@ -280,7 +280,9 @@ async def test_add_session_feedback_unauthorized(mock_session_manager, sample_se
     # Execute and verify exception
     analytics_service = AnalyticsService(mock_session_manager)
     with pytest.raises(HTTPException) as exc_info:
-        await analytics_service.add_session_feedback(session_id, unauthorized_user_id, feedback_data)
+        await analytics_service.add_session_feedback(
+            session_id, unauthorized_user_id, feedback_data
+        )
     assert exc_info.value.status_code == 403
 
 
@@ -369,9 +371,9 @@ async def test_get_focus_pattern_insights_with_data(mock_session_manager, sample
                 "user_id": str(user_id),
                 "focus_rating": 3,
                 "productivity_rating": 4,
-                "timestamp": (datetime.now() - timedelta(days=1, hours=2, minutes=5)).isoformat()
+                "timestamp": (datetime.now() - timedelta(days=1, hours=2, minutes=5)).isoformat(),
             }
-        ]
+        ],
     }
 
     # Create a result object with the scalars method

@@ -51,9 +51,7 @@ class ErrorHandlerMiddleware:
 
         # Handle SQLAlchemy no result found errors
         @self.app.exception_handler(NoResultFound)
-        async def no_result_exception_handler(
-            request: Request, exc: NoResultFound
-        ) -> JSONResponse:
+        async def no_result_exception_handler(request: Request, exc: NoResultFound) -> JSONResponse:
             return self._handle_not_found_error(request, exc)
 
         # Handle integrity errors (conflicts)
@@ -65,9 +63,7 @@ class ErrorHandlerMiddleware:
 
         # Handle generic server errors
         @self.app.exception_handler(Exception)
-        async def general_exception_handler(
-            request: Request, exc: Exception
-        ) -> JSONResponse:
+        async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
             return self._handle_server_error(request, exc)
 
     def _handle_validation_error(
@@ -84,9 +80,7 @@ class ErrorHandlerMiddleware:
             A formatted error response
         """
         # Log the error
-        logger.warning(
-            f"Validation error for {request.method} {request.url.path}: {exc}"
-        )
+        logger.warning(f"Validation error for {request.method} {request.url.path}: {exc}")
 
         # Format the errors into field-specific messages
         errors = format_validation_errors(exc)
@@ -101,9 +95,7 @@ class ErrorHandlerMiddleware:
             ),
         )
 
-    def _handle_not_found_error(
-        self, request: Request, exc: NoResultFound
-    ) -> JSONResponse:
+    def _handle_not_found_error(self, request: Request, exc: NoResultFound) -> JSONResponse:
         """
         Handle not found errors and format a standardized response.
 
@@ -115,9 +107,7 @@ class ErrorHandlerMiddleware:
             A formatted error response
         """
         # Log the error
-        logger.info(
-            f"Resource not found for {request.method} {request.url.path}: {exc}"
-        )
+        logger.info(f"Resource not found for {request.method} {request.url.path}: {exc}")
 
         # Create and return the error response
         return JSONResponse(
@@ -129,9 +119,7 @@ class ErrorHandlerMiddleware:
             ),
         )
 
-    def _handle_integrity_error(
-        self, request: Request, exc: IntegrityError
-    ) -> JSONResponse:
+    def _handle_integrity_error(self, request: Request, exc: IntegrityError) -> JSONResponse:
         """
         Handle integrity errors and format a standardized response.
 
@@ -143,9 +131,7 @@ class ErrorHandlerMiddleware:
             A formatted error response
         """
         # Log the error
-        logger.warning(
-            f"Integrity error for {request.method} {request.url.path}: {exc}"
-        )
+        logger.warning(f"Integrity error for {request.method} {request.url.path}: {exc}")
 
         # Create and return the error response
         return JSONResponse(

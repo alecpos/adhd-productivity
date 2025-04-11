@@ -46,8 +46,8 @@ class NLPParser:
                 "meta_data": {
                     "nlp_confidence": analysis.get("confidence_score", 0.7),
                     "complexity_level": analysis.get("complexity_level", 3),
-                    "adhd_friendly_score": analysis.get("adhd_friendly_score", 0.7)
-                }
+                    "adhd_friendly_score": analysis.get("adhd_friendly_score", 0.7),
+                },
             }
 
             return task_data
@@ -58,19 +58,19 @@ class NLPParser:
     def _extract_title(self, text: str) -> str:
         """Extract task title from text."""
         # Get first sentence or first N words
-        first_sentence = text.split('.')[0].strip()
+        first_sentence = text.split(".")[0].strip()
         if len(first_sentence) > 100:
-            return ' '.join(first_sentence.split()[:10]) + '...'
+            return " ".join(first_sentence.split()[:10]) + "..."
         return first_sentence
 
     def _extract_due_date(self, text: str) -> Optional[datetime]:
         """Extract due date from text."""
         # Common date patterns
         patterns = [
-            r'due\s+(?:on|by)?\s*(\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*(?:\s+\d{4})?)',
-            r'by\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*(?:\s+\d{4})?)',
-            r'(?:next|this)\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)',
-            r'(?:in|within)\s+(\d+)\s+(day|week|month)s?'
+            r"due\s+(?:on|by)?\s*(\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*(?:\s+\d{4})?)",
+            r"by\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*(?:\s+\d{4})?)",
+            r"(?:next|this)\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)",
+            r"(?:in|within)\s+(\d+)\s+(day|week|month)s?",
         ]
 
         for pattern in patterns:
@@ -85,9 +85,9 @@ class NLPParser:
     def _extract_priority(self, text: str, analysis: Dict[str, Any]) -> str:
         """Extract task priority from text and analysis."""
         # Look for priority keywords
-        if re.search(r'\b(urgent|asap|emergency|critical)\b', text, re.IGNORECASE):
+        if re.search(r"\b(urgent|asap|emergency|critical)\b", text, re.IGNORECASE):
             return "HIGH"
-        elif re.search(r'\b(low|minor|whenever|no rush)\b', text, re.IGNORECASE):
+        elif re.search(r"\b(low|minor|whenever|no rush)\b", text, re.IGNORECASE):
             return "LOW"
 
         # Use complexity analysis as fallback
@@ -107,12 +107,14 @@ class NLPParser:
         breakdown = analysis.get("breakdown_suggestions", [])
         if breakdown:
             for i, step in enumerate(breakdown):
-                subtasks.append({
-                    "title": step,
-                    "description": step,
-                    "estimated_duration": 15,  # Default duration
-                    "priority": "MEDIUM"
-                })
+                subtasks.append(
+                    {
+                        "title": step,
+                        "description": step,
+                        "estimated_duration": 15,  # Default duration
+                        "priority": "MEDIUM",
+                    }
+                )
 
         return subtasks
 
@@ -121,14 +123,14 @@ class NLPParser:
         tags = []
 
         # Look for hashtags
-        hashtags = re.findall(r'#(\w+)', text)
+        hashtags = re.findall(r"#(\w+)", text)
         if hashtags:
             tags.extend(hashtags)
 
         # Look for common categories
-        categories = ['work', 'personal', 'study', 'health', 'shopping', 'finance']
+        categories = ["work", "personal", "study", "health", "shopping", "finance"]
         for category in categories:
-            if re.search(rf'\b{category}\b', text, re.IGNORECASE):
+            if re.search(rf"\b{category}\b", text, re.IGNORECASE):
                 tags.append(category)
 
         return list(set(tags))  # Remove duplicates

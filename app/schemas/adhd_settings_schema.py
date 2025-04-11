@@ -1,9 +1,11 @@
 """ADHD settings schemas."""
+
 from app.schemas.base_schema import BaseSchema
 from pydantic import Field, BaseModel
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from uuid import UUID
+
 
 class DistractionSensitivitySchema(BaseSchema):
     """Distraction sensitivity settings."""
@@ -24,9 +26,7 @@ class TimeBlockSchema(BaseSchema):
 class EnergyManagementSchema(BaseSchema):
     """Energy management settings."""
 
-    peakHours: List[TimeBlockSchema] = Field(
-        default_factory=list, description="Peak energy hours"
-    )
+    peakHours: List[TimeBlockSchema] = Field(default_factory=list, description="Peak energy hours")
     lowEnergyPeriods: List[TimeBlockSchema] = Field(
         default_factory=list, description="Low energy periods"
     )

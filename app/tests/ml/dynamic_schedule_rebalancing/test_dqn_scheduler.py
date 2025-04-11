@@ -10,6 +10,7 @@ import json
 
 from app.ml.models.adhd17_reinforcement_model import DQNScheduler, ReplayBuffer
 
+
 class TestReplayBuffer:
     """Test suite for the ReplayBuffer class."""
 
@@ -54,6 +55,7 @@ class TestReplayBuffer:
         # Test sampling more than available (should return all available)
         samples = buffer.sample(5)
         assert len(samples) == 3
+
 
 class TestDQNScheduler:
     """Test suite for the DQNScheduler class."""
@@ -151,16 +153,16 @@ class TestDQNScheduler:
         # Should choose action 1 (highest Q-value)
         assert action == 1
 
-    @patch('tensorflow.keras.Model.fit')
-    @patch('tensorflow.keras.Model.predict')
+    @patch("tensorflow.keras.Model.fit")
+    @patch("tensorflow.keras.Model.predict")
     def test_train(self, mock_predict, mock_fit):
         """Test training the DQN model."""
         # Setup mock returns
         mock_predict.side_effect = [
             np.array([[1.0, 2.0, 0.5]]),  # current_q for states
-            np.array([[1.5, 0.5, 1.0]])   # next_q for next_states
+            np.array([[1.5, 0.5, 1.0]]),  # next_q for next_states
         ]
-        mock_fit.return_value = MagicMock(history={'loss': [0.25]})
+        mock_fit.return_value = MagicMock(history={"loss": [0.25]})
 
         dqn = DQNScheduler(state_size=8, action_size=3)
 
@@ -171,8 +173,8 @@ class TestDQNScheduler:
         result = dqn.train(batch_size=1)
 
         # Check return value
-        assert 'loss' in result
-        assert result['loss'] == 0.25
+        assert "loss" in result
+        assert result["loss"] == 0.25
 
         # Check if model.fit was called with correct shapes
         args, kwargs = mock_fit.call_args
@@ -192,7 +194,7 @@ class TestDQNScheduler:
         # Buffer should now have one experience
         assert len(dqn.memory) == 1
 
-    @patch('app.ml.models.adhd17_reinforcement_model.models.load_model')
+    @patch("app.ml.models.adhd17_reinforcement_model.models.load_model")
     def test_save_load(self, mock_load_model):
         """Test saving and loading the model."""
         # Create a temporary directory
@@ -205,8 +207,12 @@ class TestDQNScheduler:
             dqn1.save(model_path)
 
             # Check if files were created - supporting both new .keras and old .h5 formats
-            assert os.path.exists(f"{model_path}_main.keras") or os.path.exists(f"{model_path}_main.h5")
-            assert os.path.exists(f"{model_path}_target.keras") or os.path.exists(f"{model_path}_target.h5")
+            assert os.path.exists(f"{model_path}_main.keras") or os.path.exists(
+                f"{model_path}_main.h5"
+            )
+            assert os.path.exists(f"{model_path}_target.keras") or os.path.exists(
+                f"{model_path}_target.h5"
+            )
             assert os.path.exists(f"{model_path}_params.json")
 
             # Check parameters file content
@@ -217,9 +223,9 @@ class TestDQNScheduler:
                 assert params["trained"] == True
 
             # Mock the load_model function to return a simple model
-            mock_load_model.return_value = tf.keras.Sequential([
-                tf.keras.layers.Dense(3, input_shape=(8,))
-            ])
+            mock_load_model.return_value = tf.keras.Sequential(
+                [tf.keras.layers.Dense(3, input_shape=(8,))]
+            )
 
             # Load the model
             dqn2 = DQNScheduler.load(model_path)

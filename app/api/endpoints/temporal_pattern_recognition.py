@@ -64,11 +64,8 @@ async def analyze_productivity_patterns(
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().isoformat(),
-        "data_range": {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat()
-        },
-        "results": results
+        "data_range": {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()},
+        "results": results,
     }
 
 
@@ -116,18 +113,13 @@ async def model_circadian_rhythm(
 
     # Create service and model circadian rhythm
     tpr_service = TemporalPatternRecognitionService(db)
-    results = await tpr_service.model_circadian_rhythm(
-        user_id, energy_log_dicts, user_data
-    )
+    results = await tpr_service.model_circadian_rhythm(user_id, energy_log_dicts, user_data)
 
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().isoformat(),
-        "data_range": {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat()
-        },
-        "results": results
+        "data_range": {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()},
+        "results": results,
     }
 
 
@@ -179,11 +171,8 @@ async def generate_productivity_insights(
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().isoformat(),
-        "data_range": {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat()
-        },
-        "results": results
+        "data_range": {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()},
+        "results": results,
     }
 
 
@@ -217,12 +206,20 @@ async def run_federated_analysis(
     # Prepare mental health data
     mh_data = {
         "mood_scores": [log.mood_score for log in mental_health_logs if log.mood_score is not None],
-        "stress_levels": [log.stress_level for log in mental_health_logs if log.stress_level is not None],
-        "anxiety_levels": [log.anxiety_level for log in mental_health_logs if log.anxiety_level is not None],
-        "sleep_quality": [log.sleep_quality for log in mental_health_logs if log.sleep_quality is not None],
-        "sleep_hours": [log.sleep_hours for log in mental_health_logs if log.sleep_hours is not None],
+        "stress_levels": [
+            log.stress_level for log in mental_health_logs if log.stress_level is not None
+        ],
+        "anxiety_levels": [
+            log.anxiety_level for log in mental_health_logs if log.anxiety_level is not None
+        ],
+        "sleep_quality": [
+            log.sleep_quality for log in mental_health_logs if log.sleep_quality is not None
+        ],
+        "sleep_hours": [
+            log.sleep_hours for log in mental_health_logs if log.sleep_hours is not None
+        ],
         "timestamp": datetime.now().isoformat(),
-        "user_id": user_id
+        "user_id": user_id,
     }
 
     # Create service and run federated analysis
@@ -234,15 +231,9 @@ async def run_federated_analysis(
     return {
         "user_id": user_id if not anonymize else f"anonymized_user_{uuid.uuid4().hex[:8]}",
         "analysis_date": datetime.now().isoformat(),
-        "data_range": {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat()
-        },
-        "privacy_settings": {
-            "anonymized": anonymize,
-            "sensitive_included": include_sensitive
-        },
-        "results": results
+        "data_range": {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()},
+        "privacy_settings": {"anonymized": anonymize, "sensitive_included": include_sensitive},
+        "results": results,
     }
 
 
@@ -302,17 +293,19 @@ async def generate_comprehensive_insights(
     # Create service and generate comprehensive insights
     tpr_service = TemporalPatternRecognitionService(db)
     results = await tpr_service.generate_comprehensive_insights(
-        user_id, time_block_dicts, mental_health_dicts, energy_log_dicts, productivity_dicts, user_data
+        user_id,
+        time_block_dicts,
+        mental_health_dicts,
+        energy_log_dicts,
+        productivity_dicts,
+        user_data,
     )
 
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().isoformat(),
-        "data_range": {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat()
-        },
-        "results": results
+        "data_range": {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()},
+        "results": results,
     }
 
 
@@ -355,12 +348,11 @@ async def optimize_schedule(
     tpr_service = TemporalPatternRecognitionService(db)
 
     # First, model circadian rhythm
-    rhythm_results = await tpr_service.model_circadian_rhythm(
-        user_id, energy_log_dicts, user_data
-    )
+    rhythm_results = await tpr_service.model_circadian_rhythm(user_id, energy_log_dicts, user_data)
 
     # Create energy pattern from rhythm results
     from app.schemas.scheduling_schema import EnergySchedulingPattern, WorkHours
+
     energy_pattern = EnergySchedulingPattern(
         hourly_energy_levels={
             int(time.split(":")[0]): level
@@ -370,8 +362,7 @@ async def optimize_schedule(
 
     # Get work hours from user preferences
     work_hours = WorkHours(
-        start_hour=user_data.get("work_start_hour", 9),
-        end_hour=user_data.get("work_end_hour", 17)
+        start_hour=user_data.get("work_start_hour", 9), end_hour=user_data.get("work_end_hour", 17)
     )
 
     # Optimize schedule
@@ -382,20 +373,15 @@ async def optimize_schedule(
     return {
         "user_id": user_id,
         "optimization_date": datetime.now().isoformat(),
-        "energy_pattern": {
-            "hourly_energy_levels": energy_pattern.hourly_energy_levels
-        },
-        "work_hours": {
-            "start_hour": work_hours.start_hour,
-            "end_hour": work_hours.end_hour
-        },
-        "optimized_schedule": optimized_schedule
+        "energy_pattern": {"hourly_energy_levels": energy_pattern.hourly_energy_levels},
+        "work_hours": {"start_hour": work_hours.start_hour, "end_hour": work_hours.end_hour},
+        "optimized_schedule": optimized_schedule,
     }
 
 
 @router.get("/patterns", response_model=TemporalPatternResponse)
 async def analyze_productivity_patterns(
-    service: TemporalPatternService = Depends()
+    service: TemporalPatternService = Depends(),
 ) -> TemporalPatternResponse:
     """
     Analyze productivity patterns from user data.

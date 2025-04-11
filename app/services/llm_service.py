@@ -27,6 +27,7 @@ from time import sleep
 
 logger = logging.getLogger(__name__)
 
+
 class LLMService:
     """Service for language model operations."""
 
@@ -100,8 +101,8 @@ class LLMService:
                     "max_length": max_length,
                     "temperature": 0.7,
                     "num_return_sequences": 1,
-                    "do_sample": True
-                }
+                    "do_sample": True,
+                },
             )
 
             if isinstance(response, list) and response:
@@ -122,7 +123,7 @@ class LLMService:
         prompt: str,
         context: Optional[str] = None,
         system_prompt: Optional[str] = None,
-        params: Optional[Dict[str, Any]] = None
+        params: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Generate a response using the text generation model."""
         if self.offline_mode or not self.text_generation_model:
@@ -143,15 +144,12 @@ class LLMService:
                 "max_length": 1024,
                 "temperature": 0.7,
                 "top_p": 0.95,
-                "do_sample": True
+                "do_sample": True,
             }
             generation_params = {**default_params, **(params or {})}
 
             # Generate response
-            response = self.text_generation_model(
-                inputs=full_prompt,
-                params=generation_params
-            )
+            response = self.text_generation_model(inputs=full_prompt, params=generation_params)
 
             return response[0]["generated_text"].strip()
 
@@ -160,10 +158,7 @@ class LLMService:
             return self._fallback_generate_response(prompt, context, system_prompt)
 
     def _fallback_generate_response(
-        self,
-        prompt: str,
-        context: Optional[str] = None,
-        system_prompt: Optional[str] = None
+        self, prompt: str, context: Optional[str] = None, system_prompt: Optional[str] = None
     ) -> str:
         """Fallback response generation when the model is not available."""
         logger.info("Using fallback response generation")
@@ -199,7 +194,7 @@ class LLMService:
             # Get analysis from model
             response = await self.generate_response(
                 prompt=analysis_prompt,
-                params={"temperature": 0.3}  # Lower temperature for more focused analysis
+                params={"temperature": 0.3},  # Lower temperature for more focused analysis
             )
 
             # Parse and structure the response
@@ -211,7 +206,7 @@ class LLMService:
                 "potential_challenges": ["task switching", "time management"],
                 "breakdown_suggestions": ["break into smaller steps", "set timers"],
                 "energy_level_recommendation": "medium",
-                "adhd_friendly_score": 0.7
+                "adhd_friendly_score": 0.7,
             }
 
         except Exception as e:
@@ -242,13 +237,11 @@ class LLMService:
             "potential_challenges": ["distraction", "time management"],
             "breakdown_suggestions": ["break into smaller steps", "set reminders"],
             "energy_level_recommendation": "medium",
-            "adhd_friendly_score": 0.6
+            "adhd_friendly_score": 0.6,
         }
 
     async def generate_focus_strategies(
-        self,
-        user_profile: Dict[str, Any],
-        task_type: str
+        self, user_profile: Dict[str, Any], task_type: str
     ) -> List[Dict[str, Any]]:
         """Generate personalized focus strategies based on user profile and task type."""
         try:
@@ -271,8 +264,7 @@ class LLMService:
 
             # Get strategies from model
             response = await self.generate_response(
-                prompt=strategy_prompt,
-                params={"temperature": 0.7}
+                prompt=strategy_prompt, params={"temperature": 0.7}
             )
 
             # Parse and structure the response
@@ -284,7 +276,7 @@ class LLMService:
                     "duration": 25,
                     "break_intervals": [25, 50, 75],
                     "environment": ["quiet space", "minimal distractions"],
-                    "tools": ["timer", "noise-canceling headphones"]
+                    "tools": ["timer", "noise-canceling headphones"],
                 },
                 {
                     "title": "Task Chunking",
@@ -292,8 +284,8 @@ class LLMService:
                     "duration": 15,
                     "break_intervals": [15, 30, 45],
                     "environment": ["organized workspace", "good lighting"],
-                    "tools": ["checklist", "task timer"]
-                }
+                    "tools": ["checklist", "task timer"],
+                },
             ]
 
         except Exception as e:
@@ -301,9 +293,7 @@ class LLMService:
             return self._fallback_focus_strategies(user_profile, task_type)
 
     def _fallback_focus_strategies(
-        self,
-        user_profile: Dict[str, Any],
-        task_type: str
+        self, user_profile: Dict[str, Any], task_type: str
     ) -> List[Dict[str, Any]]:
         """Provide fallback focus strategies when model is unavailable."""
         # Default strategies that work for most ADHD individuals
@@ -314,38 +304,44 @@ class LLMService:
                 "duration": 25,
                 "break_intervals": [25, 50, 75],
                 "environment": ["quiet space", "minimal distractions"],
-                "tools": ["timer", "noise-canceling headphones"]
+                "tools": ["timer", "noise-canceling headphones"],
             }
         ]
 
         # Add task-specific strategies
         if task_type.lower() in ["creative", "writing", "brainstorming"]:
-            common_strategies.append({
-                "title": "Mind Mapping",
-                "description": "Visually organize thoughts before starting task",
-                "duration": 30,
-                "break_intervals": [30, 60],
-                "environment": ["comfortable space", "inspiration materials"],
-                "tools": ["whiteboard", "colored pens", "mind mapping app"]
-            })
+            common_strategies.append(
+                {
+                    "title": "Mind Mapping",
+                    "description": "Visually organize thoughts before starting task",
+                    "duration": 30,
+                    "break_intervals": [30, 60],
+                    "environment": ["comfortable space", "inspiration materials"],
+                    "tools": ["whiteboard", "colored pens", "mind mapping app"],
+                }
+            )
         elif task_type.lower() in ["focus", "study", "reading"]:
-            common_strategies.append({
-                "title": "Body Doubling",
-                "description": "Work alongside someone else to maintain accountability",
-                "duration": 45,
-                "break_intervals": [45, 90],
-                "environment": ["shared workspace", "accountability partner"],
-                "tools": ["video call app", "shared timer"]
-            })
+            common_strategies.append(
+                {
+                    "title": "Body Doubling",
+                    "description": "Work alongside someone else to maintain accountability",
+                    "duration": 45,
+                    "break_intervals": [45, 90],
+                    "environment": ["shared workspace", "accountability partner"],
+                    "tools": ["video call app", "shared timer"],
+                }
+            )
         else:
-            common_strategies.append({
-                "title": "Task Chunking",
-                "description": "Break the task into 15-minute manageable chunks",
-                "duration": 15,
-                "break_intervals": [15, 30, 45],
-                "environment": ["organized workspace", "good lighting"],
-                "tools": ["checklist", "task timer"]
-            })
+            common_strategies.append(
+                {
+                    "title": "Task Chunking",
+                    "description": "Break the task into 15-minute manageable chunks",
+                    "duration": 15,
+                    "break_intervals": [15, 30, 45],
+                    "environment": ["organized workspace", "good lighting"],
+                    "tools": ["checklist", "task timer"],
+                }
+            )
 
         return common_strategies
 
@@ -387,8 +383,7 @@ class LLMService:
 
             # Get extraction from model
             response = await self.generate_response(
-                prompt=extraction_prompt,
-                params={"temperature": 0.3}
+                prompt=extraction_prompt, params={"temperature": 0.3}
             )
 
             # Mock parsed data (in production, you would parse the actual response)
@@ -396,9 +391,9 @@ class LLMService:
                 "confidence": 0.85,
                 "entities": [
                     {"type": "task", "value": "complete project", "confidence": 0.9},
-                    {"type": "date", "value": "tomorrow", "confidence": 0.8}
+                    {"type": "date", "value": "tomorrow", "confidence": 0.8},
                 ],
-                "intent": "task_creation"
+                "intent": "task_creation",
             }
 
         except Exception as e:
@@ -411,8 +406,17 @@ class LLMService:
         entities = []
 
         # Check for basic date keywords
-        date_keywords = ["today", "tomorrow", "monday", "tuesday", "wednesday",
-                         "thursday", "friday", "saturday", "sunday"]
+        date_keywords = [
+            "today",
+            "tomorrow",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]
         for keyword in date_keywords:
             if keyword.lower() in text.lower():
                 entities.append({"type": "date", "value": keyword, "confidence": 0.7})
@@ -422,11 +426,7 @@ class LLMService:
             entities.append({"type": "time", "value": "time_mentioned", "confidence": 0.6})
 
         # Assume task creation intent for simplicity
-        return {
-            "confidence": 0.6,
-            "entities": entities,
-            "intent": "task_creation"
-        }
+        return {"confidence": 0.6, "entities": entities, "intent": "task_creation"}
 
     async def analyze_text(self, text: str) -> Dict[str, Any]:
         """Analyze text for sentiment, complexity, key phrases, etc."""
@@ -444,7 +444,7 @@ class LLMService:
                 "topics": ["work", "planning"],
                 "summary": "A note about completing a project by the deadline",
                 "recommendations": ["Set a reminder", "Break down into subtasks"],
-                "meta_data": {"word_count": len(text.split())}
+                "meta_data": {"word_count": len(text.split())},
             }
         except Exception as e:
             logger.error(f"Error analyzing text: {str(e)}")
@@ -476,5 +476,5 @@ class LLMService:
             "topics": [],
             "summary": text[:100] + "..." if len(text) > 100 else text,
             "recommendations": ["Consider breaking into smaller tasks"],
-            "meta_data": {"word_count": word_count}
+            "meta_data": {"word_count": word_count},
         }

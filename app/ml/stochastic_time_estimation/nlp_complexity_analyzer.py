@@ -30,6 +30,7 @@ from app.ml.models import BaseMLModel
 
 logger = logging.getLogger(__name__)
 
+
 class NLPComplexityAnalyzer(BaseMLModel):
     """
     NLP system to analyze task descriptions and estimate complexity.
@@ -50,7 +51,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
         model_name: str = "en_core_web_md",
         complexity_weights: Optional[Dict[str, float]] = None,
         cognitive_load_mapping: Optional[Dict[str, float]] = None,
-        store_analysis: bool = True
+        store_analysis: bool = True,
     ):
         """
         Initialize the NLP Complexity Analyzer.
@@ -87,7 +88,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "vocabulary_diversity": 0.15,
             "technical_terms": 0.2,
             "number_of_steps": 0.25,
-            "ambiguity": 0.1
+            "ambiguity": 0.1,
         }
 
         # Default cognitive load mapping
@@ -99,39 +100,144 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "communication": 0.4,
             "organization": 0.3,
             "routine": 0.2,
-            "simple": 0.1
+            "simple": 0.1,
         }
 
         # Technical terms by domain (expandable)
         self.technical_terms = {
-            "programming": ["algorithm", "function", "class", "object", "variable", "database",
-                           "interface", "dependency", "repository", "module", "framework",
-                           "library", "API", "endpoint", "frontend", "backend", "fullstack"],
-            "data_science": ["regression", "classification", "clustering", "dataset", "feature",
-                           "model", "training", "validation", "accuracy", "precision", "recall",
-                           "F1", "matrix", "correlation", "bias", "variance", "hyperparameter"],
-            "project_management": ["milestone", "deliverable", "stakeholder", "timeline", "scope",
-                                 "budget", "resource", "dependency", "critical", "risk", "mitigation",
-                                 "timeline", "gantt", "kanban", "sprint", "agile", "waterfall"],
-            "academic": ["thesis", "research", "literature", "review", "methodology", "analysis",
-                        "theory", "hypothesis", "experiment", "data", "results", "discussion",
-                        "conclusion", "citation", "reference", "journal", "publication"]
+            "programming": [
+                "algorithm",
+                "function",
+                "class",
+                "object",
+                "variable",
+                "database",
+                "interface",
+                "dependency",
+                "repository",
+                "module",
+                "framework",
+                "library",
+                "API",
+                "endpoint",
+                "frontend",
+                "backend",
+                "fullstack",
+            ],
+            "data_science": [
+                "regression",
+                "classification",
+                "clustering",
+                "dataset",
+                "feature",
+                "model",
+                "training",
+                "validation",
+                "accuracy",
+                "precision",
+                "recall",
+                "F1",
+                "matrix",
+                "correlation",
+                "bias",
+                "variance",
+                "hyperparameter",
+            ],
+            "project_management": [
+                "milestone",
+                "deliverable",
+                "stakeholder",
+                "timeline",
+                "scope",
+                "budget",
+                "resource",
+                "dependency",
+                "critical",
+                "risk",
+                "mitigation",
+                "timeline",
+                "gantt",
+                "kanban",
+                "sprint",
+                "agile",
+                "waterfall",
+            ],
+            "academic": [
+                "thesis",
+                "research",
+                "literature",
+                "review",
+                "methodology",
+                "analysis",
+                "theory",
+                "hypothesis",
+                "experiment",
+                "data",
+                "results",
+                "discussion",
+                "conclusion",
+                "citation",
+                "reference",
+                "journal",
+                "publication",
+            ],
         }
 
         # Step indicator terms
         self.step_indicators = [
-            "first", "second", "third", "fourth", "fifth", "finally", "lastly",
-            "step", "phase", "stage", "part", "section", "begin", "start", "then", "next",
-            "after", "before", "once", "when", "eventually", "finish", "complete"
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "finally",
+            "lastly",
+            "step",
+            "phase",
+            "stage",
+            "part",
+            "section",
+            "begin",
+            "start",
+            "then",
+            "next",
+            "after",
+            "before",
+            "once",
+            "when",
+            "eventually",
+            "finish",
+            "complete",
         ]
 
         # Ambiguity indicators
         self.ambiguity_indicators = [
-            "maybe", "perhaps", "possibly", "might", "could", "potentially",
-            "somehow", "sometime", "somewhere", "someone", "something",
-            "unclear", "unsure", "uncertain", "ambiguous", "vague",
-            "approximately", "around", "about", "roughly", "estimate",
-            "either", "or", "not sure", "don't know", "unknown"
+            "maybe",
+            "perhaps",
+            "possibly",
+            "might",
+            "could",
+            "potentially",
+            "somehow",
+            "sometime",
+            "somewhere",
+            "someone",
+            "something",
+            "unclear",
+            "unsure",
+            "uncertain",
+            "ambiguous",
+            "vague",
+            "approximately",
+            "around",
+            "about",
+            "roughly",
+            "estimate",
+            "either",
+            "or",
+            "not sure",
+            "don't know",
+            "unknown",
         ]
 
     async def analyze_task(self, task_id: str) -> Dict[str, Any]:
@@ -153,23 +259,21 @@ class NLPComplexityAnalyzer(BaseMLModel):
         # Get task data
         task = await self._get_task(task_id)
         if task is None:
-            return {
-                "error": f"Task {task_id} not found"
-            }
+            return {"error": f"Task {task_id} not found"}
 
         # Handle both object attributes and dictionary access
         title = ""
         description = ""
 
-        if hasattr(task, 'title'):
+        if hasattr(task, "title"):
             title = task.title
-        elif isinstance(task, dict) and 'title' in task:
-            title = task['title']
+        elif isinstance(task, dict) and "title" in task:
+            title = task["title"]
 
-        if hasattr(task, 'description'):
-            description = task.description or ''
-        elif isinstance(task, dict) and 'description' in task:
-            description = task.get('description', '')
+        if hasattr(task, "description"):
+            description = task.description or ""
+        elif isinstance(task, dict) and "description" in task:
+            description = task.get("description", "")
 
         # Combine title and description for analysis
         text = f"{title} {description}"
@@ -183,9 +287,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
         # Perform the analysis
         if self.nlp is None:
             logger.error("No spaCy model available for NLP analysis")
-            return {
-                "error": "NLP model not available"
-            }
+            return {"error": "NLP model not available"}
 
         # Analyze the text
         doc = self.nlp(text)
@@ -206,14 +308,17 @@ class NLPComplexityAnalyzer(BaseMLModel):
         ambiguity_score = self._calculate_ambiguity(doc, text)
 
         # Determine focus requirements
-        focus_requirements = self._determine_focus_requirements(doc, complexity_score, cognitive_load)
+        focus_requirements = self._determine_focus_requirements(
+            doc, complexity_score, cognitive_load
+        )
 
         # Extract topics
         topics = self._extract_topics(doc)
 
         # Calculate time impact factor
-        time_impact_factor = self._calculate_time_impact(complexity_score, cognitive_load,
-                                                        estimated_steps, ambiguity_score)
+        time_impact_factor = self._calculate_time_impact(
+            complexity_score, cognitive_load, estimated_steps, ambiguity_score
+        )
 
         # Prepare result
         result = {
@@ -226,7 +331,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "time_impact_factor": time_impact_factor,
             "features": features,
             "topics": topics,  # Include topics in the result
-            "analysis_timestamp": datetime.now().isoformat()
+            "analysis_timestamp": datetime.now().isoformat(),
         }
 
         # Store analysis if requested
@@ -293,7 +398,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
                 "number_of_steps": 0,
                 "ambiguity": 0,
                 "vocabulary_complexity": 0,
-                "syntactic_complexity": 0
+                "syntactic_complexity": 0,
             }
 
         # Average sentence length (in words)
@@ -306,7 +411,9 @@ class NLPComplexityAnalyzer(BaseMLModel):
         normalized_word_length = max(0, min(normalized_word_length, 1.0))  # Clamp to 0-1
 
         # Vocabulary diversity (unique words / total words)
-        unique_words = len(set(token.lemma_ for token in doc if not token.is_stop and not token.is_punct))
+        unique_words = len(
+            set(token.lemma_ for token in doc if not token.is_stop and not token.is_punct)
+        )
         vocabulary_diversity = unique_words / max(1, n_words)
         normalized_vocabulary_diversity = min(vocabulary_diversity * 5, 1.0)  # Normalize to 0-1
 
@@ -323,7 +430,9 @@ class NLPComplexityAnalyzer(BaseMLModel):
         normalized_steps = min(step_count / 5, 1.0)  # Normalize to 0-1
 
         # Ambiguity indicators
-        ambiguity_count = sum(indicator.lower() in text.lower() for indicator in self.ambiguity_indicators)
+        ambiguity_count = sum(
+            indicator.lower() in text.lower() for indicator in self.ambiguity_indicators
+        )
         normalized_ambiguity = min(ambiguity_count / 3, 1.0)  # Normalize to 0-1
 
         # Add vocabulary complexity (required by tests)
@@ -337,7 +446,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "technical_terms": normalized_technical_terms,
             "number_of_steps": normalized_steps,
             "ambiguity": normalized_ambiguity,
-            "syntactic_complexity": 0.6  # Added for test compatibility
+            "syntactic_complexity": 0.6,  # Added for test compatibility
         }
 
     def _calculate_complexity_score(self, features: Dict[str, float]) -> float:
@@ -377,14 +486,45 @@ class NLPComplexityAnalyzer(BaseMLModel):
                 load_scores.append(score)
 
         # Analyze verbs and their cognitive complexity
-        high_load_verbs = ["analyze", "evaluate", "synthesize", "create", "design", "develop",
-                         "investigate", "research", "solve", "optimize"]
+        high_load_verbs = [
+            "analyze",
+            "evaluate",
+            "synthesize",
+            "create",
+            "design",
+            "develop",
+            "investigate",
+            "research",
+            "solve",
+            "optimize",
+        ]
 
-        medium_load_verbs = ["implement", "apply", "organize", "prepare", "plan", "outline",
-                          "schedule", "coordinate", "calculate", "test"]
+        medium_load_verbs = [
+            "implement",
+            "apply",
+            "organize",
+            "prepare",
+            "plan",
+            "outline",
+            "schedule",
+            "coordinate",
+            "calculate",
+            "test",
+        ]
 
-        low_load_verbs = ["check", "list", "review", "read", "write", "send", "find",
-                        "complete", "log", "enter", "update"]
+        low_load_verbs = [
+            "check",
+            "list",
+            "review",
+            "read",
+            "write",
+            "send",
+            "find",
+            "complete",
+            "log",
+            "enter",
+            "update",
+        ]
 
         for token in doc:
             if token.pos_ == "VERB":
@@ -426,10 +566,10 @@ class NLPComplexityAnalyzer(BaseMLModel):
                 verb_initial_sentences += 1
 
         # Count bullet points
-        bullet_points = len(re.findall(r'[\n\r][ \t]*[-*•][ \t]', text))
+        bullet_points = len(re.findall(r"[\n\r][ \t]*[-*•][ \t]", text))
 
         # Count numbered items
-        numbered_items = len(re.findall(r'[\n\r][ \t]*\d+\.[ \t]', text))
+        numbered_items = len(re.findall(r"[\n\r][ \t]*\d+\.[ \t]", text))
 
         # Combine indicators
         estimated_steps = max(
@@ -437,7 +577,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             verb_initial_sentences,
             bullet_points,
             numbered_items,
-            1  # Minimum of 1 step
+            1,  # Minimum of 1 step
         )
 
         return estimated_steps
@@ -454,7 +594,9 @@ class NLPComplexityAnalyzer(BaseMLModel):
             Ambiguity score (0-1)
         """
         # Count ambiguity indicators
-        ambiguity_count = sum(indicator.lower() in text.lower() for indicator in self.ambiguity_indicators)
+        ambiguity_count = sum(
+            indicator.lower() in text.lower() for indicator in self.ambiguity_indicators
+        )
 
         # Count modal verbs (might, could, would, etc.)
         modal_count = sum(1 for token in doc if token.tag_ == "MD")
@@ -472,10 +614,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
         return ambiguity_score
 
     def _determine_focus_requirements(
-        self,
-        doc,
-        complexity_score: float,
-        cognitive_load: float
+        self, doc, complexity_score: float, cognitive_load: float
     ) -> Dict[str, float]:
         """
         Determine focus requirements for the task.
@@ -511,7 +650,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "context_switching": round(context_switching, 2),
             "deep_work": round(deep_work, 2),
             "distraction_sensitivity": round(distraction_sensitivity, 2),
-            "detail_orientation": round(complexity_score * 0.8, 2)  # Required by tests
+            "detail_orientation": round(complexity_score * 0.8, 2),  # Required by tests
         }
 
     def _extract_topics(self, doc) -> List[str]:
@@ -529,11 +668,13 @@ class NLPComplexityAnalyzer(BaseMLModel):
 
         try:
             # Extract noun chunks as potential topics
-            if hasattr(doc, 'noun_chunks'):
+            if hasattr(doc, "noun_chunks"):
                 noun_chunks = list(doc.noun_chunks)
 
                 # Count frequency of head nouns
-                head_nouns = Counter([chunk.root.lemma_ for chunk in noun_chunks if hasattr(chunk, 'root')])
+                head_nouns = Counter(
+                    [chunk.root.lemma_ for chunk in noun_chunks if hasattr(chunk, "root")]
+                )
 
                 # Get the most common topics (at most 5)
                 top_topics = [topic for topic, _ in head_nouns.most_common(5)]
@@ -555,7 +696,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
         complexity_score: float,
         cognitive_load: float,
         estimated_steps: int,
-        ambiguity_score: float
+        ambiguity_score: float,
     ) -> float:
         """
         Calculate impact on time estimation.
@@ -596,9 +737,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
         """
         try:
             # Use SQLAlchemy method to query tasks
-            result = await self.db.execute(
-                select(TaskModel).where(TaskModel.id == task_id)
-            )
+            result = await self.db.execute(select(TaskModel).where(TaskModel.id == task_id))
             row = result.first()
 
             # Return None if task not found
@@ -628,7 +767,8 @@ class NLPComplexityAnalyzer(BaseMLModel):
         try:
             # Use SQLAlchemy method to query analysis
             result = await self.db.execute(
-                select(TaskAnalysis).where(TaskAnalysis.task_id == task_id)
+                select(TaskAnalysis)
+                .where(TaskAnalysis.task_id == task_id)
                 .order_by(TaskAnalysis.created_at.desc())
             )
             row = result.first()
@@ -647,7 +787,9 @@ class NLPComplexityAnalyzer(BaseMLModel):
             logger.error(f"Error retrieving analysis for task {task_id}: {e}")
             return None
 
-    async def _store_analysis(self, task: Union[TaskModel, Dict[str, Any]], analysis_result: Dict[str, Any]) -> None:
+    async def _store_analysis(
+        self, task: Union[TaskModel, Dict[str, Any]], analysis_result: Dict[str, Any]
+    ) -> None:
         """
         Store analysis results in database.
 
@@ -660,10 +802,10 @@ class NLPComplexityAnalyzer(BaseMLModel):
 
         # Get task ID either from attribute or dictionary
         task_id = None
-        if hasattr(task, 'id'):
+        if hasattr(task, "id"):
             task_id = task.id
-        elif isinstance(task, dict) and 'id' in task:
-            task_id = task['id']
+        elif isinstance(task, dict) and "id" in task:
+            task_id = task["id"]
 
         if not task_id:
             logger.error("Cannot store analysis: task ID is missing")
@@ -671,10 +813,10 @@ class NLPComplexityAnalyzer(BaseMLModel):
 
         # Get estimated duration either from attribute or dictionary
         estimated_duration = 30  # Default
-        if hasattr(task, 'estimated_duration') and task.estimated_duration is not None:
+        if hasattr(task, "estimated_duration") and task.estimated_duration is not None:
             estimated_duration = task.estimated_duration
-        elif isinstance(task, dict) and 'estimated_duration' in task:
-            estimated_duration = task['estimated_duration']
+        elif isinstance(task, dict) and "estimated_duration" in task:
+            estimated_duration = task["estimated_duration"]
 
         # Create task analysis record
         task_analysis = TaskAnalysis(
@@ -685,7 +827,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             potential_challenges=[],  # To be implemented
             breakdown_suggestions=[],  # To be implemented
             energy_level_recommendation="medium",  # Default
-            adhd_friendly_score=1 - analysis_result["complexity_score"]  # Inverse of complexity
+            adhd_friendly_score=1 - analysis_result["complexity_score"],  # Inverse of complexity
         )
 
         # Store in database
@@ -694,7 +836,9 @@ class NLPComplexityAnalyzer(BaseMLModel):
 
         logger.info(f"Stored task analysis for task {task_id}")
 
-    def _format_analysis_result(self, analysis: TaskAnalysis, task: Union[TaskModel, Dict[str, Any]]) -> Dict[str, Any]:
+    def _format_analysis_result(
+        self, analysis: TaskAnalysis, task: Union[TaskModel, Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """
         Format saved analysis back to result format.
 
@@ -707,19 +851,21 @@ class NLPComplexityAnalyzer(BaseMLModel):
         """
         # Get task ID either from attribute or dictionary
         task_id = None
-        if hasattr(task, 'id'):
+        if hasattr(task, "id"):
             task_id = task.id
-        elif isinstance(task, dict) and 'id' in task:
-            task_id = task['id']
+        elif isinstance(task, dict) and "id" in task:
+            task_id = task["id"]
 
         # Get estimated duration either from attribute or dictionary
         estimated_duration = 30  # Default
-        if hasattr(task, 'estimated_duration') and task.estimated_duration is not None:
+        if hasattr(task, "estimated_duration") and task.estimated_duration is not None:
             estimated_duration = task.estimated_duration
-        elif isinstance(task, dict) and 'estimated_duration' in task:
-            estimated_duration = task.get('estimated_duration', 30)
+        elif isinstance(task, dict) and "estimated_duration" in task:
+            estimated_duration = task.get("estimated_duration", 30)
 
-        time_impact_factor = analysis.time_estimate / estimated_duration if estimated_duration > 0 else 1.0
+        time_impact_factor = (
+            analysis.time_estimate / estimated_duration if estimated_duration > 0 else 1.0
+        )
 
         return {
             "task_id": task_id,
@@ -731,14 +877,11 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "ambiguity_score": 0.4,  # Not stored in database
             "is_cached": True,
             "topics": ["topic1", "topic2", "topic3"],  # Required by tests
-            "analysis_timestamp": datetime.now().isoformat()
+            "analysis_timestamp": datetime.now().isoformat(),
         }
 
     async def update_with_observation(
-        self,
-        task_id: str,
-        actual_duration: int,
-        context_data: Optional[Dict[str, Any]] = None
+        self, task_id: str, actual_duration: int, context_data: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Update the NLP complexity analyzer with a new observation.
@@ -769,7 +912,7 @@ class NLPComplexityAnalyzer(BaseMLModel):
             return {
                 "success": True,
                 "task_id": task_id,
-                "message": "Created new analysis during update"
+                "message": "Created new analysis during update",
             }
 
         # Update the existing analysis with the actual duration
@@ -780,15 +923,17 @@ class NLPComplexityAnalyzer(BaseMLModel):
 
         # For now, we just log the update - a more sophisticated implementation
         # would adjust the complexity scores based on the actual time taken
-        logger.info(f"Updated NLP analyzer with task {task_id} observation: " +
-                   f"deviation_ratio={deviation_ratio:.2f}")
+        logger.info(
+            f"Updated NLP analyzer with task {task_id} observation: "
+            + f"deviation_ratio={deviation_ratio:.2f}"
+        )
 
         return {
             "success": True,
             "task_id": task_id,
             "actual_duration": actual_duration,
             "estimated_duration": estimated_duration,
-            "deviation_ratio": float(deviation_ratio)
+            "deviation_ratio": float(deviation_ratio),
         }
 
     def save(self, filepath: str) -> None:
@@ -803,11 +948,11 @@ class NLPComplexityAnalyzer(BaseMLModel):
             "cognitive_load_mapping": self.cognitive_load_mapping,
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(params, f)
 
     @classmethod
-    def load(cls, filepath: str) -> 'NLPComplexityAnalyzer':
+    def load(cls, filepath: str) -> "NLPComplexityAnalyzer":
         """
         Load model parameters from a file.
 
@@ -818,12 +963,12 @@ class NLPComplexityAnalyzer(BaseMLModel):
             Loaded NLPComplexityAnalyzer instance
         """
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 params = json.load(f)
 
             return cls(
                 complexity_weights=params.get("complexity_weights"),
-                cognitive_load_mapping=params.get("cognitive_load_mapping")
+                cognitive_load_mapping=params.get("cognitive_load_mapping"),
             )
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logger.error(f"Error loading model parameters: {e}")

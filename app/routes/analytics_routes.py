@@ -31,9 +31,7 @@ async def get_insights_service(
     return UserInsightsService(db)
 
 
-class AnalyticsRouter(
-    BaseRouter[AnalyticsSchema, AnalyticsService, UserAnalytics]
-):
+class AnalyticsRouter(BaseRouter[AnalyticsSchema, AnalyticsService, UserAnalytics]):
     def __init__(self):
         super().__init__(
             prefix="/analytics",

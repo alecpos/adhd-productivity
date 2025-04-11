@@ -34,10 +34,19 @@ def merge_schemas(*schemas: Type[BaseModel], name: str = "MergedSchema") -> Type
                 )
 
     # Create and return the merged schema
-    return type(name, (BaseModel,), {"__annotations__": {k: v[0] for k, v in fields.items()}, **{k: v[1] for k, v in fields.items()}})
+    return type(
+        name,
+        (BaseModel,),
+        {
+            "__annotations__": {k: v[0] for k, v in fields.items()},
+            **{k: v[1] for k, v in fields.items()},
+        },
+    )
 
 
-def create_schema_subset(base_schema: Type[BaseModel], fields_to_include: List[str], name: str = "SubsetSchema") -> Type[BaseModel]:
+def create_schema_subset(
+    base_schema: Type[BaseModel], fields_to_include: List[str], name: str = "SubsetSchema"
+) -> Type[BaseModel]:
     """Create a new schema with only specified fields from base schema."""
     fields: Dict[str, Any] = {}
 
@@ -61,11 +70,19 @@ def create_schema_subset(base_schema: Type[BaseModel], fields_to_include: List[s
             raise ValueError(f"Field {field_name} not found in base schema")
 
     # Create and return the subset schema
-    return type(name, (BaseModel,), {"__annotations__": {k: v[0] for k, v in fields.items()}, **{k: v[1] for k, v in fields.items()}})
+    return type(
+        name,
+        (BaseModel,),
+        {
+            "__annotations__": {k: v[0] for k, v in fields.items()},
+            **{k: v[1] for k, v in fields.items()},
+        },
+    )
 
 
 def schema_to_dict(schema: BaseModel, exclude_none: bool = True) -> Dict[str, Any]:
     """Convert a schema instance to a dictionary with proper type handling."""
+
     def convert_value(value: Any) -> Any:
         if isinstance(value, datetime):
             return value.isoformat()
@@ -87,6 +104,7 @@ def schema_to_dict(schema: BaseModel, exclude_none: bool = True) -> Dict[str, An
 
 def dict_to_schema(data: Dict[str, Any], schema_class: Type[T]) -> T:
     """Convert a dictionary to a schema instance with proper type handling."""
+
     def convert_value(value: Any, expected_type: Type) -> Any:
         if value is None:
             return None
@@ -110,8 +128,7 @@ def dict_to_schema(data: Dict[str, Any], schema_class: Type[T]) -> T:
                 return {convert_value(item, args[0]) for item in value}
             if origin == dict:
                 return {
-                    convert_value(k, args[0]): convert_value(v, args[1])
-                    for k, v in value.items()
+                    convert_value(k, args[0]): convert_value(v, args[1]) for k, v in value.items()
                 }
 
         return value
@@ -119,10 +136,7 @@ def dict_to_schema(data: Dict[str, Any], schema_class: Type[T]) -> T:
     converted_data = {}
     for field_name, field in schema_class.model_fields.items():
         if field_name in data:
-            converted_data[field_name] = convert_value(
-                data[field_name],
-                field.annotation
-            )
+            converted_data[field_name] = convert_value(data[field_name], field.annotation)
 
     return schema_class(**converted_data)
 

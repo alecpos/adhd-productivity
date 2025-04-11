@@ -26,8 +26,8 @@ CreateSchemaType = TypeVar("CreateSchemaType")
 T = TypeVar("T")
 
 # Default circuit breaker states
-CLOSED = "closed"      # Normal operation, requests go through
-OPEN = "open"          # Failure threshold exceeded, requests fail fast
+CLOSED = "closed"  # Normal operation, requests go through
+OPEN = "open"  # Failure threshold exceeded, requests fail fast
 HALF_OPEN = "half-open"  # Testing if service is back online
 
 
@@ -65,14 +65,18 @@ class CircuitBreaker:
         self.failure_count = 0
         self.last_failure_time = None
 
-        logger.info(f"Circuit breaker '{name}' initialized with failure_threshold={failure_threshold}, "
-                   f"recovery_timeout={recovery_timeout}")
+        logger.info(
+            f"Circuit breaker '{name}' initialized with failure_threshold={failure_threshold}, "
+            f"recovery_timeout={recovery_timeout}"
+        )
 
     def __call__(self, func):
         """Make the circuit breaker callable as a decorator."""
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.call(func, *args, **kwargs)
+
         return wrapper
 
     async def call(self, func, *args, **kwargs):
@@ -109,7 +113,9 @@ class CircuitBreaker:
         self.failure_count += 1
         self.last_failure_time = datetime.now()
 
-        logger.warning(f"Circuit '{self.name}' recorded failure {self.failure_count}/{self.failure_threshold}: {str(exception)}")
+        logger.warning(
+            f"Circuit '{self.name}' recorded failure {self.failure_count}/{self.failure_threshold}: {str(exception)}"
+        )
 
         if self.state == HALF_OPEN or self.failure_count >= self.failure_threshold:
             logger.error(f"Circuit '{self.name}' is now OPEN due to failures")
@@ -155,14 +161,18 @@ class BulkheadManager:
         self.active_count = 0
         self.queue_count = 0
 
-        logger.info(f"Bulkhead '{name}' initialized with max_concurrent_calls={max_concurrent_calls}, "
-                   f"max_queue_size={max_queue_size}")
+        logger.info(
+            f"Bulkhead '{name}' initialized with max_concurrent_calls={max_concurrent_calls}, "
+            f"max_queue_size={max_queue_size}"
+        )
 
     def __call__(self, func):
         """Make the bulkhead callable as a decorator."""
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.execute(func, *args, **kwargs)
+
         return wrapper
 
     async def execute(self, func, *args, **kwargs):
@@ -231,18 +241,17 @@ class ThreadPoolBulkhead:
 
     def __call__(self, func):
         """Make the bulkhead callable as a decorator."""
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.execute(func, *args, **kwargs)
+
         return wrapper
 
     async def execute(self, func, *args, **kwargs):
         """Execute a function in the thread pool."""
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            self.pool,
-            functools.partial(func, *args, **kwargs)
-        )
+        return await loop.run_in_executor(self.pool, functools.partial(func, *args, **kwargs))
 
 
 class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
@@ -290,7 +299,9 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                     "timeout",
                 ]
 
-                is_retryable = isinstance(e, asyncio.TimeoutError) or any(err in error_str for err in concurrency_errors)
+                is_retryable = isinstance(e, asyncio.TimeoutError) or any(
+                    err in error_str for err in concurrency_errors
+                )
                 if not is_retryable:
                     raise
 
@@ -299,18 +310,24 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
 
                 if retry_count > max_retries:
                     logger.error(f"Max retries ({max_retries}) exceeded. Last error: {error_str}")
-                    raise ServiceError(f"Max retries ({max_retries}) exceeded. Last error: {error_str}")
+                    raise ServiceError(
+                        f"Max retries ({max_retries}) exceeded. Last error: {error_str}"
+                    )
 
-                matched_error = "timeout" if isinstance(e, asyncio.TimeoutError) else next(
-                    (err for err in concurrency_errors if err in error_str), "unknown"
+                matched_error = (
+                    "timeout"
+                    if isinstance(e, asyncio.TimeoutError)
+                    else next((err for err in concurrency_errors if err in error_str), "unknown")
                 )
                 log_message = error_message or f"Operation failed due to {matched_error}"
 
                 # Calculate jitter to avoid thundering herd
-                jitter = (0.5 + (0.5 * (hash(str(time.time())) % 100) / 100))
+                jitter = 0.5 + (0.5 * (hash(str(time.time())) % 100) / 100)
                 actual_delay = delay * jitter
 
-                logger.warning(f"{log_message} (Attempt {retry_count}/{max_retries}). Retrying in {actual_delay:.2f}s")
+                logger.warning(
+                    f"{log_message} (Attempt {retry_count}/{max_retries}). Retrying in {actual_delay:.2f}s"
+                )
 
                 delay = min(delay * backoff_factor, max_delay)
                 await asyncio.sleep(actual_delay)
@@ -335,6 +352,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
         error_message: Optional[str] = None,
     ):
         """Decorator for adding retry logic to async methods."""
+
         def decorator(func: Callable[..., T]) -> Callable[..., T]:
             @wraps(func)
             async def wrapper(*args, **kwargs) -> T:
@@ -351,7 +369,9 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                     retry_exceptions=retry_exceptions,
                     error_message=error_message,
                 )
+
             return wrapper
+
         return decorator
 
     @staticmethod
@@ -362,6 +382,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
         expected_exceptions: Tuple = (Exception,),
     ):
         """Decorator for adding circuit breaker to methods."""
+
         def decorator(func: Callable[..., T]) -> Callable[..., T]:
             # Use function name if none provided
             breaker_name = name or func.__qualname__
@@ -377,6 +398,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 return await circuit_breaker.call(func, *args, **kwargs)
 
             return wrapper
+
         return decorator
 
     @staticmethod
@@ -386,6 +408,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
         max_queue_size: int = 20,
     ):
         """Decorator for adding bulkhead protection to methods."""
+
         def decorator(func: Callable[..., T]) -> Callable[..., T]:
             # Use function name if none provided
             bulkhead_name = name or func.__qualname__
@@ -400,6 +423,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 return await bulkhead.execute(func, *args, **kwargs)
 
             return wrapper
+
         return decorator
 
     @staticmethod
@@ -408,6 +432,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
         max_workers: int = 5,
     ):
         """Decorator for adding thread pool isolation to CPU-bound methods."""
+
         def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
             # Use function name if none provided
             pool_name = name or func.__qualname__
@@ -421,6 +446,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 return await thread_pool.execute(func, *args, **kwargs)
 
             return wrapper
+
         return decorator
 
     async def health_check(self) -> Dict[str, Any]:
@@ -446,19 +472,13 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             details["database"] = "down"
             details["database_error"] = str(e)
 
-        return {
-            "status": status,
-            "service": self.__class__.__name__,
-            "details": details
-        }
+        return {"status": status, "service": self.__class__.__name__, "details": details}
 
     @with_retry()
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[SchemaType]:
         """Get all items with pagination."""
         try:
-            result = await self.db.execute(
-                select(self.model).offset(skip).limit(limit)
-            )
+            result = await self.db.execute(select(self.model).offset(skip).limit(limit))
             items = list(result.scalars().all())
             return [self.schema_class.model_validate(item) for item in items]
         except Exception as e:
@@ -468,9 +488,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
     async def get_by_id(self, id: UUID) -> Optional[ModelType]:
         """Get item by ID."""
         try:
-            result = await self.db.execute(
-                select(self.model).where(self.model.id == id)
-            )
+            result = await self.db.execute(select(self.model).where(self.model.id == id))
             return result.scalar_one_or_none()
         except Exception as e:
             raise ServiceError(f"Error retrieving item: {str(e)}")
@@ -528,9 +546,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
     async def exists(self, id: UUID) -> bool:
         """Check if an item exists by ID."""
         try:
-            result = await self.db.execute(
-                select(self.model).where(self.model.id == id)
-            )
+            result = await self.db.execute(select(self.model).where(self.model.id == id))
             return result.scalar_one_or_none() is not None
         except Exception as e:
             raise ServiceError(f"Error checking item existence: {str(e)}")
@@ -539,9 +555,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
     async def count(self) -> int:
         """Get total count of items."""
         try:
-            result = await self.db.execute(
-                select(self.model)
-            )
+            result = await self.db.execute(select(self.model))
             return len(result.scalars().all())
         except Exception as e:
             raise ServiceError(f"Error counting items: {str(e)}")

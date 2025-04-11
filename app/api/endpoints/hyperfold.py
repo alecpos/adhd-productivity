@@ -17,11 +17,7 @@ from app.ml.hyperfold_attention_v2 import HyperfoldAttentionV2
 from app.core.config import settings
 from app.core.security.security import get_current_user
 from app.models.user_model import UserModel
-from app.services.bioauth_service import (
-    BioAuthService,
-    get_bioauth_service,
-    BiometricType
-)
+from app.services.bioauth_service import BioAuthService, get_bioauth_service, BiometricType
 
 router = APIRouter(
     prefix="/hyperfold",
@@ -49,21 +45,21 @@ def get_hyperfold_model() -> HyperfoldAttentionV2:
         # Define modalities - dimensions are examples and should be adjusted
         # based on actual data formats
         modalities = {
-            "calendar": 64,   # Calendar event features
+            "calendar": 64,  # Calendar event features
             "biometric": 32,  # Biometric data features
-            "task": 48,       # Task features
-            "context": 24     # Environmental/contextual features
+            "task": 48,  # Task features
+            "context": 24,  # Environmental/contextual features
         }
 
         # Create the model with multi-modal support
         _hyperfold_model = HyperfoldAttentionV2(
-            input_dim=64,     # Fallback for single-modal operation
+            input_dim=64,  # Fallback for single-modal operation
             hidden_dim=128,
             output_dim=64,
             modalities=modalities,
             manifold_type="hyperbolic",  # Can be "hyperbolic", "spherical", "euclidean", or "product"
             max_window_size=128,
-            dropout=0.1
+            dropout=0.1,
         )
 
         # Load pre-trained weights if available
@@ -81,54 +77,43 @@ def get_hyperfold_model() -> HyperfoldAttentionV2:
 
 class TemporalPatternRequest(BaseModel):
     """Request for temporal pattern recognition."""
+
     calendar_data: Optional[List[Dict[str, Any]]] = Field(
-        None,
-        description="Calendar event data for pattern recognition"
+        None, description="Calendar event data for pattern recognition"
     )
     task_data: Optional[List[Dict[str, Any]]] = Field(
-        None,
-        description="Task data for pattern recognition"
+        None, description="Task data for pattern recognition"
     )
     context_data: Optional[Dict[str, Any]] = Field(
-        None,
-        description="Contextual/environmental data"
+        None, description="Contextual/environmental data"
     )
     time_range: Optional[List[str]] = Field(
-        None,
-        description="Time range for analysis in ISO format [start, end]"
+        None, description="Time range for analysis in ISO format [start, end]"
     )
     include_biometrics: bool = Field(
-        False,
-        description="Whether to include biometric data in the analysis"
+        False, description="Whether to include biometric data in the analysis"
     )
 
 
 class TemporalPatternResponse(BaseModel):
     """Response for temporal pattern recognition."""
+
     optimal_times: List[Dict[str, Any]] = Field(
-        ...,
-        description="Optimal time slots identified for high productivity"
+        ..., description="Optimal time slots identified for high productivity"
     )
     pattern_insights: Dict[str, Any] = Field(
-        ...,
-        description="Insights extracted from temporal patterns"
+        ..., description="Insights extracted from temporal patterns"
     )
     focus_predictions: Optional[List[Dict[str, float]]] = Field(
-        None,
-        description="Predicted focus levels across time periods"
+        None, description="Predicted focus levels across time periods"
     )
     energy_predictions: Optional[List[Dict[str, float]]] = Field(
-        None,
-        description="Predicted energy levels across time periods"
+        None, description="Predicted energy levels across time periods"
     )
     recommended_schedule: Optional[List[Dict[str, Any]]] = Field(
-        None,
-        description="Recommended task scheduling based on patterns"
+        None, description="Recommended task scheduling based on patterns"
     )
-    metadata: Dict[str, Any] = Field(
-        ...,
-        description="Additional metadata about the prediction"
-    )
+    metadata: Dict[str, Any] = Field(..., description="Additional metadata about the prediction")
 
 
 @router.post("/patterns", response_model=TemporalPatternResponse)
@@ -136,7 +121,7 @@ async def analyze_temporal_patterns(
     request: TemporalPatternRequest,
     bioauth_service: Optional[BioAuthService] = Depends(get_bioauth_service),
     current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Analyze temporal patterns using the enhanced MIT Hyperfold system.
@@ -178,8 +163,7 @@ async def analyze_temporal_patterns(
             try:
                 # Get user devices
                 devices = await bioauth_service.get_user_devices(
-                    user_id=str(current_user.id),
-                    db=db
+                    user_id=str(current_user.id), db=db
                 )
 
                 if devices:
@@ -189,7 +173,8 @@ async def analyze_temporal_patterns(
                     for device in devices:
                         # Check if device supports heart rate or HRV
                         supported_metrics = [
-                            metric for metric in [BiometricType.HEART_RATE, BiometricType.HRV]
+                            metric
+                            for metric in [BiometricType.HEART_RATE, BiometricType.HRV]
                             if metric in device.supported_metrics
                         ]
 
@@ -200,10 +185,12 @@ async def analyze_temporal_patterns(
                             # Get data for the last 24 hours (or specified time range)
                             if request.time_range and len(request.time_range) == 2:
                                 from datetime import datetime
+
                                 start_time = datetime.fromisoformat(request.time_range[0])
                                 end_time = datetime.fromisoformat(request.time_range[1])
                             else:
                                 from datetime import datetime, timedelta
+
                                 end_time = datetime.utcnow()
                                 start_time = end_time - timedelta(hours=24)
 
@@ -213,7 +200,7 @@ async def analyze_temporal_patterns(
                                 metric_type=metric,
                                 start_time=start_time,
                                 end_time=end_time,
-                                db=db
+                                db=db,
                             )
 
                             biometric_data_points.extend(data)
@@ -232,7 +219,7 @@ async def analyze_temporal_patterns(
         if not modality_data:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No valid data provided for analysis"
+                detail="No valid data provided for analysis",
             )
 
         # Use placeholder for state features (could be derived from biometrics)
@@ -251,39 +238,42 @@ async def analyze_temporal_patterns(
                 "start_time": "09:00:00",
                 "end_time": "11:00:00",
                 "task_type": "deep_work",
-                "effectiveness": 0.85
+                "effectiveness": 0.85,
             },
             {
                 "start_time": "14:30:00",
                 "end_time": "16:00:00",
                 "task_type": "creative",
-                "effectiveness": 0.78
-            }
+                "effectiveness": 0.78,
+            },
         ]
 
         # Example pattern insights
         pattern_insights = {
             "daily_energy_peak": "10:00:00",
             "daily_energy_trough": "15:00:00",
-            "weekly_patterns": {
-                "most_productive_day": "Tuesday",
-                "least_productive_day": "Friday"
-            },
+            "weekly_patterns": {"most_productive_day": "Tuesday", "least_productive_day": "Friday"},
             "task_completion_insights": {
                 "best_time_for_deep_work": "Morning",
-                "best_time_for_admin_tasks": "Afternoon"
-            }
+                "best_time_for_admin_tasks": "Afternoon",
+            },
         }
 
         # Example focus predictions (hourly for a day)
         focus_predictions = [
-            {"time": f"{hour:02d}:00:00", "focus_level": round(float(np.random.normal(0.7, 0.15)), 2)}
+            {
+                "time": f"{hour:02d}:00:00",
+                "focus_level": round(float(np.random.normal(0.7, 0.15)), 2),
+            }
             for hour in range(8, 18)
         ]
 
         # Example energy predictions (hourly for a day)
         energy_predictions = [
-            {"time": f"{hour:02d}:00:00", "energy_level": round(float(np.random.normal(0.65, 0.2)), 2)}
+            {
+                "time": f"{hour:02d}:00:00",
+                "energy_level": round(float(np.random.normal(0.65, 0.2)), 2),
+            }
             for hour in range(8, 18)
         ]
 
@@ -294,15 +284,15 @@ async def analyze_temporal_patterns(
                 "task_name": "Project planning",
                 "start_time": "09:00:00",
                 "end_time": "10:30:00",
-                "confidence": 0.82
+                "confidence": 0.82,
             },
             {
                 "task_id": "task_002",
                 "task_name": "Email processing",
                 "start_time": "11:00:00",
                 "end_time": "12:00:00",
-                "confidence": 0.75
-            }
+                "confidence": 0.75,
+            },
         ]
 
         # Prepare response
@@ -317,10 +307,13 @@ async def analyze_temporal_patterns(
                 "biometrics_included": "biometric" in modality_data,
                 "model_version": "MIT Hyperfold v2.0",
                 "attention_metadata": {
-                    "window_sizes": metadata.get("window", {}).get("window_sizes", []).tolist()
-                    if "window" in metadata else []
-                }
-            }
+                    "window_sizes": (
+                        metadata.get("window", {}).get("window_sizes", []).tolist()
+                        if "window" in metadata
+                        else []
+                    )
+                },
+            },
         )
 
         return response
@@ -328,22 +321,22 @@ async def analyze_temporal_patterns(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing temporal patterns: {str(e)}"
+            detail=f"Error processing temporal patterns: {str(e)}",
         )
 
 
 class ManifoldTypeRequest(BaseModel):
     """Request to change the Riemannian manifold type."""
+
     manifold_type: str = Field(
         ...,
-        description="Type of Riemannian manifold to use (hyperbolic, spherical, euclidean, product)"
+        description="Type of Riemannian manifold to use (hyperbolic, spherical, euclidean, product)",
     )
 
 
 @router.post("/config/manifold", response_model=Dict[str, Any])
 async def update_manifold_type(
-    request: ManifoldTypeRequest,
-    current_user: UserModel = Depends(get_current_user)
+    request: ManifoldTypeRequest, current_user: UserModel = Depends(get_current_user)
 ):
     """
     Update the Riemannian manifold type used by the Hyperfold system.
@@ -361,7 +354,7 @@ async def update_manifold_type(
     if request.manifold_type.lower() not in valid_types:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid manifold type. Must be one of: {', '.join(valid_types)}"
+            detail=f"Invalid manifold type. Must be one of: {', '.join(valid_types)}",
         )
 
     try:
@@ -377,11 +370,11 @@ async def update_manifold_type(
             "status": "success",
             "message": f"Manifold type updated to {request.manifold_type}",
             "manifold_type": request.manifold_type,
-            "note": "This is a placeholder. In production, this would require model reconstruction."
+            "note": "This is a placeholder. In production, this would require model reconstruction.",
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error updating manifold type: {str(e)}"
+            detail=f"Error updating manifold type: {str(e)}",
         )

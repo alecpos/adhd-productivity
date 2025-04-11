@@ -49,7 +49,7 @@ class ProductivityPatternLSTM(nn.Module):
             hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
-            dropout=dropout if num_layers > 1 else 0
+            dropout=dropout if num_layers > 1 else 0,
         )
 
         # Output layer
@@ -61,9 +61,9 @@ class ProductivityPatternLSTM(nn.Module):
     def _init_weights(self):
         """Initialize model weights."""
         for name, param in self.named_parameters():
-            if 'weight' in name:
+            if "weight" in name:
                 nn.init.xavier_uniform_(param)
-            elif 'bias' in name:
+            elif "bias" in name:
                 nn.init.zeros_(param)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -115,16 +115,20 @@ class ProductivityPatternLSTM(nn.Module):
         # Find local maxima in predictions
         peaks = []
         for i in range(1, len(predictions) - 1):
-            if predictions[i] > predictions[i-1] and predictions[i] > predictions[i+1]:
-                peaks.append({
-                    'index': i,
-                    'value': float(predictions[i]),
-                    'window_size': 2  # Default window size
-                })
+            if predictions[i] > predictions[i - 1] and predictions[i] > predictions[i + 1]:
+                peaks.append(
+                    {
+                        "index": i,
+                        "value": float(predictions[i]),
+                        "window_size": 2,  # Default window size
+                    }
+                )
 
         return peaks
 
-    def detect_productivity_bottlenecks(self, time_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def detect_productivity_bottlenecks(
+        self, time_blocks: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Detect productivity bottlenecks in time blocks.
 
         Args:
@@ -135,17 +139,19 @@ class ProductivityPatternLSTM(nn.Module):
         """
         bottlenecks = []
         for block in time_blocks:
-            if block.get('productivity_score', 0) < 0.3:  # Threshold for bottleneck
-                bottlenecks.append({
-                    'start_time': block['start_time'],
-                    'end_time': block['end_time'],
-                    'productivity_score': block.get('productivity_score', 0),
-                    'suggested_improvements': [
-                        'Take a short break',
-                        'Switch to a different task',
-                        'Review task priority'
-                    ]
-                })
+            if block.get("productivity_score", 0) < 0.3:  # Threshold for bottleneck
+                bottlenecks.append(
+                    {
+                        "start_time": block["start_time"],
+                        "end_time": block["end_time"],
+                        "productivity_score": block.get("productivity_score", 0),
+                        "suggested_improvements": [
+                            "Take a short break",
+                            "Switch to a different task",
+                            "Review task priority",
+                        ],
+                    }
+                )
 
         return bottlenecks
 
@@ -172,11 +178,7 @@ class CircadianRhythmModel(nn.Module):
         layers = []
         in_dim = input_dim
         for _ in range(num_layers):
-            layers.extend([
-                nn.Linear(in_dim, hidden_dim),
-                nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim)
-            ])
+            layers.extend([nn.Linear(in_dim, hidden_dim), nn.ReLU(), nn.BatchNorm1d(hidden_dim)])
             in_dim = hidden_dim
 
         # Output layer
@@ -237,17 +239,25 @@ class CircadianRhythmModel(nn.Module):
         optimal_times = []
         for i, pred in enumerate(predictions):
             if pred > 0.7:  # High energy threshold
-                optimal_times.append({
-                    'time_index': i,
-                    'energy_level': float(pred),
-                    'suggested_tasks': ['Deep work', 'Creative tasks', 'Complex problem solving']
-                })
+                optimal_times.append(
+                    {
+                        "time_index": i,
+                        "energy_level": float(pred),
+                        "suggested_tasks": [
+                            "Deep work",
+                            "Creative tasks",
+                            "Complex problem solving",
+                        ],
+                    }
+                )
             elif pred > 0.4:  # Medium energy threshold
-                optimal_times.append({
-                    'time_index': i,
-                    'energy_level': float(pred),
-                    'suggested_tasks': ['Meetings', 'Email', 'Administrative tasks']
-                })
+                optimal_times.append(
+                    {
+                        "time_index": i,
+                        "energy_level": float(pred),
+                        "suggested_tasks": ["Meetings", "Email", "Administrative tasks"],
+                    }
+                )
 
         return optimal_times
 
@@ -274,11 +284,7 @@ class ProductivityCorrelationSystem(nn.Module):
         layers = []
         in_dim = input_dim
         for _ in range(num_layers):
-            layers.extend([
-                nn.Linear(in_dim, hidden_dim),
-                nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim)
-            ])
+            layers.extend([nn.Linear(in_dim, hidden_dim), nn.ReLU(), nn.BatchNorm1d(hidden_dim)])
             in_dim = hidden_dim
 
         # Output layer
@@ -327,9 +333,9 @@ class ProductivityCorrelationSystem(nn.Module):
             # Calculate correlations
             correlations = {}
             for i in range(X.shape[1]):
-                for j in range(i+1, X.shape[1]):
+                for j in range(i + 1, X.shape[1]):
                     corr = torch.corrcoef(torch.stack([predictions[:, i], predictions[:, j]]))[0, 1]
-                    correlations[f'feature_{i}_feature_{j}'] = float(corr)
+                    correlations[f"feature_{i}_feature_{j}"] = float(corr)
 
             return correlations
 
@@ -391,11 +397,7 @@ class MentalHealthFederatedModel(nn.Module):
         layers = []
         in_dim = input_dim
         for _ in range(num_layers):
-            layers.extend([
-                nn.Linear(in_dim, hidden_dim),
-                nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim)
-            ])
+            layers.extend([nn.Linear(in_dim, hidden_dim), nn.ReLU(), nn.BatchNorm1d(hidden_dim)])
             in_dim = hidden_dim
 
         # Output layer
@@ -488,9 +490,9 @@ class MentalHealthFederatedModel(nn.Module):
 
             # Calculate insights
             insights = {
-                'stress_level': float(predictions.mean()),
-                'anxiety_score': float(predictions.std()),
-                'overall_wellbeing': float(1 - predictions.mean())  # Inverse of stress
+                "stress_level": float(predictions.mean()),
+                "anxiety_score": float(predictions.std()),
+                "overall_wellbeing": float(1 - predictions.mean()),  # Inverse of stress
             }
 
             return insights

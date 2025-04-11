@@ -8,7 +8,8 @@ from unittest.mock import MagicMock, patch, AsyncMock
 
 # Fix numpy bool issue
 import numpy as np
-if not hasattr(np, 'bool_'):
+
+if not hasattr(np, "bool_"):
     np.bool_ = bool
 
 # Create mock modules for all dependencies
@@ -16,9 +17,11 @@ mock_theano = MagicMock()
 mock_theano_tensor = MagicMock()
 mock_pymc3 = MagicMock()
 
+
 # Mock MentalHealthModel
 class MockMentalHealthModel:
     """Mock implementation of MentalHealthModel for testing."""
+
     id = "mh-test-123"
     user_id = "user-test-123"
     mood_score = 7
@@ -38,12 +41,14 @@ class MockMentalHealthModel:
             "focus_level": self.focus_level,
             "energy_level": self.energy_level,
             "stress_level": self.stress_level,
-            "sleep_hours": self.sleep_hours
+            "sleep_hours": self.sleep_hours,
         }
+
 
 # Mock EnergyModel
 class MockEnergyModel:
     """Mock implementation of EnergyModel for testing."""
+
     id = "energy-test-123"
     user_id = "user-test-123"
     morning_energy = 7
@@ -59,8 +64,9 @@ class MockEnergyModel:
             "morning_energy": self.morning_energy,
             "afternoon_energy": self.afternoon_energy,
             "evening_energy": self.evening_energy,
-            "overall_energy": self.overall_energy
+            "overall_energy": self.overall_energy,
         }
+
 
 # Mock BaseMLModel
 class MockBaseMLModel:
@@ -87,6 +93,7 @@ class MockBaseMLModel:
         """Mock implementation of load method."""
         return cls(model_path=filepath)
 
+
 # Mock FeatureEngineer
 class MockFeatureEngineer:
     """Mock implementation of FeatureEngineer."""
@@ -99,30 +106,31 @@ class MockFeatureEngineer:
         """Mock implementation of transform method."""
         return features
 
+
 # Create mock modules
-sys.modules['theano'] = mock_theano
-sys.modules['theano.tensor'] = mock_theano_tensor
-sys.modules['pymc3'] = mock_pymc3
+sys.modules["theano"] = mock_theano
+sys.modules["theano.tensor"] = mock_theano_tensor
+sys.modules["pymc3"] = mock_pymc3
 
 # Patch MentalHealthModel
 mental_health_module = MagicMock()
 mental_health_module.MentalHealthModel = MockMentalHealthModel
-sys.modules['app.models.mental_health_model'] = mental_health_module
+sys.modules["app.models.mental_health_model"] = mental_health_module
 
 # Patch EnergyModel
 energy_module = MagicMock()
 energy_module.EnergyModel = MockEnergyModel
-sys.modules['app.models.energy_model'] = energy_module
+sys.modules["app.models.energy_model"] = energy_module
 
 # Patch BaseMLModel
 ml_models_module = MagicMock()
 ml_models_module.BaseMLModel = MockBaseMLModel
-sys.modules['app.ml.models'] = ml_models_module
+sys.modules["app.ml.models"] = ml_models_module
 
 # Patch FeatureEngineer
 feature_eng_module = MagicMock()
 feature_eng_module.FeatureEngineer = MockFeatureEngineer
-sys.modules['app.ml.feature_engineering'] = feature_eng_module
+sys.modules["app.ml.feature_engineering"] = feature_eng_module
 
 # Now import the rest
 import pytest
@@ -132,7 +140,11 @@ import tempfile
 from datetime import datetime, timedelta
 
 from app.tests.ml.stochastic_time_estimation.test_utils import (
-    create_mock_task, create_mock_user, create_mock_health_metrics, mock_db, run_async_test
+    create_mock_task,
+    create_mock_user,
+    create_mock_health_metrics,
+    mock_db,
+    run_async_test,
 )
 
 from app.ml.stochastic_time_estimation import NLPComplexityAnalyzer
@@ -148,7 +160,7 @@ class TestNLPComplexityAnalyzer:
         mock_nlp = MagicMock()
         mock_nlp.return_value = MagicMock()
 
-        with patch('spacy.load', return_value=mock_nlp):
+        with patch("spacy.load", return_value=mock_nlp):
             return NLPComplexityAnalyzer(
                 db=mock_db,
                 complexity_weights={
@@ -156,14 +168,10 @@ class TestNLPComplexityAnalyzer:
                     "vocabulary_complexity": 0.3,
                     "syntactic_complexity": 0.25,
                     "ambiguity": 0.15,
-                    "steps_count": 0.1
+                    "steps_count": 0.1,
                 },
-                cognitive_load_mapping={
-                    "low": 1.0,
-                    "medium": 1.5,
-                    "high": 2.0
-                },
-                store_analysis=True
+                cognitive_load_mapping={"low": 1.0, "medium": 1.5, "high": 2.0},
+                store_analysis=True,
             )
 
     @pytest.mark.asyncio
@@ -185,7 +193,7 @@ class TestNLPComplexityAnalyzer:
             category="work",
             focus_required=4,
             energy_required=3,
-            difficulty=4
+            difficulty=4,
         )
 
         # Mock _get_task to return our task
@@ -207,7 +215,7 @@ class TestNLPComplexityAnalyzer:
             "vocabulary_complexity": 0.8,
             "syntactic_complexity": 0.6,
             "ambiguity": 0.4,
-            "steps_count": 0.5
+            "steps_count": 0.5,
         }
 
         analyzer._calculate_complexity_score = MagicMock(return_value=0.65)
@@ -219,7 +227,7 @@ class TestNLPComplexityAnalyzer:
         analyzer._determine_focus_requirements.return_value = {
             "sustained_attention": 0.8,
             "context_switching": 0.6,
-            "detail_orientation": 0.7
+            "detail_orientation": 0.7,
         }
 
         analyzer._extract_topics = MagicMock(return_value=["report", "analysis", "project"])
@@ -261,7 +269,7 @@ class TestNLPComplexityAnalyzer:
             task_id="task-1",
             title="Write report",
             description="Write a detailed report on project progress",
-            category="work"
+            category="work",
         )
 
         # Mock _get_task
@@ -286,7 +294,7 @@ class TestNLPComplexityAnalyzer:
             "focus_requirements": {"sustained_attention": 0.8, "deep_work": 0.7},
             "ambiguity_score": 0.4,
             "topics": ["topic1", "topic2", "topic3"],
-            "is_cached": True
+            "is_cached": True,
         }
 
         # Set up the analyzer's _format_analysis_result to return our expected result
@@ -306,13 +314,14 @@ class TestNLPComplexityAnalyzer:
     @pytest.mark.asyncio
     async def test_analyze_tasks_batch(self, analyzer):
         """Test analyzing multiple tasks in a batch."""
+
         # Mock analyze_task
         async def mock_analyze(task_id):
             return {
                 "task_id": task_id,
                 "complexity_score": 0.65,
                 "cognitive_load": 0.75,
-                "time_impact_factor": 1.4
+                "time_impact_factor": 1.4,
             }
 
         analyzer.analyze_task = AsyncMock(side_effect=mock_analyze)
@@ -336,10 +345,7 @@ class TestNLPComplexityAnalyzer:
         """Test getting time factor for a task."""
         # Mock analyze_task
         analyzer.analyze_task = AsyncMock()
-        analyzer.analyze_task.return_value = {
-            "task_id": "task-1",
-            "time_impact_factor": 1.4
-        }
+        analyzer.analyze_task.return_value = {"task_id": "task-1", "time_impact_factor": 1.4}
 
         # Get time factor
         time_factor = await analyzer.get_time_factor("task-1")
@@ -387,7 +393,7 @@ class TestNLPComplexityAnalyzer:
             "vocabulary_complexity": 0.3,
             "syntactic_complexity": 0.25,
             "ambiguity": 0.15,
-            "steps_count": 0.1
+            "steps_count": 0.1,
         }
 
         # Sample features
@@ -396,20 +402,14 @@ class TestNLPComplexityAnalyzer:
             "vocabulary_complexity": 0.8,
             "syntactic_complexity": 0.6,
             "ambiguity": 0.4,
-            "steps_count": 0.5
+            "steps_count": 0.5,
         }
 
         # Calculate score
         score = analyzer._calculate_complexity_score(features)
 
         # Verify score calculation
-        expected_score = (
-            0.7 * 0.2 +
-            0.8 * 0.3 +
-            0.6 * 0.25 +
-            0.4 * 0.15 +
-            0.5 * 0.1
-        )
+        expected_score = 0.7 * 0.2 + 0.8 * 0.3 + 0.6 * 0.25 + 0.4 * 0.15 + 0.5 * 0.1
         assert round(score, 4) == round(expected_score, 4)
 
         # Score should be between 0 and 1
@@ -430,7 +430,9 @@ class TestNLPComplexityAnalyzer:
         mock_doc.__len__ = lambda self: len(mock_tokens)
 
         # Calculate cognitive load
-        load = analyzer._estimate_cognitive_load(mock_doc, "Sample text for testing cognitive load estimation.")
+        load = analyzer._estimate_cognitive_load(
+            mock_doc, "Sample text for testing cognitive load estimation."
+        )
 
         # Verify load is between 0 and 1
         assert 0.0 <= load <= 1.0
@@ -484,7 +486,9 @@ class TestNLPComplexityAnalyzer:
         mock_doc.__len__ = lambda self: len(mock_tokens)
 
         # Calculate ambiguity
-        ambiguity = analyzer._calculate_ambiguity(mock_doc, "Sample text with some ambiguous terms.")
+        ambiguity = analyzer._calculate_ambiguity(
+            mock_doc, "Sample text with some ambiguous terms."
+        )
 
         # Verify ambiguity score is between 0 and 1
         assert 0.0 <= ambiguity <= 1.0
@@ -496,9 +500,7 @@ class TestNLPComplexityAnalyzer:
 
         # Call the method
         focus_reqs = analyzer._determine_focus_requirements(
-            mock_doc,
-            complexity_score=0.7,
-            cognitive_load=0.8
+            mock_doc, complexity_score=0.7, cognitive_load=0.8
         )
 
         # Verify focus requirements
@@ -547,16 +549,15 @@ class TestNLPComplexityAnalyzer:
         assert len(extracted_topics) > 0
         assert isinstance(extracted_topics, list)
         assert all(isinstance(topic, str) for topic in extracted_topics)
-        assert set(topics).issuperset(set(extracted_topics))  # All extracted topics should be in our original topics list
+        assert set(topics).issuperset(
+            set(extracted_topics)
+        )  # All extracted topics should be in our original topics list
 
     def test_calculate_time_impact(self, analyzer):
         """Test calculation of time impact factor."""
         # Call the method with test values
         impact = analyzer._calculate_time_impact(
-            complexity_score=0.7,
-            cognitive_load=0.8,
-            estimated_steps=5,
-            ambiguity_score=0.4
+            complexity_score=0.7, cognitive_load=0.8, estimated_steps=5, ambiguity_score=0.4
         )
 
         # Verify impact factor
@@ -675,19 +676,17 @@ class TestNLPComplexityAnalyzer:
             "vocabulary_complexity": 0.3,
             "syntactic_complexity": 0.25,
             "ambiguity": 0.15,
-            "steps_count": 0.1
+            "steps_count": 0.1,
         }
-        analyzer.cognitive_load_mapping = {
-            "low": 1.0,
-            "medium": 1.5,
-            "high": 2.0
-        }
+        analyzer.cognitive_load_mapping = {"low": 1.0, "medium": 1.5, "high": 2.0}
 
         # Mock json operations
-        with patch('json.dump') as mock_dump, \
-             patch('builtins.open', create=True) as mock_open, \
-             patch('json.load') as mock_load, \
-             patch('os.path.exists') as mock_exists:
+        with (
+            patch("json.dump") as mock_dump,
+            patch("builtins.open", create=True) as mock_open,
+            patch("json.load") as mock_load,
+            patch("os.path.exists") as mock_exists,
+        ):
 
             # Setup for save
             mock_open.return_value.__enter__.return_value = MagicMock()
@@ -697,7 +696,7 @@ class TestNLPComplexityAnalyzer:
             mock_load.return_value = {
                 "complexity_weights": analyzer.complexity_weights,
                 "cognitive_load_mapping": analyzer.cognitive_load_mapping,
-                "store_analysis": True
+                "store_analysis": True,
             }
 
             # Save the model
@@ -709,7 +708,7 @@ class TestNLPComplexityAnalyzer:
                 mock_dump.assert_called()
 
                 # Load the model
-                with patch('spacy.load'):  # Mock spaCy load during model loading
+                with patch("spacy.load"):  # Mock spaCy load during model loading
                     loaded_analyzer = NLPComplexityAnalyzer.load(filepath)
 
                 # Verify load was called

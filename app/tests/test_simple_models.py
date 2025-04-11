@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import Column, String, ForeignKey, Integer, DateTime
 from sqlalchemy.orm import relationship, declared_attr, Mapped, mapped_column
 
+
 class TestBaseModel(DeclarativeBase):
     """Base model for test models to prevent loading the full model hierarchy."""
 
@@ -21,6 +22,7 @@ class TestBaseModel(DeclarativeBase):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
 # Create simplified models for testing
 class SimpleUser(TestBaseModel):
     """Simple user model for testing."""
@@ -29,6 +31,7 @@ class SimpleUser(TestBaseModel):
 
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
+
 
 class SimpleTask(TestBaseModel):
     """Simple task model for testing."""
@@ -41,10 +44,12 @@ class SimpleTask(TestBaseModel):
     # Relationship
     user = relationship("SimpleUser")
 
+
 # Set up an in-memory SQLite test database
 TEST_DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -56,20 +61,18 @@ def db_session():
     session.close()
     TestBaseModel.metadata.drop_all(bind=engine)
 
+
 def test_base_model_init():
     """Test BaseModel initialization."""
-    assert hasattr(TestBaseModel, 'id')
-    assert hasattr(TestBaseModel, 'created_at')
-    assert hasattr(TestBaseModel, 'updated_at')
+    assert hasattr(TestBaseModel, "id")
+    assert hasattr(TestBaseModel, "created_at")
+    assert hasattr(TestBaseModel, "updated_at")
+
 
 def test_simple_user_model_create(db_session):
     """Test creating a simple user."""
     user_id = str(uuid4())
-    user = SimpleUser(
-        id=user_id,
-        username="test_user",
-        email="test@example.com"
-    )
+    user = SimpleUser(id=user_id, username="test_user", email="test@example.com")
     db_session.add(user)
     db_session.commit()
 
@@ -80,20 +83,14 @@ def test_simple_user_model_create(db_session):
     assert user_from_db.username == "test_user"
     assert user_from_db.email == "test@example.com"
 
+
 def test_simple_relationship(db_session):
     """Test a simple relationship between user and task."""
     user_id = str(uuid4())
-    user = SimpleUser(
-        id=user_id,
-        username="test_user",
-        email="test@example.com"
-    )
+    user = SimpleUser(id=user_id, username="test_user", email="test@example.com")
     db_session.add(user)
 
-    task = SimpleTask(
-        title="Test Task",
-        user_id=user_id
-    )
+    task = SimpleTask(title="Test Task", user_id=user_id)
     db_session.add(task)
     db_session.commit()
 

@@ -8,6 +8,7 @@ from typing import Optional
 
 class ModelVisitor(ast.NodeVisitor):
     """AST visitor to extract model information."""
+
     def __init__(self):
         self.classes = []
         self.imports = set()
@@ -16,10 +17,10 @@ class ModelVisitor(ast.NodeVisitor):
     def visit_ClassDef(self, node):
         """Visit a class definition."""
         class_info = {
-            'name': node.name,
-            'bases': [base.id for base in node.bases if isinstance(base, ast.Name)],
-            'fields': [],
-            'decorators': [d.id for d in node.decorator_list if isinstance(d, ast.Name)]
+            "name": node.name,
+            "bases": [base.id for base in node.bases if isinstance(base, ast.Name)],
+            "fields": [],
+            "decorators": [d.id for d in node.decorator_list if isinstance(d, ast.Name)],
         }
 
         self.current_class = class_info
@@ -31,11 +32,11 @@ class ModelVisitor(ast.NodeVisitor):
         """Visit annotated assignments (class fields)."""
         if self.current_class and isinstance(node.target, ast.Name):
             field_info = {
-                'name': node.target.id,
-                'type': self._get_type_str(node.annotation),
-                'default': self._get_default_value(node.value) if node.value else None
+                "name": node.target.id,
+                "type": self._get_type_str(node.annotation),
+                "default": self._get_default_value(node.value) if node.value else None,
             }
-            self.current_class['fields'].append(field_info)
+            self.current_class["fields"].append(field_info)
 
     def _get_type_str(self, node) -> str:
         """Convert AST type annotation to string."""
@@ -62,52 +63,54 @@ class ModelVisitor(ast.NodeVisitor):
 
 def generate_schema_from_model(model_path: str) -> str:
     """Generate schema content from a model file."""
-    with open(model_path, 'r') as f:
+    with open(model_path, "r") as f:
         tree = ast.parse(f.read())
 
     visitor = ModelVisitor()
     visitor.visit(tree)
 
     schema_content = [
-        'from typing import Optional, List, Dict, Any',
-        'from pydantic import BaseModel, Field',
-        'from datetime import datetime, date',
-        '',
-        '# Generated from ' + os.path.basename(model_path),
-        ''
+        "from typing import Optional, List, Dict, Any",
+        "from pydantic import BaseModel, Field",
+        "from datetime import datetime, date",
+        "",
+        "# Generated from " + os.path.basename(model_path),
+        "",
     ]
 
     for class_info in visitor.classes:
         # Skip classes that are clearly not models
-        if not any(base.endswith('Base') for base in class_info['bases']):
+        if not any(base.endswith("Base") for base in class_info["bases"]):
             continue
 
         # Convert SQLAlchemy model to Pydantic schema
-        schema_name = class_info['name'].replace('Model', 'Schema')
-        bases = ['BaseModel']  # Default to Pydantic BaseModel
+        schema_name = class_info["name"].replace("Model", "Schema")
+        bases = ["BaseModel"]  # Default to Pydantic BaseModel
 
-        schema_content.extend([
-            f"class {schema_name}({', '.join(bases)}):",
-            '    """',
-            f'    Schema for {class_info["name"]}',
-            '    """',
-            ''
-        ])
+        schema_content.extend(
+            [
+                f"class {schema_name}({', '.join(bases)}):",
+                '    """',
+                f'    Schema for {class_info["name"]}',
+                '    """',
+                "",
+            ]
+        )
 
         # Add fields
-        for field in class_info['fields']:
-            field_type = field['type']
+        for field in class_info["fields"]:
+            field_type = field["type"]
             # Convert SQLAlchemy types to Pydantic types
-            field_type = field_type.replace('Column', '')
+            field_type = field_type.replace("Column", "")
 
-            if field['default'] is not None:
+            if field["default"] is not None:
                 schema_content.append(f"    {field['name']}: {field_type} = {field['default']}")
             else:
                 schema_content.append(f"    {field['name']}: Optional[{field_type}] = None")
 
-        schema_content.append('')  # Add blank line between classes
+        schema_content.append("")  # Add blank line between classes
 
-    return '\n'.join(schema_content)
+    return "\n".join(schema_content)
 
 
 def main():
@@ -118,12 +121,12 @@ def main():
     model_files = []
     for root, _, files in os.walk("app/models"):
         for file in files:
-            if file.endswith('_model.py'):
+            if file.endswith("_model.py"):
                 model_files.append(os.path.join(root, file))
 
     # Generate corresponding schema files
     for model_path in model_files:
-        schema_path = model_path.replace('/models/', '/schemas/').replace('_model.py', '_schema.py')
+        schema_path = model_path.replace("/models/", "/schemas/").replace("_model.py", "_schema.py")
 
         # Skip if schema already exists
         if os.path.exists(schema_path):
@@ -135,7 +138,7 @@ def main():
 
         try:
             schema_content = generate_schema_from_model(model_path)
-            with open(schema_path, 'w') as f:
+            with open(schema_path, "w") as f:
                 f.write(schema_content)
             print(f"✅ Generated: {schema_path}")
         except Exception as e:

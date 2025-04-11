@@ -13,30 +13,59 @@ from app.models.base_model import BaseModel
 
 # Import enums once
 from app.models.enums_model import (
-    SessionType, SessionStatus, BlockType, BlockPriority, CalendarType,
-    ConflictResolutionStrategy, EnergyLevel, SyncProvider, SyncSource,
-    SyncStatus, ContactType, EventType, ActivityType, DistractionType,
-    MedicationType, EventPriority, EventStatus, TaskPriority, TaskStatus,
-    CommandType, TimelineEventType, InteractionType, InteractionOutcome,
-    HyperfocusSessionStatus, MetricType
+    SessionType,
+    SessionStatus,
+    BlockType,
+    BlockPriority,
+    CalendarType,
+    ConflictResolutionStrategy,
+    EnergyLevel,
+    SyncProvider,
+    SyncSource,
+    SyncStatus,
+    ContactType,
+    EventType,
+    ActivityType,
+    DistractionType,
+    MedicationType,
+    EventPriority,
+    EventStatus,
+    TaskPriority,
+    TaskStatus,
+    CommandType,
+    TimelineEventType,
+    InteractionType,
+    InteractionOutcome,
+    HyperfocusSessionStatus,
+    MetricType,
 )
 
 # Group related model imports
 from app.models.subscription_model import (
-    SubscriptionModel, SubscriptionTierModel, SubscriptionStatusModel
+    SubscriptionModel,
+    SubscriptionTierModel,
+    SubscriptionStatusModel,
 )
 from app.models.health_model import HealthMetrics
 from app.models.contact_model import ContactModel
 from app.models.adhd_settings_model import (
-    ADHDSettingsModel, DistractionLogModel, MedicationLogModel,
-    ADHDMetricsModel, ADHDPatternsModel, PatternType
+    ADHDSettingsModel,
+    DistractionLogModel,
+    MedicationLogModel,
+    ADHDMetricsModel,
+    ADHDPatternsModel,
+    PatternType,
 )
 from app.models.analytics_model import UserAnalytics
 from app.models.interaction_model import Interaction, InteractionStats
 from app.models.calendar_model import CalendarModel
 from app.models.mental_health_model import MentalHealthLogModel
 from app.models.gamification_model import (
-    StreakModel, PointsModel, LeaderboardModel, AchievementModel, BadgeModel
+    StreakModel,
+    PointsModel,
+    LeaderboardModel,
+    AchievementModel,
+    BadgeModel,
 )
 from app.models.user_model import UserModel
 from app.models.body_doubling_model import BodyDoublingSessionModel
@@ -47,9 +76,9 @@ from app.models.auth_model import RefreshToken, LoginAttempt
 from app.models.scheduling_model import ScheduleBlock, SchedulePreferences
 from app.models.task_model import TaskModel, TaskStatus, TaskPriority
 from app.models.hyperfocus_model import HyperfocusSessionModel
-from app.models.focus_model import FocusSessionModel,FocusSessionType
+from app.models.focus_model import FocusSessionModel, FocusSessionType
 from app.models.calendar_event_model import CalendarEventModel
-from app.models.pomodoro_model import  PomodoroSessionModel
+from app.models.pomodoro_model import PomodoroSessionModel
 from app.models.calendar_sync_model import CalendarSyncModel, SyncDirection
 from app.models.time_block_model import TimeBlockModel, BlockPriority
 from app.models.voice_command_model import VoiceCommandModel, VoicePreferencesModel
@@ -66,22 +95,50 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 # List of model classes to check
 model_classes = [
     SubscriptionModel,
-    HealthMetrics, ContactModel,
-    ADHDSettingsModel, DistractionLogModel, MedicationLogModel, ADHDMetricsModel, ADHDPatternsModel,
-    UserAnalytics, Interaction, InteractionStats,
-    CalendarModel, MentalHealthLogModel,
-    StreakModel, AchievementModel, BadgeModel,
-    UserModel, BodyDoublingSessionModel,
-    NLPModel, NLPAnalysis, TaskAnalysis, FocusStrategy,
-    EnergyLog, EnergyStats,
-    SessionModel, PomodoroSessionModel, SessionStatsModel,
-    RefreshToken, LoginAttempt,
-    ScheduleBlock, SchedulePreferences,
-    TaskModel, HyperfocusSessionModel, FocusSessionModel,
-    CalendarEventModel, VoiceCommandModel, VoicePreferencesModel,
-    TimelineEventModel, ReminderModel,
-    MindfulnessSessionModel, LoginAttemptModel, CalendarSyncModel, TimeBlockModel
+    HealthMetrics,
+    ContactModel,
+    ADHDSettingsModel,
+    DistractionLogModel,
+    MedicationLogModel,
+    ADHDMetricsModel,
+    ADHDPatternsModel,
+    UserAnalytics,
+    Interaction,
+    InteractionStats,
+    CalendarModel,
+    MentalHealthLogModel,
+    StreakModel,
+    AchievementModel,
+    BadgeModel,
+    UserModel,
+    BodyDoublingSessionModel,
+    NLPModel,
+    NLPAnalysis,
+    TaskAnalysis,
+    FocusStrategy,
+    EnergyLog,
+    EnergyStats,
+    SessionModel,
+    PomodoroSessionModel,
+    SessionStatsModel,
+    RefreshToken,
+    LoginAttempt,
+    ScheduleBlock,
+    SchedulePreferences,
+    TaskModel,
+    HyperfocusSessionModel,
+    FocusSessionModel,
+    CalendarEventModel,
+    VoiceCommandModel,
+    VoicePreferencesModel,
+    TimelineEventModel,
+    ReminderModel,
+    MindfulnessSessionModel,
+    LoginAttemptModel,
+    CalendarSyncModel,
+    TimeBlockModel,
 ]
+
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -92,6 +149,7 @@ def db_session():
     session.rollback()
     session.close()
     BaseModel.metadata.drop_all(bind=engine)
+
 
 @pytest.mark.parametrize("model_class", model_classes)
 def test_model_inheritance(model_class):
@@ -104,7 +162,10 @@ def test_model_inheritance(model_class):
     if model_class.__name__ == "MockHealthMetrics":
         return  # Silently skip MockHealthMetrics
 
-    assert issubclass(model_class, BaseModel), f"{model_class.__name__} does not inherit from BaseModel"
+    assert issubclass(
+        model_class, BaseModel
+    ), f"{model_class.__name__} does not inherit from BaseModel"
+
 
 def test_uuid_assignment(db_session):
     """Test if models correctly assign UUIDs."""
@@ -113,7 +174,7 @@ def test_uuid_assignment(db_session):
         username="test_user",
         email="test@example.com",
         full_name="Test User",
-        hashed_password="test_password"
+        hashed_password="test_password",
     )
     db_session.add(user)
     db_session.commit()
@@ -124,6 +185,7 @@ def test_uuid_assignment(db_session):
     assert retrieved_user is not None
     assert retrieved_user.id == user.id
 
+
 def test_timestamp_fields(db_session):
     """Test if models properly handle timestamp fields."""
     user = UserModel(
@@ -133,7 +195,7 @@ def test_timestamp_fields(db_session):
         full_name="Test User",
         hashed_password="test_password",
         is_active=True,
-        is_verified=False
+        is_verified=False,
     )
     db_session.add(user)
     db_session.commit()
@@ -156,6 +218,7 @@ def test_timestamp_fields(db_session):
     assert retrieved_user.updated_at is not None
     assert retrieved_user.updated_at > retrieved_user.created_at  # Ensure update timestamp is later
 
+
 @pytest.mark.parametrize("model_class", model_classes)
 def test_model_serialization(model_class):
     """Test model serialization to dict."""
@@ -172,8 +235,13 @@ def test_model_serialization(model_class):
 
     # Test that the model has the expected attributes from BaseModel
     assert hasattr(model_instance, "id"), f"{model_class.__name__} should have an 'id' attribute"
-    assert hasattr(model_instance, "created_at"), f"{model_class.__name__} should have a 'created_at' attribute"
-    assert hasattr(model_instance, "updated_at"), f"{model_class.__name__} should have an 'updated_at' attribute"
+    assert hasattr(
+        model_instance, "created_at"
+    ), f"{model_class.__name__} should have a 'created_at' attribute"
+    assert hasattr(
+        model_instance, "updated_at"
+    ), f"{model_class.__name__} should have an 'updated_at' attribute"
+
 
 @pytest.mark.parametrize("model_class", model_classes)
 def test_invalid_inputs(model_class, db_session):
@@ -201,7 +269,9 @@ def test_invalid_inputs(model_class, db_session):
         db_session.rollback()
 
     # Test with invalid date
-    date_fields = [field for field in dir(model_class) if "date" in field.lower() and not field.startswith("_")]
+    date_fields = [
+        field for field in dir(model_class) if "date" in field.lower() and not field.startswith("_")
+    ]
     for field in date_fields:
         try:
             kwargs = {field: "not-a-date"}
@@ -214,6 +284,7 @@ def test_invalid_inputs(model_class, db_session):
             # Expected to fail
             db_session.rollback()
 
+
 def create_dummy_parents(db_session, model_class):
     """Create dummy parent records for models with foreign key constraints."""
     parent_data = {}
@@ -225,14 +296,19 @@ def create_dummy_parents(db_session, model_class):
             email=f"test_{uuid4().hex[:8]}@example.com",
             username=f"test_user_{uuid4().hex[:8]}",
             hashed_password="test_password",
-            full_name=f"Test User {uuid4().hex[:8]}"
+            full_name=f"Test User {uuid4().hex[:8]}",
         )
         db_session.add(user)
         db_session.flush()
         parent_data["user_id"] = str(user.id)
 
     # Create settings if needed
-    if model_name in ["DistractionLogModel", "MedicationLogModel", "ADHDMetricsModel", "ADHDPatternsModel"]:
+    if model_name in [
+        "DistractionLogModel",
+        "MedicationLogModel",
+        "ADHDMetricsModel",
+        "ADHDPatternsModel",
+    ]:
         settings = ADHDSettingsModel(
             user_id=parent_data.get("user_id", str(uuid4())),
             work_interval_duration=25,
@@ -243,7 +319,7 @@ def create_dummy_parents(db_session, model_class):
             focus_assistance_level=1,
             energy_tracking_enabled=True,
             task_chunking_enabled=True,
-            visual_aids_enabled=True
+            visual_aids_enabled=True,
         )
         db_session.add(settings)
         db_session.flush()
@@ -258,7 +334,7 @@ def create_dummy_parents(db_session, model_class):
             name="Test Calendar",
             provider="Google",
             is_primary=False,
-            is_enabled=True
+            is_enabled=True,
         )
         db_session.add(calendar)
         try:
@@ -283,7 +359,7 @@ def create_dummy_parents(db_session, model_class):
             text="Test text",
             parsed_data="{}",
             confidence_score=0.9,
-            entities=[]
+            entities=[],
         )
         db_session.add(nlp)
         db_session.flush()
@@ -297,7 +373,7 @@ def create_dummy_parents(db_session, model_class):
             user_id=parent_data.get("user_id", str(uuid4())),
             title="Test Task",
             status=TaskStatus.TODO.value,
-            priority=TaskPriority.MEDIUM.value
+            priority=TaskPriority.MEDIUM.value,
         )
         db_session.add(task)
         try:
@@ -318,7 +394,7 @@ def create_dummy_parents(db_session, model_class):
             status=SessionStatus.COMPLETED,
             start_time=datetime.now() - timedelta(hours=2),
             end_time=datetime.now() - timedelta(hours=1),
-            duration=60
+            duration=60,
         )
         db_session.add(session)
         try:
@@ -336,9 +412,11 @@ def create_dummy_parents(db_session, model_class):
 
     return parent_data
 
+
 def skip_refresh_models():
     """List of model names that should skip the refresh step due to enum mapping issues."""
     return ["ScheduleBlock"]
+
 
 @pytest.mark.parametrize("model_class", model_classes)
 def test_database_constraints(model_class, db_session):
@@ -366,47 +444,47 @@ def test_database_constraints(model_class, db_session):
 
     # Set created_at and updated_at for all models
     now = datetime.now()
-    if hasattr(instance, 'created_at') and getattr(instance, 'created_at') is None:
-        setattr(instance, 'created_at', now)
-    if hasattr(instance, 'updated_at') and getattr(instance, 'updated_at') is None:
-        setattr(instance, 'updated_at', now)
+    if hasattr(instance, "created_at") and getattr(instance, "created_at") is None:
+        setattr(instance, "created_at", now)
+    if hasattr(instance, "updated_at") and getattr(instance, "updated_at") is None:
+        setattr(instance, "updated_at", now)
 
     # Common fields for many models
-    if hasattr(instance, 'title') and getattr(instance, 'title') is None:
-        setattr(instance, 'title', f"Test {model_name} {uuid4().hex[:8]}")
+    if hasattr(instance, "title") and getattr(instance, "title") is None:
+        setattr(instance, "title", f"Test {model_name} {uuid4().hex[:8]}")
 
-    if hasattr(instance, 'name') and getattr(instance, 'name') is None:
-        setattr(instance, 'name', f"Test {model_name} {uuid4().hex[:8]}")
+    if hasattr(instance, "name") and getattr(instance, "name") is None:
+        setattr(instance, "name", f"Test {model_name} {uuid4().hex[:8]}")
 
-    if hasattr(instance, 'description') and getattr(instance, 'description') is None:
-        setattr(instance, 'description', f"Test description for {model_name}")
+    if hasattr(instance, "description") and getattr(instance, "description") is None:
+        setattr(instance, "description", f"Test description for {model_name}")
 
     # Time-related fields
-    if hasattr(instance, 'start_time') and getattr(instance, 'start_time') is None:
-        setattr(instance, 'start_time', datetime.now())
+    if hasattr(instance, "start_time") and getattr(instance, "start_time") is None:
+        setattr(instance, "start_time", datetime.now())
 
-    if hasattr(instance, 'end_time') and getattr(instance, 'end_time') is None:
-        setattr(instance, 'end_time', datetime.now() + timedelta(hours=1))
+    if hasattr(instance, "end_time") and getattr(instance, "end_time") is None:
+        setattr(instance, "end_time", datetime.now() + timedelta(hours=1))
 
-    if hasattr(instance, 'duration') and getattr(instance, 'duration') is None:
-        setattr(instance, 'duration', 30)  # 30 minutes
+    if hasattr(instance, "duration") and getattr(instance, "duration") is None:
+        setattr(instance, "duration", 30)  # 30 minutes
 
-    if hasattr(instance, 'scheduled_time') and getattr(instance, 'scheduled_time') is None:
-        setattr(instance, 'scheduled_time', datetime.now() + timedelta(hours=2))
+    if hasattr(instance, "scheduled_time") and getattr(instance, "scheduled_time") is None:
+        setattr(instance, "scheduled_time", datetime.now() + timedelta(hours=2))
 
     # Status and type fields
-    if hasattr(instance, 'status') and getattr(instance, 'status') is None:
+    if hasattr(instance, "status") and getattr(instance, "status") is None:
         if model_name == "CalendarSyncModel":
-            setattr(instance, 'status', SyncStatus.IN_PROGRESS.value)
+            setattr(instance, "status", SyncStatus.IN_PROGRESS.value)
         else:
-            setattr(instance, 'status', 'active')
+            setattr(instance, "status", "active")
 
-    if hasattr(instance, 'type') and getattr(instance, 'type') is None:
-        setattr(instance, 'type', 'default')
+    if hasattr(instance, "type") and getattr(instance, "type") is None:
+        setattr(instance, "type", "default")
 
     # Set a unique ID for all models
-    if hasattr(instance, 'id') and getattr(instance, 'id') is None:
-        setattr(instance, 'id', str(uuid4()))
+    if hasattr(instance, "id") and getattr(instance, "id") is None:
+        setattr(instance, "id", str(uuid4()))
 
     # Model-specific fields
     if model_name == "UserModel":
@@ -429,7 +507,7 @@ def test_database_constraints(model_class, db_session):
         instance.meditation_minutes = 10
         instance.date = datetime.now().date()
         instance.user_id = parent_data.get("user_id", str(uuid4()))
-        instance.metric_type = MetricType.DAILY.value if hasattr(MetricType, 'DAILY') else "daily"
+        instance.metric_type = MetricType.DAILY.value if hasattr(MetricType, "DAILY") else "daily"
         instance.mood_level = 6
         instance.focus_level = 7
 
@@ -491,8 +569,12 @@ def test_database_constraints(model_class, db_session):
         instance.settings_id = parent_data.get("settings_id", str(uuid4()))
 
     elif model_name == "Interaction":
-        instance.type = InteractionType.CHAT.value if hasattr(InteractionType, 'CHAT') else "chat"
-        instance.outcome = InteractionOutcome.POSITIVE.value if hasattr(InteractionOutcome, 'POSITIVE') else "positive"
+        instance.type = InteractionType.CHAT.value if hasattr(InteractionType, "CHAT") else "chat"
+        instance.outcome = (
+            InteractionOutcome.POSITIVE.value
+            if hasattr(InteractionOutcome, "POSITIVE")
+            else "positive"
+        )
         instance.timestamp = datetime.now()
 
     elif model_name == "ContactModel":
@@ -505,7 +587,9 @@ def test_database_constraints(model_class, db_session):
         instance.notes = "Test contact notes"
         instance.is_favorite = False
         instance.relationship_strength = "strong"
-        instance.type = ContactType.PERSONAL.value if hasattr(ContactType, 'PERSONAL') else "personal"
+        instance.type = (
+            ContactType.PERSONAL.value if hasattr(ContactType, "PERSONAL") else "personal"
+        )
 
     elif model_name == "ReminderModel":
         instance.title = f"Test Reminder {uuid4().hex[:8]}"
@@ -562,14 +646,18 @@ def test_database_constraints(model_class, db_session):
         instance.unit = "mg"  # Set the unit separately
         instance.timestamp = datetime.now()
         instance.taken = True
-        instance.medication_type = MedicationType.STIMULANT.value if hasattr(MedicationType, 'STIMULANT') else "stimulant"
+        instance.medication_type = (
+            MedicationType.STIMULANT.value if hasattr(MedicationType, "STIMULANT") else "stimulant"
+        )
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.effectiveness = 7
         instance.side_effects = "None"
         instance.settings_id = parent_data.get("settings_id", str(uuid4()))
 
     elif model_name == "DistractionLogModel":
-        instance.distraction_type = DistractionType.DIGITAL.value if hasattr(DistractionType, 'DIGITAL') else "digital"
+        instance.distraction_type = (
+            DistractionType.DIGITAL.value if hasattr(DistractionType, "DIGITAL") else "digital"
+        )
         instance.timestamp = datetime.now()
         instance.duration = 5
         instance.notes = "Test distraction"
@@ -608,14 +696,20 @@ def test_database_constraints(model_class, db_session):
         instance.status = "active"
         instance.start_time = datetime.now() - timedelta(hours=1)
         instance.end_time = datetime.now()
-        instance.session_type = FocusSessionType.POMODORO.value if hasattr(FocusSessionType, 'POMODORO') else "pomodoro"
+        instance.session_type = (
+            FocusSessionType.POMODORO.value if hasattr(FocusSessionType, "POMODORO") else "pomodoro"
+        )
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.total_breaks = 2
         instance.total_break_duration = 15
         instance.actual_focus_duration = 30
 
     elif model_name == "TimelineEventModel":
-        instance.event_type = TimelineEventType.TASK_COMPLETED.value if hasattr(TimelineEventType, 'TASK_COMPLETED') else "task_completed"
+        instance.event_type = (
+            TimelineEventType.TASK_COMPLETED.value
+            if hasattr(TimelineEventType, "TASK_COMPLETED")
+            else "task_completed"
+        )
         instance.timestamp = datetime.now()
         instance.details = "{}"
 
@@ -912,7 +1006,7 @@ def test_database_constraints(model_class, db_session):
 
     # Then convert any UUID attributes to strings
     for attr_name in dir(instance):
-        if not attr_name.startswith('_') and not callable(getattr(instance, attr_name)):
+        if not attr_name.startswith("_") and not callable(getattr(instance, attr_name)):
             try:
                 attr_value = getattr(instance, attr_name)
                 if isinstance(attr_value, UUID):
@@ -932,7 +1026,7 @@ def test_database_constraints(model_class, db_session):
         pytest.fail(f"Failed to create instance of {model_name}: {str(e)}")
 
     # Store the ID of the instance for later testing
-    instance_id = getattr(instance, 'id', None)
+    instance_id = getattr(instance, "id", None)
 
     # Now test primary key constraint in a clean session to avoid identity conflicts
     db_session.expunge_all()  # Remove all objects from the session
@@ -941,7 +1035,7 @@ def test_database_constraints(model_class, db_session):
     duplicate = model_class()
 
     # Set only necessary attributes to trigger the constraint violation
-    if hasattr(duplicate, 'id') and instance_id is not None:
+    if hasattr(duplicate, "id") and instance_id is not None:
         duplicate.id = instance_id
 
         # Add the duplicate to the session
@@ -953,6 +1047,7 @@ def test_database_constraints(model_class, db_session):
 
     # Clean up the session
     db_session.rollback()
+
 
 @pytest.mark.performance
 def test_bulk_insert_performance(db_session):
@@ -969,8 +1064,9 @@ def test_bulk_insert_performance(db_session):
             hashed_password="test_password",
             is_active=True,
             is_verified=False,
-            energy_level=EnergyLevel.MODERATE.value
-        ) for i in range(num_records)
+            energy_level=EnergyLevel.MODERATE.value,
+        )
+        for i in range(num_records)
     ]
     db_session.bulk_save_objects(users)
     db_session.commit()

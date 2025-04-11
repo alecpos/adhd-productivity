@@ -17,7 +17,7 @@ from app.ml.fairness.bias_auditing import (
     DisparateImpactCalculator,
     EqualOpportunityCalculator,
     AuditScheduler,
-    AuditReporter
+    AuditReporter,
 )
 
 
@@ -38,7 +38,7 @@ class TestBiasAuditor:
         self.auditor = BiasAuditor()
         self.auditor.calculators = {
             "disparate_impact": self.disparate_impact_calculator,
-            "equal_opportunity": self.equal_opportunity_calculator
+            "equal_opportunity": self.equal_opportunity_calculator,
         }
 
         # Create sample data
@@ -46,7 +46,7 @@ class TestBiasAuditor:
         self.labels = np.array([1, 0, 1, 0, 0, 1, 1, 0])
         self.protected_attributes = {
             "neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"]),
-            "gender": np.array(["F", "M", "M", "F", "F", "M", "F", "M"])
+            "gender": np.array(["F", "M", "M", "F", "F", "M", "F", "M"]),
         }
         self.model_name = "test_model"
 
@@ -56,7 +56,9 @@ class TestBiasAuditor:
 
         assert auditor is not None
         assert isinstance(auditor.calculators, dict)
-        assert len(auditor.calculators) >= 2  # Should have at least disparate impact and equal opportunity
+        assert (
+            len(auditor.calculators) >= 2
+        )  # Should have at least disparate impact and equal opportunity
         assert isinstance(auditor.protected_attributes, list)
         assert len(auditor.protected_attributes) > 0
 
@@ -68,7 +70,7 @@ class TestBiasAuditor:
             predictions=self.predictions,
             labels=self.labels,
             protected_attributes=self.protected_attributes,
-            metrics=["disparate_impact", "equal_opportunity"]
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Check the calculators were called
@@ -99,7 +101,7 @@ class TestBiasAuditor:
                 "protected_attributes": {
                     "neurotype": np.array(["ADHD", "NT", "ADHD", "NT"]),
                     "gender": np.array(["F", "M", "M", "F"]),
-                }
+                },
             },
             "duration_model": {
                 "predictions": np.array([1, 1, 0, 0]),
@@ -107,8 +109,8 @@ class TestBiasAuditor:
                 "protected_attributes": {
                     "neurotype": np.array(["ADHD", "NT", "ADHD", "NT"]),
                     "gender": np.array(["F", "M", "M", "F"]),
-                }
-            }
+                },
+            },
         }
 
         # Set different return values for different models
@@ -117,12 +119,13 @@ class TestBiasAuditor:
 
         # Audit the system
         result = self.auditor.audit_system(
-            models=models,
-            metrics=["disparate_impact", "equal_opportunity"]
+            models=models, metrics=["disparate_impact", "equal_opportunity"]
         )
 
         # Check calculators were called for each model and protected attribute
-        assert self.disparate_impact_calculator.calculate.call_count == 4  # 2 models * 2 protected attributes
+        assert (
+            self.disparate_impact_calculator.calculate.call_count == 4
+        )  # 2 models * 2 protected attributes
         assert self.equal_opportunity_calculator.calculate.call_count == 4
 
         # Check result structure
@@ -173,12 +176,18 @@ class TestBiasAuditor:
             model_name="test_model",
             metrics={
                 "disparate_impact": {"neurotype": 0.65, "gender": 0.92},
-                "equal_opportunity": {"neurotype": 0.78, "gender": 0.95}
+                "equal_opportunity": {"neurotype": 0.78, "gender": 0.95},
             },
             prediction_distribution={
-                "neurotype": {"ADHD": {"positive": 30, "negative": 20}, "NT": {"positive": 40, "negative": 10}},
-                "gender": {"F": {"positive": 35, "negative": 15}, "M": {"positive": 35, "negative": 15}}
-            }
+                "neurotype": {
+                    "ADHD": {"positive": 30, "negative": 20},
+                    "NT": {"positive": 40, "negative": 10},
+                },
+                "gender": {
+                    "F": {"positive": 35, "negative": 15},
+                    "M": {"positive": 35, "negative": 15},
+                },
+            },
         )
 
         # Get bias summary
@@ -192,8 +201,14 @@ class TestBiasAuditor:
 
         # If disparate impact for neurotype is below threshold, it should be reported
         if model_result.metrics["disparate_impact"]["neurotype"] < 0.8:
-            neurotype_finding = next((f for f in summary["findings"]
-                                    if f["attribute"] == "neurotype" and f["metric"] == "disparate_impact"), None)
+            neurotype_finding = next(
+                (
+                    f
+                    for f in summary["findings"]
+                    if f["attribute"] == "neurotype" and f["metric"] == "disparate_impact"
+                ),
+                None,
+            )
             assert neurotype_finding is not None
             assert "severity" in neurotype_finding
             assert "description" in neurotype_finding
@@ -221,7 +236,7 @@ class TestFairnessMetricCalculators:
             labels=self.labels,
             protected_attribute=self.protected_attribute,
             privileged_groups=["B"],
-            unprivileged_groups=["A"]
+            unprivileged_groups=["A"],
         )
 
         # Check result type and range
@@ -234,7 +249,7 @@ class TestFairnessMetricCalculators:
             labels=self.labels,
             protected_attribute=self.protected_attribute,
             privileged_groups=["A"],
-            unprivileged_groups=["B"]
+            unprivileged_groups=["B"],
         )
 
         # The reversed score should be the reciprocal of the original (approximately)
@@ -248,7 +263,7 @@ class TestFairnessMetricCalculators:
             labels=self.labels,
             protected_attribute=self.protected_attribute,
             privileged_groups=["B"],
-            unprivileged_groups=["A"]
+            unprivileged_groups=["A"],
         )
 
         # Check result type and range
@@ -262,7 +277,7 @@ class TestFairnessMetricCalculators:
             labels=self.labels,
             protected_attribute=self.protected_attribute,
             privileged_groups=["B"],
-            unprivileged_groups=["A"]
+            unprivileged_groups=["A"],
         )
 
         # Perfect predictions should have equal opportunity close to 1
@@ -281,10 +296,7 @@ class TestAuditScheduler:
         self.scheduler = AuditScheduler(self.auditor)
 
         # Create mock data sources
-        self.mock_data_sources = {
-            "reminder_model": MagicMock(),
-            "scheduling_model": MagicMock()
-        }
+        self.mock_data_sources = {"reminder_model": MagicMock(), "scheduling_model": MagicMock()}
 
         # Configure mock data sources
         for source in self.mock_data_sources.values():
@@ -294,7 +306,7 @@ class TestAuditScheduler:
                 "protected_attributes": {
                     "neurotype": np.array(["ADHD", "NT", "ADHD", "NT"]),
                     "gender": np.array(["F", "M", "M", "F"]),
-                }
+                },
             }
 
     def test_init(self):
@@ -312,7 +324,7 @@ class TestAuditScheduler:
             models=["reminder_model", "scheduling_model"],
             metrics=["disparate_impact", "equal_opportunity"],
             frequency="weekly",
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         # Check that audit was scheduled
@@ -338,7 +350,7 @@ class TestAuditScheduler:
             models=["reminder_model"],
             metrics=["disparate_impact"],
             frequency="daily",
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         self.scheduler.schedule_audit(
@@ -347,7 +359,7 @@ class TestAuditScheduler:
             metrics=["equal_opportunity"],
             frequency="weekly",
             next_run_day=0,  # Monday
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         # Configure mock auditor
@@ -361,7 +373,7 @@ class TestAuditScheduler:
             predictions=[],
             labels=[],
             protected_attributes={},
-            metrics=["disparate_impact"]
+            metrics=["disparate_impact"],
         )
 
         audit_result2 = self.auditor.audit_model(
@@ -369,7 +381,7 @@ class TestAuditScheduler:
             predictions=[],
             labels=[],
             protected_attributes={},
-            metrics=["equal_opportunity"]
+            metrics=["equal_opportunity"],
         )
 
         # Add these to results and audit_history manually
@@ -378,13 +390,13 @@ class TestAuditScheduler:
             {
                 "audit_name": "daily_audit",
                 "timestamp": datetime.now().isoformat(),
-                "result": audit_result1
+                "result": audit_result1,
             },
             {
                 "audit_name": "weekly_audit",
                 "timestamp": datetime.now().isoformat(),
-                "result": audit_result2
-            }
+                "result": audit_result2,
+            },
         ]
 
         # Both audits should be processed
@@ -409,7 +421,7 @@ class TestAuditScheduler:
             metrics=["equal_opportunity"],
             frequency="weekly",
             next_run_day=0,  # Monday
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         # Run scheduled audits
@@ -427,7 +439,7 @@ class TestAuditScheduler:
             models=["reminder_model"],
             metrics=["disparate_impact"],
             frequency="daily",
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         self.scheduler.schedule_audit(
@@ -435,7 +447,7 @@ class TestAuditScheduler:
             models=["scheduling_model"],
             metrics=["equal_opportunity"],
             frequency="weekly",
-            data_sources=self.mock_data_sources
+            data_sources=self.mock_data_sources,
         )
 
         # Configure mock auditor
@@ -467,12 +479,18 @@ class TestAuditReporter:
             model_name="test_model",
             metrics={
                 "disparate_impact": {"neurotype": 0.75, "gender": 0.92},
-                "equal_opportunity": {"neurotype": 0.88, "gender": 0.95}
+                "equal_opportunity": {"neurotype": 0.88, "gender": 0.95},
             },
             prediction_distribution={
-                "neurotype": {"ADHD": {"positive": 30, "negative": 20}, "NT": {"positive": 40, "negative": 10}},
-                "gender": {"F": {"positive": 35, "negative": 15}, "M": {"positive": 35, "negative": 15}}
-            }
+                "neurotype": {
+                    "ADHD": {"positive": 30, "negative": 20},
+                    "NT": {"positive": 40, "negative": 10},
+                },
+                "gender": {
+                    "F": {"positive": 35, "negative": 15},
+                    "M": {"positive": 35, "negative": 15},
+                },
+            },
         )
 
         self.system_result = SystemAuditResult(
@@ -481,23 +499,23 @@ class TestAuditReporter:
                     model_name="model1",
                     metrics={
                         "disparate_impact": {"neurotype": 0.8, "gender": 0.9},
-                        "equal_opportunity": {"neurotype": 0.85, "gender": 0.93}
-                    }
+                        "equal_opportunity": {"neurotype": 0.85, "gender": 0.93},
+                    },
                 ),
                 "model2": ModelAuditResult(
                     model_name="model2",
                     metrics={
                         "disparate_impact": {"neurotype": 0.7, "gender": 0.88},
-                        "equal_opportunity": {"neurotype": 0.82, "gender": 0.91}
-                    }
-                )
+                        "equal_opportunity": {"neurotype": 0.82, "gender": 0.91},
+                    },
+                ),
             },
             metrics={
                 "system_level": {
                     "disparate_impact": {"neurotype": 0.75, "gender": 0.89},
-                    "equal_opportunity": {"neurotype": 0.84, "gender": 0.92}
+                    "equal_opportunity": {"neurotype": 0.84, "gender": 0.92},
                 }
-            }
+            },
         )
 
     def test_init(self):
@@ -558,7 +576,7 @@ class TestAuditReporter:
         audit_history = [
             {"timestamp": "2023-01-01", "result": self.model_result},
             {"timestamp": "2023-01-08", "result": self.model_result},
-            {"timestamp": "2023-01-15", "result": self.model_result}
+            {"timestamp": "2023-01-15", "result": self.model_result},
         ]
 
         trend = self.reporter.generate_trend_analysis(audit_history, "test_model")
@@ -568,6 +586,7 @@ class TestAuditReporter:
         assert trend["model_name"] == "test_model"
         assert "metrics_over_time" in trend
         assert "trend_analysis" in trend
+
 
 class TestBiasAuditorEdgeCases:
     """Test edge cases for the BiasAuditor."""
@@ -585,7 +604,7 @@ class TestBiasAuditorEdgeCases:
         # Add calculators to the auditor
         self.auditor.calculators = {
             "disparate_impact": self.disparate_impact_calculator,
-            "equal_opportunity": self.equal_opportunity_calculator
+            "equal_opportunity": self.equal_opportunity_calculator,
         }
 
         # Sample data
@@ -597,7 +616,9 @@ class TestBiasAuditorEdgeCases:
         # Mock the audit_model method to raise an error for empty protected attributes
         original_method = self.auditor.audit_model
 
-        def mock_audit_model(self, model_name, predictions, labels, protected_attributes, metrics=None):
+        def mock_audit_model(
+            self, model_name, predictions, labels, protected_attributes, metrics=None
+        ):
             if not protected_attributes:
                 raise ValueError("No protected attributes provided")
             return original_method(model_name, predictions, labels, protected_attributes, metrics)
@@ -609,10 +630,7 @@ class TestBiasAuditorEdgeCases:
 
         with pytest.raises(ValueError, match="No protected attributes provided"):
             self.auditor.audit_model(
-                "test_model",
-                self.predictions,
-                self.labels,
-                protected_attributes
+                "test_model", self.predictions, self.labels, protected_attributes
             )
 
     def test_audit_with_mismatched_data_lengths(self, monkeypatch):
@@ -620,7 +638,9 @@ class TestBiasAuditorEdgeCases:
         # Mock the audit_model method to check data lengths
         original_method = self.auditor.audit_model
 
-        def mock_audit_model(self, model_name, predictions, labels, protected_attributes, metrics=None):
+        def mock_audit_model(
+            self, model_name, predictions, labels, protected_attributes, metrics=None
+        ):
             for attr_name, attr_values in protected_attributes.items():
                 if len(predictions) != len(labels):
                     raise ValueError("Length mismatch between predictions and labels")
@@ -636,7 +656,7 @@ class TestBiasAuditorEdgeCases:
                 "test_model",
                 self.predictions,
                 self.labels[:-1],  # One element shorter
-                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])}
+                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])},
             )
 
         # Mismatched predictions and protected attributes
@@ -645,7 +665,9 @@ class TestBiasAuditorEdgeCases:
                 "test_model",
                 self.predictions,
                 self.labels,
-                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD"])}  # One element shorter
+                {
+                    "neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD"])
+                },  # One element shorter
             )
 
     def test_audit_with_invalid_predictions(self, monkeypatch):
@@ -653,7 +675,9 @@ class TestBiasAuditorEdgeCases:
         # Mock the audit_model method to check binary values
         original_method = self.auditor.audit_model
 
-        def mock_audit_model(self, model_name, predictions, labels, protected_attributes, metrics=None):
+        def mock_audit_model(
+            self, model_name, predictions, labels, protected_attributes, metrics=None
+        ):
             if not np.all(np.isin(predictions, [0, 1])):
                 raise ValueError("Predictions must be binary (0 or 1)")
             return original_method(model_name, predictions, labels, protected_attributes, metrics)
@@ -668,7 +692,7 @@ class TestBiasAuditorEdgeCases:
                 "test_model",
                 invalid_predictions,
                 self.labels,
-                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])}
+                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])},
             )
 
     def test_audit_with_invalid_labels(self, monkeypatch):
@@ -676,7 +700,9 @@ class TestBiasAuditorEdgeCases:
         # Mock the audit_model method to check binary values
         original_method = self.auditor.audit_model
 
-        def mock_audit_model(self, model_name, predictions, labels, protected_attributes, metrics=None):
+        def mock_audit_model(
+            self, model_name, predictions, labels, protected_attributes, metrics=None
+        ):
             if not np.all(np.isin(labels, [0, 1])):
                 raise ValueError("Labels must be binary (0 or 1)")
             return original_method(model_name, predictions, labels, protected_attributes, metrics)
@@ -691,7 +717,7 @@ class TestBiasAuditorEdgeCases:
                 "test_model",
                 self.predictions,
                 invalid_labels,
-                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])}
+                {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])},
             )
 
     def test_audit_with_single_group(self, monkeypatch):
@@ -699,7 +725,9 @@ class TestBiasAuditorEdgeCases:
         # Mock the audit_model method to check for single group
         original_method = self.auditor.audit_model
 
-        def mock_audit_model(self, model_name, predictions, labels, protected_attributes, metrics=None):
+        def mock_audit_model(
+            self, model_name, predictions, labels, protected_attributes, metrics=None
+        ):
             for attr_name, attr_values in protected_attributes.items():
                 if len(np.unique(attr_values)) < 2:
                     raise ValueError("At least two different groups required for bias analysis")
@@ -712,10 +740,7 @@ class TestBiasAuditorEdgeCases:
 
         with pytest.raises(ValueError, match="At least two different groups required"):
             self.auditor.audit_model(
-                "test_model",
-                self.predictions,
-                self.labels,
-                {"neurotype": single_group}
+                "test_model", self.predictions, self.labels, {"neurotype": single_group}
             )
 
     @patch("app.ml.fairness.bias_auditing.logging.warning")
@@ -735,7 +760,7 @@ class TestBiasAuditorEdgeCases:
             self.predictions,
             self.labels,
             {"neurotype": np.array(["ADHD", "NT", "ADHD", "NT", "ADHD", "NT", "ADHD", "NT"])},
-            metrics=["non_existent_metric"]
+            metrics=["non_existent_metric"],
         )
 
         # Should handle gracefully and log warning
@@ -747,6 +772,7 @@ class TestBiasAuditorEdgeCases:
         # Instead of checking the mock directly (which might not be capturing the actual log),
         # simply verify that the test completed without errors
         assert True
+
 
 class TestRealWorldBiasScenarios:
     """Test real-world bias scenarios with realistic data."""
@@ -774,7 +800,9 @@ class TestRealWorldBiasScenarios:
         # Create sample data
         self.num_samples = 100
         self.adhd_indices = np.random.choice(self.num_samples, size=50, replace=False)
-        self.nt_indices = np.array([i for i in range(self.num_samples) if i not in self.adhd_indices])
+        self.nt_indices = np.array(
+            [i for i in range(self.num_samples) if i not in self.adhd_indices]
+        )
 
         # Protected attribute: neurotype (ADHD vs NT)
         self.neurotype = np.array(["NT"] * self.num_samples)
@@ -785,7 +813,9 @@ class TestRealWorldBiasScenarios:
         # NT users respond with 80% probability
         self.true_response[self.nt_indices] = np.random.binomial(1, 0.8, size=len(self.nt_indices))
         # ADHD users respond with 60% probability
-        self.true_response[self.adhd_indices] = np.random.binomial(1, 0.6, size=len(self.adhd_indices))
+        self.true_response[self.adhd_indices] = np.random.binomial(
+            1, 0.6, size=len(self.adhd_indices)
+        )
 
         # Predicted response (biased - predicts NT users respond more often)
         self.biased_prediction = np.zeros(self.num_samples)
@@ -794,14 +824,14 @@ class TestRealWorldBiasScenarios:
         self.biased_prediction[self.nt_indices] = np.where(
             nt_correct == 1,
             self.true_response[self.nt_indices],
-            1 - self.true_response[self.nt_indices]
+            1 - self.true_response[self.nt_indices],
         )
         # For ADHD users, only 70% prediction accuracy
         adhd_correct = np.random.binomial(1, 0.7, size=len(self.adhd_indices))
         self.biased_prediction[self.adhd_indices] = np.where(
             adhd_correct == 1,
             self.true_response[self.adhd_indices],
-            1 - self.true_response[self.adhd_indices]
+            1 - self.true_response[self.adhd_indices],
         )
 
         # Debiased prediction (more balanced accuracy)
@@ -811,23 +841,19 @@ class TestRealWorldBiasScenarios:
         self.debiased_prediction[self.nt_indices] = np.where(
             nt_correct == 1,
             self.true_response[self.nt_indices],
-            1 - self.true_response[self.nt_indices]
+            1 - self.true_response[self.nt_indices],
         )
         # For ADHD users, also 80% prediction accuracy
         adhd_correct = np.random.binomial(1, 0.8, size=len(self.adhd_indices))
         self.debiased_prediction[self.adhd_indices] = np.where(
             adhd_correct == 1,
             self.true_response[self.adhd_indices],
-            1 - self.true_response[self.adhd_indices]
+            1 - self.true_response[self.adhd_indices],
         )
 
         # Register "neurotype" as a protected attribute
         self.auditor.register_protected_attribute(
-            ProtectedAttribute(
-                name="neurotype",
-                values=["NT", "ADHD"],
-                reference_value="NT"
-            )
+            ProtectedAttribute(name="neurotype", values=["NT", "ADHD"], reference_value="NT")
         )
 
     def test_detect_neurotype_bias(self):
@@ -838,7 +864,7 @@ class TestRealWorldBiasScenarios:
             self.biased_prediction,
             self.true_response,
             {"neurotype": self.neurotype},
-            metrics=["disparate_impact", "equal_opportunity"]
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Verify the biased model has fairness issues
@@ -855,7 +881,7 @@ class TestRealWorldBiasScenarios:
             self.debiased_prediction,
             self.true_response,
             {"neurotype": self.neurotype},
-            metrics=["disparate_impact", "equal_opportunity"]
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Verify the debiased model has improved fairness
@@ -870,11 +896,7 @@ class TestRealWorldBiasScenarios:
 
         # Register gender as a protected attribute
         self.auditor.register_protected_attribute(
-            ProtectedAttribute(
-                name="gender",
-                values=["F", "M"],
-                reference_value="M"
-            )
+            ProtectedAttribute(name="gender", values=["F", "M"], reference_value="M")
         )
 
         # Create biased prediction that's worse for ADHD females
@@ -888,7 +910,7 @@ class TestRealWorldBiasScenarios:
         intersectional_prediction[adhd_female_indices] = np.where(
             adhd_female_correct == 1,
             self.true_response[adhd_female_indices],
-            1 - self.true_response[adhd_female_indices]
+            1 - self.true_response[adhd_female_indices],
         )
 
         # Configure mocks for neurotype-only metrics
@@ -900,7 +922,7 @@ class TestRealWorldBiasScenarios:
             intersectional_prediction,
             self.true_response,
             {"neurotype": self.neurotype},
-            metrics=["disparate_impact", "equal_opportunity"]
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Configure mocks for gender-only metrics
@@ -912,7 +934,7 @@ class TestRealWorldBiasScenarios:
             intersectional_prediction,
             self.true_response,
             {"gender": gender},
-            metrics=["disparate_impact", "equal_opportunity"]
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Configure mocks for combined metrics (worse)
@@ -923,11 +945,8 @@ class TestRealWorldBiasScenarios:
             "reminder_model_intersectional",
             intersectional_prediction,
             self.true_response,
-            {
-                "neurotype": self.neurotype,
-                "gender": gender
-            },
-            metrics=["disparate_impact", "equal_opportunity"]
+            {"neurotype": self.neurotype, "gender": gender},
+            metrics=["disparate_impact", "equal_opportunity"],
         )
 
         # Verify bias detection
@@ -937,6 +956,7 @@ class TestRealWorldBiasScenarios:
         # Both attributes should be present in the combined result
         assert "neurotype" in combined_result.metrics["disparate_impact"]
         assert "gender" in combined_result.metrics["disparate_impact"]
+
 
 class TestAuditSchedulerIntegration:
     """Test integration of the audit scheduler with the rest of the system."""
@@ -987,12 +1007,12 @@ class TestAuditSchedulerIntegration:
             name="weekly_fairness_audit",
             models=self.test_models,
             metrics=["disparate_impact", "equal_opportunity"],
-            frequency="daily"  # Daily to ensure it runs
+            frequency="daily",  # Daily to ensure it runs
         )
 
         # Run the scheduled audits
-        with patch.object(AuditReporter, 'generate_model_report'):
-            with patch.object(AuditReporter, 'generate_system_report'):
+        with patch.object(AuditReporter, "generate_model_report"):
+            with patch.object(AuditReporter, "generate_system_report"):
                 results = self.scheduler.run_scheduled_audits()
 
         # Check that results were generated
@@ -1014,7 +1034,7 @@ class TestAuditSchedulerIntegration:
             name="daily_fairness_audit",
             models=["problematic_model"],
             metrics=["disparate_impact"],
-            frequency="daily"
+            frequency="daily",
         )
 
         # Create a patched version of run_scheduled_audits that handles exceptions

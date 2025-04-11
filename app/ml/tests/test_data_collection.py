@@ -7,7 +7,14 @@ from datetime import datetime, timedelta
 import numpy as np
 
 from app.ml.data_collection import DataCollector
-from .conftest import MockUser, MockMentalHealthModel, MockEnergyLog, MockTaskModel, MockCalendarEventModel, MockAsyncResult
+from .conftest import (
+    MockUser,
+    MockMentalHealthModel,
+    MockEnergyLog,
+    MockTaskModel,
+    MockCalendarEventModel,
+    MockAsyncResult,
+)
 
 
 @pytest.mark.asyncio
@@ -26,7 +33,7 @@ async def test_get_mental_health_data(db_session, test_user, sample_data):
             "energy_level": 4,
             "focus_level": 3,
             "sleep_hours": 7,
-            "timestamp": datetime.now()
+            "timestamp": datetime.now(),
         }
     ]
 
@@ -50,13 +57,7 @@ async def test_get_energy_data(db_session, test_user, sample_data):
     collector = DataCollector(db_session)
 
     # Create mock data with the expected structure
-    mock_data = [
-        {
-            "level": 4,
-            "timestamp": datetime.now(),
-            "notes": "Morning energy"
-        }
-    ]
+    mock_data = [{"level": 4, "timestamp": datetime.now(), "notes": "Morning energy"}]
 
     # Replace the method with a mock that returns our data
     collector.get_energy_data = AsyncMock(return_value=mock_data)
@@ -87,7 +88,7 @@ async def test_get_task_data(db_session, test_user, sample_data):
             "actual_duration": 35,
             "energy_required": 4,
             "completion_rate": 1.0,
-            "created_at": datetime.now()
+            "created_at": datetime.now(),
         }
     ]
 
@@ -121,7 +122,7 @@ async def test_get_calendar_data(db_session, test_user, sample_data):
             "energy_required": 3,
             "focus_required": 4,
             "focus_score": 4,
-            "energy_level": 3
+            "energy_level": 3,
         }
     ]
 
@@ -152,7 +153,7 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "anxiety_level": 2,
             "stress_level": 3,
             "energy_level": 4,
-            "timestamp": datetime.now()
+            "timestamp": datetime.now(),
         },
         {
             "mood_score": 5,
@@ -160,21 +161,13 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "anxiety_level": 1,
             "stress_level": 2,
             "energy_level": 5,
-            "timestamp": datetime.now() - timedelta(days=1)
-        }
+            "timestamp": datetime.now() - timedelta(days=1),
+        },
     ]
 
     energy_data = [
-        {
-            "level": 4,
-            "time_of_day": "morning",
-            "timestamp": datetime.now()
-        },
-        {
-            "level": 3,
-            "time_of_day": "evening",
-            "timestamp": datetime.now() - timedelta(days=1)
-        }
+        {"level": 4, "time_of_day": "morning", "timestamp": datetime.now()},
+        {"level": 3, "time_of_day": "evening", "timestamp": datetime.now() - timedelta(days=1)},
     ]
 
     task_data = [
@@ -186,7 +179,7 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "actual_duration": 35,
             "energy_required": 4,
             "completion_rate": 1.0,
-            "created_at": datetime.now()
+            "created_at": datetime.now(),
         },
         {
             "title": "Task 2",
@@ -196,8 +189,8 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "actual_duration": 0,
             "energy_required": 3,
             "completion_rate": 0.0,
-            "created_at": datetime.now() - timedelta(days=1)
-        }
+            "created_at": datetime.now() - timedelta(days=1),
+        },
     ]
 
     calendar_data = [
@@ -209,7 +202,7 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "energy_required": 3,
             "focus_required": 4,
             "focus_score": 4,
-            "energy_level": 3
+            "energy_level": 3,
         },
         {
             "title": "Appointment",
@@ -219,8 +212,8 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "energy_required": 2,
             "focus_required": 3,
             "focus_score": 3,
-            "energy_level": 4
-        }
+            "energy_level": 4,
+        },
     ]
 
     # Patch the collection methods to return our test data

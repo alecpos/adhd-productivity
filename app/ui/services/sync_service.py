@@ -31,8 +31,11 @@ class SyncService:
         self.task_manager = SyncTaskManager()
 
     async def sync_tasks(
-        self, user_id: str, integration: ProjectToolIntegration,
-        import_tasks: bool = True, export_tasks: bool = True
+        self,
+        user_id: str,
+        integration: ProjectToolIntegration,
+        import_tasks: bool = True,
+        export_tasks: bool = True,
     ) -> SyncResult:
         """
         Synchronize tasks between ADHD Calendar and an external project management tool.

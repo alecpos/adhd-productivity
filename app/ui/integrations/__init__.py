@@ -12,22 +12,26 @@ from app.ui.integrations.jira_api_client import JiraApiClient
 from app.ui.integrations.resilient_jira_api_client import ResilientJiraApiClient
 from app.ui.integrations.jira_error_handler import JiraErrorHandler
 from app.ui.integrations.jira_field_mappers import (
-    StatusMapper, PriorityMapper, DateFormatter, FieldExtractor, CustomFieldMapper
+    StatusMapper,
+    PriorityMapper,
+    DateFormatter,
+    FieldExtractor,
+    CustomFieldMapper,
 )
 
 __all__ = [
-    'JiraIntegration',
-    'JiraAuthenticator',
-    'JiraTaskMapper',
-    'JiraQueryBuilder',
-    'JiraApiClient',
-    'ResilientJiraApiClient',
-    'JiraErrorHandler',
-    'StatusMapper',
-    'PriorityMapper',
-    'DateFormatter',
-    'FieldExtractor',
-    'CustomFieldMapper',
+    "JiraIntegration",
+    "JiraAuthenticator",
+    "JiraTaskMapper",
+    "JiraQueryBuilder",
+    "JiraApiClient",
+    "ResilientJiraApiClient",
+    "JiraErrorHandler",
+    "StatusMapper",
+    "PriorityMapper",
+    "DateFormatter",
+    "FieldExtractor",
+    "CustomFieldMapper",
 ]
 
 # This init file marks this directory as a Python package

@@ -31,9 +31,11 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 # Define BioAuth-25 data models
 class BiometricType(str, Enum):
     """Types of biometric data supported by BioAuth-25."""
+
     HEART_RATE = "heart_rate"
     HRV = "heart_rate_variability"
     EDA = "electrodermal_activity"  # Skin conductance
@@ -47,6 +49,7 @@ class BiometricType(str, Enum):
 
 class WearableDeviceType(str, Enum):
     """Types of supported wearable devices."""
+
     SMARTWATCH = "smartwatch"
     FITNESS_TRACKER = "fitness_tracker"
     SMART_RING = "smart_ring"
@@ -58,6 +61,7 @@ class WearableDeviceType(str, Enum):
 
 class BioAuthDeviceInfo(BaseModel):
     """Information about a connected BioAuth-25 device."""
+
     device_id: str
     device_type: WearableDeviceType
     manufacturer: str
@@ -71,6 +75,7 @@ class BioAuthDeviceInfo(BaseModel):
 
 class BiometricDataPoint(BaseModel):
     """A single biometric data point from a wearable device."""
+
     metric_type: BiometricType
     timestamp: datetime
     value: float
@@ -81,6 +86,7 @@ class BiometricDataPoint(BaseModel):
 
 class BiometricBatch(BaseModel):
     """A batch of biometric data points."""
+
     user_id: str
     device_id: str
     data_points: List[BiometricDataPoint]
@@ -90,6 +96,7 @@ class BiometricBatch(BaseModel):
 
 class BioAuthCredential(BaseModel):
     """Secure credential for BioAuth-25 device authentication."""
+
     device_id: str
     user_id: str
     access_token: str
@@ -170,8 +177,8 @@ class BioAuthService:
             raise HTTPException(status_code=500, detail="BioAuth API base URL not configured")
 
         # Ensure path is properly encoded
-        encoded_path = quote(path.strip('/'))
-        return urljoin(self.base_url.rstrip('/') + '/', encoded_path)
+        encoded_path = quote(path.strip("/"))
+        return urljoin(self.base_url.rstrip("/") + "/", encoded_path)
 
     async def verify_biometric(self, user_id: str, biometric_data: Dict) -> bool:
         """Verify user's biometric data."""
@@ -179,23 +186,15 @@ class BioAuthService:
             url = self._build_url(f"verify/{user_id}")
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
-            response = requests.post(
-                url,
-                json=biometric_data,
-                headers=headers,
-                timeout=10
-            )
+            response = requests.post(url, json=biometric_data, headers=headers, timeout=10)
             response.raise_for_status()
             return response.json().get("verified", False)
 
         except requests.RequestException as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"BioAuth verification failed: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"BioAuth verification failed: {str(e)}")
 
     async def register_biometric(self, user_id: str, biometric_data: Dict) -> bool:
         """Register new biometric data for a user."""
@@ -203,23 +202,15 @@ class BioAuthService:
             url = self._build_url(f"register/{user_id}")
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
-            response = requests.post(
-                url,
-                json=biometric_data,
-                headers=headers,
-                timeout=10
-            )
+            response = requests.post(url, json=biometric_data, headers=headers, timeout=10)
             response.raise_for_status()
             return response.json().get("registered", False)
 
         except requests.RequestException as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"BioAuth registration failed: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"BioAuth registration failed: {str(e)}")
 
     async def register_device(
         self,
@@ -229,7 +220,7 @@ class BioAuthService:
         model: str,
         device_identifier: str,
         auth_code: str,
-        db: AsyncSession
+        db: AsyncSession,
     ) -> BioAuthDeviceInfo:
         """
         Register a new wearable device for a user using the BioAuth-25 protocol.
@@ -249,17 +240,14 @@ class BioAuthService:
         # Validate the authorization code with the device manufacturer's API
         async with aiohttp.ClientSession() as session:
             token_url = f"{self.base_url}/auth/token"
-            headers = {
-                "Content-Type": "application/json",
-                "X-API-Key": self.api_key
-            }
+            headers = {"Content-Type": "application/json", "X-API-Key": self.api_key}
             payload = {
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
                 "auth_code": auth_code,
                 "device_id": device_identifier,
                 "device_type": device_type,
-                "user_id": user_id
+                "user_id": user_id,
             }
 
             async with session.post(token_url, headers=headers, json=payload) as response:
@@ -268,7 +256,7 @@ class BioAuthService:
                     logger.error(f"Device registration failed: {error_text}")
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Device registration failed: {error_text}"
+                        detail=f"Device registration failed: {error_text}",
                     )
 
                 token_data = await response.json()
@@ -280,7 +268,7 @@ class BioAuthService:
                     access_token=token_data["access_token"],
                     refresh_token=token_data["refresh_token"],
                     expires_at=datetime.utcnow() + timedelta(seconds=token_data["expires_in"]),
-                    scope=token_data["scope"].split()
+                    scope=token_data["scope"].split(),
                 )
                 self._credential_cache[device_identifier] = credential
 
@@ -298,10 +286,7 @@ class BioAuthService:
         """Get device information from the BioAuth API."""
         async with aiohttp.ClientSession() as session:
             url = f"{self.base_url}/devices/{device_id}"
-            headers = {
-                "Authorization": f"Bearer {access_token}",
-                "X-API-Key": self.api_key
-            }
+            headers = {"Authorization": f"Bearer {access_token}", "X-API-Key": self.api_key}
 
             async with session.get(url, headers=headers) as response:
                 if response.status != 200:
@@ -309,7 +294,7 @@ class BioAuthService:
                     logger.error(f"Failed to get device info: {error_text}")
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Failed to get device info: {error_text}"
+                        detail=f"Failed to get device info: {error_text}",
                     )
 
                 data = await response.json()
@@ -323,7 +308,7 @@ class BioAuthService:
                     supported_metrics=[BiometricType(m) for m in data["supported_metrics"]],
                     connection_status=data["connection_status"],
                     last_sync=datetime.fromisoformat(data["last_sync"]),
-                    battery_level=data.get("battery_level")
+                    battery_level=data.get("battery_level"),
                 )
 
     async def get_user_devices(self, user_id: str, db: AsyncSession) -> List[BioAuthDeviceInfo]:
@@ -331,8 +316,10 @@ class BioAuthService:
         # TODO: Implement database query to get user devices
         # For now, return from cache if available
         return [
-            device for device_id, device in self._device_cache.items()
-            if device_id in self._credential_cache and self._credential_cache[device_id].user_id == user_id
+            device
+            for device_id, device in self._device_cache.items()
+            if device_id in self._credential_cache
+            and self._credential_cache[device_id].user_id == user_id
         ]
 
     async def get_recent_biometric_data(
@@ -342,7 +329,7 @@ class BioAuthService:
         metric_type: BiometricType,
         start_time: datetime,
         end_time: datetime,
-        db: AsyncSession
+        db: AsyncSession,
     ) -> List[BiometricDataPoint]:
         """
         Get recent biometric data for a specific metric from a device.
@@ -362,14 +349,14 @@ class BioAuthService:
         if device_id not in self._credential_cache:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Device {device_id} not registered for user {user_id}"
+                detail=f"Device {device_id} not registered for user {user_id}",
             )
 
         credential = self._credential_cache[device_id]
         if credential.user_id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not authorized to access this device's data"
+                detail="Not authorized to access this device's data",
             )
 
         # Check if token needs refresh
@@ -381,12 +368,9 @@ class BioAuthService:
             url = f"{self.base_url}/data/{device_id}/{metric_type}"
             headers = {
                 "Authorization": f"Bearer {credential.access_token}",
-                "X-API-Key": self.api_key
+                "X-API-Key": self.api_key,
             }
-            params = {
-                "start_time": start_time.isoformat(),
-                "end_time": end_time.isoformat()
-            }
+            params = {"start_time": start_time.isoformat(), "end_time": end_time.isoformat()}
 
             async with session.get(url, headers=headers, params=params) as response:
                 if response.status != 200:
@@ -394,7 +378,7 @@ class BioAuthService:
                     logger.error(f"Failed to get biometric data: {error_text}")
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Failed to get biometric data: {error_text}"
+                        detail=f"Failed to get biometric data: {error_text}",
                     )
 
                 data = await response.json()
@@ -406,7 +390,7 @@ class BioAuthService:
                         value=item["value"],
                         confidence=item.get("confidence", 1.0),
                         device_id=device_id,
-                        context=item.get("context")
+                        context=item.get("context"),
                     )
                     for item in data["data_points"]
                 ]
@@ -421,16 +405,13 @@ class BioAuthService:
 
         async with aiohttp.ClientSession() as session:
             url = f"{self.base_url}/auth/refresh"
-            headers = {
-                "Content-Type": "application/json",
-                "X-API-Key": self.api_key
-            }
+            headers = {"Content-Type": "application/json", "X-API-Key": self.api_key}
             payload = {
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
                 "refresh_token": credential.refresh_token,
                 "device_id": device_id,
-                "user_id": credential.user_id
+                "user_id": credential.user_id,
             }
 
             async with session.post(url, headers=headers, json=payload) as response:
@@ -446,7 +427,9 @@ class BioAuthService:
                 # Update credential
                 credential.access_token = token_data["access_token"]
                 credential.refresh_token = token_data["refresh_token"]
-                credential.expires_at = datetime.utcnow() + timedelta(seconds=token_data["expires_in"])
+                credential.expires_at = datetime.utcnow() + timedelta(
+                    seconds=token_data["expires_in"]
+                )
 
                 # TODO: Update database record
 
@@ -482,12 +465,14 @@ class BioAuthService:
                                 value=item["value"],
                                 confidence=item.get("confidence", 1.0),
                                 device_id=device_id,
-                                context=item.get("context")
+                                context=item.get("context"),
                             )
                             for item in webhook_data["data"]
                         ],
                         batch_id=webhook_data.get("batch_id", f"{device_id}_{int(time.time())}"),
-                        collected_at=datetime.fromisoformat(webhook_data.get("collected_at", datetime.utcnow().isoformat()))
+                        collected_at=datetime.fromisoformat(
+                            webhook_data.get("collected_at", datetime.utcnow().isoformat())
+                        ),
                     )
 
                     # Add to processing queue
@@ -501,7 +486,9 @@ class BioAuthService:
 
             if device_id in self._device_cache:
                 # Update device status
-                self._device_cache[device_id].connection_status = webhook_data.get("status", "unknown")
+                self._device_cache[device_id].connection_status = webhook_data.get(
+                    "status", "unknown"
+                )
                 self._device_cache[device_id].battery_level = webhook_data.get("battery_level")
                 self._device_cache[device_id].last_sync = datetime.fromisoformat(
                     webhook_data.get("last_sync", datetime.utcnow().isoformat())
@@ -525,9 +512,7 @@ class BioAuthService:
 
         # Calculate HMAC signature
         calculated_signature = hmac.new(
-            self.client_secret.encode(),
-            canonical_data.encode(),
-            hashlib.sha256
+            self.client_secret.encode(), canonical_data.encode(), hashlib.sha256
         ).hexdigest()
 
         # Put the signature back
@@ -548,14 +533,13 @@ class BioAuthService:
 
         # Find devices that support HRV
         hrv_devices = [
-            device for device in devices
-            if BiometricType.HRV in device.supported_metrics
+            device for device in devices if BiometricType.HRV in device.supported_metrics
         ]
 
         if not hrv_devices:
             return {
                 "status": "no_data",
-                "message": "No devices with HRV capabilities found for user"
+                "message": "No devices with HRV capabilities found for user",
             }
 
         # Use the most recently synced device
@@ -572,13 +556,13 @@ class BioAuthService:
                 metric_type=BiometricType.HRV,
                 start_time=start_time,
                 end_time=end_time,
-                db=db
+                db=db,
             )
 
             if not hrv_data:
                 return {
                     "status": "no_data",
-                    "message": "No HRV data available for the specified time period"
+                    "message": "No HRV data available for the specified time period",
                 }
 
             # Analyze HRV data to extract stress indicators
@@ -591,10 +575,7 @@ class BioAuthService:
 
             # Current HRV (last hour)
             recent_cutoff = end_time - timedelta(hours=1)
-            recent_values = [
-                point.value for point in hrv_data
-                if point.timestamp >= recent_cutoff
-            ]
+            recent_values = [point.value for point in hrv_data if point.timestamp >= recent_cutoff]
             current_hrv = sum(recent_values) / len(recent_values) if recent_values else 0
 
             # Calculate stress level (simplified)
@@ -616,16 +597,13 @@ class BioAuthService:
                 "device": {
                     "id": device.device_id,
                     "model": device.model,
-                    "manufacturer": device.manufacturer
-                }
+                    "manufacturer": device.manufacturer,
+                },
             }
 
         except Exception as e:
             logger.error(f"Error analyzing HRV data: {str(e)}")
-            return {
-                "status": "error",
-                "message": f"Error analyzing HRV data: {str(e)}"
-            }
+            return {"status": "error", "message": f"Error analyzing HRV data: {str(e)}"}
 
     async def get_cognitive_load_estimate(self, user_id: str, db: AsyncSession) -> Dict[str, Any]:
         """
@@ -639,10 +617,7 @@ class BioAuthService:
         devices = await self.get_user_devices(user_id, db)
 
         if not devices:
-            return {
-                "status": "no_data",
-                "message": "No devices found for user"
-            }
+            return {"status": "no_data", "message": "No devices found for user"}
 
         # Identify which metrics we can collect
         available_metrics = set()
@@ -658,11 +633,11 @@ class BioAuthService:
         # Define metrics for cognitive load estimation in order of preference
         cognitive_metrics = [
             BiometricType.COGNITIVE_LOAD,  # Direct measurement if available
-            BiometricType.HRV,             # Heart rate variability
-            BiometricType.HEART_RATE,      # Heart rate
-            BiometricType.EDA,             # Electrodermal activity
-            BiometricType.STRESS,          # Stress index
-            BiometricType.RESPIRATORY_RATE # Respiratory rate
+            BiometricType.HRV,  # Heart rate variability
+            BiometricType.HEART_RATE,  # Heart rate
+            BiometricType.EDA,  # Electrodermal activity
+            BiometricType.STRESS,  # Stress index
+            BiometricType.RESPIRATORY_RATE,  # Respiratory rate
         ]
 
         # Collect data from available metrics
@@ -682,7 +657,7 @@ class BioAuthService:
                         metric_type=metric,
                         start_time=start_time,
                         end_time=end_time,
-                        db=db
+                        db=db,
                     )
 
                     if metric_data:
@@ -693,7 +668,7 @@ class BioAuthService:
         if not data_points:
             return {
                 "status": "no_data",
-                "message": "No relevant biometric data available for cognitive load estimation"
+                "message": "No relevant biometric data available for cognitive load estimation",
             }
 
         # Process data to estimate cognitive load
@@ -706,7 +681,9 @@ class BioAuthService:
             points = data_points[BiometricType.COGNITIVE_LOAD]
             values = [point.value for point in points]
             weights = [point.confidence for point in points]
-            cognitive_load = sum(v * w for v, w in zip(values, weights)) / sum(weights) if weights else 0
+            cognitive_load = (
+                sum(v * w for v, w in zip(values, weights)) / sum(weights) if weights else 0
+            )
             confidence = 0.9  # High confidence
         else:
             # Combine multiple metrics with a weighted approach
@@ -716,7 +693,7 @@ class BioAuthService:
                 BiometricType.HEART_RATE: 0.2,
                 BiometricType.EDA: 0.25,
                 BiometricType.STRESS: 0.4,
-                BiometricType.RESPIRATORY_RATE: 0.15
+                BiometricType.RESPIRATORY_RATE: 0.15,
             }
 
             # Calculate normalized values for each component
@@ -739,7 +716,7 @@ class BioAuthService:
                     # Higher HR often correlates with higher load
                     avg = sum(values) / len(values)
                     # Normalize: 60bpm -> 0, 120bpm -> 100
-                    component_values[metric] = max(0, min(100, (avg - 60) * (100/60)))
+                    component_values[metric] = max(0, min(100, (avg - 60) * (100 / 60)))
 
                 elif metric == BiometricType.EDA:
                     # Higher EDA means higher arousal/load
@@ -756,16 +733,19 @@ class BioAuthService:
                     # Higher rate can indicate stress/load
                     avg = sum(values) / len(values)
                     # Normalize: 12 -> 0, 20 -> 100
-                    component_values[metric] = max(0, min(100, (avg - 12) * (100/8)))
+                    component_values[metric] = max(0, min(100, (avg - 12) * (100 / 8)))
 
             if component_values:
                 # Weighted average of components
                 total_weight = sum(component_weights[m] for m in component_values.keys())
                 if total_weight > 0:
-                    cognitive_load = sum(
-                        component_values[m] * component_weights[m]
-                        for m in component_values.keys()
-                    ) / total_weight
+                    cognitive_load = (
+                        sum(
+                            component_values[m] * component_weights[m]
+                            for m in component_values.keys()
+                        )
+                        / total_weight
+                    )
 
                     # Confidence based on number and quality of metrics
                     confidence = min(0.85, 0.3 + 0.15 * len(component_values))
@@ -776,7 +756,7 @@ class BioAuthService:
             "confidence": confidence,
             "metrics_used": list(data_points.keys()),
             "recommended_task_complexity": self._get_recommended_complexity(cognitive_load),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     def _get_recommended_complexity(self, cognitive_load: float) -> str:

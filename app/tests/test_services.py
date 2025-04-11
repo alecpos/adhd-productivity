@@ -79,6 +79,7 @@ service_classes = [
 # - AuthService
 # - TimelineService
 
+
 @pytest.fixture
 def db_session():
     """Create a mock database session for testing."""
@@ -104,6 +105,7 @@ def db_session():
     mock_session.execute = AsyncMock(return_value=mock_result)
 
     return mock_session
+
 
 @pytest.fixture
 def task_service(db_session):
@@ -162,10 +164,10 @@ def task_service(db_session):
 
         updated_response = MagicMock()
         updated_response.id = mock_response.id
-        updated_response.title = update_data.get('title', latest_task.title)
-        updated_response.description = update_data.get('description', latest_task.description)
-        updated_response.status = update_data.get('status', latest_task.status)
-        updated_response.priority = update_data.get('priority', latest_task.priority)
+        updated_response.title = update_data.get("title", latest_task.title)
+        updated_response.description = update_data.get("description", latest_task.description)
+        updated_response.status = update_data.get("status", latest_task.status)
+        updated_response.priority = update_data.get("priority", latest_task.priority)
         updated_response.created_at = mock_response.created_at
         updated_response.updated_at = datetime.utcnow()
 
@@ -213,70 +215,84 @@ def task_service(db_session):
 
     return service
 
+
 @pytest.fixture
 def calendar_service(db_session):
     """Create a calendar service instance."""
     return CalendarService(db=db_session)
+
 
 @pytest.fixture
 def energy_service(db_session):
     """Create an energy service instance."""
     return EnergyService(db=db_session)
 
+
 @pytest.fixture
 def focus_service(db_session):
     """Create a focus service instance."""
     return FocusService(db=db_session)
+
 
 @pytest.fixture
 def gamification_service(db_session):
     """Create a gamification service instance."""
     return GamificationService(db=db_session)
 
+
 @pytest.fixture
 def health_service(db_session):
     """Create a health service instance."""
     return HealthService(db=db_session)
+
 
 @pytest.fixture
 def hyperfocus_service(db_session):
     """Create a hyperfocus service instance."""
     return HyperfocusService(db=db_session)
 
+
 @pytest.fixture
 def mental_health_service(db_session):
     """Create a mental health service instance."""
     return MentalHealthService(db=db_session)
+
 
 @pytest.fixture
 def nlp_service(db_session):
     """Create an NLP service instance."""
     return NLPService(db=db_session)
 
+
 @pytest.fixture
 def pomodoro_service(db_session):
     """Create a pomodoro service instance."""
     return PomodoroService(db=db_session)
+
 
 @pytest.fixture
 def productivity_service(db_session):
     """Create a productivity service instance."""
     return ProductivityService(db=db_session)
 
+
 @pytest.fixture
 def scheduling_service(db_session):
     """Create a scheduling service instance."""
     return SchedulingService(db=db_session)
+
 
 @pytest.fixture
 def subscription_service(db_session):
     """Create a subscription service instance."""
     return SubscriptionService(db=db_session)
 
+
 @pytest.fixture
 def user_service(db_session):
     """Create a user service instance."""
     return UserService(db=db_session)
+
 
 @pytest.fixture
 def body_doubling_service(db_session):
@@ -290,38 +306,47 @@ def body_doubling_service(db_session):
         session_manager=session_manager,
         matching_engine=matching_engine,
         analytics_service=analytics_service,
-        notification_service=notification_service
+        notification_service=notification_service,
     )
+
 
 @pytest.fixture
 def outlook_calendar_service(db_session):
     """Create an Outlook calendar service instance."""
     return OutlookCalendarService(db=db_session)
 
+
 @pytest.fixture
 def apple_calendar_service(db_session):
     """Create an Apple calendar service instance."""
     return AppleCalendarService(db=db_session)
+
 
 @pytest.fixture
 def google_calendar_service(db_session):
     """Create a Google calendar service instance."""
     return GoogleCalendarService(db=db_session)
 
+
 @pytest.fixture
 def analytics_service(db_session):
     """Create an analytics service instance."""
     return AnalyticsService(db=db_session)
+
 
 @pytest.fixture
 def user_insights_service(db_session):
     """Create a user insights service instance."""
     return UserInsightsService(db=db_session)
 
+
 @pytest.mark.parametrize("service_class", service_classes)
 def test_service_inheritance(service_class):
     """Test if service class inherits from BaseService."""
-    assert issubclass(service_class, BaseService), f"{service_class.__name__} does not inherit from BaseService"
+    assert issubclass(
+        service_class, BaseService
+    ), f"{service_class.__name__} does not inherit from BaseService"
+
 
 @pytest.mark.asyncio
 async def test_base_service_initialization(db_session):
@@ -331,30 +356,34 @@ async def test_base_service_initialization(db_session):
     assert service.model == TaskModel
     assert service.schema_class == TaskResponse
 
+
 @pytest.mark.asyncio
-@pytest.mark.parametrize("service_fixture", [
-    "task_service",
-    # Temporarily disable other services until we have proper schema mappings
-    # "calendar_service",
-    # "energy_service",
-    # "focus_service",
-    # "gamification_service",
-    # "health_service",
-    # "hyperfocus_service",
-    # "mental_health_service",
-    # "nlp_service",
-    # "pomodoro_service",
-    # "productivity_service",
-    # "scheduling_service",
-    # "subscription_service",
-    # "user_service",
-    # "body_doubling_service",
-    # "outlook_calendar_service",
-    # "apple_calendar_service",
-    # "google_calendar_service",
-    # "analytics_service",
-    # "user_insights_service",
-])
+@pytest.mark.parametrize(
+    "service_fixture",
+    [
+        "task_service",
+        # Temporarily disable other services until we have proper schema mappings
+        # "calendar_service",
+        # "energy_service",
+        # "focus_service",
+        # "gamification_service",
+        # "health_service",
+        # "hyperfocus_service",
+        # "mental_health_service",
+        # "nlp_service",
+        # "pomodoro_service",
+        # "productivity_service",
+        # "scheduling_service",
+        # "subscription_service",
+        # "user_service",
+        # "body_doubling_service",
+        # "outlook_calendar_service",
+        # "apple_calendar_service",
+        # "google_calendar_service",
+        # "analytics_service",
+        # "user_insights_service",
+    ],
+)
 async def test_service_crud_operations_parametrized(service_fixture, request):
     """Test CRUD operations for all service types."""
     service = request.getfixturevalue(service_fixture)
@@ -437,6 +466,7 @@ async def test_service_crud_operations_parametrized(service_fixture, request):
     items_after_delete = await service.get_all()
     assert not any(item.id == created_item.id for item in items_after_delete)
 
+
 @pytest.mark.asyncio
 async def test_service_error_handling(task_service):
     """Test error handling in service operations."""
@@ -453,6 +483,7 @@ async def test_service_error_handling(task_service):
     result = await task_service.delete(invalid_id)
     assert result is False
 
+
 @pytest.mark.asyncio
 async def test_service_field_operations(task_service):
     """Test field-specific operations."""
@@ -463,7 +494,7 @@ async def test_service_field_operations(task_service):
         due_date=datetime.utcnow() + timedelta(days=1),
         estimated_duration=30,
         priority=BlockPriority.MEDIUM,
-        status=TaskStatus.TODO
+        status=TaskStatus.TODO,
     )
     created_task = await task_service.create(task_data)
 
@@ -477,6 +508,7 @@ async def test_service_field_operations(task_service):
     assert len(tasks_by_status) == 1
     assert tasks_by_status[0].id == created_task.id
 
+
 @pytest.mark.asyncio
 async def test_service_count_operation(task_service):
     """Test count operation."""
@@ -487,7 +519,7 @@ async def test_service_count_operation(task_service):
         due_date=datetime.utcnow() + timedelta(days=1),
         estimated_duration=30,
         priority=BlockPriority.MEDIUM,
-        status=TaskStatus.TODO
+        status=TaskStatus.TODO,
     )
     await task_service.create(task_data)
     await task_service.create(task_data)
@@ -495,6 +527,7 @@ async def test_service_count_operation(task_service):
     # Test count
     count = await task_service.count()
     assert count == 2
+
 
 @pytest.mark.asyncio
 async def test_service_exists_operation(task_service):
@@ -506,7 +539,7 @@ async def test_service_exists_operation(task_service):
         due_date=datetime.utcnow() + timedelta(days=1),
         estimated_duration=30,
         priority=BlockPriority.MEDIUM,
-        status=TaskStatus.TODO
+        status=TaskStatus.TODO,
     )
     created_task = await task_service.create(task_data)
 
@@ -518,17 +551,19 @@ async def test_service_exists_operation(task_service):
     exists = await task_service.exists(uuid4())
     assert exists is False
 
+
 @pytest.mark.asyncio
 async def test_service_retry_mechanism(task_service):
     """Test service retry mechanism."""
     # Create a task that should trigger retries
     task_data = TaskCreate(
-        title="Test Task" * 20,  # Long enough to potentially trigger DB errors but within validation limits
+        title="Test Task"
+        * 20,  # Long enough to potentially trigger DB errors but within validation limits
         description="Test Description",
         due_date=datetime.utcnow() + timedelta(days=1),
         estimated_duration=30,
         priority=BlockPriority.MEDIUM,
-        status=TaskStatus.TODO
+        status=TaskStatus.TODO,
     )
 
     # Test that operation either succeeds or raises ServiceError
@@ -536,6 +571,7 @@ async def test_service_retry_mechanism(task_service):
         await task_service.create(task_data)
     except ServiceError:
         pass  # Expected behavior for some databases
+
 
 @pytest.mark.asyncio
 async def test_service_concurrency_control(task_service):
@@ -547,7 +583,7 @@ async def test_service_concurrency_control(task_service):
         due_date=datetime.utcnow() + timedelta(days=1),
         estimated_duration=30,
         priority=BlockPriority.MEDIUM,
-        status=TaskStatus.TODO
+        status=TaskStatus.TODO,
     )
     created_task = await task_service.create(task_data)
 

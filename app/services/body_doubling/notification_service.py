@@ -65,7 +65,9 @@ class NotificationService:
         self, session_id: UUID, host_id: UUID, requester_id: UUID
     ) -> bool:
         """Send a notification about a join request."""
-        print(f"Notification: User {requester_id} requested to join session {session_id} (host: {host_id})")
+        print(
+            f"Notification: User {requester_id} requested to join session {session_id} (host: {host_id})"
+        )
         return True
 
     async def notify_join_request_response(
@@ -80,14 +82,18 @@ class NotificationService:
         self, user_id: UUID, session_id: UUID, minutes_until: int
     ) -> bool:
         """Send a reminder notification about an upcoming session."""
-        print(f"Notification: Reminder - your session {session_id} starts in {minutes_until} minutes")
+        print(
+            f"Notification: Reminder - your session {session_id} starts in {minutes_until} minutes"
+        )
         return True
 
     async def send_match_suggestion(
         self, user_id: UUID, match_id: UUID, score: float, data: Dict[str, Any]
     ) -> bool:
         """Send a notification about a potential session match."""
-        print(f"Notification: Found matching partner {match_id} for user {user_id} (score: {score})")
+        print(
+            f"Notification: Found matching partner {match_id} for user {user_id} (score: {score})"
+        )
         return True
 
     async def send_session_feedback_request(self, user_id: UUID, session_id: UUID) -> bool:

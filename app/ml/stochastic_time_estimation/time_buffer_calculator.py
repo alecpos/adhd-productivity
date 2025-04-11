@@ -33,20 +33,22 @@ logger = logging.getLogger(__name__)
 
 class TransitionDifficulty(Enum):
     """Classification of transition difficulty levels."""
-    MINIMAL = "minimal"      # Almost no context switch
-    EASY = "easy"            # Simple context switch
-    MODERATE = "moderate"    # Notable context switch
+
+    MINIMAL = "minimal"  # Almost no context switch
+    EASY = "easy"  # Simple context switch
+    MODERATE = "moderate"  # Notable context switch
     DIFFICULT = "difficult"  # Significant context switch
-    SEVERE = "severe"        # Extremely challenging context switch
+    SEVERE = "severe"  # Extremely challenging context switch
 
 
 class ContextChangeType(Enum):
     """Types of context changes that affect transition time."""
-    LOCATION = "location"              # Physical location change
-    TOOLS = "tools"                    # Different tools or setup
+
+    LOCATION = "location"  # Physical location change
+    TOOLS = "tools"  # Different tools or setup
     MENTAL_CONTEXT = "mental_context"  # Different thinking modes
     SOCIAL_CONTEXT = "social_context"  # Different social environments
-    ENERGY_LEVEL = "energy_level"      # Different energy requirements
+    ENERGY_LEVEL = "energy_level"  # Different energy requirements
 
 
 class TimeBufferCalculator(BaseMLModel):
@@ -72,7 +74,7 @@ class TimeBufferCalculator(BaseMLModel):
         base_transition_times: Optional[Dict[str, int]] = None,
         context_change_weights: Optional[Dict[str, float]] = None,
         adaptation_rate: float = 0.2,
-        lookback_period: int = 30  # days
+        lookback_period: int = 30,  # days
     ):
         """
         Initialize the Time Buffer Calculator.
@@ -100,26 +102,22 @@ class TimeBufferCalculator(BaseMLModel):
             TransitionDifficulty.EASY.value: 10,
             TransitionDifficulty.MODERATE.value: 15,
             TransitionDifficulty.DIFFICULT.value: 25,
-            TransitionDifficulty.SEVERE.value: 40
+            TransitionDifficulty.SEVERE.value: 40,
         }
 
         # Default weights for different types of context changes
         self.context_change_weights = context_change_weights or {
-            ContextChangeType.LOCATION.value: 0.35,         # Physical movement is significant
-            ContextChangeType.TOOLS.value: 0.20,            # Setting up tools takes time
-            ContextChangeType.MENTAL_CONTEXT.value: 0.25,   # Mental context switching is hard
-            ContextChangeType.SOCIAL_CONTEXT.value: 0.10,   # Social context changes have some impact
-            ContextChangeType.ENERGY_LEVEL.value: 0.10      # Energy level transitions have some impact
+            ContextChangeType.LOCATION.value: 0.35,  # Physical movement is significant
+            ContextChangeType.TOOLS.value: 0.20,  # Setting up tools takes time
+            ContextChangeType.MENTAL_CONTEXT.value: 0.25,  # Mental context switching is hard
+            ContextChangeType.SOCIAL_CONTEXT.value: 0.10,  # Social context changes have some impact
+            ContextChangeType.ENERGY_LEVEL.value: 0.10,  # Energy level transitions have some impact
         }
 
         # User-specific transition adjustments (filled during runtime)
         self.user_adjustments = {}
 
-    async def calculate_buffer(
-        self,
-        current_task_id: str,
-        next_task_id: str
-    ) -> Dict[str, Any]:
+    async def calculate_buffer(self, current_task_id: str, next_task_id: str) -> Dict[str, Any]:
         """
         Calculate appropriate time buffer between two tasks.
 
@@ -137,7 +135,7 @@ class TimeBufferCalculator(BaseMLModel):
         if self.db is None:
             return {
                 "error": "No database connection available",
-                "buffer_minutes": self.min_buffer_minutes
+                "buffer_minutes": self.min_buffer_minutes,
             }
 
         # Get task information
@@ -147,7 +145,7 @@ class TimeBufferCalculator(BaseMLModel):
         if current_task is None or next_task is None:
             return {
                 "error": "One or both tasks not found",
-                "buffer_minutes": self.min_buffer_minutes
+                "buffer_minutes": self.min_buffer_minutes,
             }
 
         # Analyze transition difficulty
@@ -158,14 +156,17 @@ class TimeBufferCalculator(BaseMLModel):
         # Determine base buffer time from difficulty
         base_buffer = self.base_transition_times.get(
             transition_difficulty.value,
-            self.base_transition_times[TransitionDifficulty.MODERATE.value]
+            self.base_transition_times[TransitionDifficulty.MODERATE.value],
         )
 
         # Calculate context change impact
         context_changes = await self._calculate_context_changes(current_task, next_task)
 
         # This is a temporary fix for the function signature mismatch
-        if isinstance(context_changes, dict) and context_changes.get("location", {}).get("change_factor", None) is not None:
+        if (
+            isinstance(context_changes, dict)
+            and context_changes.get("location", {}).get("change_factor", None) is not None
+        ):
             # Convert from new detailed format to simplified format for _calculate_context_impact_factor
             simplified_changes = {}
             for change_type, details in context_changes.items():
@@ -178,17 +179,15 @@ class TimeBufferCalculator(BaseMLModel):
 
         # Get user-specific adjustments
         user_id = current_task.user_id
-        user_factor = await self._get_user_adjustment_factor(
-            user_id,
-            current_task,
-            next_task
-        )
+        user_factor = await self._get_user_adjustment_factor(user_id, current_task, next_task)
 
         # Calculate final buffer time
         buffer_minutes = base_buffer * context_impact_factor * user_factor
 
         # Ensure buffer is within bounds
-        buffer_minutes = max(self.min_buffer_minutes, min(int(buffer_minutes), self.max_buffer_minutes))
+        buffer_minutes = max(
+            self.min_buffer_minutes, min(int(buffer_minutes), self.max_buffer_minutes)
+        )
 
         return {
             "buffer_minutes": buffer_minutes,
@@ -198,10 +197,10 @@ class TimeBufferCalculator(BaseMLModel):
             "adjustment_factors": {
                 "base_buffer": base_buffer,
                 "context_impact_factor": context_impact_factor,
-                "user_adjustment_factor": user_factor
+                "user_adjustment_factor": user_factor,
             },
             "user_id": user_id,
-            "calculation_timestamp": datetime.now().isoformat()
+            "calculation_timestamp": datetime.now().isoformat(),
         }
 
     async def update_with_observation(
@@ -209,7 +208,7 @@ class TimeBufferCalculator(BaseMLModel):
         current_task_id: str,
         next_task_id: str,
         actual_transition_minutes: int,
-        user_id: Optional[str] = None
+        user_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Update model with observed transition time.
@@ -233,15 +232,17 @@ class TimeBufferCalculator(BaseMLModel):
             next_task = await self._get_task(next_task_id)
 
             if current_task is None or next_task is None:
-                logger.warning(f"Cannot update model - one or both tasks not found: {current_task_id}, {next_task_id}")
+                logger.warning(
+                    f"Cannot update model - one or both tasks not found: {current_task_id}, {next_task_id}"
+                )
                 return {"error": "One or both tasks not found"}
 
             # Get user ID from task or parameter
             task_user_id = None
-            if hasattr(current_task, 'user_id'):
+            if hasattr(current_task, "user_id"):
                 task_user_id = current_task.user_id
-            elif isinstance(current_task, dict) and 'user_id' in current_task:
-                task_user_id = current_task['user_id']
+            elif isinstance(current_task, dict) and "user_id" in current_task:
+                task_user_id = current_task["user_id"]
 
             user_id = user_id or task_user_id
             if not user_id:
@@ -264,16 +265,17 @@ class TimeBufferCalculator(BaseMLModel):
                     self.user_adjustments[user_id][key] = 1.0
 
                 # Calculate adjustment - if actual > predicted, increase factor
-                error_ratio = actual_transition_minutes / predicted_minutes if predicted_minutes > 0 else 1.0
+                error_ratio = (
+                    actual_transition_minutes / predicted_minutes if predicted_minutes > 0 else 1.0
+                )
 
                 # Limit extreme adjustments
                 error_ratio = max(0.5, min(error_ratio, 2.0))
 
                 # Apply gradual adjustment using adaptation rate
                 self.user_adjustments[user_id][key] = (
-                    (1 - self.adaptation_rate) * self.user_adjustments[user_id][key] +
-                    self.adaptation_rate * error_ratio
-                )
+                    1 - self.adaptation_rate
+                ) * self.user_adjustments[user_id][key] + self.adaptation_rate * error_ratio
 
             # Log the update
             logger.info(
@@ -284,11 +286,7 @@ class TimeBufferCalculator(BaseMLModel):
 
             # Store the observation in the database
             await self._store_transition_observation(
-                user_id,
-                current_task_id,
-                next_task_id,
-                predicted_minutes,
-                actual_transition_minutes
+                user_id, current_task_id, next_task_id, predicted_minutes, actual_transition_minutes
             )
 
             return {
@@ -298,7 +296,9 @@ class TimeBufferCalculator(BaseMLModel):
                 "predicted_minutes": predicted_minutes,
                 "actual_minutes": actual_transition_minutes,
                 "category_keys": category_keys,
-                "updated_factors": {key: self.user_adjustments[user_id][key] for key in category_keys}
+                "updated_factors": {
+                    key: self.user_adjustments[user_id][key] for key in category_keys
+                },
             }
 
         except Exception as e:
@@ -316,9 +316,7 @@ class TimeBufferCalculator(BaseMLModel):
             Dictionary with transition statistics
         """
         if self.db is None:
-            return {
-                "error": "No database connection available"
-            }
+            return {"error": "No database connection available"}
 
         # Get recent transition observations
         transitions = await self._get_transition_history(user_id)
@@ -331,7 +329,7 @@ class TimeBufferCalculator(BaseMLModel):
                 "prediction_accuracy": 0,
                 "common_transition_difficulties": {},
                 "transition_time_by_day": {},
-                "transition_time_by_hour": {}
+                "transition_time_by_hour": {},
             }
 
         # Calculate statistics
@@ -390,13 +388,13 @@ class TimeBufferCalculator(BaseMLModel):
             "prediction_accuracy": round(accuracy, 1),
             "common_transition_difficulties": difficulties,
             "transition_time_by_day": day_averages,
-            "transition_time_by_hour": hour_averages
+            "transition_time_by_hour": hour_averages,
         }
 
     async def _analyze_transition_difficulty(
         self,
         current_task: Union[TaskModel, Dict[str, Any]],
-        next_task: Union[TaskModel, Dict[str, Any]]
+        next_task: Union[TaskModel, Dict[str, Any]],
     ) -> Tuple[TransitionDifficulty, Dict[str, Any]]:
         """
         Analyze the difficulty of transitioning between two tasks.
@@ -450,8 +448,14 @@ class TimeBufferCalculator(BaseMLModel):
         if current_tools and next_tools:
             try:
                 # Handle various collection types that might not be directly convertible to set
-                current_set = set(current_tools) if isinstance(current_tools, (list, set, tuple)) else {current_tools}
-                next_set = set(next_tools) if isinstance(next_tools, (list, set, tuple)) else {next_tools}
+                current_set = (
+                    set(current_tools)
+                    if isinstance(current_tools, (list, set, tuple))
+                    else {current_tools}
+                )
+                next_set = (
+                    set(next_tools) if isinstance(next_tools, (list, set, tuple)) else {next_tools}
+                )
 
                 common_tools = current_set.intersection(next_set)
                 all_tools = current_set.union(next_set)
@@ -495,7 +499,7 @@ class TimeBufferCalculator(BaseMLModel):
     async def _calculate_context_changes(
         self,
         current_task: Union[TaskModel, Dict[str, Any]],
-        next_task: Union[TaskModel, Dict[str, Any]]
+        next_task: Union[TaskModel, Dict[str, Any]],
     ) -> Dict[str, Any]:
         """
         Calculate context changes between two tasks.
@@ -517,14 +521,11 @@ class TimeBufferCalculator(BaseMLModel):
             # Simple case: different named locations
             if current_task.location != next_task.location:
                 location_change = 1.0
-                location_details = {
-                    "from": current_task.location,
-                    "to": next_task.location
-                }
+                location_details = {"from": current_task.location, "to": next_task.location}
 
         changes[ContextChangeType.LOCATION.value] = {
             "change_factor": location_change,
-            "details": location_details
+            "details": location_details,
         }
 
         # Tools context change
@@ -548,12 +549,12 @@ class TimeBufferCalculator(BaseMLModel):
                 tools_details = {
                     "tools_to_put_away": list(current_tools - next_tools),
                     "tools_to_get_out": list(next_tools - current_tools),
-                    "tools_to_keep_using": list(common_tools)
+                    "tools_to_keep_using": list(common_tools),
                 }
 
         changes[ContextChangeType.TOOLS.value] = {
             "change_factor": tools_change,
-            "details": tools_details
+            "details": tools_details,
         }
 
         # Mental context change
@@ -566,14 +567,14 @@ class TimeBufferCalculator(BaseMLModel):
                 mental_change += 0.7
                 mental_details["focus_type_change"] = {
                     "from": current_task.focus_type,
-                    "to": next_task.focus_type
+                    "to": next_task.focus_type,
                 }
 
         if current_task.category != next_task.category:
             mental_change += 0.3
             mental_details["category_change"] = {
                 "from": current_task.category,
-                "to": next_task.category
+                "to": next_task.category,
             }
 
         # Cap at 1.0
@@ -581,7 +582,7 @@ class TimeBufferCalculator(BaseMLModel):
 
         changes[ContextChangeType.MENTAL_CONTEXT.value] = {
             "change_factor": mental_change,
-            "details": mental_details
+            "details": mental_details,
         }
 
         # Social context change
@@ -593,12 +594,12 @@ class TimeBufferCalculator(BaseMLModel):
                 social_change = 1.0
                 social_details["collaboration_change"] = {
                     "from": "collaborative" if current_task.is_collaborative else "individual",
-                    "to": "collaborative" if next_task.is_collaborative else "individual"
+                    "to": "collaborative" if next_task.is_collaborative else "individual",
                 }
 
         changes[ContextChangeType.SOCIAL_CONTEXT.value] = {
             "change_factor": social_change,
-            "details": social_details
+            "details": social_details,
         }
 
         # Energy level change
@@ -612,17 +613,19 @@ class TimeBufferCalculator(BaseMLModel):
             energy_details = {
                 "from": current_task.energy_required,
                 "to": next_task.energy_required,
-                "difference": energy_diff
+                "difference": energy_diff,
             }
 
         changes[ContextChangeType.ENERGY_LEVEL.value] = {
             "change_factor": energy_change,
-            "details": energy_details
+            "details": energy_details,
         }
 
         return changes
 
-    async def _analyze_context_changes(self, from_task: Union[TaskModel, Dict[str, Any]], to_task: Union[TaskModel, Dict[str, Any]]) -> Dict[str, Any]:
+    async def _analyze_context_changes(
+        self, from_task: Union[TaskModel, Dict[str, Any]], to_task: Union[TaskModel, Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """
         Analyze context changes between two tasks.
 
@@ -663,11 +666,11 @@ class TimeBufferCalculator(BaseMLModel):
 
         cumulative_impact = 0
         for change_type, change_info in context_changes.items():
-            if not isinstance(change_info, dict) or 'change_factor' not in change_info:
+            if not isinstance(change_info, dict) or "change_factor" not in change_info:
                 continue
 
             weight = self.context_change_weights.get(change_type, 0.1)
-            change_factor = change_info.get('change_factor', 0)
+            change_factor = change_info.get("change_factor", 0)
             cumulative_impact += weight * change_factor
 
         # Ensure the impact factor is at least 1.0 and scale it reasonably
@@ -677,7 +680,7 @@ class TimeBufferCalculator(BaseMLModel):
         self,
         task1: Union[TaskModel, Dict[str, Any]],
         task2: Union[TaskModel, Dict[str, Any]],
-        available_time: int
+        available_time: int,
     ) -> Dict[str, Any]:
         """
         Calculate opportunity cost between two tasks.
@@ -732,8 +735,12 @@ class TimeBufferCalculator(BaseMLModel):
 
         # Calculate estimated value (priority scaled by deadline proximity)
         # Priority is typically 1-5 scale, normalize to 0-1
-        t1_normalized_priority = (t1_priority - 1) / 4 if isinstance(t1_priority, (int, float)) else 0.5
-        t2_normalized_priority = (t2_priority - 1) / 4 if isinstance(t2_priority, (int, float)) else 0.5
+        t1_normalized_priority = (
+            (t1_priority - 1) / 4 if isinstance(t1_priority, (int, float)) else 0.5
+        )
+        t2_normalized_priority = (
+            (t2_priority - 1) / 4 if isinstance(t2_priority, (int, float)) else 0.5
+        )
 
         t1_value = t1_normalized_priority * (1 + t1_deadline_proximity)
         t2_value = t2_normalized_priority * (1 + t2_deadline_proximity)
@@ -780,13 +787,13 @@ class TimeBufferCalculator(BaseMLModel):
         completion_factor_t1 = 1.0 if t1_can_complete else 0.5
         completion_factor_t2 = 1.0 if t2_can_complete else 0.5
 
-        t1_score = (0.4 * t1_value +
-                   0.3 * t1_efficiency +
-                   0.1 * t1_cognitive_alignment) * completion_factor_t1
+        t1_score = (
+            0.4 * t1_value + 0.3 * t1_efficiency + 0.1 * t1_cognitive_alignment
+        ) * completion_factor_t1
 
-        t2_score = (0.4 * t2_value +
-                   0.3 * t2_efficiency +
-                   0.1 * t2_cognitive_alignment) * completion_factor_t2
+        t2_score = (
+            0.4 * t2_value + 0.3 * t2_efficiency + 0.1 * t2_cognitive_alignment
+        ) * completion_factor_t2
 
         # Calculate opportunity cost
         if t1_score > t2_score:
@@ -794,13 +801,17 @@ class TimeBufferCalculator(BaseMLModel):
             better_task = "task1"
             opportunity_cost = t2_score
             opportunity_cost_ratio = t2_score / t1_score if t1_score > 0 else 0
-            cost_description = f"Choosing Task 1 ({self._get_attribute(task1, 'title', 'Task 1')}) over Task 2"
+            cost_description = (
+                f"Choosing Task 1 ({self._get_attribute(task1, 'title', 'Task 1')}) over Task 2"
+            )
         else:
             # Task 2 is better, opportunity cost is task 1's score
             better_task = "task2"
             opportunity_cost = t1_score
             opportunity_cost_ratio = t1_score / t2_score if t2_score > 0 else 0
-            cost_description = f"Choosing Task 2 ({self._get_attribute(task2, 'title', 'Task 2')}) over Task 1"
+            cost_description = (
+                f"Choosing Task 2 ({self._get_attribute(task2, 'title', 'Task 2')}) over Task 1"
+            )
 
         # Determine regret risk (how close are the scores)
         regret_risk = opportunity_cost_ratio
@@ -815,7 +826,7 @@ class TimeBufferCalculator(BaseMLModel):
                 "deadline_proximity": round(t1_deadline_proximity, 2),
                 "can_complete": t1_can_complete,
                 "cognitive_alignment": round(t1_cognitive_alignment, 2),
-                "score": round(t1_score, 2)
+                "score": round(t1_score, 2),
             },
             "task2": {
                 "id": self._get_attribute(task2, "id", "unknown"),
@@ -826,7 +837,7 @@ class TimeBufferCalculator(BaseMLModel):
                 "deadline_proximity": round(t2_deadline_proximity, 2),
                 "can_complete": t2_can_complete,
                 "cognitive_alignment": round(t2_cognitive_alignment, 2),
-                "score": round(t2_score, 2)
+                "score": round(t2_score, 2),
             },
             "better_task": better_task,
             "opportunity_cost": round(opportunity_cost, 2),
@@ -834,14 +845,11 @@ class TimeBufferCalculator(BaseMLModel):
             "regret_risk": round(regret_risk, 2),
             "available_time": available_time,
             "cost_description": cost_description,
-            "recommendation": f"Based on opportunity cost analysis, {better_task} provides more value given your current constraints."
+            "recommendation": f"Based on opportunity cost analysis, {better_task} provides more value given your current constraints.",
         }
 
     async def _get_user_adjustment_factor(
-        self,
-        user_id: str,
-        current_task: TaskModel,
-        next_task: TaskModel
+        self, user_id: str, current_task: TaskModel, next_task: TaskModel
     ) -> float:
         """
         Get user-specific adjustment factor based on historical patterns.
@@ -884,7 +892,11 @@ class TimeBufferCalculator(BaseMLModel):
             return obj[attr_name]
         return default
 
-    async def _get_tasks(self, current_task_id: str, next_task_id: str) -> Tuple[Optional[Union[TaskModel, Dict[str, Any]]], Optional[Union[TaskModel, Dict[str, Any]]]]:
+    async def _get_tasks(
+        self, current_task_id: str, next_task_id: str
+    ) -> Tuple[
+        Optional[Union[TaskModel, Dict[str, Any]]], Optional[Union[TaskModel, Dict[str, Any]]]
+    ]:
         """
         Helper method to get both tasks for a transition.
 
@@ -902,7 +914,7 @@ class TimeBufferCalculator(BaseMLModel):
     async def _get_transition_category_keys(
         self,
         current_task: Union[TaskModel, Dict[str, Any]],
-        next_task: Union[TaskModel, Dict[str, Any]]
+        next_task: Union[TaskModel, Dict[str, Any]],
     ) -> List[str]:
         """
         Get category keys for a transition between tasks.
@@ -967,7 +979,11 @@ class TimeBufferCalculator(BaseMLModel):
         category_observations = {}
 
         for transition in transitions:
-            if "category_keys" not in transition or "actual_minutes" not in transition or "predicted_minutes" not in transition:
+            if (
+                "category_keys" not in transition
+                or "actual_minutes" not in transition
+                or "predicted_minutes" not in transition
+            ):
                 continue
 
             actual = transition["actual_minutes"]
@@ -1022,7 +1038,7 @@ class TimeBufferCalculator(BaseMLModel):
                 "actual_minutes": 20,
                 "transition_difficulty": TransitionDifficulty.MODERATE.value,
                 "category_keys": ["cat:work->home", "diff:moderate", "focus:decreasing"],
-                "timestamp": (datetime.now() - timedelta(days=5)).isoformat()
+                "timestamp": (datetime.now() - timedelta(days=5)).isoformat(),
             },
             {
                 "user_id": user_id,
@@ -1031,8 +1047,13 @@ class TimeBufferCalculator(BaseMLModel):
                 "predicted_minutes": 10,
                 "actual_minutes": 25,
                 "transition_difficulty": TransitionDifficulty.DIFFICULT.value,
-                "category_keys": ["cat:home->work", "diff:difficult", "loc_change:true", "focus:increasing"],
-                "timestamp": (datetime.now() - timedelta(days=3)).isoformat()
+                "category_keys": [
+                    "cat:home->work",
+                    "diff:difficult",
+                    "loc_change:true",
+                    "focus:increasing",
+                ],
+                "timestamp": (datetime.now() - timedelta(days=3)).isoformat(),
             },
             {
                 "user_id": user_id,
@@ -1042,8 +1063,8 @@ class TimeBufferCalculator(BaseMLModel):
                 "actual_minutes": 18,
                 "transition_difficulty": TransitionDifficulty.MODERATE.value,
                 "category_keys": ["cat:work->work", "diff:moderate", "focus:same"],
-                "timestamp": (datetime.now() - timedelta(days=1)).isoformat()
-            }
+                "timestamp": (datetime.now() - timedelta(days=1)).isoformat(),
+            },
         ]
 
     async def _store_transition_observation(
@@ -1052,7 +1073,7 @@ class TimeBufferCalculator(BaseMLModel):
         current_task_id: str,
         next_task_id: str,
         predicted_minutes: int,
-        actual_minutes: int
+        actual_minutes: int,
     ) -> None:
         """
         Store a transition observation in the database.
@@ -1106,7 +1127,7 @@ class TimeBufferCalculator(BaseMLModel):
                 "location": "office",
                 "tools_needed": [],
                 "is_collaborative": False,
-                "focus_type": "analytical"
+                "focus_type": "analytical",
             }
         except Exception as e:
             logger.error(f"Error getting task: {e}")
@@ -1126,14 +1147,14 @@ class TimeBufferCalculator(BaseMLModel):
             "max_buffer_minutes": self.max_buffer_minutes,
             "adaptation_rate": self.adaptation_rate,
             "lookback_period": self.lookback_period,
-            "user_adjustments": self.user_adjustments
+            "user_adjustments": self.user_adjustments,
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(params, f)
 
     @classmethod
-    def load(cls, filepath: str) -> 'TimeBufferCalculator':
+    def load(cls, filepath: str) -> "TimeBufferCalculator":
         """
         Load model parameters from a file.
 
@@ -1144,7 +1165,7 @@ class TimeBufferCalculator(BaseMLModel):
             Loaded TimeBufferCalculator instance
         """
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 params = json.load(f)
 
             calculator = cls(
@@ -1153,7 +1174,7 @@ class TimeBufferCalculator(BaseMLModel):
                 min_buffer_minutes=params.get("min_buffer_minutes", 5),
                 max_buffer_minutes=params.get("max_buffer_minutes", 60),
                 adaptation_rate=params.get("adaptation_rate", 0.2),
-                lookback_period=params.get("lookback_period", 30)
+                lookback_period=params.get("lookback_period", 30),
             )
 
             # Restore user adjustments
@@ -1169,7 +1190,7 @@ class TimeBufferCalculator(BaseMLModel):
         user_id: str,
         lookback_days: int = 90,
         rolling_window_days: int = 7,
-        include_weekends: bool = True
+        include_weekends: bool = True,
     ) -> Dict[str, Any]:
         """
         Resample historical task transition data to weekly frequency with rolling averages.
@@ -1203,17 +1224,17 @@ class TimeBufferCalculator(BaseMLModel):
                 "weekly_transitions": {},
                 "weekly_stats": {},
                 "rolling_averages": {},
-                "patterns": {}
+                "patterns": {},
             }
 
         # Convert transitions to DataFrame for analysis
         df = pd.DataFrame(transitions)
 
         # Ensure timestamp field is in datetime format
-        if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-        elif 'transition_date' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['transition_date'])
+        if "timestamp" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
+        elif "transition_date" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["transition_date"])
         else:
             # If no timestamp field exists, create one based on current time
             # This is a fallback and should be improved in production
@@ -1221,101 +1242,137 @@ class TimeBufferCalculator(BaseMLModel):
             now = datetime.now()
             # Create artificial timestamps spread over the lookback period
             timestamps = [now - timedelta(days=i) for i in range(len(df))]
-            df['timestamp'] = timestamps
+            df["timestamp"] = timestamps
 
         # Filter to lookback period
         start_date = datetime.now() - timedelta(days=lookback_days)
-        df = df[df['timestamp'] >= start_date]
+        df = df[df["timestamp"] >= start_date]
 
         if df.empty:
-            logger.warning(f"No transition data available within lookback period for user {user_id}")
+            logger.warning(
+                f"No transition data available within lookback period for user {user_id}"
+            )
             return {
                 "error": "No transition data within lookback period",
                 "weekly_transitions": {},
                 "weekly_stats": {},
                 "rolling_averages": {},
-                "patterns": {}
+                "patterns": {},
             }
 
         # Remove weekend data if specified
         if not include_weekends:
             # 0 = Monday, 6 = Sunday in datetime.weekday()
-            df = df[df['timestamp'].dt.weekday < 5]
+            df = df[df["timestamp"].dt.weekday < 5]
 
         # Extract numeric variables for analysis
         numeric_cols = []
         for col in df.columns:
-            if col in ['actual_minutes', 'predicted_minutes', 'buffer_minutes', 'transition_time']:
+            if col in ["actual_minutes", "predicted_minutes", "buffer_minutes", "transition_time"]:
                 numeric_cols.append(col)
             elif df[col].dtype in [np.int64, np.float64]:
                 numeric_cols.append(col)
 
         # Add derived columns for analysis
-        if 'actual_minutes' in df.columns and 'predicted_minutes' in df.columns:
-            df['prediction_error'] = df['actual_minutes'] - df['predicted_minutes']
-            df['prediction_error_pct'] = (df['prediction_error'] / df['predicted_minutes']) * 100
-            numeric_cols.extend(['prediction_error', 'prediction_error_pct'])
+        if "actual_minutes" in df.columns and "predicted_minutes" in df.columns:
+            df["prediction_error"] = df["actual_minutes"] - df["predicted_minutes"]
+            df["prediction_error_pct"] = (df["prediction_error"] / df["predicted_minutes"]) * 100
+            numeric_cols.extend(["prediction_error", "prediction_error_pct"])
 
         # Set timestamp as index for resampling
-        df.set_index('timestamp', inplace=True)
+        df.set_index("timestamp", inplace=True)
 
         # Resample data to weekly frequency
         weekly_aggs = {}
         for col in numeric_cols:
-            weekly_aggs[col] = ['mean', 'min', 'max', 'std', 'count']
+            weekly_aggs[col] = ["mean", "min", "max", "std", "count"]
 
-        weekly_df = df[numeric_cols].resample('W-MON').agg(weekly_aggs)
+        weekly_df = df[numeric_cols].resample("W-MON").agg(weekly_aggs)
 
         # Flatten column MultiIndex
-        weekly_df.columns = ['_'.join(col).strip() for col in weekly_df.columns.values]
+        weekly_df.columns = ["_".join(col).strip() for col in weekly_df.columns.values]
 
         # Add week number and year
-        weekly_df['year'] = weekly_df.index.year
-        weekly_df['week_number'] = weekly_df.index.isocalendar().week
+        weekly_df["year"] = weekly_df.index.year
+        weekly_df["week_number"] = weekly_df.index.isocalendar().week
 
         # Calculate rolling averages on daily data first
-        daily_df = df[numeric_cols].resample('D').mean()
+        daily_df = df[numeric_cols].resample("D").mean()
 
         # Apply rolling window to the daily data
         rolling_cols = {}
         for col in numeric_cols:
             rolling_col = f"{col}_rolling_{rolling_window_days}d"
-            daily_df[rolling_col] = daily_df[col].rolling(window=rolling_window_days, min_periods=1).mean()
+            daily_df[rolling_col] = (
+                daily_df[col].rolling(window=rolling_window_days, min_periods=1).mean()
+            )
             rolling_cols[col] = rolling_col
 
         # Resample rolling averages to weekly to align with weekly_df
-        rolling_weekly = daily_df[[rolling_cols[col] for col in numeric_cols]].resample('W-MON').last()
+        rolling_weekly = (
+            daily_df[[rolling_cols[col] for col in numeric_cols]].resample("W-MON").last()
+        )
 
         # Calculate week-over-week changes
-        for col in [c for c in weekly_df.columns if c.endswith('_mean')]:
-            weekly_df[f'{col}_wow_change'] = weekly_df[col].pct_change() * 100
+        for col in [c for c in weekly_df.columns if c.endswith("_mean")]:
+            weekly_df[f"{col}_wow_change"] = weekly_df[col].pct_change() * 100
 
         # Identify patterns in day of week variations
         day_patterns = {}
         for col in numeric_cols:
             # Create a DataFrame grouped by day of week
-            day_data = df[col].groupby(df.index.weekday).agg(['mean', 'std', 'count'])
-            day_data.index = day_data.index.map(lambda x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x])
+            day_data = df[col].groupby(df.index.weekday).agg(["mean", "std", "count"])
+            day_data.index = day_data.index.map(
+                lambda x: [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                ][x]
+            )
             day_patterns[col] = day_data.to_dict()
 
         # Reset index to make timestamp a column again in weekly_df
         weekly_df.reset_index(inplace=True)
-        weekly_df.rename(columns={'index': 'week_start'}, inplace=True)
+        weekly_df.rename(columns={"index": "week_start"}, inplace=True)
 
         # Prepare result dictionary
         result = {
-            "weekly_transitions": weekly_df.to_dict(orient='records'),
+            "weekly_transitions": weekly_df.to_dict(orient="records"),
             "weekly_stats": {
                 "total_weeks": len(weekly_df),
-                "average_transitions_per_week": weekly_df['actual_minutes_count'].mean() if 'actual_minutes_count' in weekly_df.columns else None,
-                "most_efficient_week": weekly_df.iloc[weekly_df['actual_minutes_mean'].idxmin()]['week_start'].strftime('%Y-%m-%d') if 'actual_minutes_mean' in weekly_df.columns and not weekly_df.empty else None,
-                "least_efficient_week": weekly_df.iloc[weekly_df['actual_minutes_mean'].idxmax()]['week_start'].strftime('%Y-%m-%d') if 'actual_minutes_mean' in weekly_df.columns and not weekly_df.empty else None,
+                "average_transitions_per_week": (
+                    weekly_df["actual_minutes_count"].mean()
+                    if "actual_minutes_count" in weekly_df.columns
+                    else None
+                ),
+                "most_efficient_week": (
+                    weekly_df.iloc[weekly_df["actual_minutes_mean"].idxmin()][
+                        "week_start"
+                    ].strftime("%Y-%m-%d")
+                    if "actual_minutes_mean" in weekly_df.columns and not weekly_df.empty
+                    else None
+                ),
+                "least_efficient_week": (
+                    weekly_df.iloc[weekly_df["actual_minutes_mean"].idxmax()][
+                        "week_start"
+                    ].strftime("%Y-%m-%d")
+                    if "actual_minutes_mean" in weekly_df.columns and not weekly_df.empty
+                    else None
+                ),
             },
-            "rolling_averages": rolling_weekly.to_dict(orient='records') if not rolling_weekly.empty else {},
+            "rolling_averages": (
+                rolling_weekly.to_dict(orient="records") if not rolling_weekly.empty else {}
+            ),
             "patterns": {
                 "day_of_week": day_patterns,
-                "weekly_trend": self._analyze_weekly_trend(weekly_df) if not weekly_df.empty else {}
-            }
+                "weekly_trend": (
+                    self._analyze_weekly_trend(weekly_df) if not weekly_df.empty else {}
+                ),
+            },
         }
 
         logger.info(f"Successfully generated weekly transition patterns for user {user_id}")
@@ -1334,7 +1391,7 @@ class TimeBufferCalculator(BaseMLModel):
         trend_analysis = {}
 
         # Find columns that represent means of metrics
-        mean_cols = [col for col in weekly_df.columns if col.endswith('_mean')]
+        mean_cols = [col for col in weekly_df.columns if col.endswith("_mean")]
 
         for col in mean_cols:
             if weekly_df[col].count() < 3:  # Need at least 3 data points for meaningful trend
@@ -1361,8 +1418,10 @@ class TimeBufferCalculator(BaseMLModel):
                 "last_value": last_value,
                 "change": last_value - first_value,
                 "pct_change": pct_change,
-                "direction": "improving" if pct_change < 0 else "worsening" if pct_change > 0 else "stable",
-                "weeks_analyzed": len(weekly_df)
+                "direction": (
+                    "improving" if pct_change < 0 else "worsening" if pct_change > 0 else "stable"
+                ),
+                "weeks_analyzed": len(weekly_df),
             }
 
         return trend_analysis

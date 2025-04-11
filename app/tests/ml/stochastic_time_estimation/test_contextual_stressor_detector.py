@@ -11,7 +11,8 @@ from unittest.mock import MagicMock, patch, AsyncMock
 
 # Fix numpy bool issue
 import numpy as np
-if not hasattr(np, 'bool_'):
+
+if not hasattr(np, "bool_"):
     np.bool_ = bool
 
 # Create mock modules for all dependencies
@@ -19,9 +20,11 @@ mock_theano = MagicMock()
 mock_theano_tensor = MagicMock()
 mock_pymc3 = MagicMock()
 
+
 # Mock MentalHealthModel
 class MockMentalHealthModel:
     """Mock implementation of MentalHealthModel for testing."""
+
     id = "mh-test-123"
     user_id = "user-test-123"
     mood_score = 7
@@ -41,12 +44,14 @@ class MockMentalHealthModel:
             "focus_level": self.focus_level,
             "energy_level": self.energy_level,
             "stress_level": self.stress_level,
-            "sleep_hours": self.sleep_hours
+            "sleep_hours": self.sleep_hours,
         }
+
 
 # Mock EnergyModel
 class MockEnergyModel:
     """Mock implementation of EnergyModel for testing."""
+
     id = "energy-test-123"
     user_id = "user-test-123"
     morning_energy = 7
@@ -62,8 +67,9 @@ class MockEnergyModel:
             "morning_energy": self.morning_energy,
             "afternoon_energy": self.afternoon_energy,
             "evening_energy": self.evening_energy,
-            "overall_energy": self.overall_energy
+            "overall_energy": self.overall_energy,
         }
+
 
 # Mock BaseMLModel
 class MockBaseMLModel:
@@ -90,6 +96,7 @@ class MockBaseMLModel:
         """Mock implementation of load method."""
         return cls(model_path=filepath)
 
+
 # Import BaseModel for MockHealthMetrics
 from app.models.base_model import BaseModel
 from app.models.enums_model import MetricType
@@ -98,13 +105,14 @@ from sqlalchemy import Column, String, Integer, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+
 # Mock HealthMetrics
 class MockHealthMetrics:
     """Mock HealthMetrics for testing."""
 
     def __init__(self, **kwargs):
         self.id = str(uuid4())
-        self.user_id = 'user-test-123'
+        self.user_id = "user-test-123"
         self.timestamp = datetime.utcnow()
         self.metric_type = MetricType.SLEEP
         self.energy_level = 8
@@ -130,6 +138,7 @@ class MockHealthMetrics:
         """Check if user needs a break based on focus and energy levels."""
         return self.focus_level < 3 or self.energy_level < 3
 
+
 # Mock FeatureEngineer
 class MockFeatureEngineer:
     """Mock implementation of FeatureEngineer."""
@@ -142,38 +151,40 @@ class MockFeatureEngineer:
         """Mock implementation of transform method."""
         return features
 
+
 # Create mock modules
-sys.modules['theano'] = mock_theano
-sys.modules['theano.tensor'] = mock_theano_tensor
-sys.modules['pymc3'] = mock_pymc3
+sys.modules["theano"] = mock_theano
+sys.modules["theano.tensor"] = mock_theano_tensor
+sys.modules["pymc3"] = mock_pymc3
 
 # Patch MentalHealthModel
 mental_health_module = MagicMock()
 mental_health_module.MentalHealthModel = MockMentalHealthModel
-sys.modules['app.models.mental_health_model'] = mental_health_module
+sys.modules["app.models.mental_health_model"] = mental_health_module
 
 # Patch EnergyModel
 energy_module = MagicMock()
 energy_module.EnergyModel = MockEnergyModel
-sys.modules['app.models.energy_model'] = energy_module
+sys.modules["app.models.energy_model"] = energy_module
 
 # Patch HealthMetrics
 health_module = MagicMock()
 health_module.HealthMetrics = MockHealthMetrics
-sys.modules['app.models.health_model'] = health_module
+sys.modules["app.models.health_model"] = health_module
 
 # Patch BaseMLModel
 ml_models_module = MagicMock()
 ml_models_module.BaseMLModel = MockBaseMLModel
-sys.modules['app.ml.models'] = ml_models_module
+sys.modules["app.ml.models"] = ml_models_module
 
 # Patch FeatureEngineer
 feature_eng_module = MagicMock()
 feature_eng_module.FeatureEngineer = MockFeatureEngineer
-sys.modules['app.ml.feature_engineering'] = feature_eng_module
+sys.modules["app.ml.feature_engineering"] = feature_eng_module
 
 # Patch StressLevel and StressorType enums
 from enum import Enum
+
 
 class MockStressLevel(Enum):
     LOW = "low"
@@ -181,12 +192,14 @@ class MockStressLevel(Enum):
     HIGH = "high"
     EXTREME = "extreme"
 
+
 class MockStressorType(Enum):
     PHYSIOLOGICAL = "physiological"
     ENVIRONMENTAL = "environmental"
     COGNITIVE = "cognitive"
     EMOTIONAL = "emotional"
     SOCIAL = "social"
+
 
 # Now import the rest
 import pytest
@@ -197,7 +210,11 @@ import json
 from datetime import datetime, timedelta
 
 from app.tests.ml.stochastic_time_estimation.test_utils import (
-    create_mock_task, create_mock_user, create_mock_health_metrics, mock_db, run_async_test
+    create_mock_task,
+    create_mock_user,
+    create_mock_health_metrics,
+    mock_db,
+    run_async_test,
 )
 
 from app.ml.stochastic_time_estimation import ContextualStressorDetector
@@ -212,25 +229,15 @@ class TestContextualStressorDetector:
         return ContextualStressorDetector(
             db=mock_db,
             lookback_period=24,
-            stress_threshold_hr={
-                "low": 0.1,
-                "moderate": 0.2,
-                "high": 0.3,
-                "extreme": 0.4
-            },
-            stress_threshold_hrv={
-                "low": 0.1,
-                "moderate": 0.2,
-                "high": 0.3,
-                "extreme": 0.4
-            },
+            stress_threshold_hr={"low": 0.1, "moderate": 0.2, "high": 0.3, "extreme": 0.4},
+            stress_threshold_hrv={"low": 0.1, "moderate": 0.2, "high": 0.3, "extreme": 0.4},
             stress_impact_weights={
                 "physiological": 0.3,
                 "environmental": 0.2,
                 "cognitive": 0.2,
                 "emotional": 0.2,
-                "social": 0.1
-            }
+                "social": 0.1,
+            },
         )
 
     @pytest.mark.asyncio
@@ -246,10 +253,7 @@ class TestContextualStressorDetector:
     async def test_detect_current_stress(self, detector):
         """Test detecting current stress levels."""
         # Mock user and health metrics
-        user = create_mock_user(
-            user_id="user-123",
-            resting_heart_rate=65
-        )
+        user = create_mock_user(user_id="user-123", resting_heart_rate=65)
 
         # Mock recent health metrics
         metrics = [
@@ -258,9 +262,9 @@ class TestContextualStressorDetector:
                 heart_rate=85,  # Elevated heart rate
                 heart_rate_variability=40,
                 focus_level=5,  # Moderate focus
-                mood_level=6,   # Moderate mood
-                anxiety_level=4, # Moderate anxiety
-                timestamp=datetime.now() - timedelta(hours=1)
+                mood_level=6,  # Moderate mood
+                anxiety_level=4,  # Moderate anxiety
+                timestamp=datetime.now() - timedelta(hours=1),
             ),
             MockHealthMetrics(
                 user_id="user-123",
@@ -269,8 +273,8 @@ class TestContextualStressorDetector:
                 focus_level=6,
                 mood_level=7,
                 anxiety_level=3,
-                timestamp=datetime.now()
-            )
+                timestamp=datetime.now(),
+            ),
         ]
 
         # Mock methods
@@ -325,18 +329,20 @@ class TestContextualStressorDetector:
             task_id="task-123",
             user_id="user-123",
             difficulty=4,  # Higher difficulty
-            focus_required=5  # High focus requirement
+            focus_required=5,  # High focus requirement
         )
 
         # Mock methods
         detector._get_task = AsyncMock(return_value=task)
-        detector.detect_current_stress = AsyncMock(return_value={
-            "user_id": "user-123",
-            "overall_stress_level": "moderate",
-            "stress_score": 45,
-            "time_impact_factor": 1.3,
-            "detected_stressors": []
-        })
+        detector.detect_current_stress = AsyncMock(
+            return_value={
+                "user_id": "user-123",
+                "overall_stress_level": "moderate",
+                "stress_score": 45,
+                "time_impact_factor": 1.3,
+                "detected_stressors": [],
+            }
+        )
         detector._calculate_task_stress_sensitivity = MagicMock(return_value=0.7)
 
         # Test the method
@@ -358,18 +364,18 @@ class TestContextualStressorDetector:
             MockHealthMetrics(
                 heart_rate=80,  # Higher than resting
                 heart_rate_variability=40,
-                timestamp=datetime.now() - timedelta(hours=2)
+                timestamp=datetime.now() - timedelta(hours=2),
             ),
             MockHealthMetrics(
                 heart_rate=85,  # Even higher
                 heart_rate_variability=35,  # Lower HRV indicates stress
-                timestamp=datetime.now() - timedelta(hours=1)
+                timestamp=datetime.now() - timedelta(hours=1),
             ),
             MockHealthMetrics(
                 heart_rate=90,  # Highest
                 heart_rate_variability=30,  # Lowest
-                timestamp=datetime.now()
-            )
+                timestamp=datetime.now(),
+            ),
         ]
 
         # Test the method
@@ -401,17 +407,14 @@ class TestContextualStressorDetector:
             MockHealthMetrics(
                 environment_data={
                     "noise_level": 75,  # Moderately high
-                    "temperature": 27  # Above comfort zone
+                    "temperature": 27,  # Above comfort zone
                 },
-                timestamp=datetime.now() - timedelta(hours=1)
+                timestamp=datetime.now() - timedelta(hours=1),
             ),
             MockHealthMetrics(
-                environment_data={
-                    "noise_level": 80,  # High
-                    "temperature": 29  # Higher
-                },
-                timestamp=datetime.now()
-            )
+                environment_data={"noise_level": 80, "temperature": 29},  # High  # Higher
+                timestamp=datetime.now(),
+            ),
         ]
 
         # Test the method
@@ -432,17 +435,14 @@ class TestContextualStressorDetector:
         # Create health metrics with focus data
         metrics = [
             MockHealthMetrics(
-                focus_level=7,  # Good focus
-                timestamp=datetime.now() - timedelta(hours=2)
+                focus_level=7, timestamp=datetime.now() - timedelta(hours=2)  # Good focus
             ),
             MockHealthMetrics(
-                focus_level=5,  # Moderate focus
-                timestamp=datetime.now() - timedelta(hours=1)
+                focus_level=5, timestamp=datetime.now() - timedelta(hours=1)  # Moderate focus
             ),
             MockHealthMetrics(
-                focus_level=4,  # Lower focus indicates stress
-                timestamp=datetime.now()
-            )
+                focus_level=4, timestamp=datetime.now()  # Lower focus indicates stress
+            ),
         ]
 
         # Test the method
@@ -464,20 +464,20 @@ class TestContextualStressorDetector:
         # Create health metrics with mood and anxiety data
         metrics = [
             MockHealthMetrics(
-                mood_level=8,     # Good mood
+                mood_level=8,  # Good mood
                 anxiety_level=3,  # Low anxiety
-                timestamp=datetime.now() - timedelta(hours=2)
+                timestamp=datetime.now() - timedelta(hours=2),
             ),
             MockHealthMetrics(
-                mood_level=6,     # Moderate mood
+                mood_level=6,  # Moderate mood
                 anxiety_level=5,  # Moderate anxiety
-                timestamp=datetime.now() - timedelta(hours=1)
+                timestamp=datetime.now() - timedelta(hours=1),
             ),
             MockHealthMetrics(
-                mood_level=5,     # Lower mood
+                mood_level=5,  # Lower mood
                 anxiety_level=6,  # Higher anxiety
-                timestamp=datetime.now()
-            )
+                timestamp=datetime.now(),
+            ),
         ]
 
         # Test the method
@@ -499,21 +499,9 @@ class TestContextualStressorDetector:
         """Test calculating overall stress from multiple stressors."""
         # Create stressors with different levels
         stressors = [
-            {
-                "stressor_type": "physiological",
-                "stress_level": "moderate",
-                "stress_score": 45
-            },
-            {
-                "stressor_type": "environmental",
-                "stress_level": "high",
-                "stress_score": 65
-            },
-            {
-                "stressor_type": "cognitive",
-                "stress_level": "low",
-                "stress_score": 25
-            }
+            {"stressor_type": "physiological", "stress_level": "moderate", "stress_score": 45},
+            {"stressor_type": "environmental", "stress_level": "high", "stress_score": 65},
+            {"stressor_type": "cognitive", "stress_level": "low", "stress_score": 25},
         ]
 
         # Test the method
@@ -552,7 +540,12 @@ class TestContextualStressorDetector:
     def test_save_and_load(self, detector):
         """Test saving and loading model parameters."""
         # Setup custom thresholds
-        detector.stress_threshold_hr = {"low": 0.15, "moderate": 0.25, "high": 0.35, "extreme": 0.45}
+        detector.stress_threshold_hr = {
+            "low": 0.15,
+            "moderate": 0.25,
+            "high": 0.35,
+            "extreme": 0.45,
+        }
         detector.lookback_period = 36
 
         # Save to a temporary file
@@ -562,7 +555,7 @@ class TestContextualStressorDetector:
 
             # Verify file exists and contains data
             assert os.path.exists(filepath)
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 data = json.load(f)
                 assert "stress_threshold_hr" in data
                 assert "lookback_period" in data

@@ -11,7 +11,10 @@ router_instances = [
     # Add other router instances here
 ]
 
+
 @pytest.mark.parametrize("router_instance", router_instances)
 def test_router_instance(router_instance):
     """Test if router instance is an instance of APIRouter."""
-    assert isinstance(router_instance, APIRouter), f"{router_instance} is not an instance of APIRouter"
+    assert isinstance(
+        router_instance, APIRouter
+    ), f"{router_instance} is not an instance of APIRouter"

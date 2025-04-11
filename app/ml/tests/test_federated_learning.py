@@ -3,6 +3,7 @@ import numpy as np
 from unittest.mock import patch, MagicMock, Mock
 import sys
 
+
 # Mock the dependencies that are causing issues
 class MockTF:
     class keras:
@@ -30,6 +31,7 @@ class MockTF:
                 def __init__(self, learning_rate=0.01):
                     self.learning_rate = learning_rate
 
+
 class MockTFF:
     class ClientData:
         def __init__(self, client_ids, client_fn):
@@ -40,30 +42,43 @@ class MockTFF:
     def build_federated_averaging_process(model_fn, client_optimizer_fn, server_optimizer_fn):
         return MockFederatedAveragingProcess()
 
+
 class MockFederatedAveragingProcess:
     def next(self, server_state, federated_dataset):
         return {"metrics": {"loss": 0.5}, "model": MagicMock()}
+
 
 # Create mocks for module imports
 @pytest.fixture(autouse=True)
 def mock_imports():
     """Mock the imports that are causing issues."""
     modules = {
-        'tensorflow': MockTF(),
-        'tensorflow_federated': MockTFF(),
-        'app.ml.models.federated_learning_model': Mock(),
+        "tensorflow": MockTF(),
+        "tensorflow_federated": MockTFF(),
+        "app.ml.models.federated_learning_model": Mock(),
     }
 
-    with patch.dict('sys.modules', modules):
+    with patch.dict("sys.modules", modules):
         yield
+
 
 # Now we'll create a MockFederatedLearningModel
 class MockFederatedLearningModel:
     """Mock implementation of FederatedLearningModel for testing."""
 
-    def __init__(self, model_fn, num_clients=10, client_data_size=100, input_shape=(10,),
-                 output_shape=1, learning_rate=0.01, batch_size=32, epochs=5,
-                 federated_rounds=3, client_fraction=0.5):
+    def __init__(
+        self,
+        model_fn,
+        num_clients=10,
+        client_data_size=100,
+        input_shape=(10,),
+        output_shape=1,
+        learning_rate=0.01,
+        batch_size=32,
+        epochs=5,
+        federated_rounds=3,
+        client_fraction=0.5,
+    ):
         self.model_fn = model_fn
         self.num_clients = num_clients
         self.client_data_size = client_data_size
@@ -92,6 +107,7 @@ class MockFederatedLearningModel:
     def create_preprocessing_function(self):
         def preprocess_fn(data):
             return data
+
         self.preprocessing_fn = preprocess_fn
         return preprocess_fn
 
@@ -127,12 +143,15 @@ class MockFederatedLearningModel:
     def get_metrics(self):
         return self.metrics
 
+
 @pytest.fixture
 def model_fn():
     def create_model():
         model = MockTF.keras.Model()
         return model
+
     return create_model
+
 
 @pytest.fixture
 def federated_model(model_fn):
@@ -146,8 +165,9 @@ def federated_model(model_fn):
         batch_size=32,
         epochs=5,
         federated_rounds=3,
-        client_fraction=0.5
+        client_fraction=0.5,
     )
+
 
 @pytest.fixture
 def sample_user_data():
@@ -159,6 +179,7 @@ def sample_user_data():
         labels = np.random.rand(20, 1)
         user_data[user_id] = (features, labels)
     return user_data
+
 
 # Tests
 def test_model_initialization(federated_model):
@@ -173,10 +194,12 @@ def test_model_initialization(federated_model):
     assert federated_model.federated_rounds == 3
     assert federated_model.client_fraction == 0.5
 
+
 def test_create_client_model(federated_model):
     """Test creating a client model with proper architecture."""
     client_model = federated_model.create_client_model()
     assert isinstance(client_model, MockTF.keras.Model)
+
 
 def test_create_preprocessing_function(federated_model):
     """Test creating preprocessing functions for federated learning."""
@@ -187,6 +210,7 @@ def test_create_preprocessing_function(federated_model):
     sample_data = np.random.rand(10, 10)
     processed_data = preprocess_fn(sample_data)
     assert processed_data.shape == sample_data.shape
+
 
 def test_generate_synthetic_data(federated_model):
     """Test generating synthetic data for federated learning."""
@@ -204,6 +228,7 @@ def test_generate_synthetic_data(federated_model):
     assert features.shape[1] == federated_model.input_shape[0]
     assert labels.shape[1] == federated_model.output_shape
 
+
 def test_train_model(federated_model):
     """Test training the federated learning model."""
     metrics = federated_model.train()
@@ -211,6 +236,7 @@ def test_train_model(federated_model):
     assert "accuracy" in metrics
     assert len(metrics["loss"]) > 0
     assert len(metrics["accuracy"]) > 0
+
 
 def test_evaluate_model(federated_model):
     """Test evaluating the model on test data."""
@@ -221,11 +247,13 @@ def test_evaluate_model(federated_model):
     assert isinstance(evaluation["loss"], float)
     assert isinstance(evaluation["accuracy"], float)
 
+
 def test_predict_with_model(federated_model):
     """Test making predictions with the model."""
     test_features = np.random.rand(10, 10)
     predictions = federated_model.predict(test_features)
     assert predictions.shape == (10, federated_model.output_shape)
+
 
 def test_save_and_load_model(federated_model, tmp_path):
     """Test saving and loading the model."""
@@ -239,6 +267,7 @@ def test_save_and_load_model(federated_model, tmp_path):
     load_result = federated_model.load_model(save_path)
     assert load_result is True
 
+
 def test_client_updates(federated_model):
     """Test getting client updates."""
     updates = federated_model.get_client_updates()
@@ -246,11 +275,12 @@ def test_client_updates(federated_model):
     assert "client_1" in updates
     assert "weights" in updates["client_1"]
 
+
 def test_aggregate_updates(federated_model):
     """Test aggregating client updates."""
     client_updates = {
         "client_1": {"weights": np.random.rand(10, 10)},
-        "client_2": {"weights": np.random.rand(10, 10)}
+        "client_2": {"weights": np.random.rand(10, 10)},
     }
     aggregated = federated_model.aggregate_updates(client_updates)
     assert isinstance(aggregated, dict)

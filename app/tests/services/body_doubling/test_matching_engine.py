@@ -211,8 +211,14 @@ class TestMatchingEngine:
 
     @pytest.mark.asyncio
     async def test_find_matching_users(
-        self, matching_engine, mock_session_manager, sample_user_id, sample_match_id,
-        sample_user_prefs, sample_match_criteria, sample_match_session
+        self,
+        matching_engine,
+        mock_session_manager,
+        sample_user_id,
+        sample_match_id,
+        sample_user_prefs,
+        sample_match_criteria,
+        sample_match_session,
     ):
         """Test finding matching users."""
         # Arrange
@@ -238,7 +244,9 @@ class TestMatchingEngine:
         criteria = {"min_score": 10}
 
         # Act
-        matches = await matching_engine.find_matching_users(sample_user_id, sample_user_prefs, criteria)
+        matches = await matching_engine.find_matching_users(
+            sample_user_id, sample_user_prefs, criteria
+        )
 
         # Assert
         assert len(matches) == 0
@@ -270,7 +278,12 @@ class TestMatchingEngine:
 
     @pytest.mark.asyncio
     async def test_request_match_already_active(
-        self, matching_engine, mock_session_manager, sample_user_id, sample_match_criteria, sample_session
+        self,
+        matching_engine,
+        mock_session_manager,
+        sample_user_id,
+        sample_match_criteria,
+        sample_session,
     ):
         """Test requesting a match when user already has an active session."""
         # Arrange
@@ -309,10 +322,10 @@ class TestMatchingEngine:
         async def mock_execute(query):
             # This simulates the database update by setting the session status to ACTIVE
             request_session.status = SessionStatus.ACTIVE
-            if not request_session.meta_data.get('participants'):
-                request_session.meta_data['participants'] = []
-            if str(sample_match_id) not in request_session.meta_data['participants']:
-                request_session.meta_data['participants'].append(str(sample_match_id))
+            if not request_session.meta_data.get("participants"):
+                request_session.meta_data["participants"] = []
+            if str(sample_match_id) not in request_session.meta_data["participants"]:
+                request_session.meta_data["participants"].append(str(sample_match_id))
 
             # Return a mock result object compatible with SQLAlchemy's execute()
             result_mock = AsyncMock()
@@ -363,7 +376,9 @@ class TestMatchingEngine:
         # Print the actual error message for debugging
         print(f"Error message: {exc_info.value.detail}")
         # Accept any error message about status not being valid
-        assert "status" in exc_info.value.detail.lower() or "active" in exc_info.value.detail.lower()
+        assert (
+            "status" in exc_info.value.detail.lower() or "active" in exc_info.value.detail.lower()
+        )
 
     @pytest.mark.asyncio
     async def test_accept_match_partner_already_active(

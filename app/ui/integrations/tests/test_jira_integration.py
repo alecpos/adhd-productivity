@@ -12,7 +12,7 @@ from app.ui.project_management_integration import (
     ProjectToolType,
     SyncDirection,
     SyncFrequency,
-    ExternalTask
+    ExternalTask,
 )
 from app.ui.integrations.jira_integration import JiraIntegration
 
@@ -29,7 +29,7 @@ def jira_config():
         project_ids=["PROJ"],
         labels_to_sync=["adhd-calendar"],
         enabled=True,
-        user_id="test-user-1"
+        user_id="test-user-1",
     )
 
 
@@ -49,8 +49,8 @@ def mock_jira_issue():
             "priority": {"name": "High"},
             "assignee": {"displayName": "Test User"},
             "labels": ["adhd-calendar", "test"],
-            "project": {"id": "PROJ", "key": "PROJ"}
-        }
+            "project": {"id": "PROJ", "key": "PROJ"},
+        },
     }
 
 
@@ -60,8 +60,10 @@ async def test_jira_authenticate_success(jira_config):
     integration = JiraIntegration(jira_config)
 
     # Patch the authenticate method to return True
-    with patch.object(integration, '_get_auth_headers', return_value={}), \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_get_auth_headers", return_value={}),
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
         result = await integration.authenticate()
         assert result is True
 
@@ -72,8 +74,10 @@ async def test_jira_authenticate_failure(jira_config):
     integration = JiraIntegration(jira_config)
 
     # Patch the authenticate method to raise an exception
-    with patch.object(integration, '_get_auth_headers', side_effect=Exception("Auth failed")), \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_get_auth_headers", side_effect=Exception("Auth failed")),
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
         result = await integration.authenticate()
         assert result is False
 
@@ -84,9 +88,11 @@ async def test_fetch_tasks(jira_config, mock_jira_issue):
     integration = JiraIntegration(jira_config)
 
     # Mock the necessary methods
-    with patch.object(integration, '_build_jql_query', return_value="project = PROJ"), \
-         patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_build_jql_query", return_value="project = PROJ"),
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
 
         # Setup mock return value
         mock_api_call.return_value = {"issues": [mock_jira_issue]}
@@ -117,12 +123,14 @@ async def test_create_task(jira_config):
         "status": "not_started",
         "due_date": datetime(2023, 12, 31),
         "priority": "high",
-        "labels": ["adhd-calendar", "test"]
+        "labels": ["adhd-calendar", "test"],
     }
 
     # Mock responses
-    with patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
 
         # Setup mock return value
         mock_api_call.return_value = {"id": "10002", "key": "PROJ-124"}
@@ -151,12 +159,14 @@ async def test_update_task(jira_config):
         "status": "in_progress",
         "due_date": datetime(2023, 12, 31),
         "priority": "critical",
-        "labels": ["adhd-calendar", "test", "updated"]
+        "labels": ["adhd-calendar", "test", "updated"],
     }
 
     # Mock responses
-    with patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
 
         # Setup mock return value
         mock_api_call.return_value = {"id": "10001", "key": "PROJ-123"}
@@ -179,8 +189,10 @@ async def test_delete_task(jira_config):
     integration = JiraIntegration(jira_config)
 
     # Mock responses
-    with patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
 
         # Setup mock return value
         mock_api_call.return_value = {}
@@ -199,13 +211,15 @@ async def test_get_projects(jira_config):
     integration = JiraIntegration(jira_config)
 
     # Mock responses
-    with patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging'):
+    with (
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging"),
+    ):
 
         # Setup mock return value
         mock_api_call.return_value = [
             {"id": "10000", "key": "PROJ1", "name": "Project One"},
-            {"id": "10001", "key": "PROJ2", "name": "Project Two"}
+            {"id": "10001", "key": "PROJ2", "name": "Project Two"},
         ]
 
         # Call the method
@@ -223,8 +237,10 @@ async def test_error_handling(jira_config):
     integration = JiraIntegration(jira_config)
 
     # Mock responses
-    with patch.object(integration, '_make_api_call', new_callable=AsyncMock) as mock_api_call, \
-         patch('app.ui.integrations.jira_integration.logging') as mock_logging:
+    with (
+        patch.object(integration, "_make_api_call", new_callable=AsyncMock) as mock_api_call,
+        patch("app.ui.integrations.jira_integration.logging") as mock_logging,
+    ):
 
         # Setup mock to raise exception
         mock_api_call.side_effect = Exception("API error")

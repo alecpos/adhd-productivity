@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 class StressLevel(Enum):
     """Stress level classification."""
+
     LOW = "low"
     MODERATE = "moderate"
     HIGH = "high"
@@ -41,6 +42,7 @@ class StressLevel(Enum):
 
 class StressorType(Enum):
     """Types of detected stressors."""
+
     PHYSIOLOGICAL = "physiological"  # Heart rate, HRV, etc.
     ENVIRONMENTAL = "environmental"  # Noise, temperature, etc.
     COGNITIVE = "cognitive"  # Mental fatigue, focus, etc.
@@ -68,7 +70,7 @@ class ContextualStressorDetector(BaseMLModel):
         stress_threshold_hr: Optional[Dict[str, float]] = None,
         stress_threshold_hrv: Optional[Dict[str, float]] = None,
         stress_impact_weights: Optional[Dict[StressorType, float]] = None,
-        lookback_period: int = 24  # hours
+        lookback_period: int = 24,  # hours
     ):
         """
         Initialize the Contextual Stressor Detector.
@@ -87,18 +89,18 @@ class ContextualStressorDetector(BaseMLModel):
 
         # Default heart rate thresholds (percentages above resting)
         self.stress_threshold_hr = stress_threshold_hr or {
-            StressLevel.LOW.value: 0.1,      # 10% above resting
+            StressLevel.LOW.value: 0.1,  # 10% above resting
             StressLevel.MODERATE.value: 0.2,  # 20% above resting
-            StressLevel.HIGH.value: 0.3,      # 30% above resting
-            StressLevel.EXTREME.value: 0.4    # 40% above resting
+            StressLevel.HIGH.value: 0.3,  # 30% above resting
+            StressLevel.EXTREME.value: 0.4,  # 40% above resting
         }
 
         # Default HRV thresholds (percentages below baseline)
         self.stress_threshold_hrv = stress_threshold_hrv or {
-            StressLevel.LOW.value: 0.1,      # 10% below baseline
+            StressLevel.LOW.value: 0.1,  # 10% below baseline
             StressLevel.MODERATE.value: 0.2,  # 20% below baseline
-            StressLevel.HIGH.value: 0.3,      # 30% below baseline
-            StressLevel.EXTREME.value: 0.4    # 40% below baseline
+            StressLevel.HIGH.value: 0.3,  # 30% below baseline
+            StressLevel.EXTREME.value: 0.4,  # 40% below baseline
         }
 
         # Default stressor type weights
@@ -107,7 +109,7 @@ class ContextualStressorDetector(BaseMLModel):
             StressorType.ENVIRONMENTAL.value: 0.2,
             StressorType.COGNITIVE.value: 0.2,
             StressorType.EMOTIONAL.value: 0.2,
-            StressorType.SOCIAL.value: 0.1
+            StressorType.SOCIAL.value: 0.1,
         }
 
         # Environmental thresholds
@@ -116,14 +118,14 @@ class ContextualStressorDetector(BaseMLModel):
                 StressLevel.LOW.value: 60,
                 StressLevel.MODERATE.value: 70,
                 StressLevel.HIGH.value: 80,
-                StressLevel.EXTREME.value: 90
+                StressLevel.EXTREME.value: 90,
             },
             "temperature": {  # Deviation from comfort zone (20-24°C) in °C
                 StressLevel.LOW.value: 2,
                 StressLevel.MODERATE.value: 4,
                 StressLevel.HIGH.value: 6,
-                StressLevel.EXTREME.value: 8
-            }
+                StressLevel.EXTREME.value: 8,
+            },
         }
 
     async def detect_current_stress(self, user_id: str) -> Dict[str, Any]:
@@ -142,16 +144,12 @@ class ContextualStressorDetector(BaseMLModel):
             - trend: Trend in stress levels (increasing, decreasing, stable)
         """
         if self.db is None:
-            return {
-                "error": "No database connection available"
-            }
+            return {"error": "No database connection available"}
 
         # Get user's resting heart rate as baseline
         user = await self._get_user(user_id)
         if user is None:
-            return {
-                "error": f"User {user_id} not found"
-            }
+            return {"error": f"User {user_id} not found"}
 
         # Get recent health metrics
         metrics = await self._get_recent_health_metrics(user_id)
@@ -162,14 +160,18 @@ class ContextualStressorDetector(BaseMLModel):
                 "stress_score": 0,
                 "detected_stressors": [],
                 "time_impact_factor": 1.0,
-                "trend": "stable"
+                "trend": "stable",
             }
 
         # Extract heart rate data
-        hr_data = [m for m in metrics if hasattr(m, 'heart_rate') and m.heart_rate is not None]
+        hr_data = [m for m in metrics if hasattr(m, "heart_rate") and m.heart_rate is not None]
 
         # Determine resting heart rate (use the lowest 10th percentile from metrics or user default)
-        resting_hr = user.resting_heart_rate if hasattr(user, 'resting_heart_rate') and user.resting_heart_rate else 65
+        resting_hr = (
+            user.resting_heart_rate
+            if hasattr(user, "resting_heart_rate") and user.resting_heart_rate
+            else 65
+        )
         if hr_data:
             hr_values = [m.heart_rate for m in hr_data]
             if hr_values:
@@ -219,7 +221,7 @@ class ContextualStressorDetector(BaseMLModel):
             "detected_stressors": stressors,
             "time_impact_factor": time_impact_factor,
             "trend": trend,
-            "analysis_timestamp": datetime.now().isoformat()
+            "analysis_timestamp": datetime.now().isoformat(),
         }
 
     async def get_task_stress_adjustment(self, task_id: str) -> float:
@@ -242,7 +244,7 @@ class ContextualStressorDetector(BaseMLModel):
         # Handle dictionary and object access patterns for task
         # Support both object attribute access and dictionary key access
         try:
-            user_id = task.user_id if hasattr(task, 'user_id') else task.get('user_id', None)
+            user_id = task.user_id if hasattr(task, "user_id") else task.get("user_id", None)
             if not user_id:
                 return 1.0  # Default: no adjustment
 
@@ -256,10 +258,10 @@ class ContextualStressorDetector(BaseMLModel):
 
             # Adjust factor based on task difficulty and stress sensitivity
             task_difficulty = 3  # Default to medium difficulty
-            if hasattr(task, 'difficulty') and task.difficulty is not None:
+            if hasattr(task, "difficulty") and task.difficulty is not None:
                 task_difficulty = task.difficulty
-            elif isinstance(task, dict) and 'difficulty' in task:
-                task_difficulty = task['difficulty']
+            elif isinstance(task, dict) and "difficulty" in task:
+                task_difficulty = task["difficulty"]
 
             stress_sensitivity = self._calculate_task_stress_sensitivity(task)
 
@@ -273,9 +275,7 @@ class ContextualStressorDetector(BaseMLModel):
             return 1.0  # Default: no adjustment
 
     def _analyze_physiological_stress(
-        self,
-        metrics: List[HealthMetrics],
-        resting_hr: float
+        self, metrics: List[HealthMetrics], resting_hr: float
     ) -> Dict[str, Any]:
         """
         Analyze physiological stress indicators (heart rate, HRV, etc.).
@@ -288,8 +288,12 @@ class ContextualStressorDetector(BaseMLModel):
             Dictionary with physiological stress analysis
         """
         # Extract relevant metrics
-        hr_metrics = [m for m in metrics if hasattr(m, 'heart_rate') and m.heart_rate is not None]
-        hrv_metrics = [m for m in metrics if hasattr(m, 'heart_rate_variability') and m.heart_rate_variability is not None]
+        hr_metrics = [m for m in metrics if hasattr(m, "heart_rate") and m.heart_rate is not None]
+        hrv_metrics = [
+            m
+            for m in metrics
+            if hasattr(m, "heart_rate_variability") and m.heart_rate_variability is not None
+        ]
 
         if not hr_metrics and not hrv_metrics:
             return None
@@ -304,14 +308,15 @@ class ContextualStressorDetector(BaseMLModel):
 
             # Determine stress level from heart rate
             for level, threshold in sorted(
-                self.stress_threshold_hr.items(),
-                key=lambda x: self.stress_level_to_numeric(x[0])
+                self.stress_threshold_hr.items(), key=lambda x: self.stress_level_to_numeric(x[0])
             ):
                 if hr_elevation >= threshold:
                     hr_stress_level = level
 
             # Calculate heart rate stress score (0-100)
-            hr_stress_score = min(100, int(hr_elevation * 100 / self.stress_threshold_hr[StressLevel.EXTREME.value]))
+            hr_stress_score = min(
+                100, int(hr_elevation * 100 / self.stress_threshold_hr[StressLevel.EXTREME.value])
+            )
 
         # Analyze HRV
         hrv_stress_level = StressLevel.LOW.value
@@ -325,19 +330,25 @@ class ContextualStressorDetector(BaseMLModel):
 
             # Determine stress level from HRV
             for level, threshold in sorted(
-                self.stress_threshold_hrv.items(),
-                key=lambda x: self.stress_level_to_numeric(x[0])
+                self.stress_threshold_hrv.items(), key=lambda x: self.stress_level_to_numeric(x[0])
             ):
                 if hrv_reduction >= threshold:
                     hrv_stress_level = level
 
             # Calculate HRV stress score (0-100)
-            hrv_stress_score = min(100, int(hrv_reduction * 100 / self.stress_threshold_hrv[StressLevel.EXTREME.value]))
+            hrv_stress_score = min(
+                100, int(hrv_reduction * 100 / self.stress_threshold_hrv[StressLevel.EXTREME.value])
+            )
 
         # Combine heart rate and HRV indicators
         if hr_metrics and hrv_metrics:
             # Use the higher of the two stress levels
-            combined_level = hr_stress_level if self.stress_level_to_numeric(hr_stress_level) > self.stress_level_to_numeric(hrv_stress_level) else hrv_stress_level
+            combined_level = (
+                hr_stress_level
+                if self.stress_level_to_numeric(hr_stress_level)
+                > self.stress_level_to_numeric(hrv_stress_level)
+                else hrv_stress_level
+            )
             combined_score = max(hr_stress_score, hrv_stress_score)
         elif hr_metrics:
             combined_level = hr_stress_level
@@ -353,13 +364,13 @@ class ContextualStressorDetector(BaseMLModel):
             "details": {
                 "heart_rate": {
                     "value": hr_metrics[-1].heart_rate if hr_metrics else None,
-                    "stress_level": hr_stress_level if hr_metrics else None
+                    "stress_level": hr_stress_level if hr_metrics else None,
                 },
                 "hrv": {
                     "value": hrv_metrics[-1].heart_rate_variability if hrv_metrics else None,
-                    "stress_level": hrv_stress_level if hrv_metrics else None
-                }
-            }
+                    "stress_level": hrv_stress_level if hrv_metrics else None,
+                },
+            },
         }
 
     def _analyze_environmental_stress(self, metrics: List[HealthMetrics]) -> Dict[str, Any]:
@@ -373,7 +384,7 @@ class ContextualStressorDetector(BaseMLModel):
             Dictionary with environmental stress analysis
         """
         # Extract metrics with environment data
-        env_metrics = [m for m in metrics if hasattr(m, 'environment_data') and m.environment_data]
+        env_metrics = [m for m in metrics if hasattr(m, "environment_data") and m.environment_data]
 
         if not env_metrics:
             return None
@@ -387,26 +398,24 @@ class ContextualStressorDetector(BaseMLModel):
         stressors = []
 
         # Check noise level
-        if 'noise_level' in latest_env:
-            noise_level = latest_env['noise_level']
+        if "noise_level" in latest_env:
+            noise_level = latest_env["noise_level"]
             noise_stress_level = StressLevel.LOW.value
 
             for level, threshold in sorted(
-                self.env_thresholds['noise_level'].items(),
-                key=lambda x: self.stress_level_to_numeric(x[0])
+                self.env_thresholds["noise_level"].items(),
+                key=lambda x: self.stress_level_to_numeric(x[0]),
             ):
                 if noise_level >= threshold:
                     noise_stress_level = level
 
-            stressors.append({
-                "factor": "noise",
-                "value": noise_level,
-                "stress_level": noise_stress_level
-            })
+            stressors.append(
+                {"factor": "noise", "value": noise_level, "stress_level": noise_stress_level}
+            )
 
         # Check temperature
-        if 'temperature' in latest_env:
-            temp = latest_env['temperature']
+        if "temperature" in latest_env:
+            temp = latest_env["temperature"]
             temp_stress_level = StressLevel.LOW.value
 
             # Calculate deviation from comfort zone (20-24°C)
@@ -419,37 +428,43 @@ class ContextualStressorDetector(BaseMLModel):
                 temp_deviation = temp - comfort_max
 
             for level, threshold in sorted(
-                self.env_thresholds['temperature'].items(),
-                key=lambda x: self.stress_level_to_numeric(x[0])
+                self.env_thresholds["temperature"].items(),
+                key=lambda x: self.stress_level_to_numeric(x[0]),
             ):
                 if temp_deviation >= threshold:
                     temp_stress_level = level
 
-            stressors.append({
-                "factor": "temperature",
-                "value": temp,
-                "deviation": temp_deviation,
-                "stress_level": temp_stress_level
-            })
+            stressors.append(
+                {
+                    "factor": "temperature",
+                    "value": temp,
+                    "deviation": temp_deviation,
+                    "stress_level": temp_stress_level,
+                }
+            )
 
         # If no specific environmental stressors found
         if not stressors:
             return None
 
         # Determine overall environmental stress level (take the highest)
-        overall_level = max(stressors, key=lambda x: self.stress_level_to_numeric(x["stress_level"]))["stress_level"]
+        overall_level = max(
+            stressors, key=lambda x: self.stress_level_to_numeric(x["stress_level"])
+        )["stress_level"]
 
         # Calculate overall stress score
         overall_score = 0
         for stressor in stressors:
-            factor_score = self.stress_level_to_numeric(stressor["stress_level"]) * 25  # 0-100 scale
+            factor_score = (
+                self.stress_level_to_numeric(stressor["stress_level"]) * 25
+            )  # 0-100 scale
             overall_score = max(overall_score, factor_score)
 
         return {
             "stressor_type": StressorType.ENVIRONMENTAL.value,
             "stress_level": overall_level,
             "stress_score": overall_score,
-            "details": stressors
+            "details": stressors,
         }
 
     def _analyze_cognitive_stress(self, metrics: List[HealthMetrics]) -> Dict[str, Any]:
@@ -463,7 +478,9 @@ class ContextualStressorDetector(BaseMLModel):
             Dictionary with cognitive stress analysis
         """
         # Extract relevant metrics
-        focus_metrics = [m for m in metrics if hasattr(m, 'focus_level') and m.focus_level is not None]
+        focus_metrics = [
+            m for m in metrics if hasattr(m, "focus_level") and m.focus_level is not None
+        ]
 
         if not focus_metrics:
             return None
@@ -489,9 +506,7 @@ class ContextualStressorDetector(BaseMLModel):
             "stressor_type": StressorType.COGNITIVE.value,
             "stress_level": focus_stress_level,
             "stress_score": cognitive_stress_score,
-            "details": {
-                "focus_level": recent_focus
-            }
+            "details": {"focus_level": recent_focus},
         }
 
     def _analyze_emotional_stress(self, metrics: List[HealthMetrics]) -> Dict[str, Any]:
@@ -505,8 +520,10 @@ class ContextualStressorDetector(BaseMLModel):
             Dictionary with emotional stress analysis
         """
         # Extract relevant metrics
-        mood_metrics = [m for m in metrics if hasattr(m, 'mood_level') and m.mood_level is not None]
-        anxiety_metrics = [m for m in metrics if hasattr(m, 'anxiety_level') and m.anxiety_level is not None]
+        mood_metrics = [m for m in metrics if hasattr(m, "mood_level") and m.mood_level is not None]
+        anxiety_metrics = [
+            m for m in metrics if hasattr(m, "anxiety_level") and m.anxiety_level is not None
+        ]
 
         if not mood_metrics and not anxiety_metrics:
             return None
@@ -564,7 +581,7 @@ class ContextualStressorDetector(BaseMLModel):
             "stressor_type": StressorType.EMOTIONAL.value,
             "stress_level": overall_level,
             "stress_score": overall_score,
-            "details": details
+            "details": details,
         }
 
     def _analyze_social_stress(self, metrics: List[HealthMetrics], user_id: str) -> Dict[str, Any]:
@@ -580,8 +597,9 @@ class ContextualStressorDetector(BaseMLModel):
         """
         # For now, use a simple implementation based on available metrics
         # In a real implementation, this would analyze calendar events, meeting frequency, etc.
-        social_pressure_metrics = [m for m in metrics
-                                 if hasattr(m, 'social_pressure') and m.social_pressure is not None]
+        social_pressure_metrics = [
+            m for m in metrics if hasattr(m, "social_pressure") and m.social_pressure is not None
+        ]
 
         if not social_pressure_metrics:
             return None
@@ -605,9 +623,7 @@ class ContextualStressorDetector(BaseMLModel):
             "stressor_type": StressorType.SOCIAL.value,
             "stress_level": social_stress_level,
             "stress_score": social_stress_score,
-            "details": {
-                "social_pressure": recent_pressure
-            }
+            "details": {"social_pressure": recent_pressure},
         }
 
     def _calculate_overall_stress(self, stressors: List[Dict[str, Any]]) -> Tuple[int, str]:
@@ -685,16 +701,16 @@ class ContextualStressorDetector(BaseMLModel):
             energy_required = 3
 
             # Get focus required from task
-            if hasattr(task, 'focus_required') and task.focus_required is not None:
+            if hasattr(task, "focus_required") and task.focus_required is not None:
                 focus_required = task.focus_required
-            elif isinstance(task, dict) and 'focus_required' in task:
-                focus_required = task['focus_required']
+            elif isinstance(task, dict) and "focus_required" in task:
+                focus_required = task["focus_required"]
 
             # Get energy required from task
-            if hasattr(task, 'energy_required') and task.energy_required is not None:
+            if hasattr(task, "energy_required") and task.energy_required is not None:
                 energy_required = task.energy_required
-            elif isinstance(task, dict) and 'energy_required' in task:
-                energy_required = task['energy_required']
+            elif isinstance(task, dict) and "energy_required" in task:
+                energy_required = task["energy_required"]
 
             # Calculate sensitivities
             focus_sensitivity = focus_required / 5  # 0.2-1.0
@@ -734,7 +750,9 @@ class ContextualStressorDetector(BaseMLModel):
             return "stable"
 
         # Simple trend detection
-        trend_value = sum(recent_scores[i] - recent_scores[i-1] for i in range(1, len(recent_scores)))
+        trend_value = sum(
+            recent_scores[i] - recent_scores[i - 1] for i in range(1, len(recent_scores))
+        )
 
         if trend_value > 5:
             return "increasing"
@@ -762,12 +780,7 @@ class ContextualStressorDetector(BaseMLModel):
         # Query recent metrics
         stmt = (
             select(HealthMetrics)
-            .where(
-                and_(
-                    HealthMetrics.user_id == user_id,
-                    HealthMetrics.timestamp >= lookback_time
-                )
-            )
+            .where(and_(HealthMetrics.user_id == user_id, HealthMetrics.timestamp >= lookback_time))
             .order_by(HealthMetrics.timestamp)
         )
 
@@ -834,7 +847,7 @@ class ContextualStressorDetector(BaseMLModel):
             {"timestamp": datetime.now() - timedelta(hours=24), "score": 30},
             {"timestamp": datetime.now() - timedelta(hours=18), "score": 45},
             {"timestamp": datetime.now() - timedelta(hours=12), "score": 40},
-            {"timestamp": datetime.now() - timedelta(hours=6), "score": 35}
+            {"timestamp": datetime.now() - timedelta(hours=6), "score": 35},
         ]
 
     @staticmethod
@@ -871,14 +884,14 @@ class ContextualStressorDetector(BaseMLModel):
             "stress_threshold_hrv": self.stress_threshold_hrv,
             "stress_impact_weights": self.stress_impact_weights,
             "lookback_period": self.lookback_period,
-            "env_thresholds": self.env_thresholds
+            "env_thresholds": self.env_thresholds,
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(params, f)
 
     @classmethod
-    def load(cls, filepath: str) -> 'ContextualStressorDetector':
+    def load(cls, filepath: str) -> "ContextualStressorDetector":
         """
         Load model parameters from a file.
 
@@ -889,14 +902,14 @@ class ContextualStressorDetector(BaseMLModel):
             Loaded ContextualStressorDetector instance
         """
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 params = json.load(f)
 
             return cls(
                 stress_threshold_hr=params.get("stress_threshold_hr"),
                 stress_threshold_hrv=params.get("stress_threshold_hrv"),
                 stress_impact_weights=params.get("stress_impact_weights"),
-                lookback_period=params.get("lookback_period", 24)
+                lookback_period=params.get("lookback_period", 24),
             )
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logger.error(f"Error loading model parameters: {e}")

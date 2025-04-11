@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Enums
 class ProjectToolType(str, Enum):
     """Types of supported project management tools."""
+
     JIRA = "jira"
     TRELLO = "trello"
     ASANA = "asana"
@@ -37,6 +38,7 @@ class ProjectToolType(str, Enum):
 
 class SyncDirection(str, Enum):
     """Direction of synchronization between ADHD Calendar and external tools."""
+
     IMPORT = "import"  # One-way sync from external to local
     EXPORT = "export"  # One-way sync from local to external
     BIDIRECTIONAL = "bidirectional"  # Two-way sync
@@ -44,6 +46,7 @@ class SyncDirection(str, Enum):
 
 class SyncFrequency(str, Enum):
     """How often synchronization should occur."""
+
     MANUAL = "manual"
     HOURLY = "hourly"
     DAILY = "daily"
@@ -53,6 +56,7 @@ class SyncFrequency(str, Enum):
 # Models
 class ProjectToolConfig(BaseModel):
     """Configuration for a project management tool integration."""
+
     tool_type: ProjectToolType
     api_url: str
     auth_token: Optional[str] = None
@@ -70,6 +74,7 @@ class ProjectToolConfig(BaseModel):
 
 class ExternalTask(BaseModel):
     """Representation of a task from an external project management tool."""
+
     external_id: str
     title: str
     description: Optional[str] = None
@@ -94,6 +99,7 @@ class ExternalTask(BaseModel):
 
 class SyncResult(BaseModel):
     """Result of a synchronization operation."""
+
     success: bool
     tool_type: ProjectToolType
     tasks_imported: int = 0
@@ -159,7 +165,7 @@ class ProjectToolIntegration(ABC):
             "high": "high",
             "medium": "medium",
             "low": "low",
-            "lowest": "trivial"
+            "lowest": "trivial",
         }
         return priority_map.get(external_priority.lower(), "medium")
 
@@ -170,16 +176,13 @@ class ProjectToolIntegration(ABC):
             "to do": "not_started",
             "in progress": "in_progress",
             "done": "completed",
-            "blocked": "blocked"
+            "blocked": "blocked",
         }
         return status_map.get(external_status.lower(), "not_started")
 
 
 # Import service components
-from app.ui.services.sync_service import (
-    import_tasks,
-    export_tasks
-)
+from app.ui.services.sync_service import import_tasks, export_tasks
 
 
 class ProjectManagementService:
@@ -227,7 +230,9 @@ class ProjectManagementService:
                 self.integrations[user_id] = {}
 
             self.integrations[user_id][config.tool_type] = integration
-            logger.info(f"Successfully registered {config.tool_type} integration for user {user_id}")
+            logger.info(
+                f"Successfully registered {config.tool_type} integration for user {user_id}"
+            )
             return True
 
         except Exception as e:
@@ -295,10 +300,7 @@ class ProjectManagementService:
         self, user_id: str, integration: ProjectToolIntegration
     ) -> SyncResult:
         """Synchronize tasks for a single tool."""
-        result = SyncResult(
-            success=True,
-            tool_type=integration.config.tool_type
-        )
+        result = SyncResult(success=True, tool_type=integration.config.tool_type)
 
         # Check connection
         if not await integration.test_connection():
@@ -383,7 +385,7 @@ class ProjectManagementService:
                 "last_sync": integration.config.last_sync,
                 "sync_frequency": integration.config.sync_frequency,
                 "sync_direction": integration.config.sync_direction,
-                "enabled": integration.config.enabled
+                "enabled": integration.config.enabled,
             }
 
         return status

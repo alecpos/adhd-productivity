@@ -7,6 +7,7 @@ from datetime import datetime
 from app.schemas.temporal_pattern_schema import TemporalPatternResponse
 from app.ml.temporal_pattern_recognition import TemporalPatternRecognitionService
 
+
 class TemporalPatternService:
     """Service for analyzing temporal patterns in user productivity."""
 
@@ -35,7 +36,7 @@ class TemporalPatternService:
             user_id="current_user",  # TODO: Get actual user ID
             patterns=patterns,
             recommendations=recommendations,
-            confidence_score=0.92  # TODO: Calculate actual confidence score
+            confidence_score=0.92,  # TODO: Calculate actual confidence score
         )
 
         return response

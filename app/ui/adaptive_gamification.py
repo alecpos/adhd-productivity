@@ -58,11 +58,7 @@ class UserMotivationModel:
         return {
             "optimal_mechanics": ["progress_bar", "challenge", "feedback"],
             "optimal_rewards": ["points", "badges"],
-            "motivation_factors": {
-                "achievement": 0.8,
-                "novelty": 0.6,
-                "autonomy": 0.7
-            }
+            "motivation_factors": {"achievement": 0.8, "novelty": 0.6, "autonomy": 0.7},
         }
 
     def update(self, behavior_data: Dict[str, Any]) -> None:
@@ -89,6 +85,7 @@ class UserMotivationModel:
 
 class MotivationType(str, Enum):
     """Types of motivation that may work for different users."""
+
     ACHIEVEMENT = "achievement"
     SOCIAL = "social"
     IMMERSION = "immersion"
@@ -101,6 +98,7 @@ class MotivationType(str, Enum):
 
 class RewardType(str, Enum):
     """Types of rewards that can be offered to users."""
+
     POINTS = "points"
     BADGES = "badges"
     LEVELS = "levels"
@@ -115,6 +113,7 @@ class RewardType(str, Enum):
 
 class GameMechanic(str, Enum):
     """Game mechanics that can be applied for different users."""
+
     PROGRESS_BAR = "progress_bar"
     LEADERBOARD = "leaderboard"
     CHALLENGE = "challenge"
@@ -131,6 +130,7 @@ class GameMechanic(str, Enum):
 
 class UserMotivationProfile(BaseModel):
     """User's motivation profile with preferences and effectiveness scores."""
+
     user_id: str
     motivation_types: Dict[MotivationType, float] = Field(
         default_factory=lambda: {t: 0.5 for t in MotivationType}
@@ -148,6 +148,7 @@ class UserMotivationProfile(BaseModel):
 
 class GamificationAction(BaseModel):
     """A specific gamification action to take for user motivation."""
+
     user_id: str
     mechanic: GameMechanic
     reward_type: Optional[RewardType] = None
@@ -181,12 +182,12 @@ class AdaptiveGamificationEngine:
             GameMechanic.PROGRESS_BAR: [
                 "You're making great progress! {progress}% complete!",
                 "Keep it up! Only {remaining}% to go!",
-                "You've come so far already - {progress}% done!"
+                "You've come so far already - {progress}% done!",
             ],
             GameMechanic.CHALLENGE: [
                 "New challenge unlocked: {challenge_name}",
                 "Ready for a challenge? Try {challenge_name}!",
-                "Challenge yourself with: {challenge_name}"
+                "Challenge yourself with: {challenge_name}",
             ],
             # Add more templates for other mechanics
         }
@@ -222,37 +223,35 @@ class AdaptiveGamificationEngine:
         updated_values = model.predict(behaviors)
 
         # Update the profile with new values
-        for motivation_type, score in updated_values.get('motivation_types', {}).items():
+        for motivation_type, score in updated_values.get("motivation_types", {}).items():
             if motivation_type in profile.motivation_types:
                 # Apply exponential moving average to smooth changes
                 alpha = 0.3  # Learning rate
-                profile.motivation_types[motivation_type] = (
-                    (1 - alpha) * profile.motivation_types[motivation_type] + alpha * score
-                )
+                profile.motivation_types[motivation_type] = (1 - alpha) * profile.motivation_types[
+                    motivation_type
+                ] + alpha * score
 
         # Update other profile aspects similarly
-        for reward_type, score in updated_values.get('reward_preferences', {}).items():
+        for reward_type, score in updated_values.get("reward_preferences", {}).items():
             if reward_type in profile.reward_preferences:
                 alpha = 0.3
-                profile.reward_preferences[reward_type] = (
-                    (1 - alpha) * profile.reward_preferences[reward_type] + alpha * score
-                )
+                profile.reward_preferences[reward_type] = (1 - alpha) * profile.reward_preferences[
+                    reward_type
+                ] + alpha * score
 
-        for mechanic, score in updated_values.get('mechanic_effectiveness', {}).items():
+        for mechanic, score in updated_values.get("mechanic_effectiveness", {}).items():
             if mechanic in profile.mechanic_effectiveness:
                 alpha = 0.3
                 profile.mechanic_effectiveness[mechanic] = (
-                    (1 - alpha) * profile.mechanic_effectiveness[mechanic] + alpha * score
-                )
+                    1 - alpha
+                ) * profile.mechanic_effectiveness[mechanic] + alpha * score
 
         # Update burnout risk if provided
-        if 'burnout_risk' in updated_values:
-            profile.burnout_risk = (
-                0.7 * profile.burnout_risk + 0.3 * updated_values['burnout_risk']
-            )
+        if "burnout_risk" in updated_values:
+            profile.burnout_risk = 0.7 * profile.burnout_risk + 0.3 * updated_values["burnout_risk"]
 
         # Update novelty decay rates
-        for element, rate in updated_values.get('novelty_decay_rates', {}).items():
+        for element, rate in updated_values.get("novelty_decay_rates", {}).items():
             profile.novelty_decay_rates[element] = rate
 
         profile.last_updated = datetime.utcnow()
@@ -321,15 +320,13 @@ class AdaptiveGamificationEngine:
         for mechanic_str, mechanic in [(m.value, m) for m in GameMechanic]:
             if mechanic_str in profile.novelty_decay_rates:
                 days_since_update = (datetime.utcnow() - profile.last_updated).days
-                novelty_factor = np.exp(-profile.novelty_decay_rates[mechanic_str] * days_since_update)
-                adjusted_effectiveness[mechanic] *= (0.5 + 0.5 * novelty_factor)
+                novelty_factor = np.exp(
+                    -profile.novelty_decay_rates[mechanic_str] * days_since_update
+                )
+                adjusted_effectiveness[mechanic] *= 0.5 + 0.5 * novelty_factor
 
         # Sort by effectiveness and return top mechanics
-        sorted_mechanics = sorted(
-            adjusted_effectiveness.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+        sorted_mechanics = sorted(adjusted_effectiveness.items(), key=lambda x: x[1], reverse=True)
         return [mechanic for mechanic, _ in sorted_mechanics[:limit]]
 
     async def get_gamification_actions(
@@ -338,16 +335,13 @@ class AdaptiveGamificationEngine:
         """
         Generate gamification actions tailored to the user's profile and current context.
         """
-        optimal_mechanics = await self.get_optimal_mechanics(user_id, context, limit=count*2)
+        optimal_mechanics = await self.get_optimal_mechanics(user_id, context, limit=count * 2)
         profile = await self.get_user_profile(user_id)
         actions = []
 
         for mechanic in optimal_mechanics[:count]:
             # Select the most effective reward type for this mechanic
-            reward_type = max(
-                profile.reward_preferences.items(),
-                key=lambda x: x[1]
-            )[0]
+            reward_type = max(profile.reward_preferences.items(), key=lambda x: x[1])[0]
 
             # Create a message based on the context and mechanic
             message = self._generate_message(mechanic, context)
@@ -358,21 +352,21 @@ class AdaptiveGamificationEngine:
             # Calculate strength based on user's current state
             strength = self._calculate_action_strength(profile, mechanic, context)
 
-            actions.append(GamificationAction(
-                user_id=user_id,
-                mechanic=mechanic,
-                reward_type=reward_type,
-                context=context,
-                strength=strength,
-                message=message,
-                visual_element=visual_element
-            ))
+            actions.append(
+                GamificationAction(
+                    user_id=user_id,
+                    mechanic=mechanic,
+                    reward_type=reward_type,
+                    context=context,
+                    strength=strength,
+                    message=message,
+                    visual_element=visual_element,
+                )
+            )
 
         return actions
 
-    def _generate_message(
-        self, mechanic: GameMechanic, context: Dict[str, Any]
-    ) -> str:
+    def _generate_message(self, mechanic: GameMechanic, context: Dict[str, Any]) -> str:
         """Generate a contextually appropriate message for the gamification mechanic."""
         if mechanic not in self.message_templates:
             return f"You're making progress with {mechanic.value}!"
@@ -399,7 +393,9 @@ class AdaptiveGamificationEngine:
                 message = message.replace("{remaining}", str(context["remaining"]))
             elif "completed" in context and "total" in context:
                 # Calculate remaining from completed/total
-                remaining = int(100 * (context["total"] - context["completed"]) / max(1, context["total"]))
+                remaining = int(
+                    100 * (context["total"] - context["completed"]) / max(1, context["total"])
+                )
                 message = message.replace("{remaining}", str(remaining))
 
         # Replace other placeholders with context values
@@ -427,23 +423,29 @@ class AdaptiveGamificationEngine:
 
         # Add mechanic-specific configuration
         if mechanic == GameMechanic.PROGRESS_BAR:
-            visual_config.update({
-                "progress_percent": context.get("progress", 0),
-                "segmented": True,  # Segmented progress is better for ADHD users
-                "show_milestones": True,
-            })
+            visual_config.update(
+                {
+                    "progress_percent": context.get("progress", 0),
+                    "segmented": True,  # Segmented progress is better for ADHD users
+                    "show_milestones": True,
+                }
+            )
         elif mechanic == GameMechanic.CHALLENGE:
-            visual_config.update({
-                "challenge_name": context.get("challenge_name", "Daily Challenge"),
-                "difficulty": context.get("difficulty", "medium"),
-                "time_limited": context.get("time_limited", False),
-            })
+            visual_config.update(
+                {
+                    "challenge_name": context.get("challenge_name", "Daily Challenge"),
+                    "difficulty": context.get("difficulty", "medium"),
+                    "time_limited": context.get("time_limited", False),
+                }
+            )
         elif mechanic == GameMechanic.TIMER:
-            visual_config.update({
-                "duration": context.get("duration", 25 * 60),  # Default 25 minutes
-                "visual_countdown": True,
-                "audio_cues": context.get("audio_cues", True),
-            })
+            visual_config.update(
+                {
+                    "duration": context.get("duration", 25 * 60),  # Default 25 minutes
+                    "visual_countdown": True,
+                    "audio_cues": context.get("audio_cues", True),
+                }
+            )
 
         return visual_config
 
@@ -470,12 +472,12 @@ class AdaptiveGamificationEngine:
         # Adjust for user's current energy level - strengthen for low energy
         energy_factor = 1.0 + ((1.0 - context.get("energy_level", 0.5)) * 0.4)
 
-        return min(1.0, base_strength * burnout_factor * importance_factor *
-                  difficulty_factor * energy_factor)
+        return min(
+            1.0,
+            base_strength * burnout_factor * importance_factor * difficulty_factor * energy_factor,
+        )
 
-    async def apply_gamification_action(
-        self, action: GamificationAction
-    ) -> Dict[str, Any]:
+    async def apply_gamification_action(self, action: GamificationAction) -> Dict[str, Any]:
         """Apply a gamification action and track its effectiveness."""
         # Log the action for effectiveness tracking
         await self.gamification_service.log_gamification_action(
@@ -516,16 +518,14 @@ class AdaptiveGamificationEngine:
 
         # Weight the factors based on their importance
         effectiveness = (
-            0.4 * completion_rate +
-            0.3 * min(1.0, time_engaged / 300) +  # Normalize to 0-1 (5 minutes max)
-            0.3 * reaction_score
+            0.4 * completion_rate
+            + 0.3 * min(1.0, time_engaged / 300)  # Normalize to 0-1 (5 minutes max)
+            + 0.3 * reaction_score
         )
 
         # Record the effectiveness
         await self.gamification_service.record_action_effectiveness(
-            action_id=action_id,
-            effectiveness=effectiveness,
-            engagement_metrics=engagement_metrics
+            action_id=action_id, effectiveness=effectiveness, engagement_metrics=engagement_metrics
         )
 
         # Update the user's motivation profile based on this feedback

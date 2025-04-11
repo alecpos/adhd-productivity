@@ -12,17 +12,23 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch, AsyncMock
 
 from app.tests.ml.stochastic_time_estimation.test_utils import (
-    create_mock_task, create_mock_user, create_mock_health_metrics, mock_db, run_async_test
+    create_mock_task,
+    create_mock_user,
+    create_mock_health_metrics,
+    mock_db,
+    run_async_test,
 )
 
 
 @pytest.fixture
 def mock_components():
     """Create mock instances of all components."""
-    with patch("app.ml.stochastic_time_estimation.BayesianDurationPredictor") as mock_bdp, \
-         patch("app.ml.stochastic_time_estimation.NLPComplexityAnalyzer") as mock_nca, \
-         patch("app.ml.stochastic_time_estimation.ContextualStressorDetector") as mock_csd, \
-         patch("app.ml.stochastic_time_estimation.TimeBufferCalculator") as mock_tbc:
+    with (
+        patch("app.ml.stochastic_time_estimation.BayesianDurationPredictor") as mock_bdp,
+        patch("app.ml.stochastic_time_estimation.NLPComplexityAnalyzer") as mock_nca,
+        patch("app.ml.stochastic_time_estimation.ContextualStressorDetector") as mock_csd,
+        patch("app.ml.stochastic_time_estimation.TimeBufferCalculator") as mock_tbc,
+    ):
 
         # Configure mock instances
         mock_bdp_instance = MagicMock()
@@ -30,7 +36,7 @@ def mock_components():
         mock_bdp_instance.predict.return_value = {
             "estimated_duration": 60.0,
             "confidence_interval": (45.0, 75.0),
-            "factors": {"complexity": 1.2, "user_history": 1.1}
+            "factors": {"complexity": 1.2, "user_history": 1.1},
         }
 
         mock_nca_instance = MagicMock()
@@ -39,7 +45,7 @@ def mock_components():
             "complexity_score": 0.7,
             "cognitive_load": "medium",
             "focus_required": 3,
-            "time_impact_factor": 1.2
+            "time_impact_factor": 1.2,
         }
         mock_nca_instance.get_time_factor = AsyncMock()  # Replace with AsyncMock
         mock_nca_instance.get_time_factor.return_value = 1.2
@@ -49,7 +55,7 @@ def mock_components():
         mock_csd_instance.detect_current_stress.return_value = {
             "overall_stress_level": "moderate",
             "stress_score": 45,
-            "time_impact_factor": 1.3
+            "time_impact_factor": 1.3,
         }
         mock_csd_instance.get_task_stress_adjustment = AsyncMock()  # Replace with AsyncMock
         mock_csd_instance.get_task_stress_adjustment.return_value = 1.3
@@ -57,7 +63,9 @@ def mock_components():
         mock_tbc_instance = MagicMock()
         mock_tbc_instance.calculate_buffer = AsyncMock()  # Replace with AsyncMock
         mock_tbc_instance.calculate_buffer.return_value = 15.0
-        mock_tbc_instance.calculate_buffers_for_task_sequence = AsyncMock()  # Replace with AsyncMock
+        mock_tbc_instance.calculate_buffers_for_task_sequence = (
+            AsyncMock()
+        )  # Replace with AsyncMock
         mock_tbc_instance.calculate_buffers_for_task_sequence.return_value = [10.0, 15.0, 12.0]
 
         # Configure mock constructors to return mock instances
@@ -70,7 +78,7 @@ def mock_components():
             "bayesian_predictor": mock_bdp_instance,
             "nlp_analyzer": mock_nca_instance,
             "stressor_detector": mock_csd_instance,
-            "buffer_calculator": mock_tbc_instance
+            "buffer_calculator": mock_tbc_instance,
         }
 
 
@@ -84,17 +92,17 @@ class TestStochasticTimeEstimationIntegration:
         task1 = create_mock_task(
             task_id="task-1",
             description="Write a comprehensive project proposal for the client",
-            estimated_duration=45.0
+            estimated_duration=45.0,
         )
         task2 = create_mock_task(
             task_id="task-2",
             description="Create wireframes for the new mobile app",
-            estimated_duration=60.0
+            estimated_duration=60.0,
         )
         task3 = create_mock_task(
             task_id="task-3",
             description="Meeting with the development team",
-            estimated_duration=30.0
+            estimated_duration=30.0,
         )
 
         user = create_mock_user(user_id="test-user-1")
@@ -140,12 +148,14 @@ class TestStochasticTimeEstimationIntegration:
         for i, (task, duration) in enumerate(zip([task1, task2, task3], adjusted_durations)):
             # Add task to schedule
             end_time = current_time + timedelta(minutes=int(duration))
-            schedule.append({
-                "task_id": task["id"],
-                "start_time": current_time,
-                "end_time": end_time,
-                "duration_minutes": int(duration)
-            })
+            schedule.append(
+                {
+                    "task_id": task["id"],
+                    "start_time": current_time,
+                    "end_time": end_time,
+                    "duration_minutes": int(duration),
+                }
+            )
 
             # Add transition buffer if not the last task
             if i < len(transition_buffers):
@@ -165,7 +175,7 @@ class TestStochasticTimeEstimationIntegration:
 
         # Check if timings are consistent
         for i in range(1, len(schedule)):
-            previous_end = schedule[i-1]["end_time"]
+            previous_end = schedule[i - 1]["end_time"]
             current_start = schedule[i]["start_time"]
             assert current_start > previous_end
             buffer = (current_start - previous_end).total_seconds() / 60
@@ -185,7 +195,7 @@ class TestStochasticTimeEstimationIntegration:
         task = create_mock_task(
             task_id="task-1",
             description="Complete a detailed analysis report",
-            estimated_duration=60.0
+            estimated_duration=60.0,
         )
 
         # Get components
@@ -203,7 +213,7 @@ class TestStochasticTimeEstimationIntegration:
             csd.detect_current_stress.return_value = {
                 "overall_stress_level": stress_level,
                 "stress_score": 25 * (stress_levels.index(stress_level) + 1),
-                "time_impact_factor": time_impact
+                "time_impact_factor": time_impact,
             }
             csd.get_task_stress_adjustment.return_value = time_impact
 
@@ -215,7 +225,7 @@ class TestStochasticTimeEstimationIntegration:
 
         # Verify durations increase with stress level
         for i in range(1, len(durations)):
-            assert durations[i] > durations[i-1]
+            assert durations[i] > durations[i - 1]
 
         # Verify highest stress level significantly impacts duration
         assert durations[-1] >= durations[0] * 1.5
@@ -228,18 +238,18 @@ class TestStochasticTimeEstimationIntegration:
             create_mock_task(
                 task_id="simple-task",
                 description="Send a quick email to the team",
-                estimated_duration=15.0
+                estimated_duration=15.0,
             ),
             create_mock_task(
                 task_id="medium-task",
                 description="Prepare slides for the weekly presentation",
-                estimated_duration=45.0
+                estimated_duration=45.0,
             ),
             create_mock_task(
                 task_id="complex-task",
                 description="Develop a comprehensive business strategy for the next quarter",
-                estimated_duration=120.0
-            )
+                estimated_duration=120.0,
+            ),
         ]
 
         # Get components
@@ -258,7 +268,7 @@ class TestStochasticTimeEstimationIntegration:
                 "complexity_score": complexity_scores[i],
                 "cognitive_load": ["low", "medium", "high"][i],
                 "focus_required": i + 2,
-                "time_impact": time_impacts[i]
+                "time_impact": time_impacts[i],
             }
             nca.get_time_factor.return_value = time_impacts[i]
 
@@ -267,7 +277,7 @@ class TestStochasticTimeEstimationIntegration:
             bdp.predict.return_value = {
                 "estimated_duration": base_duration * time_impacts[i],
                 "confidence_interval": (base_duration * 0.8, base_duration * 1.2),
-                "factors": {"complexity": time_impacts[i], "user_history": 1.0}
+                "factors": {"complexity": time_impacts[i], "user_history": 1.0},
             }
 
             # Get the prediction
@@ -276,29 +286,28 @@ class TestStochasticTimeEstimationIntegration:
 
         # Verify that complexity impacts duration
         ratio_simple_to_complex = adjusted_durations[2] / adjusted_durations[0]
-        assert ratio_simple_to_complex > (tasks[2]["estimated_duration"] / tasks[0]["estimated_duration"])
+        assert ratio_simple_to_complex > (
+            tasks[2]["estimated_duration"] / tasks[0]["estimated_duration"]
+        )
 
     @pytest.mark.asyncio
     async def test_buffer_calculation_and_adaptation(self, mock_db, mock_components):
         """Test buffer calculation adapts to task characteristics."""
         # Create test data with different locations and tools
         home_task = create_mock_task(
-            task_id="home-task",
-            location="home",
-            tools_required=["computer"],
-            energy_required=2
+            task_id="home-task", location="home", tools_required=["computer"], energy_required=2
         )
         office_task = create_mock_task(
             task_id="office-task",
             location="office",
             tools_required=["whiteboard", "projector"],
-            energy_required=4
+            energy_required=4,
         )
         coffee_task = create_mock_task(
             task_id="coffee-task",
             location="coffee shop",
             tools_required=["notebook", "phone"],
-            energy_required=3
+            energy_required=3,
         )
 
         # Get buffer calculator
@@ -326,7 +335,7 @@ class TestStochasticTimeEstimationIntegration:
             (office_task, coffee_task),
             (coffee_task, home_task),
             (home_task, home_task),
-            (office_task, office_task)
+            (office_task, office_task),
         ]:
             buffer = await tbc.calculate_buffer(from_task["id"], to_task["id"])
             buffers.append(buffer)
