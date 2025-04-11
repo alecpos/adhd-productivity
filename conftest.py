@@ -1,9 +1,11 @@
 """Root level conftest to help with imports."""
 
-import sys
 import os
+import sys
 from pathlib import Path
 
-# Add the project root to Python path
-project_root = Path(__file__).parent.absolute()
-sys.path.insert(0, str(project_root)) 
+# Get the root directory of the project
+root_dir = Path(__file__).parent
+
+# Add the root directory to Python path
+sys.path.insert(0, str(root_dir)) 
