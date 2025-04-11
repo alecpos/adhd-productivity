@@ -19,5 +19,12 @@ repos:
     rev: v1.3.0
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all]
+        additional_dependencies:
+            - types-requests
+            - types-python-dateutil
+            - types-pytz
+            - types-redis
+            - types-setuptools
+            - types-six
+            - types-urllib3
         args: [--ignore-missing-imports] 
