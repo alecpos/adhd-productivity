@@ -1,7 +1,7 @@
 """
 Commitment Detection API Endpoints for ADHD Calendar.
 
-This module defines FastAPI endpoints for the commitment detection and 
+This module defines FastAPI endpoints for the commitment detection and
 proactive forgetfulness mitigation system.
 """
 from typing import Dict, List, Optional, Any
@@ -38,19 +38,19 @@ def detect_commitments(
 ):
     """
     Detect commitments in text.
-    
+
     This endpoint analyzes text for explicit and implicit commitments
     and returns the detected commitments.
     """
     service = CommitmentDetectionService(db)
-    
+
     # Make sure the user ID in the request matches the current user
     if str(request.user_id) != str(current_user.id):
         raise HTTPException(
             status_code=403,
             detail="User ID in request does not match authenticated user"
         )
-    
+
     detection_response = service.detect_commitments(request)
     return detection_response
 
@@ -63,18 +63,18 @@ def create_commitment(
 ):
     """
     Create a new commitment.
-    
+
     This endpoint creates a new commitment from the provided data.
     """
     service = CommitmentDetectionService(db)
-    
+
     # Make sure the user ID in the request matches the current user
     if str(commitment.user_id) != str(current_user.id):
         raise HTTPException(
             status_code=403,
             detail="User ID in request does not match authenticated user"
         )
-    
+
     db_commitment = service.create_commitment(commitment)
     return CommitmentResponse.from_orm(db_commitment)
 
@@ -93,11 +93,11 @@ def get_commitments(
 ):
     """
     Get commitments for the current user.
-    
+
     This endpoint retrieves commitments with optional filtering.
     """
     service = CommitmentDetectionService(db)
-    
+
     # Convert string parameters to enums if provided
     status_enum = None
     if status:
@@ -108,7 +108,7 @@ def get_commitments(
                 status_code=400,
                 detail=f"Invalid status: {status}"
             )
-    
+
     source_enum = None
     if source:
         try:
@@ -118,7 +118,7 @@ def get_commitments(
                 status_code=400,
                 detail=f"Invalid source: {source}"
             )
-    
+
     priority_enum = None
     if priority:
         try:
@@ -128,7 +128,7 @@ def get_commitments(
                 status_code=400,
                 detail=f"Invalid priority: {priority}"
             )
-    
+
     commitments, total = service.get_user_commitments(
         user_id=current_user.id,
         status=status_enum,
@@ -139,7 +139,7 @@ def get_commitments(
         skip=skip,
         limit=limit
     )
-    
+
     return CommitmentsList(
         items=[CommitmentResponse.from_orm(c) for c in commitments],
         total=total,
@@ -156,23 +156,23 @@ def get_commitment(
 ):
     """
     Get a specific commitment.
-    
+
     This endpoint retrieves a commitment by ID.
     """
     service = CommitmentDetectionService(db)
-    
+
     try:
         commitment = service.get_commitment(commitment_id)
-        
+
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
                 status_code=403,
                 detail="This commitment does not belong to the current user"
             )
-        
+
         return CommitmentResponse.from_orm(commitment)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=404,
@@ -189,26 +189,26 @@ def update_commitment(
 ):
     """
     Update a commitment.
-    
+
     This endpoint updates a commitment with the provided data.
     """
     service = CommitmentDetectionService(db)
-    
+
     try:
         # First get the commitment to check ownership
         commitment = service.get_commitment(commitment_id)
-        
+
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
                 status_code=403,
                 detail="This commitment does not belong to the current user"
             )
-        
+
         # Update the commitment
         updated_commitment = service.update_commitment(commitment_id, update_data)
         return CommitmentResponse.from_orm(updated_commitment)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=404,
@@ -224,25 +224,25 @@ def delete_commitment(
 ):
     """
     Delete a commitment.
-    
+
     This endpoint deletes a commitment by ID.
     """
     service = CommitmentDetectionService(db)
-    
+
     try:
         # First get the commitment to check ownership
         commitment = service.get_commitment(commitment_id)
-        
+
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
                 status_code=403,
                 detail="This commitment does not belong to the current user"
             )
-        
+
         # Delete the commitment
         service.delete_commitment(commitment_id)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=404,
@@ -258,26 +258,26 @@ def confirm_commitment(
 ):
     """
     Confirm a commitment.
-    
+
     This endpoint marks a commitment as confirmed.
     """
     service = CommitmentDetectionService(db)
-    
+
     try:
         # First get the commitment to check ownership
         commitment = service.get_commitment(commitment_id)
-        
+
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
                 status_code=403,
                 detail="This commitment does not belong to the current user"
             )
-        
+
         # Confirm the commitment
         confirmed_commitment = service.confirm_commitment(commitment_id)
         return CommitmentResponse.from_orm(confirmed_commitment)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=404,
@@ -293,26 +293,26 @@ def reject_commitment(
 ):
     """
     Reject a commitment.
-    
+
     This endpoint marks a commitment as rejected.
     """
     service = CommitmentDetectionService(db)
-    
+
     try:
         # First get the commitment to check ownership
         commitment = service.get_commitment(commitment_id)
-        
+
         # Make sure the commitment belongs to the current user
         if str(commitment.user_id) != str(current_user.id):
             raise HTTPException(
                 status_code=403,
                 detail="This commitment does not belong to the current user"
             )
-        
+
         # Reject the commitment
         rejected_commitment = service.reject_commitment(commitment_id)
         return CommitmentResponse.from_orm(rejected_commitment)
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=404,
@@ -328,12 +328,12 @@ def process_dialogue(
 ):
     """
     Process a dialogue message.
-    
+
     This endpoint processes a message from the user in the 'forgot anything?'
     dialogue system and returns an appropriate response.
     """
     service = DialogueSystemService(db)
-    
+
     response = service.process_message(request, str(current_user.id))
     return response
 
@@ -346,12 +346,12 @@ def analyze_journal_entry(
 ):
     """
     Analyze a journal entry for commitments.
-    
+
     This endpoint analyzes a journal entry for commitments and saves any
     detected commitments.
     """
     service = CommitmentDetectionService(db)
-    
+
     commitments = service.analyze_journal_entry(text, current_user.id)
     return [CommitmentResponse.from_orm(c) for c in commitments]
 
@@ -363,11 +363,11 @@ def process_smart_reminders(
 ):
     """
     Process smart reminders.
-    
+
     This endpoint processes smart reminders for the current user,
     sending any that are due.
     """
     service = SmartReminderService(db)
-    
+
     result = service.process_smart_reminders(current_user.id)
     return result

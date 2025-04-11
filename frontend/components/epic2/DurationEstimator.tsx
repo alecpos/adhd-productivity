@@ -33,14 +33,14 @@ export const DurationEstimator = () => {
   const [estimate, setEstimate] = useState<DurationEstimate | null>(null);
   const [showFactors, setShowFactors] = useState(false);
   const [taskFactors, setTaskFactors] = useState<TaskComplexityFactor[]>([]);
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
-  
+
   // Format minutes to hours and minutes
   const formatMinutes = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
+
     if (hours === 0) {
       return `${mins} min`;
     } else if (mins === 0) {
@@ -49,15 +49,15 @@ export const DurationEstimator = () => {
       return `${hours} hr ${mins} min`;
     }
   };
-  
+
   // Analyze task description
   const analyzeTask = () => {
     if (!taskDescription.trim()) return;
-    
+
     setIsAnalyzing(true);
     setEstimate(null);
     setTaskFactors([]);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       // Mock estimate result
@@ -67,34 +67,34 @@ export const DurationEstimator = () => {
         confidence: 0.85,
         mostLikely: Math.round(sliderValue * 1.2),
       };
-      
+
       setEstimate(mockEstimate);
       setTaskFactors(mockTaskFactors);
       setIsAnalyzing(false);
       setShowFactors(true);
     }, 1500);
   };
-  
+
   // Get bar chart data for duration distribution
   const getChartData = () => {
     if (!estimate) return null;
-    
+
     // Create a simplified distribution around the most likely estimate
     const step = Math.round((estimate.maxEstimate - estimate.minEstimate) / 5);
     const labels = [];
     const data = [];
-    
+
     for (let i = 0; i < 5; i++) {
       const value = estimate.minEstimate + i * step;
       labels.push(formatMinutes(value));
-      
+
       // Create a normal-like distribution with peak at the most likely value
       const distanceFromMostLikely = Math.abs(value - estimate.mostLikely);
       const normalizedDistance = distanceFromMostLikely / (estimate.maxEstimate - estimate.minEstimate);
       const height = Math.max(0.1, 1 - normalizedDistance * 1.5);
       data.push(Math.round(height * 100));
     }
-    
+
     return {
       labels,
       datasets: [
@@ -105,7 +105,7 @@ export const DurationEstimator = () => {
       ]
     };
   };
-  
+
   const chartConfig = {
     backgroundGradientFrom: "#ffffff",
     backgroundGradientTo: "#ffffff",
@@ -117,7 +117,7 @@ export const DurationEstimator = () => {
     },
     barPercentage: 0.8,
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <Card containerStyle={styles.card}>
@@ -125,7 +125,7 @@ export const DurationEstimator = () => {
         <Text style={styles.description}>
           Our Bayesian prediction network analyzes task descriptions to provide more accurate time estimates.
         </Text>
-        
+
         <Text style={styles.label}>Task Description</Text>
         <TextInput
           style={styles.input}
@@ -135,7 +135,7 @@ export const DurationEstimator = () => {
           multiline
           numberOfLines={4}
         />
-        
+
         <Text style={styles.label}>Your Estimate: {formatMinutes(sliderValue)}</Text>
         <View style={styles.sliderContainer}>
           <Text style={styles.sliderLabel}>15min</Text>
@@ -153,7 +153,7 @@ export const DurationEstimator = () => {
           />
           <Text style={styles.sliderLabel}>4hrs</Text>
         </View>
-        
+
         <Button
           title="Analyze Task"
           onPress={analyzeTask}
@@ -162,18 +162,18 @@ export const DurationEstimator = () => {
           buttonStyle={styles.button}
         />
       </Card>
-      
+
       {isAnalyzing && (
         <Card containerStyle={styles.card}>
           <ActivityIndicator size="large" color="#4782DA" />
           <Text style={styles.analyzingText}>Analyzing task complexity...</Text>
         </Card>
       )}
-      
+
       {estimate && (
         <Card containerStyle={styles.card}>
           <Card.Title>Estimated Duration</Card.Title>
-          
+
           <View style={styles.estimateContainer}>
             <View style={styles.estimateBox}>
               <Text style={styles.estimateLabel}>Minimum</Text>
@@ -188,13 +188,13 @@ export const DurationEstimator = () => {
               <Text style={styles.estimateValue}>{formatMinutes(estimate.maxEstimate)}</Text>
             </View>
           </View>
-          
+
           <Text style={styles.confidenceText}>
             Confidence: {Math.round(estimate.confidence * 100)}%
           </Text>
-          
+
           <Divider style={styles.divider} />
-          
+
           <Text style={styles.chartTitle}>Duration Distribution</Text>
           <BarChart
             data={getChartData() || { labels: [], datasets: [{ data: [] }] }}
@@ -205,15 +205,15 @@ export const DurationEstimator = () => {
             showValuesOnTopOfBars
             withHorizontalLabels={false}
           />
-          
+
           <Text style={styles.explanationText}>
             The most likely duration is {formatMinutes(estimate.mostLikely)}, which is {
-              estimate.mostLikely > sliderValue 
-                ? `${Math.round((estimate.mostLikely - sliderValue) / sliderValue * 100)}% longer` 
+              estimate.mostLikely > sliderValue
+                ? `${Math.round((estimate.mostLikely - sliderValue) / sliderValue * 100)}% longer`
                 : `${Math.round((sliderValue - estimate.mostLikely) / sliderValue * 100)}% shorter`
             } than your estimate.
           </Text>
-          
+
           <Button
             title={showFactors ? "Hide Complexity Factors" : "Show Complexity Factors"}
             type="outline"
@@ -222,11 +222,11 @@ export const DurationEstimator = () => {
           />
         </Card>
       )}
-      
+
       {showFactors && taskFactors.length > 0 && (
         <Card containerStyle={styles.card}>
           <Card.Title>Task Complexity Analysis</Card.Title>
-          
+
           {taskFactors.map((factor) => (
             <View key={factor.id} style={styles.factorContainer}>
               <View style={styles.factorHeader}>
@@ -237,16 +237,16 @@ export const DurationEstimator = () => {
               </View>
               <Text style={styles.factorDescription}>{factor.description}</Text>
               <View style={styles.factorBarContainer}>
-                <View 
+                <View
                   style={[
-                    styles.factorBar, 
+                    styles.factorBar,
                     { width: `${factor.score * 10}%`, backgroundColor: getScoreColor(factor.score) }
-                  ]} 
+                  ]}
                 />
               </View>
             </View>
           ))}
-          
+
           <Text style={styles.factorExplanation}>
             These factors were identified by our NLP Complexity Analyzer from your task description
             and historical performance data. High scores indicate areas that may increase task duration.
@@ -412,4 +412,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 10,
   },
-}); 
+});

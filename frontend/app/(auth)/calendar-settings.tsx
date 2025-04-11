@@ -43,7 +43,7 @@ export default function CalendarSettingsScreen() {
         setLoading('google');
         try {
             const authResponse = await promptAsync({ showInRecents: true });
-            
+
             if (authResponse?.type === 'success' && authResponse.authentication) {
                 await calendarService.setGoogleToken(authResponse.authentication.accessToken);
                 Toast.show({
@@ -110,7 +110,7 @@ export default function CalendarSettingsScreen() {
     return (
         <View style={styles.container}>
             <Text h4 style={styles.title}>Calendar Settings</Text>
-            
+
             <View style={styles.buttonContainer}>
                 <AnimatedButton
                     title="Connect Google Calendar"
@@ -176,4 +176,4 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         overflow: 'hidden',
     },
-}); 
+});

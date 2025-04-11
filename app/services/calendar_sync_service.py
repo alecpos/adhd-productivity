@@ -21,15 +21,15 @@ class CalendarSyncService:
     async def sync_calendars(self, user_id: str) -> List[Dict[str, Any]]:
         """
         Synchronize calendars from all connected providers.
-        
+
         Args:
             user_id: The ID of the user whose calendars to sync
-            
+
         Returns:
             List of sync results for each provider
         """
         sync_results = []
-        
+
         try:
             # Sync Google Calendar
             try:
@@ -46,7 +46,7 @@ class CalendarSyncService:
                     "error": str(e),
                     "timestamp": datetime.utcnow()
                 })
-            
+
             # Sync Apple Calendar
             try:
                 # TODO: Implement once Apple Calendar sync is ready
@@ -62,7 +62,7 @@ class CalendarSyncService:
                     "error": str(e),
                     "timestamp": datetime.utcnow()
                 })
-            
+
             # Sync Outlook Calendar
             try:
                 # TODO: Implement once Outlook Calendar sync is ready
@@ -78,21 +78,21 @@ class CalendarSyncService:
                     "error": str(e),
                     "timestamp": datetime.utcnow()
                 })
-            
+
             return sync_results
-            
+
         except Exception as e:
             raise IntegrationError(f"Calendar sync failed: {str(e)}")
-    
-    async def get_all_events(self, start_date: Optional[datetime] = None, 
+
+    async def get_all_events(self, start_date: Optional[datetime] = None,
                            end_date: Optional[datetime] = None) -> List[CalendarEventModel]:
         """
         Get all calendar events across providers for a given date range.
-        
+
         Args:
             start_date: Optional start date to filter events
             end_date: Optional end date to filter events
-            
+
         Returns:
             List of calendar events from all providers
         """
@@ -100,6 +100,6 @@ class CalendarSyncService:
             start_date = datetime.utcnow()
         if not end_date:
             end_date = start_date + timedelta(days=30)  # Default to next 30 days
-            
+
         # TODO: Implement fetching events from all providers
         return []

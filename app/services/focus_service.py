@@ -71,7 +71,7 @@ class FocusService(BaseService[FocusSessionModel, FocusSessionSchema, FocusSessi
         session.status = "paused"
         if reason:
             session.meta_data = {**(session.meta_data or {}), "pause_reason": reason}
-            
+
         await self.db.commit()
         await self.db.refresh(session)
         return self.schema_class.from_orm(session)
@@ -119,4 +119,4 @@ class FocusService(BaseService[FocusSessionModel, FocusSessionSchema, FocusSessi
             "average_focus_level": round(avg_focus_level, 2),
             "average_energy_level": round(avg_energy_level, 2),
             "average_productivity_score": round(avg_productivity, 2),
-        } 
+        }

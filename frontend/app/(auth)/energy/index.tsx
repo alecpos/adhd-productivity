@@ -60,22 +60,22 @@ export default function EnergyMappingScreen() {
 }
 
 const useStyles = makeStyles((theme) => ({
-  container: { 
-    padding: theme.spacing.lg 
+  container: {
+    padding: theme.spacing.lg
   },
-  slider: { 
-    marginVertical: theme.spacing.lg 
+  slider: {
+    marginVertical: theme.spacing.lg
   },
-  thumb: { 
-    height: 20, 
+  thumb: {
+    height: 20,
     width: 20,
-    backgroundColor: theme.colors.primary 
+    backgroundColor: theme.colors.primary
   },
-  track: { 
+  track: {
     height: 5,
-    backgroundColor: theme.colors.grey5 
+    backgroundColor: theme.colors.grey5
   },
-  input: { 
-    marginBottom: theme.spacing.lg 
+  input: {
+    marginBottom: theme.spacing.lg
   },
 }));

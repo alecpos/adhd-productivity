@@ -14,4 +14,4 @@ class UUIDSchema(BaseSchema):
 
 class NoneSchema(BaseSchema):
     """Schema for None type returns."""
-    pass 
+    pass

@@ -233,12 +233,12 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
     } catch (error) {
       console.error(`Attempt ${retries + 1} failed:`, error);
     }
-    
+
     retries++;
     const delay = Math.pow(2, retries) * 1000; // Exponential backoff
     await new Promise(resolve => setTimeout(resolve, delay));
   }
-  
+
   throw new Error(`Failed after ${maxRetries} retries`);
 }
 ```
@@ -298,4 +298,4 @@ Properly catch and handle exceptions to prevent exposing internal error details.
 
 - [API Documentation](./api_documentation.md)
 - [API Design Guidelines](./api_design_guidelines.md)
-- [Authentication Flow](./authentication_flow.md) 
+- [Authentication Flow](./authentication_flow.md)

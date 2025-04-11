@@ -443,7 +443,7 @@ for commitment in detected_commitments:
         user_id=user_id,
         commitment=commitment
     )
-    
+
     # If significant conflicts or duplicates, handle them
     if related_items.has_conflicts:
         resolved_commitment = forget_service.resolve_conflicts(
@@ -453,7 +453,7 @@ for commitment in detected_commitments:
     else:
         # Store the commitment
         stored_commitment = forget_service.store_commitment(commitment)
-        
+
         # 3. Create smart reminders for each commitment
         reminder = forget_service.create_smart_reminder(
             user_id=user_id,
@@ -598,4 +598,4 @@ secure_client.set_data_retention_policy(
 
 ---
 
-For additional examples and advanced use cases, refer to the [API Documentation](epic3_api.md) and [Implementation Details](epic3_implementation.md). 
+For additional examples and advanced use cases, refer to the [API Documentation](epic3_api.md) and [Implementation Details](epic3_implementation.md).

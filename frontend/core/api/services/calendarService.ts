@@ -61,7 +61,7 @@ class CalendarService {
         const params = new URLSearchParams();
         if (startDate) params.append('start_date', new Date(startDate).toISOString());
         if (endDate) params.append('end_date', new Date(endDate).toISOString());
-        
+
         const response = await api.get<CalendarEvent[]>(`${API_ENDPOINTS.CALENDAR.USER_EVENTS(userId)}?${params.toString()}`);
         return response.data;
     }
@@ -100,7 +100,7 @@ class CalendarService {
             start_date: startDate,
             end_date: endDate
         });
-        
+
         const response = await api.get<string[]>(`${API_ENDPOINTS.CALENDAR.AVAILABLE_SLOTS(userId)}?${params.toString()}`);
         return response.data;
     }

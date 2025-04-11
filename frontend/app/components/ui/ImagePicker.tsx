@@ -65,7 +65,7 @@ export const CustomImagePicker: React.FC<ImagePickerProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.picker}
         onPress={() => setShowOptions(true)}
       >
@@ -126,4 +126,4 @@ const useStyles = makeStyles((theme) => ({
     color: theme.colors.grey2,
     fontSize: theme.fontSize.md,
   },
-})); 
+}));

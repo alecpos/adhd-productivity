@@ -154,11 +154,11 @@ class ResourceUpdate(BaseModelWithValidators):
     name: Optional[str] = None
     status: Optional[str] = None
     completion_date: Optional[datetime] = None
-    
+
     # If status is "completed", completion_date must be provided
     _validate_completion = validate_dependent_fields(
-        "status", 
-        ["completion_date"], 
+        "status",
+        ["completion_date"],
         check_value="completed"
     )
 ```
@@ -181,4 +181,4 @@ This implementation provides a solid foundation for consistent, maintainable, an
 4. API documentation is comprehensive and up-to-date
 5. Testing is simplified through consistent response structures
 
-These standards are designed to evolve over time, and we encourage feedback and suggestions for improvements as we continue to expand the API. 
+These standards are designed to evolve over time, and we encourage feedback and suggestions for improvements as we continue to expand the API.

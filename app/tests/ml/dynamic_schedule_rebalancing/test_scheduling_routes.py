@@ -41,7 +41,7 @@ async def mock_optimize_with_circadian_error(request, current_user, db):
 
 class TestSchedulingRoutesEpic4:
     """Test suite for the scheduling routes related to Epic 4."""
-    
+
     @pytest.mark.asyncio
     async def test_optimize_with_circadian(self, assert_dict_structure):
         """Test the circadian optimization endpoint."""
@@ -49,7 +49,7 @@ class TestSchedulingRoutesEpic4:
         db = MagicMock()
         current_user = MagicMock()
         current_user.id = "user123"
-        
+
         # Mock request
         request = MagicMock()
         request.tasks = [
@@ -67,14 +67,14 @@ class TestSchedulingRoutesEpic4:
                 deadline=None
             )
         ]
-        
+
         # Call our mock function directly
         response = await mock_optimize_with_circadian(
             request=request,
             current_user=current_user,
             db=db
         )
-        
+
         # Verify we got the expected response
         if assert_dict_structure:
             assert_dict_structure(response, ["schedule", "energy_curve", "message"])
@@ -82,12 +82,12 @@ class TestSchedulingRoutesEpic4:
             assert "schedule" in response
             assert "energy_curve" in response
             assert "message" in response
-        
+
         # Check that the response contains the expected data
         assert len(response["energy_curve"]) == 3
         assert response["energy_curve"][0]["hour"] == 9
         assert response["energy_curve"][0]["energy_level"] == 8.0
-    
+
     @pytest.mark.asyncio
     async def test_optimize_with_circadian_error_handling(self):
         """Test error handling in the circadian optimization endpoint."""
@@ -95,11 +95,11 @@ class TestSchedulingRoutesEpic4:
         db = MagicMock()
         current_user = MagicMock()
         current_user.id = "user123"
-        
+
         # Mock request
         request = MagicMock()
         request.tasks = []
-        
+
         # Call should raise HTTPException
         with pytest.raises(HTTPException) as exc_info:
             await mock_optimize_with_circadian_error(
@@ -107,11 +107,11 @@ class TestSchedulingRoutesEpic4:
                 current_user=current_user,
                 db=db
             )
-        
+
         # Check exception details
         assert exc_info.value.status_code == 500
         assert "Error optimizing schedule with circadian awareness" in str(exc_info.value.detail)
 
 
 if __name__ == "__main__":
-    pytest.main(["-xvs", __file__]) 
+    pytest.main(["-xvs", __file__])

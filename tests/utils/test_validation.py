@@ -198,7 +198,7 @@ def test_phone_number_validator_too_short():
 class SimpleTestModel(BaseModel):
     """Simple test model for manual validation."""
     field: str
-    
+
     @validator('field')
     def validate_field(cls, v):
         if v != "test":
@@ -211,7 +211,7 @@ def test_simple_validation():
     # Test with valid value
     model = SimpleTestModel(field="test")
     assert model.field == "test"
-    
+
     # Test with invalid value
     with pytest.raises(Exception) as excinfo:
         SimpleTestModel(field="invalid")
@@ -222,23 +222,23 @@ def test_validate_at_least_one_field_present():
     """Test validate_at_least_one_field_present function."""
     fields = ["field1", "field2"]
     validator_fn = validate_at_least_one_field_present(fields)
-    
+
     # Create a model with the validator
     class TestModel(BaseModel):
         field1: str = None
         field2: str = None
-        
+
         _validate_fields = validator_fn
-    
+
     # Test with one field present
     model = TestModel(field1="value")
     assert model.field1 == "value"
-    
+
     # Test with both fields present
     model = TestModel(field1="value1", field2="value2")
     assert model.field1 == "value1"
     assert model.field2 == "value2"
-    
+
     # Test with no fields present
     with pytest.raises(Exception) as excinfo:
         TestModel()
@@ -250,25 +250,25 @@ def test_validate_dependent_fields():
     main_field = "main"
     dependent_fields = ["dependent1", "dependent2"]
     validator_fn = validate_dependent_fields(main_field, dependent_fields)
-    
+
     # Create a model with the validator
     class TestModel(BaseModel):
         main: str = None
         dependent1: str = None
         dependent2: str = None
-        
+
         _validate_fields = validator_fn
-    
+
     # Test with main field not present
     model = TestModel()
     assert model.main is None
-    
+
     # Test with main field and all dependent fields present
     model = TestModel(main="value", dependent1="value1", dependent2="value2")
     assert model.main == "value"
     assert model.dependent1 == "value1"
     assert model.dependent2 == "value2"
-    
+
     # Test with main field present but dependent field missing
     with pytest.raises(Exception) as excinfo:
         TestModel(main="value", dependent1="value1")
@@ -279,24 +279,24 @@ def test_validate_mutually_exclusive_fields():
     """Test validate_mutually_exclusive_fields function."""
     fields = ["field1", "field2"]
     validator_fn = validate_mutually_exclusive_fields(fields)
-    
+
     # Create a model with the validator
     class TestModel(BaseModel):
         field1: str = None
         field2: str = None
-        
+
         _validate_fields = validator_fn
-    
+
     # Test with one field present
     model = TestModel(field1="value")
     assert model.field1 == "value"
-    
+
     # Test with no fields present
     model = TestModel()
     assert model.field1 is None
     assert model.field2 is None
-    
+
     # Test with both fields present
     with pytest.raises(Exception) as excinfo:
         TestModel(field1="value1", field2="value2")
-    assert "Only one of these fields can be provided" in str(excinfo.value) 
+    assert "Only one of these fields can be provided" in str(excinfo.value)

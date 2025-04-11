@@ -97,4 +97,4 @@ export class HyperfocusService {
       throw new AppError('Failed to cancel session', (error as Error).message);
     }
   }
-} 
+}

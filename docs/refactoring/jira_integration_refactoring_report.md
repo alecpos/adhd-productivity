@@ -4,7 +4,7 @@
 
 This report documents the comprehensive refactoring of the Jira integration component in the ADHD Calendar backend. The refactoring was undertaken to address critical technical debt issues, particularly the excessive nesting depth (14 levels) and high cyclomatic complexity identified by debt analysis tools.
 
-**Project Timeframe:** November 10-13, 2023  
+**Project Timeframe:** November 10-13, 2023
 **Team:** Backend Engineering
 
 ## Problem Statement
@@ -152,4 +152,4 @@ While we've made significant improvements in reducing nested depth and separatin
 
 The Jira integration refactoring has successfully transformed a monolithic, difficult-to-maintain class into a component-based architecture with clear responsibilities, improved error handling, and better resilience patterns. The significant reduction in nested depth and dependencies score demonstrates the effectiveness of the refactoring approach.
 
-While there are still opportunities for improvement, particularly in the structure score as measured by the debt analysis tool, the new architecture provides a solid foundation for future enhancements and serves as a model for refactoring other complex components in the system. 
+While there are still opportunities for improvement, particularly in the structure score as measured by the debt analysis tool, the new architecture provides a solid foundation for future enhancements and serves as a model for refactoring other complex components in the system.

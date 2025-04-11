@@ -47,15 +47,15 @@ jobs:
           body: |
             ## Changes
             Automated release created for version ${{ github.ref_name }}
-            
+
             ### Dependencies
             - Python 3.9+
             - See requirements.txt for full list
-            
+
             ### Installation
             ```bash
             pip install adhd-calendar-backend==${{ github.ref_name }}
             ```
           draft: false
           prerelease: false
-          generate_release_notes: true 
+          generate_release_notes: true

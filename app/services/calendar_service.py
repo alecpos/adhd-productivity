@@ -56,7 +56,7 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
         event = await self.get_event(event_id, user_id)
         if not event:
             return None
-        
+
         update_dict = event_data.model_dump(exclude_unset=True)
         updated_event = await self.update(UUID(event_id), update_dict)
         return CalendarEventSchema.model_validate(updated_event) if updated_event else None
@@ -69,20 +69,20 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
         return await self.delete(UUID(event_id))
 
     async def apply_circadian_optimization(
-        self, 
-        user_id: UUID, 
+        self,
+        user_id: UUID,
         optimization_results: List[dict]
     ) -> Dict[str, Any]:
         """Apply circadian optimization results to calendar events.
-        
+
         This method updates calendar events based on the optimization
         results from the CircadianDQNModel.
-        
+
         Args:
             user_id: User ID
-            optimization_results: List of optimization results with event IDs 
+            optimization_results: List of optimization results with event IDs
                                   and suggested time changes
-                                  
+
         Returns:
             Summary of applied changes
         """
@@ -91,7 +91,7 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
         skipped_count = 0
         errors = []
         updated_events = []
-        
+
         for result in optimization_results:
             try:
                 # Get event ID
@@ -100,18 +100,18 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
                     skipped_count += 1
                     errors.append(f"Missing event ID in optimization result")
                     continue
-                
+
                 # Get the event
                 event = await self.get(UUID(event_id))
                 if not event or str(event.user_id) != str(user_id):
                     skipped_count += 1
                     errors.append(f"Event {event_id} not found or not owned by user")
                     continue
-                
+
                 # Parse new times
                 new_start = datetime.fromisoformat(result.get("suggested_start"))
                 new_end = datetime.fromisoformat(result.get("suggested_end"))
-                
+
                 # Apply changes
                 event_update = {
                     "start_time": new_start,
@@ -127,20 +127,20 @@ class CalendarService(BaseService[CalendarEventModel, CalendarEventSchema, Calen
                         "energy_level": result.get("energy_level", 5.0),
                     }
                 }
-                
+
                 # Update the event
                 updated_event = await self.update(UUID(event_id), event_update)
                 applied_count += 1
                 updated_events.append(CalendarEventSchema.model_validate(updated_event))
-                
+
                 # TODO: Add sync with external calendar if needed
                 # This would involve calling the appropriate calendar service
                 # based on the event's calendar type
-                
+
             except Exception as e:
                 skipped_count += 1
                 errors.append(f"Error updating event {result.get('event_id')}: {str(e)}")
-        
+
         return {
             "applied_count": applied_count,
             "skipped_count": skipped_count,

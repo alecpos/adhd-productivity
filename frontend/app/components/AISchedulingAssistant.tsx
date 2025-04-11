@@ -51,13 +51,13 @@ export default function AISchedulingAssistant() {
         <Text style={styles.description}>
           Tell me what you need to work on and I'll find the best time in your schedule.
         </Text>
-        
+
         <Input
           placeholder="What do you need to work on?"
           value={task}
           onChangeText={setTask}
         />
-        
+
         <Input
           placeholder="How many hours do you need?"
           value={hours}
@@ -76,7 +76,7 @@ export default function AISchedulingAssistant() {
       {suggestion && (
         <Card>
           <Card.Title>Scheduling Suggestions</Card.Title>
-          
+
           <Text style={styles.confidence}>
             Confidence: {(suggestion.confidence * 100).toFixed(1)}%
           </Text>
@@ -85,11 +85,11 @@ export default function AISchedulingAssistant() {
             <View key={index} style={styles.decision}>
               <Text style={styles.optionTitle}>Option {index + 1}</Text>
               <Text>{decision.reasoning}</Text>
-              
+
               <View style={styles.timeBlocks}>
                 {decision.timeBlocks.map((block, blockIndex) => (
                   <Text key={blockIndex} style={styles.timeBlock}>
-                    {new Date(block.startTime).toLocaleTimeString()} - 
+                    {new Date(block.startTime).toLocaleTimeString()} -
                     {new Date(block.endTime).toLocaleTimeString()}
                   </Text>
                 ))}
@@ -141,4 +141,4 @@ const styles = StyleSheet.create({
   acceptButton: {
     marginTop: 10,
   },
-}); 
+});

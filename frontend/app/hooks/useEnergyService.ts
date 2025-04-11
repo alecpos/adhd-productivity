@@ -262,4 +262,4 @@ export function useEnergyService() {
         batchLogEnergy,
         getUserEnergyData
     };
-} 
+}

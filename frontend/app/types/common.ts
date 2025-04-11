@@ -20,4 +20,4 @@ export const CommonTypesConstants = {
 // Export a dummy component for the router
 export default function CommonTypesComponent() {
     return null;
-} 
+}

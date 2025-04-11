@@ -47,9 +47,9 @@ export const Modal: React.FC<ModalProps> = ({
         }}
       >
         <View style={[
-          styles.container, 
-          { width: typeof width === 'number' ? width : width, 
-            height: typeof height === 'number' ? height : height 
+          styles.container,
+          { width: typeof width === 'number' ? width : width,
+            height: typeof height === 'number' ? height : height
           } as ViewStyle
         ]}>
           <Card

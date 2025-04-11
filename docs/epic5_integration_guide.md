@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 5 Integration Guide
 
-**Version**: 1.0  
-**Last Updated**: 2025-06-15  
+**Version**: 1.0
+**Last Updated**: 2025-06-15
 **Target Audience**: Developers integrating fairness components
 
 ## Overview
@@ -139,12 +139,12 @@ Update your database schema to store explanations alongside predictions:
 # Example SQLAlchemy model update
 class ProductivityPrediction(Base):
     __tablename__ = "productivity_predictions"
-    
+
     id = Column(String, primary_key=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     prediction = Column(Float, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
-    
+
     # New fields for explanations
     explanation_text = Column(Text, nullable=True)
     explanation_visual = Column(Text, nullable=True)  # Base64 encoded
@@ -344,7 +344,7 @@ class BiasAuditDataCollector:
     def __init__(self, bias_auditor):
         self.bias_auditor = bias_auditor
         self.prediction_buffer = []
-    
+
     async def collect_prediction_data(self, user_id, model_id, prediction, actual_outcome=None):
         # Get user attributes
         user = await get_user(user_id)
@@ -353,7 +353,7 @@ class BiasAuditDataCollector:
             "age_group": user.age_group,
             "gender": user.gender
         }
-        
+
         # Store prediction data
         self.prediction_buffer.append({
             "model_id": model_id,
@@ -363,11 +363,11 @@ class BiasAuditDataCollector:
             "protected_attributes": protected_attributes,
             "timestamp": datetime.utcnow()
         })
-        
+
         # Periodically flush buffer to storage
         if len(self.prediction_buffer) >= 100:
             await self.flush_buffer()
-    
+
     async def flush_buffer(self):
         # Save to database for later auditing
         await save_prediction_data(self.prediction_buffer)
@@ -382,20 +382,20 @@ Set up a process to review and act on audit reports:
 # Example: Scheduled task to review audit reports
 async def review_audit_reports():
     bias_auditor = get_bias_auditor()
-    
+
     # Get recent audit reports
     audit_ids = await get_recent_audit_ids()
     for audit_id in audit_ids:
         report = bias_auditor.generate_report(audit_id)
-        
+
         # Check for fairness violations
         if report.violations:
             # Alert administrators
             await send_fairness_alert(report)
-            
+
             # Log detailed information
             logger.warning(f"Fairness violations detected in audit {audit_id}: {report.violations}")
-            
+
             # Apply mitigation if available
             if report.recommendations:
                 for recommendation in report.recommendations:
@@ -412,20 +412,20 @@ function PredictionExplanation({ explanation }) {
   return (
     <div className="explanation-container">
       <div className="explanation-text">{explanation.text}</div>
-      
+
       {explanation.visual && (
         <div className="explanation-visual">
-          <img src={`data:image/png;base64,${explanation.visual}`} 
+          <img src={`data:image/png;base64,${explanation.visual}`}
                alt="Feature importance visualization" />
         </div>
       )}
-      
+
       <div className="explanation-features">
         <h4>Key Factors:</h4>
         <ul>
           {explanation.top_features.map(feature => (
             <li key={feature.name}>
-              <span className="feature-name">{feature.display_name}</span>: 
+              <span className="feature-name">{feature.display_name}</span>:
               <span className="feature-impact">{feature.impact_percentage}%</span>
             </li>
           ))}
@@ -451,7 +451,7 @@ function FallbackHandler({ fallbackResult }) {
           <div className="confidence-notice">{message}</div>
         </div>
       );
-      
+
     case 'alternative':
       return (
         <div className="fallback-alternatives">
@@ -460,7 +460,7 @@ function FallbackHandler({ fallbackResult }) {
           </div>
           <div className="alternatives-list">
             {alternatives.map((alt, index) => (
-              <button 
+              <button
                 key={index}
                 className="alternative-option"
                 onClick={() => selectAlternative(alt)}
@@ -471,7 +471,7 @@ function FallbackHandler({ fallbackResult }) {
           </div>
         </div>
       );
-      
+
     case 'default':
       return (
         <div className="fallback-default">
@@ -481,7 +481,7 @@ function FallbackHandler({ fallbackResult }) {
           <div className="prediction-content">{renderPrediction(prediction)}</div>
         </div>
       );
-      
+
     default:
       return (
         <div className="prediction-content">{renderPrediction(prediction)}</div>
@@ -500,10 +500,10 @@ def test_productivity_explanation():
     explainer = create_explainer('productivity', mock_productivity_model)
     input_data = {'time_of_day': 10, 'day_of_week': 2, 'task_type': 'writing'}
     prediction = 0.85
-    
+
     # Act
     explanation = explainer.explain(input_data, prediction)
-    
+
     # Assert
     assert explanation is not None
     assert explanation.text is not None
@@ -529,18 +529,18 @@ async def test_reminder_debiasing():
         'age_group': '18-25',
         'gender': 'female'
     }
-    
+
     # Act
     debiased_reminder = debiasing_service.debias_reminder(
         reminder_data=reminder_data,
         user_attributes=user_attributes
     )
-    
+
     # Assert
     assert debiased_reminder is not None
     assert 'reminder_urgency' in debiased_reminder
     assert 'suggested_time' in debiased_reminder
-    
+
     # Check that values have been adjusted
     assert debiased_reminder != reminder_data
 ```
@@ -561,28 +561,28 @@ def test_progressive_fallback():
         ]
     )
     fallback_manager.register_protocol("test_model", protocol)
-    
+
     # Act - high confidence
     result_high = fallback_manager.apply_protocol(
         model_id="test_model",
         prediction="predicted_value",
         confidence=0.9
     )
-    
+
     # Act - medium confidence
     result_medium = fallback_manager.apply_protocol(
         model_id="test_model",
         prediction="predicted_value",
         confidence=0.6
     )
-    
+
     # Act - low confidence
     result_low = fallback_manager.apply_protocol(
         model_id="test_model",
         prediction="predicted_value",
         confidence=0.2
     )
-    
+
     # Assert
     assert result_high["action"] is None  # No fallback
     assert result_medium["action"] == "notify"
@@ -603,10 +603,10 @@ async def test_bias_audit():
     ]
     outcomes = [1, 0, 1, 1, 0, 1]
     protected_attributes = {
-        "adhd_type": ["inattentive", "hyperactive", "combined", 
+        "adhd_type": ["inattentive", "hyperactive", "combined",
                       "inattentive", "hyperactive", "combined"]
     }
-    
+
     # Act
     report = bias_auditor.audit_predictions(
         predictions=predictions,
@@ -614,7 +614,7 @@ async def test_bias_audit():
         protected_attributes=protected_attributes,
         metrics=["demographic_parity"]
     )
-    
+
     # Assert
     assert report is not None
     assert "demographic_parity" in report.fairness_scores
@@ -637,52 +637,52 @@ class CachedExplanationService:
         self.cache = {}
         self.cache_ttl = cache_ttl
         self.explainers = {}
-    
+
     def get_explainer(self, model_type, model_instance):
         if model_type not in self.explainers:
             self.explainers[model_type] = create_explainer(model_type, model_instance)
         return self.explainers[model_type]
-    
+
     async def get_explanation(self, model_type, model_instance, input_data, prediction):
         # Create cache key
         cache_key = self._create_cache_key(model_type, input_data, prediction)
-        
+
         # Check cache
         if cache_key in self.cache and self._is_cache_valid(cache_key):
             return self.cache[cache_key]["explanation"]
-        
+
         # Generate explanation asynchronously
         explanation = await self._generate_explanation_async(
             model_type, model_instance, input_data, prediction
         )
-        
+
         # Cache the result
         self.cache[cache_key] = {
             "explanation": explanation,
             "timestamp": time.time()
         }
-        
+
         return explanation
-    
+
     async def _generate_explanation_async(self, model_type, model_instance, input_data, prediction):
         # Get the appropriate explainer
         explainer = self.get_explainer(model_type, model_instance)
-        
+
         # Run explanation generation in a thread pool to avoid blocking
         loop = asyncio.get_event_loop()
         explanation = await loop.run_in_executor(
-            None, 
+            None,
             lambda: explainer.explain(input_data, prediction)
         )
-        
+
         return explanation
-    
+
     def _create_cache_key(self, model_type, input_data, prediction):
         # Create a deterministic cache key from the inputs
         input_str = json.dumps(input_data, sort_keys=True)
         pred_str = str(prediction)
         return f"{model_type}:{input_str}:{pred_str}"
-    
+
     def _is_cache_valid(self, cache_key):
         # Check if cache entry is still valid
         entry_time = self.cache[cache_key]["timestamp"]
@@ -718,29 +718,29 @@ debiased_prediction = debiasing_service.mitigate_bias(
 def get_protected_attributes(user_id):
     # Get user profile
     user = get_user(user_id)
-    
+
     # Start with explicitly provided attributes
     protected_attributes = {}
-    
+
     if user.adhd_type:
         protected_attributes["adhd_type"] = user.adhd_type
-    
+
     if user.age_group:
         protected_attributes["age_group"] = user.age_group
-    
+
     if user.gender:
         protected_attributes["gender"] = user.gender
-    
+
     # For missing attributes, use aggregate values when available
     if "adhd_type" not in protected_attributes and user.interactions:
         # Infer from interaction patterns, not personally identifying
         protected_attributes["adhd_type"] = infer_adhd_type_from_interactions(user.interactions)
-    
+
     # Ensure we're using attribute buckets, not specific values
     if "age" in protected_attributes:
         protected_attributes["age_group"] = convert_age_to_group(protected_attributes["age"])
         del protected_attributes["age"]
-    
+
     return protected_attributes
 ```
 
@@ -778,4 +778,4 @@ explanation_service.set_visual_rate_limit(
 
 ---
 
-© 2025 ADHD Calendar - Fair and ethical AI for everyone 
+© 2025 ADHD Calendar - Fair and ethical AI for everyone

@@ -29,7 +29,7 @@ The circuit breaker pattern prevents repeated calls to failing services, allowin
 ```python
 @BaseService.with_circuit_breaker(
     name="dependency_name",
-    failure_threshold=5, 
+    failure_threshold=5,
     recovery_timeout=30
 )
 async def call_external_service(self, arg1, arg2):
@@ -53,7 +53,7 @@ async def bulkhead_llm_processing(self, text: str, context: Optional[str] = None
     """Process text with LLM using bulkhead pattern."""
     async def process_with_llm():
         # Actual processing logic
-        
+
     # Execute with bulkhead isolation
     result = await self._llm_processing_bulkhead(process_with_llm)()
     return result
@@ -70,7 +70,7 @@ async def health_check(self) -> Dict[str, Any]:
     circuit_states = {
         "operation_name": self._get_circuit_state("operation_name"),
     }
-    
+
     return {
         "service": "ServiceName",
         "status": "healthy" if all_ok else "degraded",
@@ -126,4 +126,4 @@ The test scripts verify:
 
 - [IMPLEMENTATION_PROGRESS.md](./IMPLEMENTATION_PROGRESS.md) - Detailed implementation status
 - [SERVICE_PATTERNS.md](./SERVICE_PATTERNS.md) - Documentation of resilience patterns
-- [DEVOPS_IMPLEMENTATION.md](../DEVOPS_IMPLEMENTATION.md) - DevOps implementation guidelines 
+- [DEVOPS_IMPLEMENTATION.md](../DEVOPS_IMPLEMENTATION.md) - DevOps implementation guidelines

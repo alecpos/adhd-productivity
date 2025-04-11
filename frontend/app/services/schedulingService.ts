@@ -60,4 +60,4 @@ class SchedulingService {
 }
 
 export const schedulingService = new SchedulingService();
-export default SchedulingService; 
+export default SchedulingService;

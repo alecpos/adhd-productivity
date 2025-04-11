@@ -33,7 +33,7 @@ export function EnergyLevelTracker({ onUpdate }: EnergyLevelTrackerProps) {
   };
 
   const chartData = {
-    labels: energyLogs.map(log => 
+    labels: energyLogs.map(log =>
       log.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     ),
     datasets: [{
@@ -44,7 +44,7 @@ export function EnergyLevelTracker({ onUpdate }: EnergyLevelTrackerProps) {
   return (
     <Card containerStyle={styles.container}>
       <Card.Title>Energy Level Tracker</Card.Title>
-      
+
       <View style={styles.currentEnergy}>
         <Text style={styles.label}>Current Energy Level (1-10)</Text>
         <Slider
@@ -57,7 +57,7 @@ export function EnergyLevelTracker({ onUpdate }: EnergyLevelTrackerProps) {
           trackStyle={{ height: theme.spacing.sm }}
         />
         <Text style={styles.value}>{currentEnergy}</Text>
-        
+
         <AnimatedButton
           title="Log Energy Level"
           onPress={handleLogEnergy}

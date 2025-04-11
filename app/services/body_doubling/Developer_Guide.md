@@ -96,30 +96,30 @@ Example of adding a new method:
 ```python
 async def pause_session(self, session_id: UUID, pause_duration: int) -> Session:
     """Temporarily pause an active session.
-    
+
     Args:
         session_id: The ID of the session to pause
         pause_duration: Pause duration in minutes
-        
+
     Returns:
         Updated session object
-    
+
     Raises:
         SessionNotFoundError: If session doesn't exist
         InvalidSessionStateError: If session is not in an active state
     """
     session = await self._get_session_by_id(session_id)
-    
+
     if session.status != SessionStatus.ACTIVE:
         raise InvalidSessionStateError(f"Cannot pause session with status {session.status}")
-    
+
     session.status = SessionStatus.PAUSED
-    session.metadata["pause_end_time"] = (datetime.now() + 
+    session.metadata["pause_end_time"] = (datetime.now() +
                                          timedelta(minutes=pause_duration)).isoformat()
-    
+
     await self._db.commit()
     await self._notification_service.notify_session_paused(session)
-    
+
     return session
 ```
 
@@ -135,11 +135,11 @@ Example:
 ```python
 async def match_by_topic_similarity(self, user_id: UUID, topics: List[str]) -> List[MatchResult]:
     """Find matches based on topic similarity.
-    
+
     Args:
         user_id: The user requesting matches
         topics: List of topics the user is interested in
-        
+
     Returns:
         List of potential matches with similarity scores
     """
@@ -159,10 +159,10 @@ Example:
 ```python
 async def calculate_topic_productivity(self, user_id: UUID) -> Dict[str, float]:
     """Calculate user's productivity score by topic.
-    
+
     Args:
         user_id: The user to analyze
-        
+
     Returns:
         Dictionary mapping topics to productivity scores
     """
@@ -191,7 +191,7 @@ async def test_create_session_with_invalid_duration(self, session_manager, user_
         "duration": -30,  # Invalid duration
         "topic": "Test topic"
     }
-    
+
     # Act & Assert
     with pytest.raises(InvalidSessionParameterError):
         await session_manager.create_session(user_id, invalid_session_data)
@@ -215,13 +215,13 @@ async def test_match_request_and_accept_flow(self, body_doubling_service, user_1
         user_id=user_1_id,
         criteria={"topic": "coding"}
     )
-    
+
     # Act - Accept match
     session = await body_doubling_service.accept_match(
         match_request_id=match_request.id,
         user_id=user_2_id
     )
-    
+
     # Assert
     assert session is not None
     assert session.participants[0].user_id == user_1_id
@@ -315,4 +315,4 @@ self._logger.info("Creating new session", extra={
 
 ---
 
-*Last updated: November 15, 2023* 
+*Last updated: November 15, 2023*

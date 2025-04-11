@@ -134,4 +134,4 @@ docker run --rm adhd-calendar-ste-tests pytest tests/ml/stochastic_time_estimati
 
 ## Conclusion
 
-The Stochastic Time Estimation Engine has comprehensive test coverage for all its components, both individually and as an integrated system. The tests cover the main functionality, edge cases, and integration scenarios, ensuring the robustness of the implementation. The Docker-based testing environment and CI/CD integration ensure that tests can be run consistently and automatically. 
+The Stochastic Time Estimation Engine has comprehensive test coverage for all its components, both individually and as an integrated system. The tests cover the main functionality, edge cases, and integration scenarios, ensuring the robustness of the implementation. The Docker-based testing environment and CI/CD integration ensure that tests can be run consistently and automatically.

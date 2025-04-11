@@ -669,4 +669,4 @@ The Dynamic Schedule Rebalancing API is supported in the following client SDKs:
 - Introduced the Dynamic Schedule Rebalancing feature
 - Added circadian rhythm optimization endpoints
 - Implemented cognitive demand analysis for tasks
-- Added support for energy level reporting 
+- Added support for energy level reporting

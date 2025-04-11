@@ -1,13 +1,13 @@
 /**
  * ADHD Calendar Standalone Component Tester
- * 
+ *
  * This script can be used to test individual components outside the main app
  * to verify they work correctly.
- * 
+ *
  * Usage:
  * 1. Uncomment the component you want to test
  * 2. Run: node standalone_test.js
- * 
+ *
  * Note: This is a basic setup for local component testing.
  */
 
@@ -81,4 +81,4 @@ To test the ${componentToTest} component:
 
 // Clean up
 // fs.unlinkSync(TEST_FILE_PATH);
-console.log('Test file created at TestComponent.jsx (not deleted for reference)'); 
+console.log('Test file created at TestComponent.jsx (not deleted for reference)');

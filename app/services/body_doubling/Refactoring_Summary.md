@@ -103,4 +103,4 @@ While there is still room for further improvement, particularly in areas like pe
 
 ---
 
-*This refactoring was part of the broader initiative to improve the technical foundation of the ADHD Calendar application.* 
+*This refactoring was part of the broader initiative to improve the technical foundation of the ADHD Calendar application.*

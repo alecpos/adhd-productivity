@@ -62,7 +62,7 @@ If you need a template for a new domain, you can generate one:
 
 ```python
 # Generate a new template for a custom domain
-selector.generate_domain_template("graph_neural_networks", 
+selector.generate_domain_template("graph_neural_networks",
                                  "graph_nn_reasoning_template.md")
 ```
 
@@ -133,4 +133,4 @@ To contribute new templates or improvements:
 1. Create a new template file or edit an existing one
 2. Add domain-specific sections to the `domain_specific_sections.json` file
 3. Update this README with any new template information
-4. Submit a PR with your changes 
+4. Submit a PR with your changes

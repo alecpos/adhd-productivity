@@ -30,7 +30,7 @@ export function FocusTimer() {
     longBreakDuration: 15,
     cyclesBeforeLongBreak: 4
   });
-  
+
   const [timer, setTimer] = useState<TimerState>({
     minutes: settings.workDuration,
     seconds: 0,
@@ -96,7 +96,7 @@ export function FocusTimer() {
             const nextCycles = prev.isBreak ? prev.cyclesCompleted + 1 : prev.cyclesCompleted;
             const isLongBreakDue = nextCycles % settings.cyclesBeforeLongBreak === 0;
             const nextBreakDuration = isLongBreakDue ? settings.longBreakDuration : settings.shortBreakDuration;
-            
+
             return {
               ...prev,
               minutes: prev.isBreak ? settings.workDuration : nextBreakDuration,
@@ -136,7 +136,7 @@ export function FocusTimer() {
         step={1}
         thumbStyle={styles.sliderThumb}
       />
-      
+
       <Text style={styles.settingLabel}>Short Break Duration (minutes)</Text>
       <Slider
         value={settings.shortBreakDuration}
@@ -146,7 +146,7 @@ export function FocusTimer() {
         step={1}
         thumbStyle={styles.sliderThumb}
       />
-      
+
       <Text style={styles.settingLabel}>Long Break Duration (minutes)</Text>
       <Slider
         value={settings.longBreakDuration}
@@ -156,7 +156,7 @@ export function FocusTimer() {
         step={1}
         thumbStyle={styles.sliderThumb}
       />
-      
+
       <Text style={styles.settingLabel}>Cycles Before Long Break</Text>
       <Slider
         value={settings.cyclesBeforeLongBreak}
@@ -179,7 +179,7 @@ export function FocusTimer() {
           onPress={() => setShowSettings(!showSettings)}
         />
       </View>
-      
+
       {showSettings ? (
         renderSettings()
       ) : (
@@ -194,15 +194,15 @@ export function FocusTimer() {
                 })
               }
             ]} />
-            
+
             <Text style={[styles.timer, { color: theme.colors.primary }]}>
               {formatTime(timer.minutes, timer.seconds)}
             </Text>
-            
+
             <Text style={styles.cycleInfo}>
               Cycle: {Math.floor(timer.cyclesCompleted / 2) + 1} / {settings.cyclesBeforeLongBreak}
             </Text>
-            
+
             <View style={styles.controls}>
               <AnimatedButton
                 icon={
@@ -216,7 +216,7 @@ export function FocusTimer() {
                 scaleOnPress
                 containerStyle={[styles.button, styles.controlButton]}
               />
-              
+
               <AnimatedButton
                 icon={
                   <Ionicons
@@ -235,15 +235,15 @@ export function FocusTimer() {
 
           <View style={styles.infoContainer}>
             <Text style={styles.infoText}>
-              {timer.isBreak 
+              {timer.isBreak
                 ? '🧘‍♂️ Take a break and recharge'
                 : '🎯 Stay focused on your task'}
             </Text>
             <Text style={styles.infoText}>
               {timer.isBreak
                 ? `Next work session: ${settings.workDuration} minutes`
-                : `Next break: ${timer.cyclesCompleted % settings.cyclesBeforeLongBreak === settings.cyclesBeforeLongBreak - 1 
-                    ? settings.longBreakDuration 
+                : `Next break: ${timer.cyclesCompleted % settings.cyclesBeforeLongBreak === settings.cyclesBeforeLongBreak - 1
+                    ? settings.longBreakDuration
                     : settings.shortBreakDuration} minutes`}
             </Text>
           </View>
@@ -324,4 +324,4 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-}); 
+});

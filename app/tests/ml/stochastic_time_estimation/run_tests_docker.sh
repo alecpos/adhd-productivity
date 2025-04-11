@@ -35,4 +35,4 @@ if [ $? -eq 0 ]; then
 else
     echo -e "\n❌ Some tests failed!"
     exit 1
-fi 
+fi

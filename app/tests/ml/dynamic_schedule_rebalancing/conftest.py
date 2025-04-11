@@ -91,7 +91,7 @@ def mock_dqn_model():
     model.main_model = MagicMock()
     model.target_model = MagicMock()
     model.memory = MagicMock()
-    
+
     return model
 
 
@@ -111,7 +111,7 @@ def mock_circadian_dqn_model():
     model.circadian_model = MagicMock()
     model.calculate_circadian_reward.return_value = 1.5
     model.combine_rewards.return_value = 1.2
-    
+
     return model
 
 
@@ -137,7 +137,7 @@ def setup_task_cognitive_profile():
             return TaskCognitiveProfile.ADMINISTRATIVE
         else:
             return TaskCognitiveProfile.ROUTINE
-    
+
     return _setup
 
 
@@ -151,7 +151,7 @@ def create_simple_keras_model():
         ])
         model.compile(optimizer='adam', loss='mse')
         return model
-    
+
     return _create
 
 
@@ -161,7 +161,7 @@ def assert_dict_structure():
     def _assert(actual, expected_keys):
         for key in expected_keys:
             assert key in actual, f"Key '{key}' not found in dictionary"
-    
+
     return _assert
 
 
@@ -172,5 +172,5 @@ def assert_objects_equal():
     def _assert(obj1, obj2, fields):
         for field in fields:
             assert getattr(obj1, field) == getattr(obj2, field), f"Field '{field}' differs between objects"
-    
-    return _assert 
+
+    return _assert

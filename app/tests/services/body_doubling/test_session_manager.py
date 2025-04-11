@@ -21,10 +21,10 @@ class ScalarsMock:
     """A mock for scalars() return values"""
     def __init__(self, result=None):
         self.result = result if result else []
-        
+
     def all(self):
         return self.result if isinstance(self.result, list) else [self.result]
-    
+
     def first(self):
         return self.result[0] if self.result and isinstance(self.result, list) and len(self.result) > 0 else self.result
 
@@ -98,24 +98,24 @@ class TestSessionManager:
 
     def setup_db_mocks(self, mock_db, execute_side_effect=None):
         """Set up common database mocks with proper async behavior.
-        
+
         Args:
             mock_db: The database mock to configure
             execute_side_effect: Optional side effect function for execute
-            
+
         Returns:
             Tuple of (original_execute, mock_db)
         """
         original_execute = mock_db.execute
-        
+
         if execute_side_effect:
             mock_db.execute = AsyncMock(side_effect=execute_side_effect)
         else:
             mock_db.execute = AsyncMock(return_value=MagicMock())
-            
+
         mock_db.commit = AsyncMock()
         mock_db.refresh = AsyncMock()
-        
+
         return original_execute, mock_db
 
     @pytest.mark.asyncio
@@ -144,21 +144,21 @@ class TestSessionManager:
         """Test getting a session by ID when it exists."""
         # Create a custom mock for the entire db.execute method
         # This approach ensures we're not trying to await the mock itself
-        
+
         # Create a results mock that will be returned by execute()
         results_mock = MagicMock()
         results_mock.scalar_one_or_none = MagicMock(return_value=sample_session)
-        
+
         # Make db.execute return our results when awaited
         async def mock_execute(*args, **kwargs):
             return results_mock
-        
+
         # Replace the mock's side_effect with our custom function
         mock_db.execute.side_effect = mock_execute
-        
+
         # Act
         result = await session_manager.get_session_by_id(sample_session_id)
-        
+
         # Assert
         assert result == sample_session
         assert mock_db.execute.called
@@ -167,21 +167,21 @@ class TestSessionManager:
     async def test_get_session_by_id_not_found(self, session_manager, mock_db, sample_session_id):
         """Test getting a session by ID when it doesn't exist."""
         # Create a custom mock for the entire db.execute method
-        
+
         # Create a results mock that will be returned by execute()
         results_mock = MagicMock()
         results_mock.scalar_one_or_none = MagicMock(return_value=None)
-        
+
         # Make db.execute return our results when awaited
         async def mock_execute(*args, **kwargs):
             return results_mock
-        
+
         # Replace the mock's side_effect with our custom function
         mock_db.execute.side_effect = mock_execute
-        
+
         # Act
         result = await session_manager.get_session_by_id(sample_session_id)
-        
+
         # Assert
         assert result is None
         assert mock_db.execute.called
@@ -190,21 +190,21 @@ class TestSessionManager:
     async def test_get_active_session(self, session_manager, mock_db, sample_session, sample_user_id):
         """Test getting active session for a user."""
         # Create a custom mock for the entire db.execute method
-        
+
         # Create a results mock that will be returned by execute()
         results_mock = MagicMock()
         results_mock.scalar_one_or_none = MagicMock(return_value=sample_session)
-        
+
         # Make db.execute return our results when awaited
         async def mock_execute(*args, **kwargs):
             return results_mock
-        
+
         # Replace the mock's side_effect with our custom function
         mock_db.execute.side_effect = mock_execute
-        
+
         # Act
         result = await session_manager.get_active_session(sample_user_id)
-        
+
         # Assert
         assert result == sample_session
         assert mock_db.execute.called
@@ -213,21 +213,21 @@ class TestSessionManager:
     async def test_get_active_session_none(self, session_manager, mock_db, sample_user_id):
         """Test getting active session when user has none."""
         # Create a custom mock for the entire db.execute method
-        
+
         # Create a results mock that will be returned by execute()
         results_mock = MagicMock()
         results_mock.scalar_one_or_none = MagicMock(return_value=None)
-        
+
         # Make db.execute return our results when awaited
         async def mock_execute(*args, **kwargs):
             return results_mock
-        
+
         # Replace the mock's side_effect with our custom function
         mock_db.execute.side_effect = mock_execute
-        
+
         # Act
         result = await session_manager.get_active_session(sample_user_id)
-        
+
         # Assert
         assert result is None
         assert mock_db.execute.called
@@ -240,23 +240,23 @@ class TestSessionManager:
         # Configure the sample session for the test
         sample_session.session_type = SessionType.GROUP
         sample_session.status = SessionStatus.ACTIVE
-        
+
         # Create a different user id for the session to ensure the test user isn't already a participant
         different_user_id = uuid4()
         sample_session.user_id = different_user_id
         sample_session.meta_data = {"participants": [str(different_user_id)], "join_requests": []}
-        
+
         # Store original methods
         original_get_session_by_id = session_manager.get_session_by_id
-        
+
         # Create async mock for session retrieval
         async def mock_get_session_by_id(session_id, **kwargs):
             assert session_id == sample_session_id
             return sample_session
-        
+
         # Track if execute is called for update
         execute_called = False
-        
+
         # Set up mocks for database operations
         async def mock_execute(query, **kwargs):
             nonlocal execute_called
@@ -265,17 +265,17 @@ class TestSessionManager:
             if str(sample_user_id) not in sample_session.meta_data["participants"]:
                 sample_session.meta_data["participants"].append(str(sample_user_id))
             return MagicMock()
-        
+
         # Apply mocks with our helper function
         original_execute, mock_db = self.setup_db_mocks(mock_db, mock_execute)
-        
+
         try:
             # Apply session manager mocks
             session_manager.get_session_by_id = mock_get_session_by_id
-            
+
             # Act
             result = await session_manager.join_session(sample_session_id, sample_user_id)
-            
+
             # Assert
             assert execute_called, "Should update participant list via execute"
             assert str(sample_user_id) in sample_session.meta_data["participants"]
@@ -283,7 +283,7 @@ class TestSessionManager:
             assert mock_db.execute.called
             assert mock_db.commit.called
             assert mock_db.refresh.called
-            
+
         finally:
             # Restore original methods
             session_manager.get_session_by_id = original_get_session_by_id
@@ -297,45 +297,45 @@ class TestSessionManager:
         # Configure the test session
         sample_session.session_type = SessionType.GROUP
         sample_session.status = SessionStatus.ACTIVE
-        
+
         # Important part: User ID is already in participants
         sample_session.meta_data = {
-            "participants": [str(sample_user_id), str(sample_session.user_id)], 
+            "participants": [str(sample_user_id), str(sample_session.user_id)],
             "join_requests": []
         }
-        
+
         # Store original method
         original_get_session_by_id = session_manager.get_session_by_id
-        
+
         # Create mock that returns session with user already in participants
         async def mock_get_session_by_id(session_id, **kwargs):
             assert session_id == sample_session_id
             return sample_session
-        
+
         # Set up tracking for execute
         execute_called = False
-        
+
         async def mock_execute(*args, **kwargs):
             nonlocal execute_called
             execute_called = True
             return MagicMock()
-        
+
         # Apply mocks with our helper function
         original_execute, mock_db = self.setup_db_mocks(mock_db, mock_execute)
-        
+
         try:
             # Apply session manager mocks
             session_manager.get_session_by_id = mock_get_session_by_id
-            
+
             # Act
             result = await session_manager.join_session(sample_session_id, sample_user_id)
-            
+
             # Assert - no error should be raised, but execute should not be called
             assert result == sample_session
             assert not execute_called, "Should not update database since user already in session"
             assert mock_db.commit.call_count == 0
             assert mock_db.refresh.call_count == 0
-            
+
         finally:
             # Restore original method
             session_manager.get_session_by_id = original_get_session_by_id
@@ -350,11 +350,11 @@ class TestSessionManager:
         sample_session.status = SessionStatus.COMPLETED
         session_manager.get_session_by_id = AsyncMock(return_value=sample_session)
         session_manager.get_active_session = AsyncMock(return_value=None)
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await session_manager.join_session(sample_session_id, sample_user_id)
-            
+
         assert exc_info.value.status_code == 400
         assert "not active" in exc_info.value.detail
         session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
@@ -367,27 +367,27 @@ class TestSessionManager:
         # Arrange
         new_user_id = uuid4()
         sample_session.session_type = SessionType.GROUP
-        
-        # Make sure the user ID is converted to string 
+
+        # Make sure the user ID is converted to string
         new_user_id_str = str(new_user_id)
         sample_session.meta_data = {
             "participants": [str(sample_session.user_id), new_user_id_str],
             "join_requests": [],
         }
-        
+
         # Store original method
         original_get_session_by_id = session_manager.get_session_by_id
-        
+
         # Mock session_manager.get_session_by_id
         async def mock_get_session_by_id(session_id, **kwargs):
             assert session_id == sample_session_id
             return sample_session
-            
+
         session_manager.get_session_by_id = AsyncMock(side_effect=mock_get_session_by_id)
-        
+
         # Set up tracking for execute
         execute_called = False
-        
+
         async def mock_execute(query, **kwargs):
             nonlocal execute_called
             execute_called = True
@@ -395,14 +395,14 @@ class TestSessionManager:
             if new_user_id_str in sample_session.meta_data["participants"]:
                 sample_session.meta_data["participants"].remove(new_user_id_str)
             return MagicMock()
-        
+
         # Apply mock DB operations
         original_execute, mock_db = self.setup_db_mocks(mock_db, mock_execute)
-        
+
         try:
             # Act
             result = await session_manager.leave_session(sample_session_id, new_user_id)
-            
+
             # Assert
             assert execute_called, "Should update participant list via execute"
             assert mock_db.execute.called
@@ -410,7 +410,7 @@ class TestSessionManager:
             assert mock_db.refresh.called
             assert new_user_id_str not in result.meta_data["participants"]
             session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
-            
+
         finally:
             # Restore original methods
             session_manager.get_session_by_id = original_get_session_by_id
@@ -421,11 +421,11 @@ class TestSessionManager:
         """Test leaving a session that doesn't exist."""
         # Arrange
         session_manager.get_session_by_id = AsyncMock(return_value=None)
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await session_manager.leave_session(sample_session_id, sample_user_id)
-            
+
         assert exc_info.value.status_code == 404
         session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
 
@@ -436,38 +436,38 @@ class TestSessionManager:
         """Test ending a session."""
         # Store original method
         original_get_session_by_id = session_manager.get_session_by_id
-        
+
         # Mock session_manager.get_session_by_id
         async def mock_get_session_by_id(session_id, **kwargs):
             assert session_id == sample_session_id
             return sample_session
-            
+
         session_manager.get_session_by_id = AsyncMock(side_effect=mock_get_session_by_id)
-        
+
         # Set up tracking for execute
         status_updated = False
-        
+
         async def mock_execute(query, **kwargs):
             nonlocal status_updated
             status_updated = True
             # Simulate updating the status to COMPLETED
             sample_session.status = SessionStatus.COMPLETED
             return MagicMock()
-        
+
         # Apply mock DB operations
         original_execute, mock_db = self.setup_db_mocks(mock_db, mock_execute)
-        
+
         try:
             # Act
             result = await session_manager.end_session(sample_session_id, sample_user_id)
-            
+
             # Assert
             assert status_updated, "Should update session status via execute"
             assert mock_db.execute.called
             assert mock_db.commit.called
             assert mock_db.refresh.called
             assert result.status == SessionStatus.COMPLETED
-            
+
         finally:
             # Restore original methods
             session_manager.get_session_by_id = original_get_session_by_id
@@ -481,11 +481,11 @@ class TestSessionManager:
         # Arrange
         different_user_id = uuid4()
         session_manager.get_session_by_id = AsyncMock(return_value=sample_session)
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await session_manager.end_session(sample_session_id, different_user_id)
-            
+
         assert exc_info.value.status_code == 403
         assert "only the host" in exc_info.value.detail.lower()
         session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
@@ -497,12 +497,12 @@ class TestSessionManager:
         result_mock = AsyncMock()
         scalars_mock = ScalarsMock([sample_session])
         result_mock.scalars = MagicMock(return_value=scalars_mock)
-        
+
         mock_db.execute = AsyncMock(return_value=result_mock)
-        
+
         # Act
         result = await session_manager.get_user_sessions(sample_user_id)
-        
+
         # Assert
         assert result == [sample_session]
         mock_db.execute.assert_called_once()
@@ -514,12 +514,12 @@ class TestSessionManager:
         result_mock = AsyncMock()
         scalars_mock = ScalarsMock([sample_session])
         result_mock.scalars = MagicMock(return_value=scalars_mock)
-        
+
         mock_db.execute = AsyncMock(return_value=result_mock)
-        
+
         # Act
         result = await session_manager.get_active_sessions()
-        
+
         # Assert
         assert result == [sample_session]
-        mock_db.execute.assert_called_once() 
+        mock_db.execute.assert_called_once()

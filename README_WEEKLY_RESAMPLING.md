@@ -96,4 +96,4 @@ This functionality is integrated with the `TimeBufferCalculator` class, which ca
 - Advanced visualizations of transition patterns
 - ML-based prediction of transition times based on historical patterns
 - Integration with calendar optimization algorithms
-- Interactive dashboards for real-time monitoring 
+- Interactive dashboards for real-time monitoring

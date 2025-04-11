@@ -17,15 +17,15 @@ from app.utils.api_responses import create_error_response
 def error_responses(*status_codes: int) -> Dict[int, Dict[str, Any]]:
     """
     Define standard error responses for FastAPI route documentation.
-    
+
     Args:
         *status_codes: The HTTP status codes to include
-        
+
     Returns:
         A dictionary mapping status codes to response descriptions
     """
     responses = {}
-    
+
     error_descriptions = {
         status.HTTP_400_BAD_REQUEST: {
             "description": "Bad Request - Invalid input data",
@@ -60,16 +60,16 @@ def error_responses(*status_codes: int) -> Dict[int, Dict[str, Any]]:
             "model": dict
         }
     }
-    
+
     # If no specific codes are provided, include all
     if not status_codes:
         return error_descriptions
-    
+
     # Include only the specified codes
     for code in status_codes:
         if code in error_descriptions:
             responses[code] = error_descriptions[code]
-    
+
     return responses
 
 
@@ -79,11 +79,11 @@ def pagination_params(
 ) -> Dict[str, int]:
     """
     Standard pagination parameters for collection endpoints.
-    
+
     Args:
         page: The page number (1-based)
         page_size: The number of items per page
-        
+
     Returns:
         A dictionary with pagination parameters
     """
@@ -93,19 +93,19 @@ def pagination_params(
 def id_path_param(resource_name: str) -> Callable[[UUID], UUID]:
     """
     Create a standard ID path parameter for resource endpoints.
-    
+
     Args:
         resource_name: The name of the resource (e.g., 'task', 'user')
-        
+
     Returns:
         A function that validates the ID parameter
     """
-    
+
     def validate_id(
         id: UUID = Path(..., description=f"The unique identifier of the {resource_name}")
     ) -> UUID:
         return id
-    
+
     return validate_id
 
 
@@ -114,12 +114,12 @@ def validate_resource_access(
 ) -> None:
     """
     Validate that the current user has access to a resource.
-    
+
     Args:
         resource_owner_id: The ID of the resource owner
         current_user_id: The ID of the current user
         is_admin: Whether the current user is an admin
-        
+
     Raises:
         HTTPException: If the user does not have access to the resource
     """
@@ -137,10 +137,10 @@ def validate_resource_access(
 def rate_limit_error(retry_after: int) -> HTTPException:
     """
     Create a rate limit error.
-    
+
     Args:
         retry_after: Seconds until the rate limit resets
-        
+
     Returns:
         An HTTPException with a rate limit error
     """
@@ -158,11 +158,11 @@ def rate_limit_error(retry_after: int) -> HTTPException:
 def not_found_error(resource_type: str, resource_id: Any) -> HTTPException:
     """
     Create a not found error.
-    
+
     Args:
         resource_type: The type of resource (e.g., 'task', 'user')
         resource_id: The ID of the resource
-        
+
     Returns:
         An HTTPException with a not found error
     """
@@ -179,10 +179,10 @@ def not_found_error(resource_type: str, resource_id: Any) -> HTTPException:
 def forbidden_error(message: str = "You do not have permission to perform this action") -> HTTPException:
     """
     Create a forbidden error.
-    
+
     Args:
         message: The error message
-        
+
     Returns:
         An HTTPException with a forbidden error
     """
@@ -199,10 +199,10 @@ def forbidden_error(message: str = "You do not have permission to perform this a
 def validation_error(errors: Dict[str, List[str]]) -> HTTPException:
     """
     Create a validation error.
-    
+
     Args:
         errors: Field-specific validation errors
-        
+
     Returns:
         An HTTPException with a validation error
     """
@@ -220,10 +220,10 @@ def validation_error(errors: Dict[str, List[str]]) -> HTTPException:
 def conflict_error(message: str) -> HTTPException:
     """
     Create a conflict error.
-    
+
     Args:
         message: The error message
-        
+
     Returns:
         An HTTPException with a conflict error
     """
@@ -234,4 +234,4 @@ def conflict_error(message: str) -> HTTPException:
             message=message,
             status_code=status.HTTP_409_CONFLICT,
         ),
-    ) 
+    )

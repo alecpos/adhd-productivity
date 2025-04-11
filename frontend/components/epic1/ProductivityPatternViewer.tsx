@@ -72,15 +72,15 @@ export const ProductivityPatternViewer = () => {
   const [selectedInsight, setSelectedInsight] = useState<ProductivityInsight | null>(null);
   const { theme } = useTheme();
   const { reduceMotion, highContrast } = useAccessibilityPreferences();
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
 
   const chartConfig = {
     backgroundGradientFrom: theme.colors.background,
     backgroundGradientTo: theme.colors.background,
     decimalPlaces: 0,
-    color: (opacity = 1) => highContrast 
-      ? `rgba(255, 255, 255, ${opacity})` 
+    color: (opacity = 1) => highContrast
+      ? `rgba(255, 255, 255, ${opacity})`
       : `rgba(71, 130, 218, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(${highContrast ? '255, 255, 255' : theme.dark ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
     style: {
@@ -127,7 +127,7 @@ export const ProductivityPatternViewer = () => {
             buttonStyle={{ borderRadius: 20 }}
           />
         </View>
-        
+
         <LineChart
           data={mockPatternData}
           width={screenWidth}
@@ -142,16 +142,16 @@ export const ProductivityPatternViewer = () => {
           withVerticalLabels={true}
           withHorizontalLabels={true}
         />
-        
+
         <Text style={styles.patternExplanation}>
-          Your productivity increases mid-week and drops on weekends. 
+          Your productivity increases mid-week and drops on weekends.
           This pattern is detected with 87% confidence based on your past 3 months of activity.
         </Text>
       </Card>
-      
+
       <Card containerStyle={styles.insightsCard}>
         <Card.Title>Productivity Insights</Card.Title>
-        
+
         {mockInsights.map((insight) => (
           <Card key={insight.id} containerStyle={styles.insightCard}>
             <View style={styles.insightHeader}>
@@ -169,7 +169,7 @@ export const ProductivityPatternViewer = () => {
           </Card>
         ))}
       </Card>
-      
+
       <Overlay
         isVisible={showInsightModal}
         onBackdropPress={() => setShowInsightModal(false)}
@@ -295,4 +295,4 @@ const styles = StyleSheet.create({
   closeButton: {
     borderRadius: 10,
   },
-}); 
+});

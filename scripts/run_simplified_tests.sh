@@ -4,4 +4,4 @@
 echo "Running simplified tests for AnalyticsService..."
 python -m app.services.body_doubling.simplified_test
 
-echo -e "\nSimplified tests completed!" 
+echo -e "\nSimplified tests completed!"

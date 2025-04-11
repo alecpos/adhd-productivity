@@ -4,7 +4,7 @@ from uuid import uuid4
 def create_valid_data(schema_class):
     """Create valid data for testing schema validation."""
     base_time = datetime.now()
-    
+
     # Common fields that should always be included
     always_include = {
         "email": "test@example.com",
@@ -182,7 +182,7 @@ def create_valid_data(schema_class):
             valid_data["total_count"] = 1
         elif "analytics" in schema_name or "insights" in schema_name:
             valid_data["data"] = response_fields["data"]
-    
+
     # Add fields based on schema name and fields
     for field_name, field in schema_fields.items():
         if field_name in always_include:
@@ -208,4 +208,4 @@ def create_valid_data(schema_class):
             elif field_name == "time_of_day":
                 valid_data[field_name] = "morning"
 
-    return valid_data 
+    return valid_data

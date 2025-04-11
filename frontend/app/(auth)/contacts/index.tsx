@@ -294,4 +294,4 @@ const useStyles = makeStyles((theme) => ({
     color: theme.colors.grey3,
     padding: theme.spacing.md,
   },
-})); 
+}));

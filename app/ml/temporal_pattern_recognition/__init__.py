@@ -1,19 +1,31 @@
 """Temporal Pattern Recognition Module."""
 
+from .service import TemporalPatternRecognitionService
+from .mock_models import (
+    MockProductivityPatternLSTM,
+    MockTemporalPatternRecognitionService
+)
+
+__all__ = [
+    'TemporalPatternRecognitionService',
+    'MockProductivityPatternLSTM',
+    'MockTemporalPatternRecognitionService'
+]
+
 # Mock class for testing
 class ProductivityPatternLSTM:
     """Mock class for ProductivityPatternLSTM."""
-    
+
     def __init__(self):
         """Initialize with mock data."""
         self.feature_names = ["time_of_day", "day_of_week", "task_type", "energy_level", "location"]
         self.input_dim = len(self.feature_names)
-    
+
     def predict(self, features):
         """Mock prediction."""
         import numpy as np
         return np.array([0.8])
-    
+
     def get_background_data(self):
         """Get mock background data."""
         import numpy as np
@@ -23,11 +35,11 @@ class ProductivityPatternLSTM:
 # Mock service class for testing
 class TemporalPatternRecognitionService:
     """Mock service for Temporal Pattern Recognition."""
-    
+
     def __init__(self):
         """Initialize with mock models."""
         self.productivity_model = ProductivityPatternLSTM()
-    
+
     async def analyze_productivity_patterns(self, user_id):
         """Mock method for analyzing productivity patterns."""
         return {
@@ -37,7 +49,7 @@ class TemporalPatternRecognitionService:
             ],
             "productivity_score": 0.85
         }
-    
+
     async def predict_optimal_time_windows(self, user_id, task_type=None, count=3):
         """Mock method for predicting optimal time windows."""
         return [

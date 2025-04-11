@@ -6,11 +6,11 @@ import { Stack } from 'expo-router';
 export default function ProductivityPatternViewerScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: 'Productivity Patterns',
           headerShown: true
-        }} 
+        }}
       />
       <ProductivityPatternViewer />
     </SafeAreaView>
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-}); 
+});

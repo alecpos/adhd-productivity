@@ -242,4 +242,4 @@ async def test_task_calendar_integration():
 7. Follow async/await patterns
 8. Add proper documentation
 9. Include unit tests
-10. Monitor performance 
+10. Monitor performance

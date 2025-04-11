@@ -76,4 +76,4 @@ export default {
   cacheDirectory,
   bundleDirectory,
   downloadDirectory,
-}; 
+};

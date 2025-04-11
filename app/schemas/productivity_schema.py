@@ -58,12 +58,12 @@ class ProductivityListResponseSchema(BaseModel):
 
 class ProductivityInsights(BaseModel):
     """Schema for productivity insights data."""
-    
+
     optimal_focus_times: List[Dict[str, Any]] = Field(default_factory=list)
     energy_patterns: Dict[str, Any] = Field(default_factory=dict)
     recommendations: List[str] = Field(default_factory=list)
     focus_session_stats: Dict[str, Any] = Field(default_factory=dict)
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

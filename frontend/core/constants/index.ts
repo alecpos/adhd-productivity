@@ -35,4 +35,4 @@ export const ERROR_MESSAGES = {
     UNAUTHORIZED: 'Please log in to continue.',
     VALIDATION_ERROR: 'Please check your input and try again.',
     SERVER_ERROR: 'Server error occurred. Please try again later.'
-} as const; 
+} as const;

@@ -43,4 +43,4 @@ i18next
     compatibilityJSON: 'v4'
   });
 
-export default i18next; 
+export default i18next;

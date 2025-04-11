@@ -1,6 +1,6 @@
 #!/bin/bash
 # Pre-commit hook that scans changed files for technical debt markers.
-# 
+#
 # Install by creating a symlink to this file in .git/hooks:
 #   ln -sf ../../scripts/git_hooks/pre-commit .git/hooks/pre-commit
 #
@@ -55,7 +55,7 @@ if [ $FOUND_TECH_DEBT -eq 1 ]; then
     echo ""
     echo "  3. Fix the issues before committing."
     echo ""
-    
+
     # Prompt for action
     read -p "Would you like to add these items to the tech debt tracker? [y/N] " ADD_TO_TRACKER
     if [[ "$ADD_TO_TRACKER" =~ ^[Yy]$ ]]; then
@@ -71,4 +71,4 @@ if [ $FOUND_TECH_DEBT -eq 1 ]; then
 fi
 
 echo "No technical debt markers found in staged files."
-exit 0 
+exit 0

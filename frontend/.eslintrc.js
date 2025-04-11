@@ -26,13 +26,13 @@ module.exports = {
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
-    
+
     // Code style
     'no-console': ['warn', { allow: ['warn', 'error'] }],
-    
+
     // Testing rules
     'jest/no-disabled-tests': 'warn',
     'jest/no-focused-tests': 'error',
     'jest/prefer-strict-equal': 'off'
   }
-}; 
+};

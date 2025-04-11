@@ -65,4 +65,4 @@ export class GamificationService {
   }
 
   // ... rest of existing code ...
-} 
+}

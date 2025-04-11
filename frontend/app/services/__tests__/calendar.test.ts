@@ -147,7 +147,7 @@ describe('CalendarService', () => {
         it('should connect to Outlook Calendar successfully', async () => {
             const mockCode = 'mock-auth-code';
             const mockAccessToken = 'mock-access-token';
-            
+
             // Mock successful auth session
             (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValueOnce({
                 type: 'success',
@@ -429,4 +429,4 @@ describe('CalendarService', () => {
             });
         });
     });
-}); 
+});

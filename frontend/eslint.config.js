@@ -171,4 +171,4 @@ module.exports = [
   baseConfig,
   tsConfig,
   testConfig,
-]; 
+];

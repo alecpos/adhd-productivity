@@ -1,7 +1,7 @@
 # ADHD Calendar: Understanding Your AI Assistant
 
-**Version**: 1.0  
-**Last Updated**: 2025-06-15  
+**Version**: 1.0
+**Last Updated**: 2025-06-15
 **Target Audience**: End users of ADHD Calendar system
 
 ## Introduction
@@ -21,7 +21,7 @@ The latest update to your ADHD Calendar introduces several important improvement
 
 ### What are AI Explanations?
 
-Whenever your ADHD Calendar suggests a schedule adjustment, recommends a task time, or provides an attention aid, you can now see **why** it made that recommendation. 
+Whenever your ADHD Calendar suggests a schedule adjustment, recommends a task time, or provides an attention aid, you can now see **why** it made that recommendation.
 
 ### How to Access Explanations
 
@@ -146,4 +146,4 @@ We're committed to building AI that works for you and with you, with transparenc
 
 ---
 
-© 2025 ADHD Calendar - Empowering focus through ethical AI 
+© 2025 ADHD Calendar - Empowering focus through ethical AI

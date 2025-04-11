@@ -73,4 +73,4 @@ export class TaskService {
 }
 
 export { Task, TaskStatus, TaskPriority };
-export const taskService = new TaskService(); 
+export const taskService = new TaskService();

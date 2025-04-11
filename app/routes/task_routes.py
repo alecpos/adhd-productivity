@@ -15,9 +15,9 @@ from uuid import UUID
 import logging
 
 from app.schemas.task_schema import (
-    TaskResponse, 
-    TaskCreate, 
-    TaskUpdate, 
+    TaskResponse,
+    TaskCreate,
+    TaskUpdate,
     TaskStatsSchema,
     TaskListResponse
 )
@@ -62,7 +62,7 @@ async def get_user_tasks(
 ):
     """
     Get all tasks for the authenticated user with pagination and filtering.
-    
+
     Args:
         current_user: The authenticated user
         db: Database session
@@ -72,15 +72,15 @@ async def get_user_tasks(
         due_after: Optional due date lower bound filter
         page: Page number (1-indexed)
         page_size: Number of items per page
-        
+
     Returns:
         A paginated list of tasks with optional statistics
     """
     logger.info(f"Fetching tasks for user_id: {current_user.id} with filters")
-    
+
     try:
         task_service = TaskService(db)
-        
+
         # Build filters dictionary
         filters = {}
         if status:
@@ -91,21 +91,21 @@ async def get_user_tasks(
             filters["due_before"] = due_before
         if due_after:
             filters["due_after"] = due_after
-            
+
         tasks, total = await task_service.get_user_tasks_paginated(
             str(current_user.id),
             page=page,
             page_size=page_size,
             filters=filters
         )
-        
+
         # Get basic stats
         stats = None
         if page == 1:  # Only include stats on first page
             stats = await task_service.get_task_statistics(str(current_user.id))
-            
+
         logger.info(f"Successfully fetched {len(tasks)} tasks for user {current_user.id}")
-        
+
         return create_collection_response(
             items=tasks,
             total=total,
@@ -114,7 +114,7 @@ async def get_user_tasks(
             wrapper_class=TaskListResponse,
             extra={"stats": stats}
         )
-        
+
     except Exception as e:
         logger.error(f"Error fetching tasks for user {current_user.id}: {str(e)}", exc_info=True)
         raise
@@ -134,35 +134,35 @@ async def get_task(
 ):
     """
     Get a specific task by ID.
-    
+
     Args:
         task_id: The ID of the task to retrieve
         current_user: The authenticated user
         db: Database session
-        
+
     Returns:
         The requested task
-        
+
     Raises:
         ResourceNotFoundError: If the task doesn't exist
         ForbiddenError: If the user doesn't own the task
     """
     logger.info(f"Fetching task {task_id} for user {current_user.id}")
-    
+
     try:
         task_service = TaskService(db)
         task = await task_service.get_task(str(task_id))
-        
+
         if task is None:
             logger.warning(f"Task {task_id} not found")
             raise not_found_error("task", task_id)
-            
+
         # Validate that the user has access to this task
         validate_resource_access(task, current_user.id, "user_id")
-        
+
         logger.info(f"Successfully fetched task {task_id}")
         return create_response(task)
-        
+
     except ResourceNotFoundError:
         return not_found_response("task", task_id)
     except Exception as e:
@@ -185,25 +185,25 @@ async def create_task(
 ):
     """
     Create a new task.
-    
+
     Args:
         task: The task data
         current_user: The authenticated user
         db: Database session
-        
+
     Returns:
         The created task
     """
     logger.info(f"Creating task for user {current_user.id}")
     logger.debug(f"Task data: {task.dict()}")
-    
+
     try:
         task_service = TaskService(db)
         created_task = await task_service.create_task(task, str(current_user.id))
         logger.info(f"Successfully created task {created_task.id} for user {current_user.id}")
-        
+
         return create_response(created_task)
-        
+
     except Exception as e:
         logger.error(f"Error creating task: {str(e)}", exc_info=True)
         raise
@@ -224,44 +224,44 @@ async def update_task(
 ):
     """
     Update a task.
-    
+
     Args:
         task_id: The ID of the task to update
         task_update: The task update data
         current_user: The authenticated user
         db: Database session
-        
+
     Returns:
         The updated task
-        
+
     Raises:
         ResourceNotFoundError: If the task doesn't exist
         ForbiddenError: If the user doesn't own the task
     """
     logger.info(f"Updating task {task_id} for user {current_user.id}")
     logger.debug(f"Update data: {task_update.dict(exclude_unset=True)}")
-    
+
     try:
         task_service = TaskService(db)
-        
+
         # First get the task to check ownership
         task = await task_service.get_task(str(task_id))
-        
+
         if task is None:
             logger.warning(f"Task {task_id} not found")
             raise not_found_error("task", task_id)
-            
+
         # Validate that the user has access to this task
         validate_resource_access(task, current_user.id, "user_id")
-        
+
         # Perform the update
         updated_task = await task_service.update_task(
             str(task_id), task_update, str(current_user.id)
         )
-        
+
         logger.info(f"Successfully updated task {task_id}")
         return create_response(updated_task)
-        
+
     except ResourceNotFoundError:
         return not_found_response("task", task_id)
     except Exception as e:
@@ -283,40 +283,40 @@ async def delete_task(
 ):
     """
     Delete a task.
-    
+
     Args:
         task_id: The ID of the task to delete
         current_user: The authenticated user
         db: Database session
-        
+
     Returns:
         204 No Content on success
-        
+
     Raises:
         ResourceNotFoundError: If the task doesn't exist
         ForbiddenError: If the user doesn't own the task
     """
     logger.info(f"Deleting task {task_id} for user {current_user.id}")
-    
+
     try:
         task_service = TaskService(db)
-        
+
         # First get the task to check ownership
         task = await task_service.get_task(str(task_id))
-        
+
         if task is None:
             logger.warning(f"Task {task_id} not found")
             raise not_found_error("task", task_id)
-            
+
         # Validate that the user has access to this task
         validate_resource_access(task, current_user.id, "user_id")
-        
+
         # Perform the deletion
         await task_service.delete(str(task_id))
-        
+
         logger.info(f"Successfully deleted task {task_id}")
         return None
-        
+
     except ResourceNotFoundError:
         return not_found_response("task", task_id)
     except Exception as e:
@@ -338,40 +338,40 @@ async def complete_task(
 ):
     """
     Mark a task as complete.
-    
+
     Args:
         task_id: The ID of the task to mark as complete
         current_user: The authenticated user
         db: Database session
-        
+
     Returns:
         The updated task
-        
+
     Raises:
         ResourceNotFoundError: If the task doesn't exist
         ForbiddenError: If the user doesn't own the task
     """
     logger.info(f"Completing task {task_id} for user {current_user.id}")
-    
+
     try:
         task_service = TaskService(db)
-        
+
         # First get the task to check ownership
         task = await task_service.get_task(str(task_id))
-        
+
         if task is None:
             logger.warning(f"Task {task_id} not found")
             raise not_found_error("task", task_id)
-            
+
         # Validate that the user has access to this task
         validate_resource_access(task, current_user.id, "user_id")
-        
+
         # Mark the task as complete
         completed_task = await task_service.complete_task(str(task_id))
-        
+
         logger.info(f"Successfully completed task {task_id}")
         return create_response(completed_task)
-        
+
     except ResourceNotFoundError:
         return not_found_response("task", task_id)
     except Exception as e:
@@ -394,36 +394,36 @@ async def get_task_statistics(
 ):
     """
     Get task statistics for the current user.
-    
+
     Args:
         current_user: The authenticated user
         db: Database session
         period_start: Optional start date for statistics
         period_end: Optional end date for statistics
-        
+
     Returns:
         Task statistics for the specified period
     """
     logger.info(f"Fetching task statistics for user {current_user.id}")
-    
+
     try:
         task_service = TaskService(db)
-        
+
         # Build filters dictionary
         filters = {}
         if period_start:
             filters["period_start"] = period_start
         if period_end:
             filters["period_end"] = period_end
-            
+
         stats = await task_service.get_task_statistics(
             str(current_user.id),
             filters=filters
         )
-        
+
         logger.info(f"Successfully fetched task statistics for user {current_user.id}")
         return create_response(stats)
-        
+
     except Exception as e:
         logger.error(f"Error fetching task statistics: {str(e)}", exc_info=True)
         raise

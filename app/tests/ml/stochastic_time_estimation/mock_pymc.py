@@ -18,7 +18,7 @@ class MockTheano:
     """Mock implementation of theano."""
     compile = MagicMock()
     tensor = MagicMock()
-    
+
     def __init__(self):
         self.compile = MagicMock()
         self.tensor = MagicMock()
@@ -47,10 +47,10 @@ class MockModel:
         self.observed_RVs = []
         self.deterministics = []
         self.potentials = []
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, *args):
         pass
 
@@ -59,11 +59,11 @@ class MockTrace:
     def __init__(self, *args, **kwargs):
         self.varnames = []
         self._straces = {}
-    
+
     def get_values(self, varname, **kwargs):
         """Return mock values for variable"""
         return np.random.normal(size=(100,))
-    
+
     def __len__(self):
         return 100
 
@@ -183,10 +183,10 @@ class ADVI:
     """Mock ADVI method"""
     def __init__(self, *args, **kwargs):
         pass
-    
+
     def fit(self, *args, **kwargs):
         return self
-    
+
     def sample(self, *args, **kwargs):
         return MockTrace()
 
@@ -203,4 +203,4 @@ math = math_module
 # Add additional PyMC3 classes/functions that might be imported
 Deterministic = lambda *args, **kwargs: 0.0
 Potential = lambda *args, **kwargs: None
-DensityDist = lambda *args, **kwargs: None 
+DensityDist = lambda *args, **kwargs: None

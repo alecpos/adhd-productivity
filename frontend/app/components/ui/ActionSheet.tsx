@@ -33,9 +33,9 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableOpacity 
-        style={styles.overlay} 
-        activeOpacity={1} 
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
         onPress={onClose}
       >
         <View style={styles.content}>
@@ -98,4 +98,4 @@ const useStyles = makeStyles((theme) => ({
   destructiveText: {
     color: theme.colors.error,
   },
-})); 
+}));

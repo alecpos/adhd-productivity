@@ -6,11 +6,11 @@ import { Stack } from 'expo-router';
 export default function AdaptiveUIScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: 'UI Preferences',
           headerShown: true
-        }} 
+        }}
       />
       <AdaptiveUI />
     </SafeAreaView>
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-}); 
+});

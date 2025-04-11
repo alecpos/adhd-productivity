@@ -3,7 +3,7 @@ import { useTheme as useRNETheme } from '@rneui/themed';
 // Re-export the useTheme hook for consistent usage throughout the app
 export const useTheme = () => {
   const { theme } = useRNETheme();
-  
+
   return {
     theme: {
       colors: {
@@ -22,4 +22,4 @@ export const useTheme = () => {
       // Add any other theme properties you might need
     }
   };
-}; 
+};

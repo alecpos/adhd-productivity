@@ -38,12 +38,12 @@ module.exports = {
     }
   },
   plugins: [
-    'expo-router', 
-    'expo-font', 
+    'expo-router',
+    'expo-font',
     'expo-secure-store'
   ],
   extra: {
     useSimpleWebApp: process.env.EXPO_TARGET === 'web',
     skipProblematicModules: process.env.EXPO_TARGET === 'web'
   }
-}; 
+};

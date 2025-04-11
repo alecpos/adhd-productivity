@@ -4645,4 +4645,3 @@
   - Status: IN_PROGRESS
   - Description: The UserModel needs consistent validation across all fields
   - Resolution Plan: Refactor using Field with proper validators
-

@@ -65,7 +65,7 @@ export default function RootLayout(): JSX.Element | null {
     <SafeAreaProvider>
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          <Stack 
+          <Stack
             screenOptions={{
               headerShown: true,
               headerTitleAlign: 'center',

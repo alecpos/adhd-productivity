@@ -151,7 +151,7 @@ export function useMentalHealthService() {
 
             // Get logs for the specific date
             const logs = await getLogs();
-            const dayLogs = logs?.filter(log => 
+            const dayLogs = logs?.filter(log =>
                 new Date(log.createdAt).toDateString() === date.toDateString()
             ) || [];
 
@@ -191,4 +191,4 @@ export function useMentalHealthService() {
         getWeeklyInsights,
         getDailyMetrics
     };
-} 
+}

@@ -35,7 +35,7 @@ class CommitmentCreate(CommitmentBase):
     user_id: UUID = Field(..., description="User who made the commitment")
     related_task_id: Optional[int] = Field(None, description="Related task ID if any")
     cross_references: Optional[List[int]] = Field(None, description="References to related commitments")
-    
+
 
 class CommitmentUpdate(BaseModel):
     """Schema for updating an existing commitment."""
@@ -64,7 +64,7 @@ class CommitmentInDB(CommitmentBase):
     detected_at: datetime
     related_task_id: Optional[int] = None
     cross_references: Optional[List[int]] = None
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

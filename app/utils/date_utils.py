@@ -15,20 +15,20 @@ def get_recurring_dates(
         "monthly": MONTHLY,
         "yearly": YEARLY
     }
-    
+
     freq = freq_map.get(recurrence_pattern.get("frequency", "").lower())
     if not freq:
         return []
-        
+
     interval = recurrence_pattern.get("interval", 1)
-    
+
     dates = list(rrule(
         freq=freq,
         interval=interval,
         dtstart=start_date,
         until=range_end
     ))
-    
+
     # Filter dates within the range
     return [d for d in dates if range_start <= d <= range_end]
 
@@ -54,9 +54,9 @@ def get_next_available_slot(
             event for event in existing_events
             if (event["start_time"] < end_time and event["end_time"] > current_time)
         ]
-        
+
         if not conflicts:
             return current_time
-            
+
         # Move to the end of the latest conflicting event
         current_time = max(event["end_time"] for event in conflicts)

@@ -22,7 +22,7 @@ export const useTaskFilters = (tasks: Task[]) => {
   const sortedTasks = useMemo(() => {
     return [...filteredTasks].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case 'due_date':
           comparison = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
@@ -55,4 +55,4 @@ export const useTaskFilters = (tasks: Task[]) => {
     toggleSortOrder,
     sortedTasks,
   };
-}; 
+};

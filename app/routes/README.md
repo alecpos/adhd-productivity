@@ -104,4 +104,4 @@ When creating new routes:
 
 - [API Design Guidelines](../../docs/api_design_guidelines.md)
 - [Authentication Guide](../../docs/authentication.md)
-- [API Documentation](../../docs/api_documentation.md) 
+- [API Documentation](../../docs/api_documentation.md)

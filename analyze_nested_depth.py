@@ -26,4 +26,4 @@ for file_data in analysis:
         print(f"  Technical Debt Scores:")
         for score_name, score_value in file_data['technical_debt_scores'].items():
             print(f"    {score_name}: {score_value}")
-        print() 
+        print()

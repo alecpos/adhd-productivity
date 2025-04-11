@@ -16,8 +16,8 @@ export function ErrorBoundary({ error, onRetry, children }: Props) {
         <Text style={styles.errorText}>Something went wrong</Text>
         <Text style={styles.errorDetail}>{error.message}</Text>
         {onRetry && (
-          <Button 
-            title="Try Again" 
+          <Button
+            title="Try Again"
             onPress={onRetry}
             type="outline"
             containerStyle={styles.buttonContainer}
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-}); 
+});

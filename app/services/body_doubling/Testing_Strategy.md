@@ -99,4 +99,4 @@ We measure test quality based on:
 - **Specificity** - Tests should verify specific behavior, not just execute code
 - **Independence** - Tests should not depend on each other
 - **Speed** - Test suite should run quickly to encourage frequent testing
-- **Comprehensibility** - Tests should be clear and document expected behavior 
+- **Comprehensibility** - Tests should be clear and document expected behavior

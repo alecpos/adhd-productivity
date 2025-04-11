@@ -107,4 +107,4 @@ export const PomodoroService = {
             throw new Error('Failed to update pomodoro session');
         }
     }
-}; 
+};

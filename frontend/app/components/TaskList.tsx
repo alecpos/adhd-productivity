@@ -65,11 +65,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const TaskList: React.FC<TaskListProps> = ({ 
-    tasks = [], 
-    onCompleteTask, 
-    onDeleteTask, 
-    loading = false 
+export const TaskList: React.FC<TaskListProps> = ({
+    tasks = [],
+    onCompleteTask,
+    onDeleteTask,
+    loading = false
 }) => {
     const [sortField, setSortField] = useState<SortField>('dueDate');
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -110,7 +110,7 @@ export const TaskList: React.FC<TaskListProps> = ({
         const searchTerm = (filter || '').toLowerCase();
         const title = (task.title || '').toLowerCase();
         const description = (task.description || '').toLowerCase();
-        
+
         return title.includes(searchTerm) || description.includes(searchTerm);
     });
 
@@ -118,13 +118,13 @@ export const TaskList: React.FC<TaskListProps> = ({
         if (sortField === 'title') {
             const titleA = (a.title || '').toLowerCase();
             const titleB = (b.title || '').toLowerCase();
-            return sortDirection === 'asc' 
+            return sortDirection === 'asc'
                 ? titleA.localeCompare(titleB)
                 : titleB.localeCompare(titleA);
         } else {
             const dateA = a.due_date ? new Date(a.due_date) : new Date(0);
             const dateB = b.due_date ? new Date(b.due_date) : new Date(0);
-            return sortDirection === 'asc' 
+            return sortDirection === 'asc'
                 ? dateA.getTime() - dateB.getTime()
                 : dateB.getTime() - dateA.getTime();
         }
@@ -163,4 +163,4 @@ export const TaskList: React.FC<TaskListProps> = ({
             />
         </View>
     );
-}; 
+};

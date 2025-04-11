@@ -83,7 +83,7 @@ class SchemaManagerSchema(BaseSchema):
         # Validate against current schema
         if not self.registry.validate_schema(schema_name, data):
             raise ValueError("Schema validation failed after migration")
-        
+
         return DictSchema(data=data)
 
     def get_schema_versions(self, schema_name: str) -> Dict[str, Type[BaseSchema]]:

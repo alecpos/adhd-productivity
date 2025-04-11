@@ -39,4 +39,4 @@ python run.py
 For more information on the app's components, refer to the following:
 - [API Documentation](../docs/api_documentation.md)
 - [ML Models Documentation](../docs/ml_models.md)
-- [Database Schema](../docs/database_schema.md) 
+- [Database Schema](../docs/database_schema.md)

@@ -7,7 +7,7 @@ export function createMockApiError(
   details?: Record<string, unknown>
 ): AxiosError<ApiError> {
   const apiError: ApiError = { status, message, details };
-  
+
   const error = new Error(message) as AxiosError<ApiError>;
   error.code = 'ERR_BAD_REQUEST';
   error.name = 'AxiosError';
@@ -25,7 +25,7 @@ export function createMockApiError(
       headers: {}
     } as AxiosRequestConfig
   } as AxiosResponse<ApiError>;
-  
+
   return error;
 }
 
@@ -73,4 +73,4 @@ export async function expectAsyncApiError(
   } catch (error) {
     expectApiError(error, expectedStatus, expectedMessage);
   }
-} 
+}

@@ -48,4 +48,4 @@ export const useTaskSearch = (tasks: Task[]) => {
     handleSearch,
     clearRecentSearches,
   };
-}; 
+};

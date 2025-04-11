@@ -10,7 +10,7 @@ from datetime import datetime
 import sys
 import importlib.util
 spec = importlib.util.spec_from_file_location(
-    "temporal_pattern_recognition", 
+    "temporal_pattern_recognition",
     "/Users/alecposner/Documents/adhd_calendar_backend/app/ml/temporal_pattern_recognition.py"
 )
 temporal_pattern_recognition = importlib.util.module_from_spec(spec)
@@ -22,7 +22,7 @@ from app.ml.models.adhd17_reinforcement_model import CircadianDQNModel, TaskCogn
 
 class TestTPRServiceEpic4:
     """Test suite for the TemporalPatternRecognitionService methods related to Epic 4."""
-    
+
     @pytest.mark.asyncio
     @patch('app.ml.models.model_factory_model.ModelFactory.create_circadian_dqn')
     @patch('app.ml.models.adhd17_reinforcement_model.CircadianDQNModel.load')
@@ -36,13 +36,13 @@ class TestTPRServiceEpic4:
         mock_model = MagicMock()
         mock_create_dqn.return_value = mock_model
         mock_model.save = MagicMock()
-        
+
         # Create service instance with mocked dependencies
         service = TemporalPatternRecognitionService()
         service.circadian_rhythm = MagicMock()
         service.circadian_rhythm.trained = False
         service.circadian_rhythm.save = MagicMock()
-        
+
         # Sample tasks
         tasks = [
             {
@@ -70,7 +70,7 @@ class TestTPRServiceEpic4:
                 "is_flexible": True
             }
         ]
-        
+
         # Sample user data
         user_data = {
             "sleep_time": datetime.now().time(),
@@ -82,26 +82,26 @@ class TestTPRServiceEpic4:
                 "focus_intensive_preferred_hours": [9, 10, 11]
             }
         }
-        
+
         # Call the method
         result = await service.optimize_schedule_with_circadian_dqn(
             user_id="user123",
             tasks=tasks,
             user_data=user_data
         )
-        
+
         # Check that a new model was created
         mock_create_dqn.assert_called_once()
         mock_load.assert_not_called()
-        
+
         # Check result structure
         assert "schedule" in result
         assert "energy_curve" in result
         assert "model_path" in result
-        
+
         # Check that model was saved
         mock_model.save.assert_called_once()
-    
+
     @pytest.mark.asyncio
     @patch('app.ml.models.adhd17_reinforcement_model.CircadianDQNModel.load')
     @patch('os.path.exists')
@@ -114,7 +114,7 @@ class TestTPRServiceEpic4:
         mock_model = MagicMock()
         mock_load.return_value = mock_model
         mock_model.save = MagicMock()
-        
+
         # Create service instance with mocked dependencies
         service = TemporalPatternRecognitionService()
         service.circadian_rhythm = MagicMock()
@@ -127,7 +127,7 @@ class TestTPRServiceEpic4:
             ]
         })
         service.circadian_rhythm.save = MagicMock()
-        
+
         # Sample tasks
         tasks = [
             {
@@ -143,7 +143,7 @@ class TestTPRServiceEpic4:
                 "is_flexible": True
             }
         ]
-        
+
         # Sample user data
         user_data = {
             "sleep_time": datetime.now().time(),
@@ -155,7 +155,7 @@ class TestTPRServiceEpic4:
                 "focus_intensive_preferred_hours": [9, 10, 11]
             }
         }
-        
+
         # Call the method with existing model path
         result = await service.optimize_schedule_with_circadian_dqn(
             user_id="user123",
@@ -163,10 +163,10 @@ class TestTPRServiceEpic4:
             user_data=user_data,
             model_path="/path/to/existing/model"
         )
-        
+
         # Check that the existing model was loaded
         mock_load.assert_called_once_with("/path/to/existing/model")
-        
+
         # Check result structure using the fixture
         if assert_dict_structure:
             assert_dict_structure(result, ["schedule", "energy_curve", "model_path"])
@@ -175,12 +175,12 @@ class TestTPRServiceEpic4:
             assert "schedule" in result
             assert "energy_curve" in result
             assert "model_path" in result
-        
+
         # Check tasks categorized correctly
         if result["schedule"]:
             # Verify that the high-focus task was categorized as FOCUS_INTENSIVE
             assert result["schedule"][0]["cognitive_category"] == TaskCognitiveProfile.FOCUS_INTENSIVE
-    
+
     @pytest.mark.asyncio
     async def test_optimize_schedule_with_circadian_dqn_energy_prediction(self, assert_dict_structure):
         """Test energy curve prediction during schedule optimization."""
@@ -197,15 +197,15 @@ class TestTPRServiceEpic4:
                 {"hour": 17, "energy_level": 4.0}
             ]
         })
-        
+
         # Mock the model creation and loading
         with patch('app.ml.models.model_factory_model.ModelFactory.create_circadian_dqn') as mock_create_dqn, \
              patch('os.path.exists', return_value=False):
-            
+
             mock_model = MagicMock()
             mock_create_dqn.return_value = mock_model
             mock_model.save = MagicMock()
-            
+
             # Sample tasks with different cognitive requirements
             tasks = [
                 {
@@ -240,7 +240,7 @@ class TestTPRServiceEpic4:
                     "priority": 1
                 }
             ]
-            
+
             # Sample user data
             user_data = {
                 "sleep_time": datetime.now().time(),
@@ -251,32 +251,32 @@ class TestTPRServiceEpic4:
                     "administrative_preferred_hours": [17, 18]
                 }
             }
-            
+
             # Call the method
             result = await service.optimize_schedule_with_circadian_dqn(
                 user_id="user123",
                 tasks=tasks,
                 user_data=user_data
             )
-            
+
             # Check that energy levels were fetched
             service.circadian_rhythm.predict_daily_curve.assert_called_once()
-            
+
             # Check that energy curve data is in the result
             if assert_dict_structure:
                 assert_dict_structure(result, ["energy_curve"])
             else:
                 assert "energy_curve" in result
-            
+
             # Get the energy levels from the result
             energy_curve = result["energy_curve"]
-            
+
             # Verify the energy prediction was processed correctly
             assert 9 in energy_curve
             assert energy_curve[9] == 8.0
             assert 14 in energy_curve
             assert energy_curve[14] == 6.0
-            
+
             # Check that schedule has energy level and suitability score for each task
             for task in result["schedule"]:
                 if assert_dict_structure:
@@ -288,4 +288,4 @@ class TestTPRServiceEpic4:
 
 
 if __name__ == "__main__":
-    pytest.main(["-xvs", __file__]) 
+    pytest.main(["-xvs", __file__])

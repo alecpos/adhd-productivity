@@ -187,18 +187,18 @@ class ProductivityService(BaseService):
         """Calculate success patterns from completed sessions."""
         if not sessions:
             return {'best_environment': None, 'patterns': {}}
-        
+
         environment_scores = defaultdict(list)
         for session in sessions:
             if session.environment and hasattr(session, 'effectiveness_score'):
                 environment_scores[session.environment].append(session.effectiveness_score)
-        
+
         best_environment = max(
             environment_scores.items(),
             key=lambda x: sum(x[1]) / len(x[1]) if x[1] else 0,
             default=(None, [])
         )[0]
-        
+
         return {
             'best_environment': best_environment,
             'environment_scores': {env: sum(scores) / len(scores) for env, scores in environment_scores.items()}

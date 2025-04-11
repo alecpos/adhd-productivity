@@ -261,4 +261,4 @@ The AnalyticsService includes comprehensive testing:
 
 ---
 
-*Last updated: November 15, 2023* 
+*Last updated: November 15, 2023*

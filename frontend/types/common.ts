@@ -1,10 +1,10 @@
-export type UUID = string; 
+export type UUID = string;
 
 export interface BaseResponse {
   success: boolean;
   message: string;
   data?: any;
-} 
+}
 
 export type ApiResponse<T> = {
   data: T;
@@ -19,4 +19,4 @@ export type ErrorResponse = {
   error?: Error;
 };
 
-export type UnknownRecord = Record<string, unknown>; 
+export type UnknownRecord = Record<string, unknown>;

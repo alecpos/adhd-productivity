@@ -53,15 +53,15 @@ export const CircadianRhythmView = () => {
   const [highFocusMinutes, setHighFocusMinutes] = useState(180); // 3 hours default
   const { theme } = useTheme();
   const { reduceMotion, highContrast } = useAccessibilityPreferences();
-  
+
   const screenWidth = Dimensions.get('window').width - 40;
 
   const chartConfig = {
     backgroundGradientFrom: theme.colors.background,
     backgroundGradientTo: theme.colors.background,
     decimalPlaces: 0,
-    color: (opacity = 1) => highContrast 
-      ? `rgba(255, 255, 255, ${opacity})` 
+    color: (opacity = 1) => highContrast
+      ? `rgba(255, 255, 255, ${opacity})`
       : `rgba(71, 130, 218, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(${highContrast ? '255, 255, 255' : theme.dark ? '255, 255, 255' : '0, 0, 0'}, ${opacity})`,
     style: {
@@ -77,10 +77,10 @@ export const CircadianRhythmView = () => {
   // Get optimal time blocks based on the current circadian curve and selected task type
   const getOptimalTimeBlocks = (): string[] => {
     if (!selectedTaskType) return [];
-    
+
     const taskType = taskTypes.find(t => t.id === selectedTaskType);
     if (!taskType) return [];
-    
+
     // In a real app, this would come from the backend based on CircadianRhythmModel calculations
     switch (taskType.bestEnergyLevel) {
       case 'high':
@@ -112,7 +112,7 @@ export const CircadianRhythmView = () => {
     <ScrollView style={styles.container}>
       <Card containerStyle={styles.card}>
         <Card.Title>Your Circadian Energy Pattern</Card.Title>
-        
+
         <View style={styles.daySelector}>
           <Button
             title="Today"
@@ -139,7 +139,7 @@ export const CircadianRhythmView = () => {
             containerStyle={styles.selectorButtonContainer}
           />
         </View>
-        
+
         <LineChart
           data={defaultCircadianData}
           width={screenWidth}
@@ -154,16 +154,16 @@ export const CircadianRhythmView = () => {
           withVerticalLabels={true}
           withHorizontalLabels={true}
         />
-        
+
         <Text style={styles.explanation}>
           This chart shows your predicted energy levels throughout the day.
           Your peak energy times are typically around 9:00 AM and 5:00 PM.
         </Text>
       </Card>
-      
+
       <Card containerStyle={styles.card}>
         <Card.Title>Optimize Your Schedule</Card.Title>
-        
+
         <Text style={styles.sectionTitle}>Task Type</Text>
         <View style={styles.taskTypeContainer}>
           {taskTypes.map((task) => (
@@ -174,10 +174,10 @@ export const CircadianRhythmView = () => {
               size="sm"
               buttonStyle={[
                 styles.taskButton,
-                { backgroundColor: selectedTaskType === task.id ? task.color : 'transparent', 
+                { backgroundColor: selectedTaskType === task.id ? task.color : 'transparent',
                   borderColor: task.color }
               ]}
-              titleStyle={{ 
+              titleStyle={{
                 color: selectedTaskType === task.id ? 'white' : task.color
               }}
               onPress={() => setSelectedTaskType(task.id)}
@@ -185,7 +185,7 @@ export const CircadianRhythmView = () => {
             />
           ))}
         </View>
-        
+
         <Text style={styles.sectionTitle}>High Focus Time Needed</Text>
         <View style={styles.sliderContainer}>
           <Slider
@@ -201,7 +201,7 @@ export const CircadianRhythmView = () => {
           />
           <Text style={styles.sliderValue}>{formatMinutes(highFocusMinutes)}</Text>
         </View>
-        
+
         {selectedTaskType && (
           <Card containerStyle={styles.recommendationCard}>
             <Card.Title>Recommended Time Blocks</Card.Title>
@@ -212,11 +212,11 @@ export const CircadianRhythmView = () => {
                 </Text>
                 {optimalTimeBlocks.map((timeBlock, index) => (
                   <View key={index} style={styles.timeBlock}>
-                    <View 
+                    <View
                       style={[
-                        styles.energyIndicator, 
+                        styles.energyIndicator,
                         { backgroundColor: getEnergyLevelColor(index === 0 ? 75 : 68) }
-                      ]} 
+                      ]}
                     />
                     <Text style={styles.timeBlockText}>{timeBlock}</Text>
                   </View>
@@ -342,4 +342,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 15,
   },
-}); 
+});

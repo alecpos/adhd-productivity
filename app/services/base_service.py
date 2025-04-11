@@ -34,11 +34,11 @@ HALF_OPEN = "half-open"  # Testing if service is back online
 class CircuitBreaker:
     """
     Circuit breaker implementation to prevent cascading failures.
-    
+
     This class implements the circuit breaker pattern to prevent an application
     from repeatedly trying to execute an operation that's likely to fail.
     """
-    
+
     def __init__(
         self,
         name: str,
@@ -48,7 +48,7 @@ class CircuitBreaker:
     ):
         """
         Initialize the circuit breaker.
-        
+
         Args:
             name: A name for this circuit breaker (for logging)
             failure_threshold: Number of failures before opening the circuit
@@ -59,26 +59,26 @@ class CircuitBreaker:
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.expected_exceptions = expected_exceptions
-        
+
         # Circuit state
         self.state = CLOSED
         self.failure_count = 0
         self.last_failure_time = None
-        
+
         logger.info(f"Circuit breaker '{name}' initialized with failure_threshold={failure_threshold}, "
                    f"recovery_timeout={recovery_timeout}")
-        
+
     def __call__(self, func):
         """Make the circuit breaker callable as a decorator."""
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.call(func, *args, **kwargs)
         return wrapper
-        
+
     async def call(self, func, *args, **kwargs):
         """
         Call the function with circuit breaker protection.
-        
+
         This method checks the current state of the circuit before executing
         the wrapped function, potentially fast-failing if the circuit is open.
         """
@@ -89,41 +89,41 @@ class CircuitBreaker:
             else:
                 logger.warning(f"Circuit '{self.name}' is OPEN - fast failing")
                 raise ServiceError(f"Service unavailable (circuit '{self.name}' is open)")
-                
+
         try:
             result = await func(*args, **kwargs)
-            
+
             # Reset on successful call if in half-open state
             if self.state == HALF_OPEN:
                 logger.info(f"Circuit '{self.name}' recovered, transitioning to CLOSED")
                 self._reset()
-                
+
             return result
-            
+
         except self.expected_exceptions as e:
             self._handle_failure(e)
             raise
-            
+
     def _handle_failure(self, exception):
         """Handle a failure, potentially opening the circuit."""
         self.failure_count += 1
         self.last_failure_time = datetime.now()
-        
+
         logger.warning(f"Circuit '{self.name}' recorded failure {self.failure_count}/{self.failure_threshold}: {str(exception)}")
-        
+
         if self.state == HALF_OPEN or self.failure_count >= self.failure_threshold:
             logger.error(f"Circuit '{self.name}' is now OPEN due to failures")
             self.state = OPEN
-            
+
     def _should_attempt_recovery(self):
         """Determine if enough time has passed to try recovery."""
         if not self.last_failure_time:
             return True
-            
+
         now = datetime.now()
         seconds_since_failure = (now - self.last_failure_time).total_seconds()
         return seconds_since_failure >= self.recovery_timeout
-        
+
     def _reset(self):
         """Reset the circuit breaker to closed state."""
         self.failure_count = 0
@@ -134,15 +134,15 @@ class CircuitBreaker:
 class BulkheadManager:
     """
     Bulkhead pattern implementation to isolate resources.
-    
+
     This class implements the bulkhead pattern to prevent a failure in one part
     of the system from cascading to other parts by isolating resources.
     """
-    
+
     def __init__(self, name: str, max_concurrent_calls: int = 10, max_queue_size: int = 20):
         """
         Initialize the bulkhead manager.
-        
+
         Args:
             name: A name for this bulkhead (for logging)
             max_concurrent_calls: Maximum number of concurrent executions
@@ -154,21 +154,21 @@ class BulkheadManager:
         self.semaphore = asyncio.Semaphore(max_concurrent_calls)
         self.active_count = 0
         self.queue_count = 0
-        
+
         logger.info(f"Bulkhead '{name}' initialized with max_concurrent_calls={max_concurrent_calls}, "
                    f"max_queue_size={max_queue_size}")
-        
+
     def __call__(self, func):
         """Make the bulkhead callable as a decorator."""
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.execute(func, *args, **kwargs)
         return wrapper
-        
+
     async def execute(self, func, *args, **kwargs):
         """
         Execute a function with bulkhead isolation.
-        
+
         This method limits the number of concurrent executions and queued requests
         to prevent resource exhaustion.
         """
@@ -176,18 +176,18 @@ class BulkheadManager:
         if self.queue_count >= self.max_queue_size:
             logger.error(f"Bulkhead '{self.name}' queue is full - rejecting request")
             raise ServiceError(f"Service overloaded (bulkhead '{self.name}' queue full)")
-            
+
         # Add to queue
         self.queue_count += 1
         logger.debug(f"Bulkhead '{self.name}' queue size: {self.queue_count}")
-        
+
         try:
             # Wait for semaphore (move from queue to active)
             async with self.semaphore:
                 self.queue_count -= 1
                 self.active_count += 1
                 logger.debug(f"Bulkhead '{self.name}' active calls: {self.active_count}")
-                
+
                 # Execute the function
                 try:
                     return await func(*args, **kwargs)
@@ -203,12 +203,12 @@ class BulkheadManager:
 class ThreadPoolBulkhead:
     """
     Thread pool based bulkhead for CPU-bound operations.
-    
+
     This class provides isolation for CPU-bound operations using thread pools.
     """
-    
+
     _thread_pools = {}  # Shared thread pools by name
-    
+
     @classmethod
     def get_pool(cls, name: str, max_workers: int = 5):
         """Get or create a thread pool with the given name."""
@@ -216,11 +216,11 @@ class ThreadPoolBulkhead:
             cls._thread_pools[name] = ThreadPoolExecutor(max_workers=max_workers)
             logger.info(f"Created thread pool '{name}' with max_workers={max_workers}")
         return cls._thread_pools[name]
-    
+
     def __init__(self, name: str, max_workers: int = 5):
         """
         Initialize the thread pool bulkhead.
-        
+
         Args:
             name: A name for this bulkhead pool
             max_workers: Maximum number of worker threads
@@ -228,14 +228,14 @@ class ThreadPoolBulkhead:
         self.name = name
         self.max_workers = max_workers
         self.pool = self.get_pool(name, max_workers)
-        
+
     def __call__(self, func):
         """Make the bulkhead callable as a decorator."""
         @wraps(func)
         async def wrapper(*args, **kwargs):
             return await self.execute(func, *args, **kwargs)
         return wrapper
-    
+
     async def execute(self, func, *args, **kwargs):
         """Execute a function in the thread pool."""
         loop = asyncio.get_event_loop()
@@ -305,11 +305,11 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                     (err for err in concurrency_errors if err in error_str), "unknown"
                 )
                 log_message = error_message or f"Operation failed due to {matched_error}"
-                
+
                 # Calculate jitter to avoid thundering herd
                 jitter = (0.5 + (0.5 * (hash(str(time.time())) % 100) / 100))
                 actual_delay = delay * jitter
-                
+
                 logger.warning(f"{log_message} (Attempt {retry_count}/{max_retries}). Retrying in {actual_delay:.2f}s")
 
                 delay = min(delay * backoff_factor, max_delay)
@@ -371,11 +371,11 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 recovery_timeout=recovery_timeout,
                 expected_exceptions=expected_exceptions,
             )
-            
+
             @wraps(func)
             async def wrapper(*args, **kwargs) -> T:
                 return await circuit_breaker.call(func, *args, **kwargs)
-            
+
             return wrapper
         return decorator
 
@@ -394,11 +394,11 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 max_concurrent_calls=max_concurrent_calls,
                 max_queue_size=max_queue_size,
             )
-            
+
             @wraps(func)
             async def wrapper(*args, **kwargs) -> T:
                 return await bulkhead.execute(func, *args, **kwargs)
-            
+
             return wrapper
         return decorator
 
@@ -415,18 +415,18 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 name=pool_name,
                 max_workers=max_workers,
             )
-            
+
             @wraps(func)
             async def wrapper(*args, **kwargs) -> Any:
                 return await thread_pool.execute(func, *args, **kwargs)
-            
+
             return wrapper
         return decorator
 
     async def health_check(self) -> Dict[str, Any]:
         """
         Perform a health check for this service.
-        
+
         Returns:
             A dictionary with health status information
         """
@@ -435,7 +435,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             "database": "up",
             "timestamp": datetime.now().isoformat(),
         }
-        
+
         # Check database connection
         try:
             # Simple query to verify database connection
@@ -445,7 +445,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             status = "degraded"
             details["database"] = "down"
             details["database_error"] = str(e)
-        
+
         return {
             "status": status,
             "service": self.__class__.__name__,
@@ -577,7 +577,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             query = select(self.model)
             for field, value in filters.items():
                 query = query.where(getattr(self.model, field) == value)
-                
+
             result = await self.db.execute(query)
             return result.scalar_one_or_none()
         except Exception as e:

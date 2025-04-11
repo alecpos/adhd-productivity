@@ -67,7 +67,7 @@ export default function DashboardScreen(): JSX.Element | null {
   const handleSubmission = useCallback((text: string): void => {
     const classification = classifySubmission(text);
     const recommendedActions = getRecommendedActions(classification.category);
-    
+
     if (classification.confidence > 0.7) {
       // Switch to appropriate tab based on classification
       switch (classification.category) {
@@ -143,15 +143,15 @@ export default function DashboardScreen(): JSX.Element | null {
         <TabView.Item style={styles.tabContent}>
           <TasksTab onSubmit={handleSubmission} />
         </TabView.Item>
-        
+
         <TabView.Item style={styles.tabContent}>
           <WellnessTab />
         </TabView.Item>
-        
+
         <TabView.Item style={styles.tabContent}>
           <CalendarTab />
         </TabView.Item>
-        
+
         <TabView.Item style={styles.tabContent}>
           <ADHDDashboard />
         </TabView.Item>

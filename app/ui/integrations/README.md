@@ -121,7 +121,7 @@ This can be useful for monitoring the integration's health and diagnosing issues
 The field mapper components handle conversion between Jira and ADHD Calendar data formats:
 
 1. **StatusMapper**: Maps between Jira issue statuses and `ExternalTaskStatus` enum values
-2. **PriorityMapper**: Maps between Jira priorities and `ExternalTaskPriority` enum values  
+2. **PriorityMapper**: Maps between Jira priorities and `ExternalTaskPriority` enum values
 3. **DateFormatter**: Handles date format conversions between systems
 4. **FieldExtractor**: Extracts and formats fields from Jira issues
 5. **CustomFieldMapper**: Manages mappings for custom fields
@@ -152,4 +152,4 @@ Each component has a corresponding test file in the `tests` directory. Run the t
 
 ```bash
 pytest app/ui/integrations/tests/
-``` 
+```

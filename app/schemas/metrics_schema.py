@@ -47,4 +47,4 @@ class RouteMetricsUpdateSchema(BaseSchema):
     user_agents: Optional[Dict[str, int]] = None
     ip_addresses: Optional[Dict[str, int]] = None
 
-    model_config = ConfigDict(from_attributes=True) 
+    model_config = ConfigDict(from_attributes=True)

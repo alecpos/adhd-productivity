@@ -217,4 +217,4 @@ A story is complete when:
 - [ ] Ethical considerations addressed and documented
 - [ ] Integration with other components verified
 - [ ] Technical debt minimized or documented
-- [ ] Computer vision-specific validations completed 
+- [ ] Computer vision-specific validations completed

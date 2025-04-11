@@ -45,7 +45,7 @@ class SessionManager:
                 "feedback": []
             }
         )
-        
+
         self.db.add(session)
         await self.db.commit()
         await self.db.refresh(session)
@@ -85,37 +85,37 @@ class SessionManager:
         session = await self.get_session_by_id(session_id)
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
-        
+
         if session.status != SessionStatus.ACTIVE:
             raise HTTPException(status_code=400, detail="Session is not active")
-        
+
         # Initialize metadata if it doesn't exist
         if not session.meta_data:
             session.meta_data = {"participants": [], "join_requests": []}
-        
+
         # Create a deep copy of the metadata to avoid reference issues
         updated_meta_data = dict(session.meta_data)
-        
+
         # Initialize participants list if it doesn't exist
         if "participants" not in updated_meta_data:
             updated_meta_data["participants"] = []
-        
+
         # Add the user to the participants list if not already there
         if str(user_id) not in updated_meta_data["participants"]:
             updated_meta_data["participants"].append(str(user_id))
-            
+
             # Update the session's metadata in the database
             # Update the meta_data field
             meta_data_update = update(BodyDoublingSessionModel).where(
                 BodyDoublingSessionModel.id == session_id
             ).values(meta_data=updated_meta_data)
-            
+
             await self.db.execute(meta_data_update)
             await self.db.commit()
-            
+
             # Refresh the session to get the updated data
             await self.db.refresh(session)
-        
+
         return session
 
     async def leave_session(self, session_id: UUID, user_id: UUID) -> BodyDoublingSessionModel:
@@ -123,28 +123,28 @@ class SessionManager:
         session = await self.get_session_by_id(session_id)
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
-        
+
         if not session.meta_data or "participants" not in session.meta_data:
             raise HTTPException(status_code=400, detail="No participants found in session")
-        
+
         if str(user_id) not in session.meta_data["participants"]:
             raise HTTPException(status_code=400, detail="User is not a participant in this session")
-        
+
         # Create a deep copy of the metadata to avoid reference issues
         updated_meta_data = dict(session.meta_data)
-        
+
         # Remove the user from the participants list
         updated_meta_data["participants"].remove(str(user_id))
-        
+
         # Check if we need to update the session status
         new_status = session.status
         # If this is a one-on-one session and the host is leaving, end the session
         if session.session_type == SessionType.ONE_ON_ONE and session.host_id == user_id:
             new_status = SessionStatus.COMPLETED
-        
+
         # Update the session in the database
         from sqlalchemy import update
-        
+
         # Update the status and meta_data fields
         session_update = update(BodyDoublingSessionModel).where(
             BodyDoublingSessionModel.id == session_id
@@ -152,10 +152,10 @@ class SessionManager:
             status=new_status,
             meta_data=updated_meta_data
         )
-        
+
         await self.db.execute(session_update)
         await self.db.commit()
-        
+
         # Refresh the session to get the updated data
         await self.db.refresh(session)
         return session
@@ -165,21 +165,21 @@ class SessionManager:
         session = await self.get_session_by_id(session_id)
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
-        
+
         if session.host_id != user_id:
             raise HTTPException(status_code=403, detail="Only the host can end the session")
-        
+
         # Update the session status in the database
         from sqlalchemy import update
-        
+
         # Update the status field
         status_update = update(BodyDoublingSessionModel).where(
             BodyDoublingSessionModel.id == session_id
         ).values(status=SessionStatus.COMPLETED)
-        
+
         await self.db.execute(status_update)
         await self.db.commit()
-        
+
         # Refresh the session to get the updated status
         await self.db.refresh(session)
         return session
@@ -189,14 +189,14 @@ class SessionManager:
         session = await self.get_session_by_id(session_id)
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
-        
+
         # Initialize meta_data if it doesn't exist
         if session.meta_data is None:
             updated_meta_data = {}
         else:
             # Create a deep copy of the metadata to avoid reference issues
             updated_meta_data = dict(session.meta_data)
-        
+
         # Ensure all required fields exist in meta_data
         if "participants" not in updated_meta_data:
             updated_meta_data["participants"] = [str(session.user_id)]
@@ -206,21 +206,21 @@ class SessionManager:
             updated_meta_data["preferences"] = {}
         if "feedback" not in updated_meta_data:
             updated_meta_data["feedback"] = []
-        
+
         # Update preferences
         updated_meta_data["preferences"] = preferences
-        
+
         # Update the session's metadata in the database
         from sqlalchemy import update
-        
+
         # Update the meta_data field
         meta_data_update = update(BodyDoublingSessionModel).where(
             BodyDoublingSessionModel.id == session_id
         ).values(meta_data=updated_meta_data)
-        
+
         await self.db.execute(meta_data_update)
         await self.db.commit()
-        
+
         # Refresh the session to get the updated data
         await self.db.refresh(session)
-        return session 
+        return session

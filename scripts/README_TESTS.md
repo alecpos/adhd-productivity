@@ -62,4 +62,4 @@ Test coverage reports are generated in the `coverage` directory after running th
 
 ---
 
-*Last updated: November 15, 2023* 
+*Last updated: November 15, 2023*

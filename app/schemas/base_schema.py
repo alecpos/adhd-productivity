@@ -10,7 +10,7 @@ T = TypeVar("T")
 
 class BaseSchema(BaseModel):
     """Base schema with common configurations.
-    
+
     All schemas should inherit from this to get:
     - ORM mode enabled
     - UUID field handling

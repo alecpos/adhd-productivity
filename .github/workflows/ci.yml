@@ -70,7 +70,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0  # Fetch all history for all branches and tags
-    
+
     - name: Cache Python dependencies
       uses: actions/cache@v3
       with:
@@ -79,7 +79,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-
           ${{ runner.os }}-pip-
-    
+
     - name: Cache Node modules
       uses: actions/cache@v3
       with:
@@ -88,59 +88,59 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-
           ${{ runner.os }}-node-
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
         cache-dependency-path: '**/requirements.txt'
-        
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov black mypy bandit flake8 safety pytest-asyncio pytest-xdist
-        
+
     - name: Install Node dependencies
       run: |
         cd frontend
         npm ci
-        
+
     - name: Run tests
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
         PYTHONPATH: ${{ github.workspace }}
       run: |
         pytest --cov=./ --cov-report=xml -n auto --dist loadfile
-        
+
     - name: Run code formatting check
       run: |
         black --check .
-        
+
     - name: Run linting
       run: |
         flake8 . --max-line-length=100 --statistics
-        
+
     - name: Run type checking
       run: |
         mypy . --ignore-missing-imports
-        
+
     - name: Run security checks
       run: |
         bandit -r . -ll
         safety check
-        
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
-        
+
     - name: Check for test coverage decrease
       run: |
         coverage report --fail-under=80
-        
+
   codeql-analysis:
     needs: pre-commit
     runs-on: ubuntu-latest
@@ -148,36 +148,36 @@ jobs:
       actions: read
       contents: read
       security-events: write
-    
+
     strategy:
       fail-fast: false
       matrix:
         language: ['python']
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
-        
+
     - name: Autobuild
       uses: github/codeql-action/autobuild@v2
-      
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
-      
+
   docker:
     needs: [test, codeql-analysis]
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-      
+
     - name: Cache Docker layers
       uses: actions/cache@v3
       with:
@@ -186,12 +186,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-${{ github.sha }}-
           ${{ runner.os }}-buildx-
-          
+
     - name: Build and test Docker image
       run: |
         docker build -t adhd-calendar-backend .
         docker run --rm adhd-calendar-backend pytest
-        
+
     - name: Scan Docker image for vulnerabilities
       uses: aquasecurity/trivy-action@master
       with:
@@ -201,32 +201,32 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        
+
   database:
     needs: test
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: '**/requirements.txt'
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+
     - name: Run database migrations
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
       run: |
         alembic upgrade head
-        
+
     - name: Test migrations rollback
       env:
         DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -238,14 +238,14 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     needs: [docker, database]
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Deploy to staging
       run: |
         echo "Add your staging deployment steps here"
         # Example: Deploy to staging environment
         # - Set up cloud credentials
         # - Push Docker image to registry
-        # - Update staging deployment 
+        # - Update staging deployment

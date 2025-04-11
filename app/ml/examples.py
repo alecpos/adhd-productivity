@@ -2,6 +2,7 @@ from .ensemble_learning import EnsembleLearner, ModelPipeline, ReinforcementOpti
 from .models import ModelFactory
 from .preprocessing import DataPreprocessor
 from .visualization import InsightVisualizer
+from .prediction_service import PredictionService
 
 
 async def ensemble_learning_example(
@@ -15,7 +16,11 @@ async def ensemble_learning_example(
     visualizer = InsightVisualizer()
 
     # Get ensemble predictions
-    predictions = await ensemble.create_ensemble_prediction()
+    predictions = await ensemble.create_ensemble_prediction(
+        mental_health_data=mental_health_data,
+        energy_data=energy_data,
+        task_data=task_data
+    )
 
     # Create visualizations
     dashboard = visualizer.create_productivity_dashboard(mental_health_data, energy_data, task_data)
@@ -84,7 +89,11 @@ async def comprehensive_analysis_example(
     optimizer = ReinforcementOptimizer(state_size=10, action_size=5)
 
     # Get ensemble predictions
-    predictions = await ensemble.create_ensemble_prediction()
+    predictions = await ensemble.create_ensemble_prediction(
+        mental_health_data=mental_health_data,
+        energy_data=energy_data,
+        task_data=task_data
+    )
 
     # Create visualizations
     dashboard = visualizer.create_productivity_dashboard(mental_health_data, energy_data, task_data)
@@ -159,3 +168,63 @@ def create_example_data(
         }
         for i in range(num_days)
     ]
+
+
+async def run_ensemble_example():
+    """Example of using ensemble learning."""
+    learner = EnsembleLearner()
+
+    # Example data
+    mental_health_data = [
+        {"mood": 0.8, "stress": 0.2, "timestamp": "2023-01-01T10:00:00"},
+        {"mood": 0.7, "stress": 0.3, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    energy_data = [
+        {"energy_level": 0.9, "activity": 0.5, "timestamp": "2023-01-01T10:00:00"},
+        {"energy_level": 0.8, "activity": 0.6, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    task_data = [
+        {"complexity": 0.7, "duration": 30, "timestamp": "2023-01-01T10:00:00"},
+        {"complexity": 0.6, "duration": 45, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    # Create ensemble prediction with all required arguments
+    prediction = await learner.create_ensemble_prediction(
+        mental_health_data=mental_health_data,
+        energy_data=energy_data,
+        task_data=task_data
+    )
+
+    return prediction
+
+
+async def run_prediction_example():
+    """Example of using prediction service."""
+    service = PredictionService()
+
+    # Example data
+    mental_health_data = [
+        {"mood": 0.8, "stress": 0.2, "timestamp": "2023-01-01T10:00:00"},
+        {"mood": 0.7, "stress": 0.3, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    energy_data = [
+        {"energy_level": 0.9, "activity": 0.5, "timestamp": "2023-01-01T10:00:00"},
+        {"energy_level": 0.8, "activity": 0.6, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    task_data = [
+        {"complexity": 0.7, "duration": 30, "timestamp": "2023-01-01T10:00:00"},
+        {"complexity": 0.6, "duration": 45, "timestamp": "2023-01-01T11:00:00"}
+    ]
+
+    # Create ensemble prediction with all required arguments
+    prediction = await service.create_ensemble_prediction(
+        mental_health_data=mental_health_data,
+        energy_data=energy_data,
+        task_data=task_data
+    )
+
+    return prediction

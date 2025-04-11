@@ -55,16 +55,16 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             user_id = task_dict.pop("user_id", None)
             if not user_id:
                 raise HTTPException(status_code=400, detail="Missing required field: user_id")
-                
+
             # Add user_id back to the dict for model creation
             task_dict["user_id"] = user_id
-            
+
             # Validate fields
             required_fields = ["title"]
             for field in required_fields:
                 if field not in task_dict or not task_dict[field]:
                     raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
-                    
+
             if "status" in task_dict:
                 try:
                     if isinstance(task_dict["status"], str):
@@ -72,7 +72,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                     TaskStatusSchema(task_dict["status"])
                 except ValueError:
                     raise ValueError(f"Invalid task status: {task_dict['status']}")
-                    
+
             if "priority" in task_dict:
                 try:
                     if isinstance(task_dict["priority"], str):
@@ -80,18 +80,18 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                     TaskPrioritySchema(task_dict["priority"])
                 except ValueError:
                     raise ValueError(f"Invalid task priority: {task_dict['priority']}")
-                    
+
             if "estimated_duration" in task_dict:
                 if (
                     not isinstance(task_dict["estimated_duration"], (int, float))
                     or task_dict["estimated_duration"] <= 0
                 ):
                     raise ValueError("Estimated duration must be a positive number")
-                    
+
             if "due_date" in task_dict and task_dict["due_date"]:
                 if not isinstance(task_dict["due_date"], datetime):
                     raise ValueError("Invalid due_date format")
-                    
+
             task = self.model(**task_dict)
             self.db.add(task)
             await self.db.commit()
@@ -107,25 +107,25 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
     async def bulkhead_task_analysis(self, task_id: UUID) -> Dict[str, Any]:
         """
         Analyze a task with bulkhead pattern to isolate resource usage.
-        
+
         Args:
             task_id: The ID of the task to analyze
-            
+
         Returns:
             Dict containing analysis results
         """
         logger.info(f"Analyzing task {task_id} with bulkhead isolation")
-        
+
         # Define the operation to perform inside the bulkhead
         async def analyze_operation():
             task = await self.get_by_id(task_id)
             if not task:
                 raise ValueError(f"Task not found: {task_id}")
-            
+
             # Call the task analyzer service
             analysis_result = await self.analyzer.analyze_task(task)
             return analysis_result
-        
+
         # Execute with bulkhead isolation
         try:
             result = await self._task_analysis_bulkhead(analyze_operation)()
@@ -298,7 +298,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             )
             result = await self.db.execute(query)
             status_counts[status.value] = result.scalar() or 0
-        
+
         # Count overdue tasks
         now = datetime.now()
         overdue_query = select(func.count()).where(
@@ -310,7 +310,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         )
         overdue_result = await self.db.execute(overdue_query)
         overdue_count = overdue_result.scalar() or 0
-        
+
         # Count tasks due today
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
@@ -324,15 +324,15 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         )
         today_result = await self.db.execute(today_query)
         today_count = today_result.scalar() or 0
-        
+
         # Get completion rate
         total_query = select(func.count()).where(self.model.user_id == user_id)
         total_result = await self.db.execute(total_query)
         total_count = total_result.scalar() or 0
-        
+
         completed_count = status_counts.get(TaskStatus.COMPLETED.value, 0)
         completion_rate = (completed_count / total_count) * 100 if total_count > 0 else 0
-        
+
         return {
             "status_counts": status_counts,
             "overdue_count": overdue_count,
@@ -350,7 +350,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             "task_create": self._get_circuit_state("task_create"),
             "task_update": self._get_circuit_state("task_update"),
         }
-        
+
         # Get bulkhead state
         bulkhead_state = {
             "task_analysis": {
@@ -358,11 +358,11 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                 "max_queue": 10       # From initialization
             }
         }
-        
+
         # Determine overall health based on circuits
         is_healthy = all(state == CLOSED for state in circuit_states.values())
         analyzer_is_healthy = analyzer_health.get("status") == "healthy"
-        
+
         return {
             "service": "TaskService",
             "status": "healthy" if (is_healthy and analyzer_is_healthy) else "degraded",
@@ -373,7 +373,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
                 "analyzer": analyzer_health
             }
         }
-    
+
     def _get_analyzer_health(self) -> Dict[str, Any]:
         """Get health status of analyzer service."""
         # In a real implementation, this would check the actual service
@@ -382,10 +382,10 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             "status": "healthy" if analyzer_circuit == CLOSED else "degraded" if analyzer_circuit == HALF_OPEN else "unhealthy",
             "circuit": analyzer_circuit
         }
-    
+
     def _get_circuit_state(self, circuit_name: str) -> str:
         """Get the current state of a circuit breaker.
-        
+
         This is a helper method that would need to access circuit breaker state.
         For a real implementation, this would need access to the circuit breaker object.
         """
@@ -418,10 +418,10 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             self.model.id == task_id,
             self.model.user_id == user_id
         ).first()
-        
+
         if not task:
             return None
-            
+
         if task.update_status(new_status):
             self.db.commit()
             self.db.refresh(task)
@@ -434,7 +434,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             self.model.id == task_id,
             self.model.user_id == user_id
         ).first()
-        
+
         if task:
             task.next_states = task.get_next_states()
         return task
@@ -444,7 +444,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         tasks = self.db.query(self.model).filter(
             self.model.user_id == user_id
         ).all()
-        
+
         for task in tasks:
             task.next_states = task.get_next_states()
         return tasks
@@ -455,20 +455,20 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             self.model.id == task_id,
             self.model.user_id == user_id
         ).first()
-        
+
         if not task:
             return None
-            
+
         # Handle status update separately if provided
         if task_update.status and task_update.status != task.status:
             if not task.update_status(task_update.status):
                 return None
-                
+
         # Update other fields
         for field, value in task_update.dict(exclude={'status'}).items():
             if value is not None:
                 setattr(task, field, value)
-                
+
         self.db.commit()
         self.db.refresh(task)
         task.next_states = task.get_next_states()
@@ -480,7 +480,7 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
             self.model.id == task_id,
             self.model.user_id == user_id
         ).first()
-        
+
         if task:
             self.db.delete(task)
             self.db.commit()

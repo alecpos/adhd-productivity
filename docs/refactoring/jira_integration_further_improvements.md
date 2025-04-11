@@ -22,20 +22,20 @@ def _should_retry(self, exception: Exception, attempt: int) -> bool:
         status = getattr(exception, "status")
         if status >= 400 and status < 500 and status != 429:
             return False
-    
+
     # Retry on connection or timeout errors
     error_str = str(exception).lower()
     if "connection" in error_str or "timeout" in error_str:
         return True
-    
+
     # Retry on server errors
     if hasattr(exception, "status") and getattr(exception, "status") >= 500:
         return True
-    
+
     # Don't retry on last attempt for other errors
     if attempt == self.retry_count - 1:
         return False
-        
+
     # Default: retry on other errors for early attempts
     return True
 ```
@@ -46,9 +46,9 @@ def _should_retry(self, exception, attempt_number):
     # Don't retry if we've reached the max retry count
     if attempt_number >= self.retry_count:
         return False
-    
+
     # Check if exception is in retryable categories
-    return (self._is_connection_error(exception) or 
+    return (self._is_connection_error(exception) or
             self._is_rate_limit_error(exception) or
             self._is_server_error(exception) or
             self._is_timeout_error(exception))
@@ -57,16 +57,16 @@ def _is_connection_error(self, exception):
     """Check if the exception is a connection error."""
     error_str = str(exception).lower()
     return (
-        'connection' in error_str or 
+        'connection' in error_str or
         'connecttimeout' in error_str or
         isinstance(exception, ConnectionError)
     )
-    
+
 def _is_rate_limit_error(self, exception):
     """Check if the exception is a rate limit error."""
     if hasattr(exception, 'status_code') and exception.status_code == 429:
         return True
-    
+
     error_str = str(exception).lower()
     return 'rate limit' in error_str or 'too many requests' in error_str
 ```
@@ -91,12 +91,12 @@ The `_classify_error` method in `JiraErrorHandler` had high complexity due to a 
 ```python
 def _classify_error(self, exception: Exception) -> str:
     error_str = str(exception).lower()
-    
+
     # HTTP response errors
     if hasattr(exception, "status"):
         status = getattr(exception, "status")
         return self._handle_http_error(status, error_str)
-    
+
     # Common error types
     if "timeout" in error_str:
         self._handle_timeout_error(exception)
@@ -110,7 +110,7 @@ def _classify_error(self, exception: Exception) -> str:
     elif isinstance(exception, ValueError) and "validation" in error_str:
         self._handle_validation_error(exception)
         return "validation"
-    
+
     # Default case
     self._handle_generic_error(exception)
     return "other"
@@ -122,7 +122,7 @@ def _classify_error(self, exception: Exception) -> str:
     # Check for HTTP status code errors first
     if hasattr(exception, "status"):
         return self._handle_http_error(getattr(exception, "status"), str(exception).lower())
-    
+
     # Use error type mapping for other error types
     error_type_map = [
         (self._is_timeout_error, "timeout", self._handle_timeout_error),
@@ -130,12 +130,12 @@ def _classify_error(self, exception: Exception) -> str:
         (self._is_json_error, "parsing", self._handle_json_error),
         (self._is_validation_error, "validation", self._handle_validation_error)
     ]
-    
+
     for checker, category, handler in error_type_map:
         if checker(exception):
             handler(exception)
             return category
-    
+
     # Default case
     self._handle_generic_error(exception)
     return "other"
@@ -173,14 +173,14 @@ def _handle_http_error(self, status: int, error_str: str) -> str:
         404: ("Resource not found. Please check IDs and paths.", "not_found"),
         429: ("Rate limit exceeded. Implementing backoff and retry logic.", "rate_limit")
     }
-    
+
     # Handle specific status codes
     if status in status_handlers:
         message, category = status_handlers[status]
         self.logger.error(message)
         self.error_categories[category] += 1
         return category
-    
+
     # Handle server errors (5xx)
     if status >= 500:
         # ... handle server errors
@@ -202,10 +202,10 @@ The `_make_request` method was refactored to extract mock data handling into sep
 ```python
 async def _make_request(self, url, method="GET", params=None, headers=None, json=None):
     logger.debug(f"Making {method} request to {url}")
-    
+
     # In real implementation we would use aiohttp
     # ...
-    
+
     # For this refactoring, we'll return mock data to demonstrate the structure
     if method == "GET" and "search" in url:
         return {"issues": self._get_mock_issues()}
@@ -219,7 +219,7 @@ async def _make_request(self, url, method="GET", params=None, headers=None, json
         return {"id": "10001", "key": url.split("/")[-1]}
     elif method == "DELETE":
         return None
-    
+
     return {}
 ```
 
@@ -227,10 +227,10 @@ async def _make_request(self, url, method="GET", params=None, headers=None, json
 ```python
 async def _make_request(self, url, method="GET", params=None, headers=None, json=None):
     logger.debug(f"Making {method} request to {url}")
-    
+
     # In real implementation we would use aiohttp
     # ...
-    
+
     # For this refactoring, we'll use mock data handlers
     request_info = {
         "url": url,
@@ -239,10 +239,10 @@ async def _make_request(self, url, method="GET", params=None, headers=None, json
         "headers": headers,
         "json": json
     }
-    
+
     if method == "DELETE":
         return None
-        
+
     # Get appropriate mock data based on request
     return self._get_mock_response(request_info)
 
@@ -250,7 +250,7 @@ def _get_mock_response(self, request_info: Dict[str, Any]) -> Dict[str, Any]:
     """Return mock data based on request information."""
     url = request_info["url"]
     method = request_info["method"]
-    
+
     # Handle different request types
     if method == "GET":
         if "search" in url:
@@ -263,7 +263,7 @@ def _get_mock_response(self, request_info: Dict[str, Any]) -> Dict[str, Any]:
         return self._create_mock_resource(request_info)
     elif method == "PUT":
         return self._update_mock_resource(request_info)
-    
+
     # Default response
     return {}
 ```
@@ -284,46 +284,46 @@ The `jira_to_external_task` method was refactored to extract field mapping logic
 ```python
 def jira_to_external_task(self, jira_issue: Dict[str, Any]) -> ExternalTask:
     self.logger.debug(f"Converting Jira issue {jira_issue.get('key')} to external task")
-    
+
     # Extract basic fields
     issue_key = jira_issue.get("key", "")
     issue_id = jira_issue.get("id", "")
-    
+
     # Extract fields dictionary
     fields = jira_issue.get("fields", {})
-    
+
     # Map core fields
     summary = fields.get("summary", "")
     description = fields.get("description", "")
-    
+
     # Map status
     jira_status = None
     status_obj = fields.get("status", {})
     if status_obj:
         jira_status = status_obj.get("name")
     status = self._map_jira_status_to_external(jira_status)
-    
+
     # Map priority
     jira_priority = None
     priority_obj = fields.get("priority", {})
     if priority_obj:
         jira_priority = priority_obj.get("name")
     priority = self._map_jira_priority_to_external(jira_priority)
-    
+
     # ... more field mappings
-    
+
     # Create external task object
     external_task = ExternalTask(
         id=issue_id,
         external_id=issue_key,
         # ... other fields
     )
-    
+
     # Map custom fields if configured
     for adhd_field, jira_field in self.custom_field_mappings.items():
         if jira_field in fields:
             external_task.custom_fields[adhd_field] = fields[jira_field]
-    
+
     return external_task
 ```
 
@@ -331,10 +331,10 @@ def jira_to_external_task(self, jira_issue: Dict[str, Any]) -> ExternalTask:
 ```python
 def jira_to_external_task(self, jira_issue: Dict[str, Any]) -> ExternalTask:
     self.logger.debug(f"Converting Jira issue {jira_issue.get('key')} to external task")
-    
+
     # Extract fields dictionary
     fields = jira_issue.get("fields", {})
-    
+
     # Create external task object
     external_task = ExternalTask(
         id=jira_issue.get("id", ""),
@@ -353,10 +353,10 @@ def jira_to_external_task(self, jira_issue: Dict[str, Any]) -> ExternalTask:
         url=self._get_issue_url(jira_issue),
         raw_data=jira_issue
     )
-    
+
     # Map custom fields if configured
     self._map_custom_fields(external_task, fields)
-    
+
     return external_task
 
 def _extract_status(self, fields: Dict[str, Any]) -> ExternalTaskStatus:
@@ -404,4 +404,4 @@ While significant improvements have been made, there are still opportunities for
 1. Continue improving structure scores across components
 2. Apply similar refactoring patterns to other areas of the codebase
 3. Implement the sync_service.py refactoring using similar approaches
-4. Add comprehensive unit tests to validate the refactored components 
+4. Add comprehensive unit tests to validate the refactored components

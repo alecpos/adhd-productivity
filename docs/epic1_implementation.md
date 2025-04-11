@@ -653,4 +653,4 @@ alembic revision -m "description_of_change"
 | Causal Inference | Moving from correlation to causation | Weeks 19-24 | Planned |
 | Real-time Processing | Stream processing architecture | Weeks 21-26 | Planned |
 | Advanced Privacy | Homomorphic encryption implementation | Weeks 23-28 | Planned |
-| Expanded Integrations | Additional third-party integrations | Weeks 25-30 | Planned | 
+| Expanded Integrations | Additional third-party integrations | Weeks 25-30 | Planned |

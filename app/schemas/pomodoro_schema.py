@@ -139,7 +139,7 @@ class PomodoroResponseSchema(PomodoroSchema):
     notes: Optional[str] = Field(None, description="Session notes")
 
     model_config = ConfigDict(from_attributes=True)
-    
+
     def dict(self, *args, **kwargs):
         """Compatibility method for Pydantic v1 style dict() method."""
         return self.model_dump(*args, **kwargs)

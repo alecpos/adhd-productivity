@@ -115,7 +115,7 @@ export default function CalendarManagement(): JSX.Element {
 
   const loadTasks = async (): Promise<void> => {
     if (!taskService) return;
-    
+
     dispatch(setLoading(true));
     try {
       const serviceTasks = await taskService.getTasks();
@@ -189,7 +189,7 @@ export default function CalendarManagement(): JSX.Element {
 
     // Enhanced input validation
     const validationErrors: string[] = [];
-    
+
     if (!newTask.title?.trim()) {
       validationErrors.push('Task title is required');
     } else if (newTask.title.trim().length < 3) {
@@ -223,7 +223,7 @@ export default function CalendarManagement(): JSX.Element {
       Toast.show({
         type: 'error',
         text1: 'Validation Error',
-        text2: validationErrors.length > 1 
+        text2: validationErrors.length > 1
           ? `${validationErrors[0]} (and ${validationErrors.length - 1} more errors)`
           : validationErrors[0],
       });
@@ -256,14 +256,14 @@ export default function CalendarManagement(): JSX.Element {
         user_id: user.id,
         completed: false
       };
-      
+
       const response = await taskService.createTask(taskData);
       if (response?.data === undefined) {
         throw new Error('Failed to save task');
       }
       const savedComponentTask = transformServiceTaskToComponentTask(response.data);
       dispatch(addTask(savedComponentTask));
-      
+
       Toast.show({
         type: 'success',
         text1: 'Success',
@@ -328,11 +328,11 @@ export default function CalendarManagement(): JSX.Element {
           endTime: updates.endTime
         },
       };
-      
+
       const updatedServiceTask = await taskService.updateTask(taskId, taskData);
       const updatedComponentTask = transformServiceTaskToComponentTask(updatedServiceTask.data);
       dispatch(updateTask(updatedComponentTask));
-      
+
       Toast.show({
         type: 'success',
         text1: 'Success',
@@ -353,7 +353,7 @@ export default function CalendarManagement(): JSX.Element {
     try {
       await taskService.deleteTask(taskId);
       dispatch(deleteTask(taskId));
-      
+
       Toast.show({
         type: 'success',
         text1: 'Success',
@@ -382,7 +382,7 @@ export default function CalendarManagement(): JSX.Element {
         value={newTask.description}
         onChangeText={text => setNewTask(prev => ({ ...prev, description: text }))}
       />
-      
+
       <Text>Difficulty Level (1-5)</Text>
       <Slider
         value={newTask.difficulty}
@@ -392,7 +392,7 @@ export default function CalendarManagement(): JSX.Element {
         step={1}
         thumbStyle={styles.sliderThumb}
       />
-      
+
       <Text>Energy Required (1-10)</Text>
       <Slider
         value={newTask.energyRequired}
@@ -521,20 +521,20 @@ export default function CalendarManagement(): JSX.Element {
                 />
               </View>
             </View>
-            
+
             <Text style={styles.taskTime}>
               {format(new Date(task.startTime), 'h:mm a')} - {format(new Date(task.endTime), 'h:mm a')}
             </Text>
-            
+
             {task.subtasks.length > 0 && (
               <View style={styles.subtaskProgress}>
                 <Text>Progress: {task.subtasks.filter(st => st.completed).length}/{task.subtasks.length}</Text>
                 <View style={styles.progressBar}>
-                  <View 
+                  <View
                     style={[
                       styles.progressFill,
                       { width: `${(task.subtasks.filter(st => st.completed).length / task.subtasks.length) * 100}%` }
-                    ]} 
+                    ]}
                   />
                 </View>
               </View>
@@ -552,7 +552,7 @@ export default function CalendarManagement(): JSX.Element {
         onPress={() => setShowTaskForm(!showTaskForm)}
         containerStyle={styles.button}
       />
-      
+
       {showTaskForm ? renderTaskForm() : renderTaskList()}
     </View>
   );
@@ -630,4 +630,4 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.colors.primary,
     borderRadius: 2,
   },
-})); 
+}));

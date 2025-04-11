@@ -100,4 +100,4 @@ To add a new screen:
 For more details on the frontend implementation, see:
 - [Frontend Architecture](../../docs/frontend_architecture.md)
 - [Component Guide](../../docs/component_guide.md)
-- [State Management](../../docs/state_management.md) 
+- [State Management](../../docs/state_management.md)

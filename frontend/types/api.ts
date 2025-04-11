@@ -39,4 +39,4 @@ export function getApiResponse<T>(response: AxiosResponse): ApiResponse<T> {
 export function handleApiError(error: unknown): never {
   const message = getErrorMessage(error);
   throw new Error(message);
-} 
+}

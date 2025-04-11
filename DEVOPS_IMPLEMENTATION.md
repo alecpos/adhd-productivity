@@ -71,7 +71,7 @@ services:
     depends_on:
       - db
     restart: always
-    
+
   # Other services...
 ```
 
@@ -121,13 +121,13 @@ The codebase has some resilience mechanisms but requires improvements:
    ```python
    # Example implementation using a library like pybreaker
    from pybreaker import CircuitBreaker
-   
+
    llm_breaker = CircuitBreaker(
        fail_max=5,
        reset_timeout=60,
        exclude=[ConnectionError, TimeoutError]
    )
-   
+
    @llm_breaker
    async def call_llm_service(self, prompt: str):
        # Service call with circuit breaker protection
@@ -137,16 +137,16 @@ The codebase has some resilience mechanisms but requires improvements:
    ```python
    # Example using thread pool executor for isolation
    from concurrent.futures import ThreadPoolExecutor
-   
+
    class BulkheadService:
        def __init__(self, max_workers=10):
            self.executor = ThreadPoolExecutor(max_workers=max_workers)
-       
+
        async def execute(self, func, *args, **kwargs):
            # Run in isolated thread pool
            loop = asyncio.get_event_loop()
            return await loop.run_in_executor(
-               self.executor, 
+               self.executor,
                functools.partial(func, *args, **kwargs)
            )
    ```
@@ -794,4 +794,4 @@ The most critical areas to address first are:
 1. Implementing comprehensive retry mechanisms
 2. Adding circuit breakers for external dependencies
 3. Setting up proper monitoring and health checks
-4. Containerizing services for consistent deployment 
+4. Containerizing services for consistent deployment

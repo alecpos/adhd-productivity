@@ -18,14 +18,14 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db)
 ) -> UserResponseSchema:
     """Get the current authenticated user.
-    
+
     Args:
         token: The JWT token for authentication
         db: The database session
-        
+
     Returns:
         The authenticated user
-        
+
     Raises:
         HTTPException: If authentication fails
     """
@@ -34,7 +34,7 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         auth_service = AuthService(db)
         user = await auth_service.get_current_user(token)
@@ -42,4 +42,4 @@ async def get_current_user(
             raise credentials_exception
         return UserResponseSchema.model_validate(user)
     except PyJWTError:
-        raise credentials_exception 
+        raise credentials_exception

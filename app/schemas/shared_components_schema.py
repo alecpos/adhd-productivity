@@ -47,30 +47,30 @@ class SessionAnalytics(BaseSchema):
     productivity_score: float = Field(..., ge=0, le=1)
     effectiveness_score: float = Field(..., ge=0, le=1)
     completion_rate: float = Field(..., ge=0, le=1)
-    
+
     # Energy and mental state
     energy_levels: List[Dict[str, Any]]
     average_energy: float = Field(..., ge=1, le=10)
     average_focus: float = Field(..., ge=1, le=10)
     mental_state_scores: Optional[List[Dict[str, Any]]] = None
-    
+
     # Time tracking
     total_focus_time: int = Field(..., description="Total focus time in minutes", ge=0)
     total_break_time: int = Field(..., description="Total break time in minutes", ge=0)
     actual_duration: Optional[int] = Field(None, description="Actual duration in minutes", ge=0)
     estimated_duration: Optional[int] = Field(None, description="Estimated duration in minutes", ge=0)
     time_efficiency: Optional[float] = Field(None, ge=0, le=1)
-    
+
     # Break and interruption analysis
     interruption_count: int = Field(default=0, ge=0)
     break_adherence: float = Field(..., ge=0, le=1)
     interruption_impact: Optional[float] = Field(None, ge=-1, le=0)
     break_effectiveness: Optional[float] = Field(None, ge=0, le=1)
-    
+
     # Environmental impact
     environment_effectiveness: Optional[float] = Field(None, ge=0, le=1)
     optimal_conditions: Optional[Dict[str, Any]] = None
-    
+
     # Additional metrics
     tags: Optional[List[str]] = None
     meta_data: Optional[Dict[str, Any]] = None
@@ -81,4 +81,4 @@ __all__ = [
     "EnvironmentalFactors",
     "Interruption",
     "SessionAnalytics",
-] 
+]

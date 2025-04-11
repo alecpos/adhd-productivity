@@ -115,4 +115,4 @@ describe('useTaskState', () => {
     expect(result.current.isUpdating).toBe(false);
     expect(result.current.error).toBe('Failed to update task status');
   });
-}); 
+});

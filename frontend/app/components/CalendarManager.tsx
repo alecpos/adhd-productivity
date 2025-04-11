@@ -40,7 +40,7 @@ const CalendarManager = () => {
 
     const fetchTasks = useCallback(async () => {
         if (!user?.id) return;
-        
+
         try {
             const events = await calendarService.getEvents();
             const mappedTasks = events?.map(event => ({
@@ -122,7 +122,7 @@ const CalendarManager = () => {
 
     const handleTaskComplete = async (taskId: string) => {
         try {
-            await calendarService.updateEvent(taskId, { 
+            await calendarService.updateEvent(taskId, {
                 end_time: new Date().toISOString(),
                 sync_status: 'pending'
             });
@@ -176,8 +176,8 @@ const CalendarManager = () => {
             <Card containerStyle={styles.card}>
                 <Card.Title>Tasks for {format(selectedDate, 'MMMM d, yyyy')}</Card.Title>
                 {getTasksForSelectedDate().map((task) => (
-                    <TaskCard 
-                        key={task.id} 
+                    <TaskCard
+                        key={task.id}
                         task={task}
                         onComplete={() => handleTaskComplete(task.id)}
                         onDelete={() => handleTaskDelete(task.id)}
@@ -206,4 +206,4 @@ const useStyles = makeStyles((theme) => ({
         color: theme.colors.grey3,
         padding: theme.spacing.md,
     },
-})); 
+}));

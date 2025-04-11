@@ -74,12 +74,12 @@ export function MentalHealthProvider({ children }: { children: React.ReactNode }
 
   const createLog = useCallback(async (data: Partial<CreateMentalHealthLog>) => {
     console.debug('Starting createLog in MentalHealthContext:', { data, user });
-    
+
     if (!user?.id) {
       console.error('CreateLog failed: User not authenticated');
       throw new Error('User not authenticated');
     }
-    
+
     try {
       console.debug('Transforming log data...');
       // Transform CreateMentalHealthLog to MentalHealthLog
@@ -146,4 +146,4 @@ export function useMentalHealth() {
     throw new Error('useMentalHealth must be used within a MentalHealthProvider');
   }
   return context;
-} 
+}

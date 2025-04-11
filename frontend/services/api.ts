@@ -58,13 +58,13 @@ api.interceptors.response.use(
     if (error.isOffline) {
       return Promise.reject(error);
     }
-    
+
     if (!error.response) {
       return Promise.reject({
         message: 'Network error. Please check your connection.'
       });
     }
-    
+
     if (error.response) {
       // Handle specific error codes
       switch (error.response.status) {
@@ -87,4 +87,4 @@ api.interceptors.response.use(
     }
     return Promise.reject(error);
   }
-); 
+);

@@ -6,4 +6,4 @@ This package contains tests for:
 - ModelFactory methods for Epic 4
 - TemporalPatternRecognitionService optimization methods
 - API endpoints for schedule optimization
-""" 
+"""

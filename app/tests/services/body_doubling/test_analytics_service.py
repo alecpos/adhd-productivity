@@ -25,16 +25,16 @@ def mock_session_manager(mock_db_session):
     """Create a mock session manager with the db session."""
     mock = AsyncMock()
     mock.db = mock_db_session
-    
+
     # Create a result for the db execute call that we can set differently in each test
     mock.db.execute_result = None
-    
+
     # Override execute to return our awaitable result
     async def mock_execute(query):
         return mock.db.execute_result
-    
+
     mock.db.execute = mock_execute
-    
+
     return mock
 
 
@@ -44,7 +44,7 @@ def sample_session():
     now = datetime.now()
     user_id = uuid.uuid4()
     session = MagicMock(spec=BodyDoublingSessionModel)
-    
+
     # Set up the session attributes
     session.id = uuid.uuid4()
     session.user_id = user_id
@@ -70,7 +70,7 @@ def sample_session():
     }
     session.focus_rating = None
     session.productivity_rating = None
-    
+
     return session
 
 
@@ -79,23 +79,23 @@ async def test_get_user_analytics_no_sessions(mock_session_manager):
     """Test getting user analytics when no sessions exist."""
     # Setup
     user_id = uuid.uuid4()
-    
+
     # Create a result object with the scalars method
     class MockScalars:
         def all(self):
             return []
-    
+
     class MockResult:
         def scalars(self):
             return MockScalars()
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
-    
+
     # Execute
     analytics_service = AnalyticsService(mock_session_manager)
     result = await analytics_service.get_user_analytics(user_id)
-    
+
     # Verify
     assert result.total_sessions == 0
     assert result.total_duration == 0
@@ -141,11 +141,11 @@ async def test_get_user_analytics_with_sessions(mock_session_manager, sample_ses
     class MockScalars:
         def all(self):
             return [sample_session, session2]
-    
+
     class MockResult:
         def scalars(self):
             return MockScalars()
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -170,15 +170,15 @@ async def test_get_session_analytics_not_found(mock_session_manager):
     """Test getting session analytics for a non-existent session."""
     # Setup
     session_id = uuid.uuid4()
-    
+
     # Create a result object that returns None for scalar_one_or_none
     class MockResult:
         def scalar_one_or_none(self):
             return None
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
-    
+
     # Execute and verify exception
     analytics_service = AnalyticsService(mock_session_manager)
     with pytest.raises(HTTPException) as exc_info:
@@ -191,12 +191,12 @@ async def test_get_session_analytics_success(mock_session_manager, sample_sessio
     """Test getting analytics for a specific session."""
     # Setup
     session_id = sample_session.id
-    
+
     # Create a result object with scalar_one_or_none method
     class MockResult:
         def scalar_one_or_none(self):
             return sample_session
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -216,12 +216,12 @@ async def test_get_session_feedback(mock_session_manager, sample_session):
     """Test getting feedback for a specific session."""
     # Setup
     session_id = sample_session.id
-    
+
     # Create a result object with scalar_one_or_none method
     class MockResult:
         def scalar_one_or_none(self):
             return sample_session
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -245,12 +245,12 @@ async def test_add_session_feedback_not_found(mock_session_manager):
     session_id = uuid.uuid4()
     user_id = uuid.uuid4()
     feedback_data = {"focus_rating": 5, "productivity_rating": 5, "notes": "Great session"}
-    
+
     # Create a result object with scalar_one_or_none method
     class MockResult:
         def scalar_one_or_none(self):
             return None
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -268,12 +268,12 @@ async def test_add_session_feedback_unauthorized(mock_session_manager, sample_se
     session_id = sample_session.id
     unauthorized_user_id = uuid.uuid4()  # Different user
     feedback_data = {"focus_rating": 5, "productivity_rating": 5, "notes": "Great session"}
-    
+
     # Create a result object with scalar_one_or_none method
     class MockResult:
         def scalar_one_or_none(self):
             return sample_session
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -291,15 +291,15 @@ async def test_add_session_feedback_success(mock_session_manager, sample_session
     session_id = sample_session.id
     user_id = sample_session.user_id
     feedback_data = {"focus_rating": 5, "productivity_rating": 5, "notes": "Great session"}
-    
+
     # Create a result object with scalar_one_or_none method
     class MockResult:
         def scalar_one_or_none(self):
             return sample_session
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
-    
+
     # Also mock the commit and refresh methods to be async no-ops
     mock_session_manager.db.commit = AsyncMock()
     mock_session_manager.db.refresh = AsyncMock()
@@ -319,16 +319,16 @@ async def test_get_focus_pattern_insights_no_sessions(mock_session_manager):
     """Test getting focus pattern insights for a user with no sessions."""
     # Setup
     user_id = uuid.uuid4()
-    
+
     # Create a result object with the scalars method
     class MockScalars:
         def all(self):
             return []
-    
+
     class MockResult:
         def scalars(self):
             return MockScalars()
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -378,11 +378,11 @@ async def test_get_focus_pattern_insights_with_data(mock_session_manager, sample
     class MockScalars:
         def all(self):
             return [sample_session, session2]
-    
+
     class MockResult:
         def scalars(self):
             return MockScalars()
-    
+
     # Set the execute result
     mock_session_manager.db.execute_result = MockResult()
 
@@ -406,7 +406,7 @@ async def test_get_focus_pattern_insights_with_data(mock_session_manager, sample
 async def test_calculate_trend():
     """Test trend calculation."""
     analytics_service = AnalyticsService(AsyncMock())
-    
+
     # Test improving trend
     values = [1, 2, 3, 4, 5]
     assert analytics_service._calculate_trend(values) == "improving"
@@ -417,4 +417,4 @@ async def test_calculate_trend():
 
     # Test stable trend
     values = [3, 3, 3, 3, 3]
-    assert analytics_service._calculate_trend(values) == "stable" 
+    assert analytics_service._calculate_trend(values) == "stable"

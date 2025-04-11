@@ -898,4 +898,4 @@ When modifying the database schema:
 1. Create a new Alembic migration
 2. Update the corresponding SQLAlchemy models
 3. Update this documentation
-4. Ensure backward compatibility if possible 
+4. Ensure backward compatibility if possible

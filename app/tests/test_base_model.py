@@ -18,19 +18,19 @@ class IDMixin:
 class TestUser(IDMixin, Base):
     """Test user model."""
     __tablename__ = "test_users"
-    
+
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    
+
     tasks = relationship("TestTask", back_populates="user")
-    
+
 class TestTask(IDMixin, Base):
     """Test task model."""
     __tablename__ = "test_tasks"
-    
+
     title = Column(String, nullable=False)
     user_id = Column(String, ForeignKey("test_users.id"))
-    
+
     user = relationship("TestUser", back_populates="tasks")
 
 # Set up an in-memory SQLite test database
@@ -71,7 +71,7 @@ def test_user_model_create(db_session):
     assert user_from_db.id == user_id
     assert user_from_db.username == "test_user"
     assert user_from_db.email == "test@example.com"
-    
+
 def test_relationship(db_session):
     """Test a relationship between user and task."""
     user_id = str(uuid4())
@@ -81,18 +81,18 @@ def test_relationship(db_session):
         email="test@example.com"
     )
     db_session.add(user)
-    
+
     task = TestTask(
         title="Test Task",
         user_id=user_id
     )
     db_session.add(task)
     db_session.commit()
-    
+
     # Verify relationship
     user_from_db = db_session.query(TestUser).filter_by(id=user_id).first()
     tasks = db_session.query(TestTask).filter_by(user_id=user_id).all()
-    
+
     assert user_from_db is not None
     assert len(tasks) == 1
     assert tasks[0].title == "Test Task"

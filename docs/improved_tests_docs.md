@@ -16,10 +16,10 @@ Test the actual TPR service functionality.
 async def test_tpr_service():
     """Test the actual TPR service functionality."""
     logger.info("Initializing TPR service...")
-    
+
     # Initialize the TPR service with default parameters
     tpr_service = TemporalPatternRecognitionService()
-    
+
     # Generate test data
     logger.info("Generating test data...")
     time_blocks = generate_time_blocks()
@@ -28,13 +28,13 @@ async def test_tpr_service():
     productivity_metrics = generate_productivity_metrics()
     user_data = generate_user_data()
     tasks = generate_tasks_for_scheduling()
-    
+
     # Log data shapes
     logger.info(f"Time blocks shape: {time_blocks.shape}")
     logger.info(f"Mental health logs shape: {mental_health_logs.shape}")
     logger.info(f"Energy logs shape: {energy_logs.shape}")
     logger.info(f"Productivity metrics shape: {productivity_metrics.shape}")
-    
+
     # Test productivity pattern analysis
     logger.info("\n=== Testing analyze_productivity_patterns ===")
     try:
@@ -46,7 +46,7 @@ async def test_tpr_service():
         logger.info(f"Productivity bottlenecks: {pformat(productivity_patterns.get('productivity_bottlenecks', [])[:2])}")
     except Exception as e:
         logger.error(f"Error in analyze_productivity_patterns: {str(e)}", exc_info=True)
-    
+
     # Test circadian rhythm modeling
     logger.info("\n=== Testing model_circadian_rhythm ===")
     try:
@@ -58,7 +58,7 @@ async def test_tpr_service():
         logger.info(f"Day of week variations: {pformat(circadian_rhythm.get('energy_curve', {}).get('day_of_week_variations', {}))}")
     except Exception as e:
         logger.error(f"Error in model_circadian_rhythm: {str(e)}", exc_info=True)
-    
+
     # Test productivity insights generation
     logger.info("\n=== Testing generate_productivity_insights ===")
     try:
@@ -70,7 +70,7 @@ async def test_tpr_service():
         logger.info(f"Productivity recommendations: {pformat(productivity_insights.get('productivity_recommendations', [])[:2])}")
     except Exception as e:
         logger.error(f"Error in generate_productivity_insights: {str(e)}", exc_info=True)
-    
+
     # Test federated analysis
     logger.info("\n=== Testing run_federated_analysis ===")
     try:
@@ -79,7 +79,7 @@ async def test_tpr_service():
             "logs": mental_health_logs.to_dict('records')[:10],
             "include_sensitive": False
         }
-        
+
         federated_insights = await tpr_service.run_federated_analysis(
             "test_user", mental_health_data
         )
@@ -88,7 +88,7 @@ async def test_tpr_service():
         logger.info(f"Anonymized insights: {pformat(federated_insights.get('anonymized_insights', {}).get('global_trends', {}))}")
     except Exception as e:
         logger.error(f"Error in run_federated_analysis: {str(e)}", exc_info=True)
-    
+
     # Test schedule optimization
     logger.info("\n=== Testing optimize_schedule_with_energy ===")
     try:
@@ -99,19 +99,19 @@ async def test_tpr_service():
         logger.info(f"First 2 optimized tasks: {pformat(optimized_schedule[:2])}")
     except Exception as e:
         logger.error(f"Error in optimize_schedule_with_energy: {str(e)}", exc_info=True)
-    
+
     # Test comprehensive insights generation
     logger.info("\n=== Testing generate_comprehensive_insights ===")
     try:
         comprehensive_insights = await tpr_service.generate_comprehensive_insights(
-            "test_user", time_blocks, mental_health_logs, energy_logs, 
+            "test_user", time_blocks, mental_health_logs, energy_logs,
             productivity_metrics, user_data
         )
         logger.info(f"Comprehensive insights keys: {list(comprehensive_insights.keys())}")
         logger.info(f"Integrated recommendations: {pformat(comprehensive_insights.get('integrated_recommendations', [])[:2])}")
     except Exception as e:
         logger.error(f"Error in generate_comprehensive_insights: {str(e)}", exc_info=True)
-    
+
     logger.info("\nAll TPR service tests completed!")
 ```
 
@@ -134,7 +134,7 @@ async def test_tpr():
     """Test the TPR functionality using our mock service."""
     print("Initializing mock TPR service...")
     tpr_service = MockTPRService()
-    
+
     # Generate test data
     print("Generating test data...")
     time_blocks = generate_time_blocks()
@@ -142,14 +142,14 @@ async def test_tpr():
     energy_logs = generate_energy_logs()
     productivity_metrics = generate_productivity_metrics()
     user_data = generate_user_data()
-    
+
     # Test productivity pattern analysis
     print("\nTesting productivity pattern analysis...")
     try:
         # Convert to DataFrame for realistic interface
         time_blocks_df = pd.DataFrame(time_blocks)
         mental_health_logs_df = pd.DataFrame(mental_health_logs)
-        
+
         # Call the service
         productivity_patterns = await tpr_service.analyze_productivity_patterns(
             "test_user", time_blocks_df, mental_health_logs_df
@@ -160,7 +160,7 @@ async def test_tpr():
         print(f"Error in analyze_productivity_patterns: {str(e)}")
         import traceback
         traceback.print_exc()
-    
+
     # Test circadian rhythm modeling
     print("\nTesting circadian rhythm modeling...")
     try:
@@ -173,7 +173,7 @@ async def test_tpr():
         print(f"Error in model_circadian_rhythm: {str(e)}")
         import traceback
         traceback.print_exc()
-    
+
     # Test productivity insights generation
     print("\nTesting productivity insights generation...")
     try:
@@ -181,7 +181,7 @@ async def test_tpr():
         time_blocks_df = pd.DataFrame(time_blocks)
         mental_health_logs_df = pd.DataFrame(mental_health_logs)
         productivity_metrics_df = pd.DataFrame(productivity_metrics)
-        
+
         # Call the service
         productivity_insights = await tpr_service.generate_productivity_insights(
             "test_user", time_blocks_df, mental_health_logs_df, productivity_metrics_df
@@ -192,7 +192,7 @@ async def test_tpr():
         print(f"Error in generate_productivity_insights: {str(e)}")
         import traceback
         traceback.print_exc()
-    
+
     # Test federated analysis (mocked)
     print("\nTesting federated analysis (mock)...")
     try:
@@ -201,7 +201,7 @@ async def test_tpr():
             "logs": mental_health_logs[:10],
             "include_sensitive": False
         }
-        
+
         # Call the service
         federated_insights = await tpr_service.run_federated_analysis(
             "test_user", mental_health_data
@@ -212,7 +212,7 @@ async def test_tpr():
         print(f"Error in run_federated_analysis: {str(e)}")
         import traceback
         traceback.print_exc()
-    
+
     # Test comprehensive insights generation
     print("\nTesting comprehensive insights generation...")
     try:
@@ -221,10 +221,10 @@ async def test_tpr():
         mental_health_logs_df = pd.DataFrame(mental_health_logs)
         energy_logs_df = pd.DataFrame(energy_logs)
         productivity_metrics_df = pd.DataFrame(productivity_metrics)
-        
+
         # Call the service
         comprehensive_insights = await tpr_service.generate_comprehensive_insights(
-            "test_user", time_blocks_df, mental_health_logs_df, energy_logs_df, 
+            "test_user", time_blocks_df, mental_health_logs_df, energy_logs_df,
             productivity_metrics_df, user_data
         )
         print(f"Comprehensive insights keys: {list(comprehensive_insights.keys())}")
@@ -248,7 +248,7 @@ Discover all Python test files in the given directory or path.
 
 Args:
     root_dir: Root directory or path to a specific file
-    
+
 Returns:
     List of paths to test files
 ```
@@ -259,22 +259,22 @@ Returns:
     def discover_test_files(self, root_dir: str) -> List[Path]:
         """
         Discover all Python test files in the given directory or path.
-        
+
         Args:
             root_dir: Root directory or path to a specific file
-            
+
         Returns:
             List of paths to test files
         """
         path = Path(root_dir)
         test_files = []
-        
+
         # If the path is a file and it's a Python test file, add it
         if path.is_file() and path.suffix == '.py':
             if "test" in path.name.lower() or "conftest" in path.name.lower():
                 test_files.append(path)
             return test_files
-        
+
         # Directories to exclude
         excluded_dir_patterns = [
             '.git', '__pycache__', 'node_modules', 'build', 'dist',
@@ -283,40 +283,40 @@ Returns:
             # More specific to this project
             'venv-tf', 'site-packages', 'lib/python'
         ]
-        
+
         # File patterns that indicate test files
         test_file_patterns = ['test', '_test', 'test_', 'conftest']
-        
+
         # Otherwise, walk through the directory
         for dirpath, dirnames, filenames in os.walk(path):
             # Skip if we're in an excluded directory
             if any(pattern in dirpath for pattern in excluded_dir_patterns):
                 continue
-                
+
             # Filter out directories to skip
             dirnames[:] = [
-                d for d in dirnames 
+                d for d in dirnames
                 if not any(pattern in os.path.join(dirpath, d) for pattern in excluded_dir_patterns)
                 and not d.startswith('.')
             ]
-            
+
             for filename in filenames:
                 if not filename.endswith('.py'):
                     continue
-                    
+
                 # Match if file has any test pattern or is in a test directory
                 is_test_file = any(pattern in filename.lower() for pattern in test_file_patterns)
                 is_in_test_dir = "test" in dirpath.lower()
-                
+
                 if is_test_file or is_in_test_dir:
                     file_path = Path(os.path.join(dirpath, filename))
-                    
+
                     # Skip files in virtual environments or site-packages
                     if any(pattern in str(file_path) for pattern in excluded_dir_patterns):
                         continue
-                    
+
                     test_files.append(file_path)
-        
+
         print(f"Found {len(test_files)} test files in {root_dir}")
         return test_files
 ```
@@ -330,7 +330,7 @@ Extract test functions from a Python file using AST.
 
 Args:
     file_path: Path to the Python file
-    
+
 Returns:
     List of dictionaries containing test function information
 ```
@@ -341,10 +341,10 @@ Returns:
     def extract_tests_from_file(self, file_path: Path) -> List[Dict[str, Any]]:
         """
         Extract test functions from a Python file using AST.
-        
+
         Args:
             file_path: Path to the Python file
-            
+
         Returns:
             List of dictionaries containing test function information
         """
@@ -354,20 +354,20 @@ Returns:
             except UnicodeDecodeError:
                 print(f"Warning: Could not decode file {file_path}, skipping...")
                 return []
-        
+
         try:
             module = ast.parse(file_content)
         except SyntaxError:
             print(f"Warning: Syntax error in file {file_path}, skipping...")
             return []
-            
+
         tests = []
-        
+
         # Extract module-level docstring and imports for context
         module_docstring = ast.get_docstring(module) or ""
         imports = [node for node in module.body if isinstance(node, (ast.Import, ast.ImportFrom))]
         import_lines = [self._get_source_segment(file_content, node) for node in imports]
-        
+
         # Track decorators for parameterized tests
         parameterized_funcs = set()
         for node in ast.walk(module):
@@ -378,17 +378,17 @@ Returns:
                         # Attempt to extract the function name being parameterized
                         if isinstance(node.args[-1], ast.Name):
                             parameterized_funcs.add(node.args[-1].id)
-        
+
         # Find test classes and functions
         for node in module.body:
             if isinstance(node, ast.ClassDef):
                 # Check if it's a test class (name contains 'Test' or has test methods)
                 is_test_class = 'test' in node.name.lower() or any(
-                    self._is_test_function(method.name) 
-                    for method in node.body 
+                    self._is_test_function(method.name)
+                    for method in node.body
                     if isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef))
                 )
-                
+
                 if is_test_class:
                     # Extract test methods from classes
                     class_tests = self._extract_test_methods(node, file_content, file_path, module_docstring, import_lines)
@@ -401,7 +401,7 @@ Returns:
                 # Extract standalone async test functions
                 test_info = self._extract_function_info(node, file_content, file_path, module_docstring, import_lines)
                 tests.append(test_info)
-        
+
         return tests
 ```
 
@@ -416,22 +416,22 @@ Extract test methods from a class definition.
 **Source code:**
 
 ```python
-    def _extract_test_methods(self, class_node: ast.ClassDef, file_content: str, 
+    def _extract_test_methods(self, class_node: ast.ClassDef, file_content: str,
                             file_path: Path, module_docstring: str, import_lines: List[str]) -> List[Dict[str, Any]]:
         """Extract test methods from a class definition."""
         tests = []
         class_docstring = ast.get_docstring(class_node) or ""
-        
+
         # Check if it's a TestCase subclass
         is_unittest = False
         for base in class_node.bases:
             if isinstance(base, ast.Name) and 'TestCase' in base.id:
                 is_unittest = True
                 break
-        
+
         # In unittest classes, ALL methods that start with 'test' are test methods
         # In pytest classes, we look for specific naming patterns
-        
+
         # Track class-level parameterization and attributes
         class_parameterized_methods = set()
         for node in class_node.body:
@@ -442,10 +442,10 @@ Extract test methods from a class definition.
                         for subnode in ast.walk(node.value):
                             if isinstance(subnode, ast.Name):
                                 class_parameterized_methods.add(subnode.id)
-        
+
         for node in class_node.body:
             include_method = False
-            
+
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Include if it's a test function
                 if self._is_test_function(node.name):
@@ -459,15 +459,15 @@ Extract test methods from a class definition.
                 # Include if the class name contains 'Test' and function name isn't private
                 elif 'test' in class_node.name.lower() and not node.name.startswith('_'):
                     include_method = True
-                
+
             if include_method:
                 test_info = self._extract_function_info(
-                    node, file_content, file_path, 
+                    node, file_content, file_path,
                     f"{module_docstring}\n\nClass: {class_node.name}\n{class_docstring}",
                     import_lines, class_name=class_node.name
                 )
                 tests.append(test_info)
-                
+
         return tests
 ```
 
@@ -485,35 +485,35 @@ Check if a function name indicates it's a test function.
     def _is_test_function(self, name: str) -> bool:
         """Check if a function name indicates it's a test function."""
         name_lower = name.lower()
-        
+
         # Common pytest naming patterns
         if name.startswith("test_") or name.endswith("_test") or "test_" in name:
             return True
-        
-        # Additional pytest/unittest patterns 
+
+        # Additional pytest/unittest patterns
         if name.startswith("test") or name.endswith("test"):
             return True
-        
+
         # Check for pytest fixture
         if name.startswith("fixture_") or name == "fixture":
             return True
-            
+
         # Other common test-related function names
         test_related = [
-            "setup", "teardown", "setUp", "tearDown", 
+            "setup", "teardown", "setUp", "tearDown",
             "setUpClass", "tearDownClass", "setUpModule", "tearDownModule",
             "setup_method", "teardown_method", "setup_class", "teardown_class",
             "setup_module", "teardown_module", "parametrize", "patch", "mock"
         ]
-        
+
         if name in test_related or any(pattern in name_lower for pattern in test_related):
             return True
-            
+
         # Check for unittest assertion methods
         assert_prefixes = ["assert", "fail", "skip", "expect"]
         if any(name.startswith(prefix) for prefix in assert_prefixes):
             return True
-            
+
         return False
 ```
 
@@ -526,7 +526,7 @@ Generate a Google-style docstring for a test using local analysis.
 
 Args:
     test_info: Dictionary containing test function information
-    
+
 Returns:
     Generated docstring
 ```
@@ -537,10 +537,10 @@ Returns:
     def generate_docstring(self, test_info: Dict[str, Any]) -> str:
         """
         Generate a Google-style docstring for a test using local analysis.
-        
+
         Args:
             test_info: Dictionary containing test function information
-            
+
         Returns:
             Generated docstring
         """
@@ -550,26 +550,26 @@ Returns:
         assertions = test_info.get("assertions", [])
         fixtures = test_info.get("fixtures", [])
         dependencies = test_info.get("dependencies", [])
-        
+
         # If there's already a good docstring, use it
         if existing_docstring and len(existing_docstring) > 10:
             return existing_docstring
-        
+
         # Create a simplified name for the test
         simplified_name = function_name.replace("test_", "").replace("_", " ")
-        
+
         # Start building the docstring
         docstring_lines = []
         docstring_lines.append(f"Test that {simplified_name}.")
         docstring_lines.append("")
-        
+
         # Add information about fixtures
         if fixtures:
             docstring_lines.append("Fixtures:")
             for fixture in fixtures:
                 docstring_lines.append(f"    * {fixture}")
             docstring_lines.append("")
-        
+
         # Add information about what is being tested
         if assertions:
             docstring_lines.append("Verifies:")
@@ -580,14 +580,14 @@ Returns:
                     assertion_text = assertion_text[:57] + "..."
                 docstring_lines.append(f"    * {assertion_text}")
             docstring_lines.append("")
-        
+
         # Add dependencies if found
         if dependencies:
             docstring_lines.append("Dependencies:")
             for dep in set(dependencies):
                 docstring_lines.append(f"    * {dep}")
             docstring_lines.append("")
-        
+
         return "\n".join(docstring_lines)
 ```
 
@@ -600,7 +600,7 @@ Process a single test file and generate docstrings for all tests.
 
 Args:
     file_path: Path to the test file
-    
+
 Returns:
     Dictionary with file path and processed tests
 ```
@@ -611,22 +611,22 @@ Returns:
     def process_test_file(self, file_path: Path) -> Dict[str, Any]:
         """
         Process a single test file and generate docstrings for all tests.
-        
+
         Args:
             file_path: Path to the test file
-            
+
         Returns:
             Dictionary with file path and processed tests
         """
         print(f"Processing file: {file_path}")
         try:
             tests = self.extract_tests_from_file(file_path)
-            
+
             # Process each test
             for test in tests:
                 docstring = self.generate_docstring(test)
                 test["generated_docstring"] = docstring
-            
+
             return {
                 "file_path": str(file_path),
                 "tests": tests
@@ -651,7 +651,7 @@ Args:
     root_dir: Root directory to search for test files
     output_dir: Directory to save the documentation
     output_file: Name of the output JSON file
-    
+
 Returns:
     Path to the output JSON file
 ```
@@ -662,33 +662,33 @@ Returns:
     def process_all_test_files(self, root_dir: str, output_dir: str, output_file: str = "test_documentation.json") -> str:
         """
         Process all test files in the given directory and save documentation.
-        
+
         Args:
             root_dir: Root directory to search for test files
             output_dir: Directory to save the documentation
             output_file: Name of the output JSON file
-            
+
         Returns:
             Path to the output JSON file
         """
         test_files = self.discover_test_files(root_dir)
         print(f"Found {len(test_files)} test files")
-        
+
         results = []
-        
+
         # Process each file
         for file_path in test_files:
             result = self.process_test_file(file_path)
             results.append(result)
-        
+
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
-        
+
         # Save results to file
         output_path = os.path.join(output_dir, output_file)
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)
-        
+
         print(f"Documentation saved to {output_path}")
         return output_path
 ```
@@ -704,7 +704,7 @@ Args:
     json_file: Path to the JSON results file
     output_dir: Directory to save the Markdown documentation
     output_file: Name of the output Markdown file
-    
+
 Returns:
     Path to the output Markdown file
 ```
@@ -712,62 +712,62 @@ Returns:
 **Source code:**
 
 ```python
-    def generate_markdown_documentation(self, json_file: str, output_dir: str, 
+    def generate_markdown_documentation(self, json_file: str, output_dir: str,
                                       output_file: str = "test_documentation.md") -> str:
         """
         Generate Markdown documentation from the JSON results.
-        
+
         Args:
             json_file: Path to the JSON results file
             output_dir: Directory to save the Markdown documentation
             output_file: Name of the output Markdown file
-            
+
         Returns:
             Path to the output Markdown file
         """
         with open(json_file, 'r', encoding='utf-8') as f:
             results = json.load(f)
-        
+
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
-        
+
         output_path = os.path.join(output_dir, output_file)
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write("# Test Suite Documentation\n\n")
-            
+
             for file_result in results:
                 file_path = file_result["file_path"]
                 f.write(f"## {os.path.basename(file_path)}\n\n")
                 f.write(f"File: `{file_path}`\n\n")
-                
+
                 if "error" in file_result:
                     f.write(f"Error processing file: {file_result['error']}\n\n")
                     continue
-                
+
                 for test in file_result["tests"]:
                     test_name = test["name"]
                     class_name = test.get("class_name", "")
-                    
+
                     if class_name:
                         f.write(f"### {class_name}::{test_name}\n\n")
                     else:
                         f.write(f"### {test_name}\n\n")
-                    
+
                     # Format the docstring for markdown
                     docstring = test["generated_docstring"]
                     f.write(f"```\n{docstring}\n```\n\n")
-                    
+
                     f.write(f"**Source code:**\n\n")
                     f.write(f"```python\n{test['source_code']}\n```\n\n")
-                    
+
                     if test.get("assertions"):
                         f.write("**Assertions:**\n\n")
                         for assertion in test["assertions"]:
                             f.write(f"- `{assertion.strip()}`\n")
                         f.write("\n")
-                    
+
                     f.write("---\n\n")
-            
+
         print(f"Markdown documentation saved to {output_path}")
         return output_path
 ```
@@ -785,7 +785,7 @@ Discover all Python test files in the given directory or path.
 
 Args:
     root_dir: Root directory or path to a specific file
-    
+
 Returns:
     List of paths to test files
 ```
@@ -796,16 +796,16 @@ Returns:
     def discover_test_files(self, root_dir: str) -> List[Path]:
         """
         Discover all Python test files in the given directory or path.
-        
+
         Args:
             root_dir: Root directory or path to a specific file
-            
+
         Returns:
             List of paths to test files
         """
         path = Path(root_dir)
         test_files = []
-        
+
         # If the path is a directory, find all test files in it
         if path.is_dir():
             for file_path in path.rglob("*.py"):
@@ -815,7 +815,7 @@ Returns:
         # If the path is a file, add it if it's a Python file
         elif path.is_file() and path.suffix == '.py':
             test_files.append(path)
-        
+
         return test_files
 ```
 
@@ -828,7 +828,7 @@ Extract test functions from a Python file using AST.
 
 Args:
     file_path: Path to the Python file
-    
+
 Returns:
     List of dictionaries containing test function information
 ```
@@ -839,24 +839,24 @@ Returns:
     def extract_tests_from_file(self, file_path: Path) -> List[Dict[str, Any]]:
         """
         Extract test functions from a Python file using AST.
-        
+
         Args:
             file_path: Path to the Python file
-            
+
         Returns:
             List of dictionaries containing test function information
         """
         with open(file_path, 'r', encoding='utf-8') as f:
             file_content = f.read()
-        
+
         module = ast.parse(file_content)
         tests = []
-        
+
         # Extract module-level docstring and imports for context
         module_docstring = ast.get_docstring(module) or ""
         imports = [node for node in module.body if isinstance(node, (ast.Import, ast.ImportFrom))]
         import_lines = [self._get_source_segment(file_content, node) for node in imports]
-        
+
         # Find test classes and functions
         for node in module.body:
             if isinstance(node, ast.ClassDef):
@@ -867,7 +867,7 @@ Returns:
                 # Extract standalone test functions
                 test_info = self._extract_function_info(node, file_content, file_path, module_docstring, import_lines)
                 tests.append(test_info)
-        
+
         return tests
 ```
 
@@ -882,21 +882,21 @@ Extract test methods from a class definition.
 **Source code:**
 
 ```python
-    def _extract_test_methods(self, class_node: ast.ClassDef, file_content: str, 
+    def _extract_test_methods(self, class_node: ast.ClassDef, file_content: str,
                             file_path: Path, module_docstring: str, import_lines: List[str]) -> List[Dict[str, Any]]:
         """Extract test methods from a class definition."""
         tests = []
         class_docstring = ast.get_docstring(class_node) or ""
-        
+
         for node in class_node.body:
             if isinstance(node, ast.FunctionDef) and self._is_test_function(node.name):
                 test_info = self._extract_function_info(
-                    node, file_content, file_path, 
+                    node, file_content, file_path,
                     f"{module_docstring}\n\nClass: {class_node.name}\n{class_docstring}",
                     import_lines, class_name=class_node.name
                 )
                 tests.append(test_info)
-                
+
         return tests
 ```
 
@@ -925,7 +925,7 @@ Generate a Google-style docstring for a test using Hugging Face API.
 
 Args:
     test_info: Dictionary containing test function information
-    
+
 Returns:
     Generated docstring
 ```
@@ -936,19 +936,19 @@ Returns:
     def generate_docstring(self, test_info: Dict[str, Any]) -> str:
         """
         Generate a Google-style docstring for a test using Hugging Face API.
-        
+
         Args:
             test_info: Dictionary containing test function information
-            
+
         Returns:
             Generated docstring
         """
         # Prepare prompt for the model
         prompt = self._create_prompt(test_info)
-        
+
         # Call Hugging Face API
         response = self._call_huggingface_api(prompt)
-        
+
         # Format the response as a Google-style docstring
         return self._format_docstring(response, test_info)
 ```
@@ -962,7 +962,7 @@ Process a single test file and generate docstrings for all tests.
 
 Args:
     file_path: Path to the test file
-    
+
 Returns:
     Dictionary with file path and processed tests
 ```
@@ -973,32 +973,32 @@ Returns:
     def process_test_file(self, file_path: Path) -> Dict[str, Any]:
         """
         Process a single test file and generate docstrings for all tests.
-        
+
         Args:
             file_path: Path to the test file
-            
+
         Returns:
             Dictionary with file path and processed tests
         """
         print(f"Processing file: {file_path}")
         try:
             tests = self.extract_tests_from_file(file_path)
-            
+
             # Process tests in batches
             processed_tests = []
             for i in range(0, len(tests), self.batch_size):
                 batch = tests[i:i+self.batch_size]
-                
+
                 # Process each test in the batch
                 for test in batch:
                     docstring = self.generate_docstring(test)
                     test["generated_docstring"] = docstring
                     processed_tests.append(test)
-                
+
                 # Add delay between batches to avoid rate limiting
                 if i + self.batch_size < len(tests):
                     time.sleep(self.delay)
-            
+
             return {
                 "file_path": str(file_path),
                 "tests": processed_tests
@@ -1024,7 +1024,7 @@ Args:
     output_dir: Directory to save the documentation
     output_file: Name of the output JSON file
     max_workers: Maximum number of worker threads
-    
+
 Returns:
     Path to the output JSON file
 ```
@@ -1032,38 +1032,38 @@ Returns:
 **Source code:**
 
 ```python
-    def process_all_test_files(self, root_dir: str, output_dir: str, output_file: str = "test_documentation.json", 
+    def process_all_test_files(self, root_dir: str, output_dir: str, output_file: str = "test_documentation.json",
                                max_workers: int = 4) -> str:
         """
         Process all test files in the given directory and save documentation.
-        
+
         Args:
             root_dir: Root directory to search for test files
             output_dir: Directory to save the documentation
             output_file: Name of the output JSON file
             max_workers: Maximum number of worker threads
-            
+
         Returns:
             Path to the output JSON file
         """
         test_files = self.discover_test_files(root_dir)
         print(f"Found {len(test_files)} test files")
-        
+
         results = []
-        
+
         # Process files in parallel
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for result in executor.map(self.process_test_file, test_files):
                 results.append(result)
-        
+
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
-        
+
         # Save results to file
         output_path = os.path.join(output_dir, output_file)
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)
-        
+
         print(f"Documentation saved to {output_path}")
         return output_path
 ```
@@ -1079,7 +1079,7 @@ Args:
     json_file: Path to the JSON results file
     output_dir: Directory to save the Markdown documentation
     output_file: Name of the output Markdown file
-    
+
 Returns:
     Path to the output Markdown file
 ```
@@ -1087,58 +1087,58 @@ Returns:
 **Source code:**
 
 ```python
-    def generate_markdown_documentation(self, json_file: str, output_dir: str, 
+    def generate_markdown_documentation(self, json_file: str, output_dir: str,
                                         output_file: str = "test_documentation.md") -> str:
         """
         Generate Markdown documentation from the JSON results.
-        
+
         Args:
             json_file: Path to the JSON results file
             output_dir: Directory to save the Markdown documentation
             output_file: Name of the output Markdown file
-            
+
         Returns:
             Path to the output Markdown file
         """
         with open(json_file, 'r', encoding='utf-8') as f:
             results = json.load(f)
-        
+
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
-        
+
         output_path = os.path.join(output_dir, output_file)
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write("# Test Suite Documentation\n\n")
-            
+
             for file_result in results:
                 file_path = file_result["file_path"]
                 f.write(f"## {os.path.basename(file_path)}\n\n")
                 f.write(f"File: `{file_path}`\n\n")
-                
+
                 if "error" in file_result:
                     f.write(f"Error processing file: {file_result['error']}\n\n")
                     continue
-                
+
                 for test in file_result["tests"]:
                     test_name = test["name"]
                     class_name = test.get("class_name", "")
-                    
+
                     if class_name:
                         f.write(f"### {class_name}::{test_name}\n\n")
                     else:
                         f.write(f"### {test_name}\n\n")
-                    
+
                     # Format the docstring for markdown
                     docstring = test["generated_docstring"]
                     docstring = re.sub(r'^"""', '', docstring)
                     docstring = re.sub(r'"""$', '', docstring)
                     docstring = docstring.strip()
-                    
+
                     f.write(f"{docstring}\n\n")
                     f.write(f"**Source code:**\n\n")
                     f.write(f"```python\n{test['source_code']}\n```\n\n")
                     f.write("---\n\n")
-            
+
         print(f"Markdown documentation saved to {output_path}")
         return output_path
 ```
@@ -1192,7 +1192,7 @@ Dependencies:
     async def test_tpr_service(self):
         logger.info("Starting Temporal Pattern Recognition mock tests...")
         logger.info("Setting up mocks...")
-        
+
         # Create the TPR service with the correct constructor parameters
         with patch('app.ml.models.productivity_pattern_model.ProductivityPatternLSTM', MockProductivityPatternLSTM), \
              patch('app.ml.models.energy_optimizer_model.CircadianRhythmModel', MockCircadianRhythmModel), \
@@ -1202,10 +1202,10 @@ Dependencies:
              patch('app.ml.models.federated_learning_model.MentalHealthFederatedModel', MockMentalHealthFederatedModel), \
              patch('app.ml.models.federated_learning_model.PrivacyBudget', MockPrivacyBudget), \
              patch('app.ml.preprocessing.preprocessor.ProductivityPatternPreprocessor', MockProductivityPatternPreprocessor):
-            
+
             # Initialize the TPR service
             tpr_service = TemporalPatternRecognitionService()
-            
+
             # Manually replace the models with our mocks since we're patching the imported classes
             tpr_service.productivity_pattern = MockProductivityPatternLSTM()
             tpr_service.circadian_rhythm = MockCircadianRhythmModel()
@@ -1214,10 +1214,10 @@ Dependencies:
             tpr_service.ensemble_learner = MockEnsembleLearnerModel()
             tpr_service.mental_health_model = MockMentalHealthFederatedModel()
             tpr_service.privacy_budget = MockPrivacyBudget()
-            
+
             # Mock user data
             user_id = "test_user"
-            
+
             # Create mock time blocks data as a list of dictionaries
             time_blocks = [
                 {
@@ -1231,7 +1231,7 @@ Dependencies:
                 }
                 for i in range(10)
             ]
-            
+
             # Create mock mental health logs as a list of dictionaries
             mental_health_logs = [
                 {
@@ -1243,7 +1243,7 @@ Dependencies:
                 }
                 for i in range(10)
             ]
-            
+
             # Create mock productivity metrics
             productivity_metrics = [
                 {
@@ -1255,7 +1255,7 @@ Dependencies:
                 }
                 for i in range(10)
             ]
-            
+
             # Create mock energy logs as a list of dictionaries
             energy_logs = [
                 {
@@ -1271,7 +1271,7 @@ Dependencies:
                     7, 6, 5, 4, 3, 2   # 6-11 PM
                 ])
             ]
-            
+
             # Create mock user data
             user_data = {
                 'id': user_id,
@@ -1288,7 +1288,7 @@ Dependencies:
                     'break_duration': 10,  # minutes
                 }
             }
-            
+
             # Test analyze_productivity_patterns
             logger.info("\n=== Testing analyze_productivity_patterns ===")
             try:
@@ -1306,7 +1306,7 @@ Dependencies:
                 logger.error(f"Error in analyze_productivity_patterns: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             # Test model_circadian_rhythm
             logger.info("\n=== Testing model_circadian_rhythm ===")
             try:
@@ -1326,7 +1326,7 @@ Dependencies:
                 logger.error(f"Error in model_circadian_rhythm: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             # Test generate_productivity_insights
             logger.info("\n=== Testing generate_productivity_insights ===")
             try:
@@ -1347,7 +1347,7 @@ Dependencies:
                 logger.error(f"Error in generate_productivity_insights: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             # Test run_federated_analysis
             logger.info("\n=== Testing run_federated_analysis ===")
             try:
@@ -1369,7 +1369,7 @@ Dependencies:
                 logger.error(f"Error in run_federated_analysis: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             # Test optimize_schedule_with_energy
             logger.info("\n=== Testing optimize_schedule_with_energy ===")
             try:
@@ -1380,7 +1380,7 @@ Dependencies:
                     {"id": "task3", "name": "Project planning", "duration": 90, "energy_required": "medium"},
                     {"id": "task4", "name": "Creative work", "duration": 120, "energy_required": "high"}
                 ]
-                
+
                 # Create mock energy pattern
                 energy_pattern = {
                     'hourly_energy': [
@@ -1390,7 +1390,7 @@ Dependencies:
                         0.7, 0.6, 0.5, 0.4, 0.3, 0.2   # 6-11 PM
                     ]
                 }
-                
+
                 result = await tpr_service.optimize_schedule_with_energy(
                     user_id=user_id,
                     tasks=tasks,
@@ -1403,7 +1403,7 @@ Dependencies:
                 logger.error(f"Error in optimize_schedule_with_energy: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             # Test generate_comprehensive_insights
             logger.info("\n=== Testing generate_comprehensive_insights ===")
             try:
@@ -1428,7 +1428,7 @@ Dependencies:
                 logger.error(f"Error in generate_comprehensive_insights: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
-            
+
             logger.info("\nAll TPR mock tests completed!")
 ```
 
@@ -1458,18 +1458,18 @@ Dependencies:
 async def mock_model_circadian_rhythm(self, user_id, energy_logs, user_data=None):
     # Mock implementation that doesn't rely on time.strftime
     energy_curve = self.circadian_rhythm.predict_daily_curve(user_data)
-    
+
     # Convert datetime objects to strings manually
     hourly_predictions = [
-        [time_obj.strftime("%H:%M"), level] 
+        [time_obj.strftime("%H:%M"), level]
         for time_obj, level in energy_curve["hourly_predictions"]
     ]
-    
+
     training_metrics = {
         "loss": 0.15,
         "rhythmic_score": 0.85
     }
-    
+
     rhythm_features = {
         "peak_times": ["09:00", "16:00"],
         "low_times": ["13:00", "22:00"],
@@ -1478,7 +1478,7 @@ async def mock_model_circadian_rhythm(self, user_id, energy_logs, user_data=None
             {"start": "15:00", "end": "17:30"}
         ]
     }
-    
+
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().strftime("%Y-%m-%d"),
@@ -1522,10 +1522,10 @@ async def mock_generate_productivity_insights(self, user_id, time_blocks, mental
     # Mock implementation
     correlation_insights = self.correlation_system.get_correlation_insights()
     recommendations = self.correlation_system.generate_personalized_recommendations(user_id)
-    
+
     # Add visualization data
     visualizations = self.correlation_system.visualize_patterns()
-    
+
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().strftime("%Y-%m-%d"),
@@ -1566,7 +1566,7 @@ async def mock_run_federated_analysis(self, user_id, mental_health_data):
     # Mock implementation
     logs = mental_health_data.get('logs', [])
     include_sensitive = mental_health_data.get('include_sensitive', False)
-    
+
     # Check privacy budget
     if not self.privacy_budget.check_query(0.1, f"Federated analysis for user {user_id}"):
         return {
@@ -1574,15 +1574,15 @@ async def mock_run_federated_analysis(self, user_id, mental_health_data):
             "user_id": user_id,
             "remaining_budget": self.privacy_budget.get_remaining_budget()
         }
-    
+
     # Preprocess data
     processed_data = self.mental_health_model.preprocess_mental_health_data(
         logs, include_sensitive=include_sensitive
     )
-    
+
     # Run prediction
     insights = self.mental_health_model.predict(processed_data)
-    
+
     return {
         "user_id": user_id,
         "analysis_date": datetime.now().strftime("%Y-%m-%d"),
@@ -1617,7 +1617,7 @@ Dependencies:
 **Source code:**
 
 ```python
-async def mock_generate_comprehensive_insights(self, user_id, time_blocks, mental_health_logs, 
+async def mock_generate_comprehensive_insights(self, user_id, time_blocks, mental_health_logs,
                                               energy_logs, productivity_metrics, user_data):
     # Create a valid EnergySchedulingPattern
     energy_scheduling_pattern = {
@@ -1631,7 +1631,7 @@ async def mock_generate_comprehensive_insights(self, user_id, time_blocks, menta
         "average_energy": 0.7,
         "average_focus": 0.65
     }
-    
+
     # Mock responses from individual analysis methods
     productivity_patterns = {
         "optimal_windows": [
@@ -1643,7 +1643,7 @@ async def mock_generate_comprehensive_insights(self, user_id, time_blocks, menta
             {"time_range": "17:30-18:30", "issue": "End-of-day fatigue", "impact_score": 0.72}
         ]
     }
-    
+
     circadian_rhythm = {
         "energy_curve": {
             "hourly_predictions": [
@@ -1662,7 +1662,7 @@ async def mock_generate_comprehensive_insights(self, user_id, time_blocks, menta
             "low_times": ["13:00", "22:00"]
         }
     }
-    
+
     productivity_insights = {
         "correlation_insights": [
             {
@@ -1680,7 +1680,7 @@ async def mock_generate_comprehensive_insights(self, user_id, time_blocks, menta
             }
         ]
     }
-    
+
     federated_insights = {
         "mental_health_insights": [
             {
@@ -1692,7 +1692,7 @@ async def mock_generate_comprehensive_insights(self, user_id, time_blocks, menta
         ],
         "privacy_budget_remaining": 0.5
     }
-    
+
     # Combine all insights
     return {
         "user_id": user_id,
@@ -1762,7 +1762,7 @@ Run the mock tests.
 def run_mock_tests():
     """Run the mock tests."""
     logger.info("Running mock tests...")
-    
+
     try:
         # Capture both stdout and stderr to get complete test output
         result = subprocess.run(
@@ -1771,10 +1771,10 @@ def run_mock_tests():
             text=True,
             check=True
         )
-        
+
         # Combine stdout and stderr for testing
         combined_output = result.stdout + result.stderr
-        
+
         # Check for success based on output content rather than just return code
         success = True
         test_sections = [
@@ -1785,14 +1785,14 @@ def run_mock_tests():
             "optimize_schedule_with_energy",
             "generate_comprehensive_insights"
         ]
-        
+
         # Check for each test section success marker
         pass_count = 0
         for section in test_sections:
             success_marker = f"{section} test passed!"
             if success_marker in combined_output:
                 pass_count += 1
-        
+
         # Check if completion marker exists
         completion_marker = "All TPR mock tests completed!"
         if completion_marker in combined_output:
@@ -1804,11 +1804,11 @@ def run_mock_tests():
         else:
             success = False
             logger.error("Mock tests did not complete successfully")
-        
-        # Parse results from the output 
+
+        # Parse results from the output
         mock_results = parse_test_results(combined_output, "mock")
         success = mock_results["success"]  # Trust the parser's judgment
-        
+
         return success, combined_output
     except subprocess.CalledProcessError as e:
         logger.error(f"Mock tests failed with exit code {e.returncode}")
@@ -1836,7 +1836,7 @@ def parse_test_results(output, test_type):
         "success": True,
         "tests": {}
     }
-    
+
     # Look for test results in the output
     if test_type == "service" or test_type == "mock":
         # Parse service/mock test results
@@ -1848,14 +1848,14 @@ def parse_test_results(output, test_type):
             "optimize_schedule_with_energy",
             "generate_comprehensive_insights"
         ]
-        
+
         # Check for test passed/failed indicators in output
         for section in test_sections:
             # Pattern to find test sections with a more flexible approach
             section_marker = f"=== Testing {section} ==="
             test_passed_marker = f"{section} test passed!"
             error_marker = f"Error in {section}: "
-            
+
             # First, check for simple pass/fail indicators
             if test_passed_marker in output:
                 results["tests"][section] = {
@@ -1870,20 +1870,20 @@ def parse_test_results(output, test_type):
                 if error_end == -1:
                     error_end = len(output)
                 error_message = output[error_start:error_end].strip()
-                
+
                 results["tests"][section] = {
                     "success": False,
                     "error": error_message,
                     "details": extract_section_details(output, section)
                 }
                 continue
-            
+
             # If no direct markers, look for section content
             if section_marker in output:
                 # Find the section in the output
                 section_start = output.find(section_marker)
                 next_section_start = float('inf')
-                
+
                 # Find the next section marker
                 for next_section in test_sections:
                     next_marker = f"=== Testing {next_section} ==="
@@ -1891,7 +1891,7 @@ def parse_test_results(output, test_type):
                         pos = output.find(next_marker, section_start + len(section_marker))
                         if pos != -1 and pos < next_section_start:
                             next_section_start = pos
-                
+
                 # If no next section, look for "All TPR mock tests completed!" or end of output
                 if next_section_start == float('inf'):
                     completion_marker = "All TPR mock tests completed!"
@@ -1900,10 +1900,10 @@ def parse_test_results(output, test_type):
                         next_section_start = completion_pos
                     else:
                         next_section_start = len(output)
-                
+
                 # Extract the section content
                 section_content = output[section_start:next_section_start].strip()
-                
+
                 # Determine success based on content
                 # If we have section content but no explicit pass/fail marker, assume it passed
                 # if there are no error indicators
@@ -1924,7 +1924,7 @@ def parse_test_results(output, test_type):
                 # Look for any line that mentions this section and extract details
                 result_pattern = re.compile(f".*?{section}.*?:.*?", re.IGNORECASE)
                 result_matches = [line for line in output.splitlines() if re.match(result_pattern, line)]
-                
+
                 if result_matches:
                     # If we found some details about this test, assume it passed
                     results["tests"][section] = {
@@ -1949,26 +1949,26 @@ def parse_test_results(output, test_type):
                     }
                     if result != "SUCCESS":
                         results["success"] = False
-    
+
     # If no tests were found but the output contains test results
     if not results["tests"] and "test passed" in output:
         # Try to extract any test results from the output
         passed_pattern = re.compile(r"([\w_]+) test passed!", re.MULTILINE)
         passed_matches = passed_pattern.findall(output)
-        
+
         for test_name in passed_matches:
             results["tests"][test_name] = {
                 "success": True,
                 "details": {"status": "Passed"}
             }
-        
+
         # If still no tests found, add a generic success entry
         if not results["tests"]:
             results["tests"]["Overall Test Execution"] = {
                 "success": True,
                 "details": {"status": "All tests executed"}
             }
-    
+
     return results
 ```
 
@@ -1990,13 +1990,13 @@ Generate test data for API requests.
 def generate_test_data():
     """Generate test data for API requests."""
     now = datetime.now()
-    
+
     # Generate time blocks
     time_blocks = []
     for i in range(20):
         start_time = now - timedelta(days=i % 7, hours=i % 12)
         end_time = start_time + timedelta(hours=2)
-        
+
         time_blocks.append({
             "id": str(uuid.uuid4()),
             "user_id": TEST_USER_ID,
@@ -2013,12 +2013,12 @@ def generate_test_data():
             "completion_rate": random.random() if i % 3 != 0 else 0,
             "effectiveness_score": random.random() * 0.8
         })
-    
+
     # Generate mental health logs
     mental_health_logs = []
     for i in range(20):
         timestamp = now - timedelta(days=i)
-        
+
         mental_health_logs.append({
             "id": str(uuid.uuid4()),
             "user_id": TEST_USER_ID,
@@ -2030,13 +2030,13 @@ def generate_test_data():
             "sleep_hours": round(random.uniform(4, 10), 1),
             "notes": f"Mental health note {i}"
         })
-    
+
     # Generate energy logs
     energy_logs = []
     for day in range(7):
         for hour in range(24):
             timestamp = now - timedelta(days=day, hours=now.hour - hour)
-            
+
             # Create a realistic circadian rhythm pattern
             base_energy = 5
             if 6 <= hour < 11:
@@ -2049,9 +2049,9 @@ def generate_test_data():
                 base_energy = 8 - (hour - 18) * 0.8
             else:
                 base_energy = 3
-            
+
             energy_level = max(1, min(10, round(base_energy + random.uniform(-1, 1), 1)))
-            
+
             energy_logs.append({
                 "id": str(uuid.uuid4()),
                 "user_id": TEST_USER_ID,
@@ -2059,12 +2059,12 @@ def generate_test_data():
                 "energy_level": energy_level,
                 "source": "manual"
             })
-    
+
     # Generate productivity metrics
     productivity_metrics = []
     for i in range(20):
         timestamp = now - timedelta(days=i)
-        
+
         productivity_metrics.append({
             "id": str(uuid.uuid4()),
             "user_id": TEST_USER_ID,
@@ -2074,7 +2074,7 @@ def generate_test_data():
             "productivity_score": round(random.uniform(0.5, 0.9), 2),
             "interruptions": random.randint(0, 10)
         })
-    
+
     # Generate tasks for scheduling
     tasks = []
     for i in range(10):
@@ -2090,7 +2090,7 @@ def generate_test_data():
             "is_flexible": bool(random.choice([True, False])),
             "dependencies": []
         })
-    
+
     return {
         "time_blocks": time_blocks,
         "mental_health_logs": mental_health_logs,
@@ -2114,19 +2114,19 @@ Test the analyze_productivity_patterns endpoint.
 def test_analyze_productivity_patterns(test_data):
     """Test the analyze_productivity_patterns endpoint."""
     logger.info("\n=== Testing /analyze_productivity_patterns endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/analyze_productivity_patterns"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "time_blocks": test_data["time_blocks"],
         "mental_health_logs": test_data["mental_health_logs"],
         "days_to_predict": 7
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2158,17 +2158,17 @@ Test the model_circadian_rhythm endpoint.
 def test_model_circadian_rhythm(test_data):
     """Test the model_circadian_rhythm endpoint."""
     logger.info("\n=== Testing /model_circadian_rhythm endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/model_circadian_rhythm"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "energy_logs": test_data["energy_logs"]
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2199,19 +2199,19 @@ Test the generate_productivity_insights endpoint.
 def test_generate_productivity_insights(test_data):
     """Test the generate_productivity_insights endpoint."""
     logger.info("\n=== Testing /generate_productivity_insights endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/generate_productivity_insights"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "time_blocks": test_data["time_blocks"],
         "mental_health_logs": test_data["mental_health_logs"],
         "productivity_metrics": test_data["productivity_metrics"]
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2243,9 +2243,9 @@ Test the run_federated_analysis endpoint.
 def test_run_federated_analysis(test_data):
     """Test the run_federated_analysis endpoint."""
     logger.info("\n=== Testing /generate_federated_insights endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/generate_federated_insights"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "mental_health_data": {
@@ -2254,10 +2254,10 @@ def test_run_federated_analysis(test_data):
         },
         "anonymize": True
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2288,17 +2288,17 @@ Test the optimize_schedule endpoint.
 def test_optimize_schedule(test_data):
     """Test the optimize_schedule endpoint."""
     logger.info("\n=== Testing /optimize_schedule endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/optimize_schedule"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "tasks": test_data["tasks"]
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2328,9 +2328,9 @@ Test the comprehensive_insights endpoint.
 def test_comprehensive_insights(test_data):
     """Test the comprehensive_insights endpoint."""
     logger.info("\n=== Testing /comprehensive_insights endpoint ===")
-    
+
     endpoint = f"{API_BASE_URL}/api/temporal-pattern-recognition/comprehensive_insights"
-    
+
     payload = {
         "user_id": TEST_USER_ID,
         "time_blocks": test_data["time_blocks"],
@@ -2338,10 +2338,10 @@ def test_comprehensive_insights(test_data):
         "energy_logs": test_data["energy_logs"],
         "productivity_metrics": test_data["productivity_metrics"]
     }
-    
+
     try:
         response = requests.post(endpoint, headers=HEADERS, json=payload)
-        
+
         if response.status_code == 200:
             result = response.json()
             logger.info(f"Status: SUCCESS (200)")
@@ -2628,27 +2628,27 @@ def patch_imports():
     sys.modules['pymc3'] = MagicMock()
     sys.modules['theano'] = MockTheano()
     sys.modules['theano.tensor'] = MagicMock()
-    
+
     # Patch app.models.mental_health_model to include MentalHealthModel
     mental_health_module = MagicMock()
     mental_health_module.MentalHealthModel = MockMentalHealthModel
     sys.modules['app.models.mental_health_model'] = mental_health_module
-    
+
     # Patch app.models.energy_model
     energy_module = MagicMock()
     energy_module.EnergyModel = MockEnergyModel
     sys.modules['app.models.energy_model'] = energy_module
-    
+
     # Patch ML base models
     ml_models_module = MagicMock()
     ml_models_module.BaseMLModel = MockBaseMLModel
     sys.modules['app.ml.models'] = ml_models_module
-    
+
     # Patch feature engineering
     feature_eng_module = MagicMock()
     feature_eng_module.FeatureEngineer = MockFeatureEngineer
     sys.modules['app.ml.feature_engineering'] = feature_eng_module
-    
+
     # Patch numpy bool
     try:
         import numpy as np
@@ -2656,12 +2656,12 @@ def patch_imports():
             np.bool_ = bool
     except ImportError:
         pass
-    
+
     yield
-    
+
     # Clean up after tests complete
     for module in [
-        'pymc3', 'theano', 'theano.tensor', 
+        'pymc3', 'theano', 'theano.tensor',
         'app.models.mental_health_model', 'app.models.energy_model',
         'app.ml.models', 'app.ml.feature_engineering'
     ]:
@@ -2687,14 +2687,14 @@ def mock_db():
     db = AsyncMock()
     db.execute = AsyncMock()
     db.commit = AsyncMock()
-    
+
     # Mock select query results
     query_result = AsyncMock()
     query_result.scalar_one_or_none = AsyncMock(return_value=None)
     query_result.scalars = AsyncMock()
     query_result.scalars.return_value.all = AsyncMock(return_value=[])
     db.execute.return_value = query_result
-    
+
     return db
 ```
 
@@ -2714,7 +2714,7 @@ This is useful for methods that use async outside of pytest's asyncio fixture.
 def run_async_test(coroutine):
     """
     Helper function to run an async test function.
-    
+
     This is useful for methods that use async outside of pytest's asyncio fixture.
     """
     import asyncio
@@ -2933,10 +2933,10 @@ Test model building.
         """Test model building."""
         mock_instance = mock_class.return_value
         mock_instance._build_model = MagicMock()
-        
+
         # Call build_model
         mock_instance._build_model()
-        
+
         # Assert the method was called
         mock_instance._build_model.assert_called_once()
 ```
@@ -2957,7 +2957,7 @@ Test prediction of patterns.
         # Setup mock instance
         mock_instance = mock_class.return_value
         mock_instance.trained = True
-        
+
         # Create prediction data
         predictions = {
             "completion_rate": np.random.random((5, 1)),
@@ -2966,14 +2966,14 @@ Test prediction of patterns.
             "optimal_time": np.random.random((5, 24)),
             "bottleneck_score": np.random.random((5, 1))
         }
-        
+
         # Setup predict_patterns to return our mocked data
         mock_instance.predict_patterns = MagicMock(return_value=predictions)
-        
+
         # Call predict_patterns with dummy data
         X = np.random.random((5, 14, 24))
         result = mock_instance.predict_patterns(X)
-        
+
         # Check predictions contains the expected keys
         assert "completion_rate" in result
         assert "energy_level" in result
@@ -3004,7 +3004,7 @@ Test initialization of CircadianRhythmModel.
         mock_instance.learning_rate = 0.001
         mock_instance.rhythmic_regularization = 0.1
         mock_instance.use_sleep_data = True
-        
+
         assert mock_instance.n_harmonics == 5
         assert mock_instance.learning_rate == 0.001
         assert mock_instance.rhythmic_regularization == 0.1
@@ -3033,10 +3033,10 @@ Test model building.
         """Test model building."""
         mock_instance = mock_class.return_value
         mock_instance._build_model = MagicMock()
-        
+
         # Call build_model
         mock_instance._build_model()
-        
+
         # Assert the method was called
         mock_instance._build_model.assert_called_once()
 ```
@@ -3057,26 +3057,26 @@ Test predicting daily energy curve.
         # Setup mock instance
         mock_instance = mock_class.return_value
         mock_instance.trained = True
-        
+
         # Create prediction data
         hourly_predictions = {
             "energy_level": np.random.random(24),
             "predicted_optimal_times": np.argsort(np.random.random(24))[-5:].tolist(),
             "confidence_scores": np.random.random(24)
         }
-        
+
         # Setup predict_daily_curve to return our mocked data
         mock_instance.predict_daily_curve = MagicMock(return_value=hourly_predictions)
-        
+
         # Call predict_daily_curve
         user_features = {
             "age": 30,
             "adhd_type": "inattentive",
             "sleep_schedule": {"wake_time": "07:00", "sleep_time": "23:00"}
         }
-        
+
         result = mock_instance.predict_daily_curve(user_features)
-        
+
         # Check predictions contains the expected keys
         assert "energy_level" in result
         assert "predicted_optimal_times" in result
@@ -3107,7 +3107,7 @@ Test initialization of ProductivityCorrelationSystem.
         mock_instance.scaler = MagicMock()
         mock_instance.pca = MagicMock()
         mock_instance.kmeans = MagicMock()
-        
+
         assert mock_instance.n_clusters == 4
         assert mock_instance.scaler is not None
         assert mock_instance.pca is not None
@@ -3136,7 +3136,7 @@ Test getting correlation insights.
         """Test getting correlation insights."""
         mock_instance = mock_class.return_value
         mock_instance.trained = True
-        
+
         # Create mock results
         insights = {
             "top_correlations": [
@@ -3159,13 +3159,13 @@ Test getting correlation insights.
                 }
             ]
         }
-        
+
         # Setup get_correlation_insights to return our mocked data
         mock_instance.get_correlation_insights = MagicMock(return_value=insights)
-        
+
         # Call the method
         result = mock_instance.get_correlation_insights()
-        
+
         # Check insights structure
         assert "top_correlations" in result
         assert "top_mutual_information" in result
@@ -3196,7 +3196,7 @@ Test initialization of MentalHealthFederatedModel.
         mock_instance.client_epochs = 1
         mock_instance.min_clients = 4
         mock_instance.dp_noise_multiplier = 0.1
-        
+
         assert mock_instance.client_batch_size == 32
         assert mock_instance.client_epochs == 1
         assert mock_instance.min_clients == 4
@@ -3224,14 +3224,14 @@ Test client ID anonymization.
     def test_anonymize_client_id(self, mock_class):
         """Test client ID anonymization."""
         mock_instance = mock_class.return_value
-        
+
         # Setup anonymize_client_id to return a predictable hash
         mock_instance.anonymize_client_id = MagicMock(return_value="anonymized_hash_value_123456789")
-        
+
         # Call the method
         user_id = "user123"
         anonymized = mock_instance.anonymize_client_id(user_id)
-        
+
         # Check anonymization
         assert len(anonymized) > 0
         assert anonymized != user_id
@@ -3258,7 +3258,7 @@ Test initialization of TemporalPatternRecognitionService.
     def test_init(self, mock_mhfm, mock_pcs, mock_crm, mock_pplstm):
         """Test initialization of TemporalPatternRecognitionService."""
         service = TemporalPatternRecognitionService()
-        
+
         # Check models are initialized
         assert service.productivity_pattern is not None
         assert service.circadian_rhythm is not None
@@ -3285,10 +3285,10 @@ Test generation of comprehensive insights.
 
 ```python
     async def test_generate_comprehensive_insights(
-        self, 
-        mock_run_federated, 
-        mock_gen_insights, 
-        mock_model_rhythm, 
+        self,
+        mock_run_federated,
+        mock_gen_insights,
+        mock_model_rhythm,
         mock_analyze_patterns,
         mock_time_blocks,
         mock_mental_health_logs,
@@ -3302,10 +3302,10 @@ Test generation of comprehensive insights.
         mock_model_rhythm.return_value = {"energy_curve": {"hourly_predictions": [("08:00", 7.5)]}}
         mock_gen_insights.return_value = {"correlation_insights": {}}
         mock_run_federated.return_value = {"insights": {}}
-        
+
         # Create service with mocked dependencies
         service = TemporalPatternRecognitionService()
-        
+
         # Call the method
         result = await service.generate_comprehensive_insights(
             "user1",
@@ -3315,7 +3315,7 @@ Test generation of comprehensive insights.
             mock_productivity_metrics,
             mock_user_data
         )
-        
+
         # Check result structure
         assert "productivity_patterns" in result
         assert "circadian_rhythm" in result
@@ -3348,16 +3348,16 @@ async def test_api_analyze_productivity_patterns():
     # Silently return instead of using pytest.skip
     # API endpoint needs rework to fix test - missing CRUD imports in endpoints module
     return
-    
+
     from fastapi.testclient import TestClient
     from app.main import app
-    
+
     client = TestClient(app)
-    
+
     # Create a mock response for the database queries
     mock_time_blocks = []
     mock_mental_health_logs = []
-    
+
     # Mock the TemporalPatternRecognitionService response
     mock_tpr_response = {
         "optimal_windows": [],
@@ -3365,21 +3365,21 @@ async def test_api_analyze_productivity_patterns():
         "flexible_block_recommendations": [],
         "predictions": {}
     }
-    
+
     # Mock authentication
     with patch('app.api.deps.get_current_user', return_value={"id": "user1", "is_admin": True}):
         # Mock TPR service directly to avoid the endpoint's imports
-        with patch('app.ml.temporal_pattern_recognition.TemporalPatternRecognitionService.analyze_productivity_patterns', 
+        with patch('app.ml.temporal_pattern_recognition.TemporalPatternRecognitionService.analyze_productivity_patterns',
                   return_value=mock_tpr_response):
-            
+
             response = client.post(
                 "/api/tpr/analyze_productivity_patterns?user_id=user1&days=30&days_to_predict=7"
             )
-            
+
             assert response.status_code == 200
             data = response.json()
             assert "results" in data
-            assert "optimal_windows" in data["results"] 
+            assert "optimal_windows" in data["results"]
 ```
 
 **Assertions:**
@@ -3451,20 +3451,20 @@ Test CRUD operations for all service types.
 async def test_service_crud_operations_parametrized(service_fixture, request):
     """Test CRUD operations for all service types."""
     service = request.getfixturevalue(service_fixture)
-    
+
     # Get the CreateSchema type from the service's actual class
     # Instead of relying on __orig_bases__, which doesn't work for coroutines
     from app.schemas.task_schema import TaskCreate
-    
+
     # Map service name to appropriate schema
     schema_map = {
         "task_service": TaskCreate,
         # Add mappings for other services as needed
     }
-    
+
     # Default to TaskCreate for testing if no specific mapping
     create_schema_type = schema_map.get(service_fixture, TaskCreate)
-    
+
     # Create test data based on the schema's fields
     test_data = {}
     for field_name, field in create_schema_type.model_fields.items():
@@ -3493,39 +3493,39 @@ async def test_service_crud_operations_parametrized(service_fixture, request):
                     test_data[field_name] = list(field.annotation.__members__.values())[0]
                 except (AttributeError, IndexError):
                     continue
-    
+
     # Create instance
     create_data = create_schema_type(**test_data)
     created_item = await service.create(create_data)
     assert created_item is not None
-    
+
     # Get by ID
     retrieved_item = await service.get_by_id(created_item.id)
     assert retrieved_item is not None
     assert retrieved_item.id == created_item.id
-    
+
     # Get all
     items = await service.get_all()
     assert len(items) >= 1
     assert any(item.id == created_item.id for item in items)
-    
+
     # Update
     update_data = {}
     for field_name, field in create_schema_type.model_fields.items():
         if field.annotation == str and not field_name.endswith("_id"):
             update_data[field_name] = f"Updated {field_name}"
             break
-    
+
     if update_data:
         updated_item = await service.update(created_item.id, update_data)
         assert updated_item is not None
         for key, value in update_data.items():
             assert getattr(updated_item, key) == value
-    
+
     # Delete
     deleted = await service.delete(created_item.id)
     assert deleted is True
-    
+
     # Verify deletion
     items_after_delete = await service.get_all()
     assert not any(item.id == created_item.id for item in items_after_delete)
@@ -3560,11 +3560,11 @@ async def test_service_error_handling(task_service):
     invalid_id = uuid4()
     result = await task_service.get_by_id(invalid_id)
     assert result is None
-    
+
     # Test update non-existent item
     with pytest.raises(ServiceError):
         await task_service.update(invalid_id, {"title": "New Title"})
-    
+
     # Test delete non-existent item
     result = await task_service.delete(invalid_id)
     assert result is False
@@ -3598,12 +3598,12 @@ async def test_service_field_operations(task_service):
         status=TaskStatus.TODO
     )
     created_task = await task_service.create(task_data)
-    
+
     # Test get by field
     task_by_title = await task_service.get_by_field("title", "Test Task")
     assert task_by_title is not None
     assert task_by_title.id == created_task.id
-    
+
     # Test get many by field
     tasks_by_status = await task_service.get_many_by_field("status", TaskStatus.TODO)
     assert len(tasks_by_status) == 1
@@ -3641,7 +3641,7 @@ async def test_service_count_operation(task_service):
     )
     await task_service.create(task_data)
     await task_service.create(task_data)
-    
+
     # Test count
     count = await task_service.count()
     assert count == 2
@@ -3674,11 +3674,11 @@ async def test_service_exists_operation(task_service):
         status=TaskStatus.TODO
     )
     created_task = await task_service.create(task_data)
-    
+
     # Test exists with valid ID
     exists = await task_service.exists(created_task.id)
     assert exists is True
-    
+
     # Test exists with invalid ID
     exists = await task_service.exists(uuid4())
     assert exists is False
@@ -3711,7 +3711,7 @@ async def test_service_retry_mechanism(task_service):
         priority=BlockPriority.MEDIUM,
         status=TaskStatus.TODO
     )
-    
+
     # Test that operation either succeeds or raises ServiceError
     try:
         await task_service.create(task_data)
@@ -3742,18 +3742,18 @@ async def test_service_concurrency_control(task_service):
         status=TaskStatus.TODO
     )
     created_task = await task_service.create(task_data)
-    
+
     # Simulate concurrent updates
     update_data_1 = {"title": "Updated Task 1"}
     update_data_2 = {"title": "Updated Task 2"}
-    
+
     # Perform updates (in real scenarios, these would be from different sessions)
     task1 = await task_service.update(created_task.id, update_data_1)
     task2 = await task_service.update(created_task.id, update_data_2)
-    
+
     # Verify last update won
     final_task = await task_service.get_by_id(created_task.id)
-    assert final_task.title == "Updated Task 2" 
+    assert final_task.title == "Updated Task 2"
 ```
 
 **Assertions:**
@@ -4067,7 +4067,7 @@ Test if router instance is an instance of APIRouter.
 ```python
 def test_router_instance(router_instance):
     """Test if router instance is an instance of APIRouter."""
-    assert isinstance(router_instance, APIRouter), f"{router_instance} is not an instance of APIRouter" 
+    assert isinstance(router_instance, APIRouter), f"{router_instance} is not an instance of APIRouter"
 ```
 
 **Assertions:**
@@ -4159,18 +4159,18 @@ def test_simple_relationship(db_session):
         email="test@example.com"
     )
     db_session.add(user)
-    
+
     task = SimpleTask(
         title="Test Task",
         user_id=user_id
     )
     db_session.add(task)
     db_session.commit()
-    
+
     # Verify relationship
     user_from_db = db_session.query(SimpleUser).filter_by(id=user_id).first()
     tasks = db_session.query(SimpleTask).filter_by(user_id=user_id).all()
-    
+
     assert user_from_db is not None
     assert len(tasks) == 1
     assert tasks[0].title == "Test Task"
@@ -4267,18 +4267,18 @@ def test_relationship(db_session):
         email="test@example.com"
     )
     db_session.add(user)
-    
+
     task = TestTask(
         title="Test Task",
         user_id=user_id
     )
     db_session.add(task)
     db_session.commit()
-    
+
     # Verify relationship
     user_from_db = db_session.query(TestUser).filter_by(id=user_id).first()
     tasks = db_session.query(TestTask).filter_by(user_id=user_id).all()
-    
+
     assert user_from_db is not None
     assert len(tasks) == 1
     assert tasks[0].title == "Test Task"
@@ -4312,11 +4312,11 @@ def test_model_inheritance(model_class):
     # Skip non-class entries that might have been accidentally added to model_classes
     if not isinstance(model_class, type):
         return  # Silently skip non-class entries
-    
+
     # Skip MockHealthMetrics as it's intentionally not inheriting from BaseModel for testing purposes
     if model_class.__name__ == "MockHealthMetrics":
         return  # Silently skip MockHealthMetrics
-    
+
     assert issubclass(model_class, BaseModel), f"{model_class.__name__} does not inherit from BaseModel"
 ```
 
@@ -4429,14 +4429,14 @@ def test_model_serialization(model_class):
     # Skip non-class entries that might have been accidentally added to model_classes
     if not isinstance(model_class, type):
         return  # Silently skip non-class entries
-    
+
     # Skip MockHealthMetrics as it's intentionally not inheriting from BaseModel for testing purposes
     if model_class.__name__ == "MockHealthMetrics":
         return  # Silently skip MockHealthMetrics
-    
+
     # Create an instance of the model
     model_instance = model_class()
-    
+
     # Test that the model has the expected attributes from BaseModel
     assert hasattr(model_instance, "id"), f"{model_class.__name__} should have an 'id' attribute"
     assert hasattr(model_instance, "created_at"), f"{model_class.__name__} should have a 'created_at' attribute"
@@ -4465,14 +4465,14 @@ def test_invalid_inputs(model_class, db_session):
     # Skip non-class entries that might have been accidentally added to model_classes
     if not isinstance(model_class, type):
         return  # Silently skip non-class entries
-    
+
     # Skip MockHealthMetrics as it's intentionally not inheriting from BaseModel for testing purposes
     if model_class.__name__ == "MockHealthMetrics":
         return  # Silently skip MockHealthMetrics
-    
+
     # Create dummy parents for models with foreign key constraints
     create_dummy_parents(db_session, model_class)
-    
+
     # Test with invalid UUID
     try:
         invalid_instance = model_class(id="not-a-uuid")
@@ -4483,7 +4483,7 @@ def test_invalid_inputs(model_class, db_session):
     except Exception:
         # Expected to fail
         db_session.rollback()
-    
+
     # Test with invalid date
     date_fields = [field for field in dir(model_class) if "date" in field.lower() and not field.startswith("_")]
     for field in date_fields:
@@ -4536,81 +4536,81 @@ def test_database_constraints(model_class, db_session):
     # Skip non-class entries that might have been accidentally added to model_classes
     if not isinstance(model_class, type):
         return  # Silently skip non-class entries
-    
+
     # Skip MockHealthMetrics as it's intentionally not inheriting from BaseModel for testing purposes
     if model_class.__name__ == "MockHealthMetrics":
         return  # Silently skip MockHealthMetrics
-    
+
     # Create dummy parents for models with foreign key constraints
     parent_data = create_dummy_parents(db_session, model_class)
-    
+
     # Create and save a valid instance with parent data
     instance = model_class()
-    
+
     # Apply parent data to the instance
     for key, value in parent_data.items():
         setattr(instance, key, value)
-    
+
     # Set required fields based on model type
     model_name = model_class.__name__
-    
+
     # Set created_at and updated_at for all models
     now = datetime.now()
     if hasattr(instance, 'created_at') and getattr(instance, 'created_at') is None:
         setattr(instance, 'created_at', now)
     if hasattr(instance, 'updated_at') and getattr(instance, 'updated_at') is None:
         setattr(instance, 'updated_at', now)
-    
+
     # Common fields for many models
     if hasattr(instance, 'title') and getattr(instance, 'title') is None:
         setattr(instance, 'title', f"Test {model_name} {uuid4().hex[:8]}")
-    
+
     if hasattr(instance, 'name') and getattr(instance, 'name') is None:
         setattr(instance, 'name', f"Test {model_name} {uuid4().hex[:8]}")
-    
+
     if hasattr(instance, 'description') and getattr(instance, 'description') is None:
         setattr(instance, 'description', f"Test description for {model_name}")
-    
+
     # Time-related fields
     if hasattr(instance, 'start_time') and getattr(instance, 'start_time') is None:
         setattr(instance, 'start_time', datetime.now())
-    
+
     if hasattr(instance, 'end_time') and getattr(instance, 'end_time') is None:
         setattr(instance, 'end_time', datetime.now() + timedelta(hours=1))
-    
+
     if hasattr(instance, 'duration') and getattr(instance, 'duration') is None:
         setattr(instance, 'duration', 30)  # 30 minutes
-    
+
     if hasattr(instance, 'scheduled_time') and getattr(instance, 'scheduled_time') is None:
         setattr(instance, 'scheduled_time', datetime.now() + timedelta(hours=2))
-    
+
     # Status and type fields
     if hasattr(instance, 'status') and getattr(instance, 'status') is None:
         if model_name == "CalendarSyncModel":
             setattr(instance, 'status', SyncStatus.IN_PROGRESS.value)
         else:
             setattr(instance, 'status', 'active')
-    
+
     if hasattr(instance, 'type') and getattr(instance, 'type') is None:
         setattr(instance, 'type', 'default')
-    
+
     # Set a unique ID for all models
     if hasattr(instance, 'id') and getattr(instance, 'id') is None:
         setattr(instance, 'id', str(uuid4()))
-    
+
     # Model-specific fields
     if model_name == "UserModel":
         instance.email = f"test_{uuid4().hex[:8]}@example.com"
         instance.username = f"test_user_{uuid4().hex[:8]}"
         instance.hashed_password = "test_password"
         instance.full_name = f"Test User {uuid4().hex[:8]}"
-    
+
     elif model_name == "LoginAttemptModel" or model_name == "LoginAttempt":
         instance.ip_address = "127.0.0.1"
         instance.user_agent = "Mozilla/5.0 (Test)"
         instance.success = True
         instance.attempt_time = datetime.now()
-    
+
     elif model_name == "HealthMetrics":
         instance.mood_score = 5
         instance.energy_level = 5
@@ -4622,7 +4622,7 @@ def test_database_constraints(model_class, db_session):
         instance.metric_type = MetricType.DAILY.value if hasattr(MetricType, 'DAILY') else "daily"
         instance.mood_level = 6
         instance.focus_level = 7
-    
+
     elif model_name == "NLPModel":
         instance.text = "Sample text for NLP analysis"
         instance.parsed_data = "{}"
@@ -4630,12 +4630,12 @@ def test_database_constraints(model_class, db_session):
         instance.confidence_score = 0.9
         instance.language = "en"
         instance.entities = []
-    
+
     elif model_name == "TaskModel":
         instance.title = f"Test Task {uuid4().hex[:8]}"
         instance.status = "todo"
         instance.priority = 2
-    
+
     elif model_name == "StreakModel":
         instance.streak_type = "daily_login"
         instance.current_count = 1
@@ -4645,7 +4645,7 @@ def test_database_constraints(model_class, db_session):
         instance.current_streak = 3
         instance.last_activity = datetime.now()
         instance.is_active = True
-    
+
     elif model_name == "FocusStrategy":
         instance.name = f"Test Strategy {uuid4().hex[:8]}"
         instance.description = "A test focus strategy"
@@ -4658,7 +4658,7 @@ def test_database_constraints(model_class, db_session):
         instance.break_intervals = [{"duration": 5, "after_minutes": 25}]
         instance.environment_setup = ["quiet room", "good lighting"]
         instance.tools_needed = ["timer", "notebook"]
-    
+
     elif model_name == "RefreshToken":
         instance.token = f"token_{uuid4().hex}"
         instance.expires_at = datetime.now() + timedelta(days=7)
@@ -4667,7 +4667,7 @@ def test_database_constraints(model_class, db_session):
         instance.is_revoked = False
         instance.token_type = "bearer"
         instance.token_id = str(uuid4())  # Add the required token_id field
-    
+
     elif model_name == "ADHDPatternsModel":
         instance.session_count = 10
         instance.pattern_type = "focus"
@@ -4679,12 +4679,12 @@ def test_database_constraints(model_class, db_session):
         instance.pattern_name = "Focus Pattern"
         instance.detection_method = "algorithm"
         instance.settings_id = parent_data.get("settings_id", str(uuid4()))
-    
+
     elif model_name == "Interaction":
         instance.type = InteractionType.CHAT.value if hasattr(InteractionType, 'CHAT') else "chat"
         instance.outcome = InteractionOutcome.POSITIVE.value if hasattr(InteractionOutcome, 'POSITIVE') else "positive"
         instance.timestamp = datetime.now()
-    
+
     elif model_name == "ContactModel":
         instance.name = f"Test Contact {uuid4().hex[:8]}"
         instance.email = f"contact_{uuid4().hex[:8]}@example.com"
@@ -4696,16 +4696,16 @@ def test_database_constraints(model_class, db_session):
         instance.is_favorite = False
         instance.relationship_strength = "strong"
         instance.type = ContactType.PERSONAL.value if hasattr(ContactType, 'PERSONAL') else "personal"
-    
+
     elif model_name == "ReminderModel":
         instance.title = f"Test Reminder {uuid4().hex[:8]}"
         instance.scheduled_time = datetime.now() + timedelta(hours=2)
         instance.status = "pending"
-    
+
     elif model_name == "AchievementModel" or model_name == "BadgeModel":
         instance.name = f"Test {model_name} {uuid4().hex[:8]}"
         instance.category = "productivity"
-    
+
     elif model_name == "InteractionStats":
         instance.period_start = datetime.now() - timedelta(days=7)
         instance.period_end = datetime.now()
@@ -4717,7 +4717,7 @@ def test_database_constraints(model_class, db_session):
         instance.effectiveness_rating = 8
         instance.total_interactions = 10
         instance.average_effectiveness = 7.5
-    
+
     elif model_name == "EnergyStats":
         instance.period_start = datetime.now() - timedelta(days=7)
         instance.period_end = datetime.now()
@@ -4730,7 +4730,7 @@ def test_database_constraints(model_class, db_session):
         instance.break_effectiveness = 0.8
         instance.interruption_impact = -0.3
         instance.user_id = parent_data.get("user_id", str(uuid4()))
-    
+
     elif model_name == "SessionStatsModel":
         instance.session_count = 10
         instance.total_duration = 600
@@ -4745,7 +4745,7 @@ def test_database_constraints(model_class, db_session):
         instance.total_sessions = 10
         instance.average_effectiveness = 0.8
         instance.completion_rate = 0.9
-    
+
     elif model_name == "MedicationLogModel":
         instance.medication_name = "Test Medication"
         instance.dosage = 10.0  # Changed from "10mg" to a float value
@@ -4757,7 +4757,7 @@ def test_database_constraints(model_class, db_session):
         instance.effectiveness = 7
         instance.side_effects = "None"
         instance.settings_id = parent_data.get("settings_id", str(uuid4()))
-    
+
     elif model_name == "DistractionLogModel":
         instance.distraction_type = DistractionType.DIGITAL.value if hasattr(DistractionType, 'DIGITAL') else "digital"
         instance.timestamp = datetime.now()
@@ -4767,7 +4767,7 @@ def test_database_constraints(model_class, db_session):
         instance.severity = 3
         instance.context = "working"
         instance.settings_id = parent_data.get("settings_id", str(uuid4()))
-    
+
     elif model_name == "MentalHealthLogModel":
         instance.log_type = "anxiety"
         instance.severity = 3
@@ -4780,7 +4780,7 @@ def test_database_constraints(model_class, db_session):
         instance.energy_level = 6
         instance.stress_level = 3
         instance.sleep_hours = 7.5
-    
+
     elif model_name == "BodyDoublingSessionModel":
         instance.duration = 30
         instance.partner_type = "virtual"
@@ -4789,7 +4789,7 @@ def test_database_constraints(model_class, db_session):
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.session_type = "focus"
         instance.status = "completed"
-    
+
     elif model_name == "FocusSessionModel":
         instance.duration = 45
         instance.focus_level = 8
@@ -4803,12 +4803,12 @@ def test_database_constraints(model_class, db_session):
         instance.total_breaks = 2
         instance.total_break_duration = 15
         instance.actual_focus_duration = 30
-    
+
     elif model_name == "TimelineEventModel":
         instance.event_type = TimelineEventType.TASK_COMPLETED.value if hasattr(TimelineEventType, 'TASK_COMPLETED') else "task_completed"
         instance.timestamp = datetime.now()
         instance.details = "{}"
-    
+
     elif model_name == "CalendarSyncModel":
         instance.external_calendar_id = f"ext_cal_{uuid4().hex[:8]}"
         instance.provider = SyncProvider.GOOGLE.value
@@ -4823,7 +4823,7 @@ def test_database_constraints(model_class, db_session):
         instance.sync_frequency = 3600
         instance.pending_conflicts = "{}"
         instance.sync_settings = "{}"
-    
+
     elif model_name == "TimeBlockModel":
         instance.title = f"Test TimeBlock {uuid4().hex[:8]}"
         instance.start_time = datetime.now()
@@ -4837,7 +4837,7 @@ def test_database_constraints(model_class, db_session):
         instance.environment_data = "null"
         instance.tags = "null"
         instance.meta_data = "null"
-    
+
     elif model_name == "VoiceCommandModel":
         instance.command_text = "Test voice command"
         instance.command_type = CommandType.VOICE.value
@@ -4847,25 +4847,25 @@ def test_database_constraints(model_class, db_session):
         instance.action_taken = "test_action"
         instance.result = {"status": "success"}
         instance.timestamp = datetime.now()
-    
+
     elif model_name == "CalendarModel":
         instance.name = f"Test Calendar {uuid4().hex[:8]}"
         instance.provider = "google"
         instance.is_primary = False
         instance.is_enabled = True
-    
+
     elif model_name == "ADHDSettingsModel":
         instance.medication_tracking_enabled = True
         instance.distraction_tracking_enabled = True
         instance.energy_tracking_enabled = True
         instance.focus_tracking_enabled = True
-    
+
     elif model_name == "ScheduleBlock":
         instance.start_time = datetime.now()
         instance.end_time = datetime.now() + timedelta(hours=1)
         instance.block_type = BlockType.TASK.value
         instance.is_available = True
-    
+
     elif model_name == "SchedulePreferences":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.preferred_start_time = datetime.now()
@@ -4873,7 +4873,7 @@ def test_database_constraints(model_class, db_session):
         instance.preferred_break_duration = 15
         instance.min_break_interval = 90
         instance.max_focus_duration = 120
-    
+
     elif model_name == "CalendarEventModel":
         instance.title = f"Test Event {uuid4().hex[:8]}"
         instance.start_time = datetime.now()
@@ -4882,7 +4882,7 @@ def test_database_constraints(model_class, db_session):
         instance.status = EventStatus.SCHEDULED.value
         instance.priority = EventPriority.MEDIUM.value
         instance.is_all_day = False
-    
+
     elif model_name == "NLPAnalysis":
         instance.nlp_record_id = parent_data.get("nlp_record_id", str(uuid4()))
         instance.sentiment_score = 0.8
@@ -4892,7 +4892,7 @@ def test_database_constraints(model_class, db_session):
         instance.summary = "Test summary"
         instance.recommendations = ["take breaks", "use timer"]
         instance.meta_data = {"source": "test"}
-    
+
     elif model_name == "TaskAnalysis":
         instance.task_id = parent_data.get("task_id", str(uuid4()))
         instance.complexity_level = 0.7
@@ -4902,7 +4902,7 @@ def test_database_constraints(model_class, db_session):
         instance.breakdown_suggestions = ["break into smaller tasks", "use pomodoro technique"]
         instance.energy_level_recommendation = "medium"
         instance.adhd_friendly_score = 0.6
-    
+
     elif model_name == "PomodoroSessionModel":
         instance.work_duration = 25
         instance.break_duration = 5
@@ -4915,14 +4915,14 @@ def test_database_constraints(model_class, db_session):
         instance.task_id = parent_data.get("task_id", str(uuid4()))
         instance.meta_data = {}
         instance.short_break_duration = 5
-    
+
     elif model_name == "LoginAttemptModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.ip_address = "192.168.1.1"
         instance.user_agent = "Mozilla/5.0"
         instance.success = True
         instance.attempt_time = datetime.now()
-    
+
     elif model_name == "VoiceCommandModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.command_text = "Test command"
@@ -4931,7 +4931,7 @@ def test_database_constraints(model_class, db_session):
         instance.confidence_score = 0.9
         instance.processing_time = 0.5
         instance.action_taken = "Test action"
-    
+
     elif model_name == "VoicePreferencesModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.language = "en-US"
@@ -4939,12 +4939,12 @@ def test_database_constraints(model_class, db_session):
         instance.confirmation_required = True
         instance.wake_word = "Hey Assistant"
         instance.disabled_commands = []
-    
+
     elif model_name == "TimelineEventModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.event_type = TimelineEventType.TASK_COMPLETED.value
         instance.title = "Test Event"
-    
+
     elif model_name == "InteractionStats":
         instance.period_start = datetime.now() - timedelta(days=7)
         instance.period_end = datetime.now()
@@ -4956,7 +4956,7 @@ def test_database_constraints(model_class, db_session):
         instance.effectiveness_rating = 8
         instance.total_interactions = 10
         instance.average_effectiveness = 7.5
-    
+
     elif model_name == "CalendarModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.name = "Test Calendar"
@@ -4965,7 +4965,7 @@ def test_database_constraints(model_class, db_session):
         instance.is_primary = True
         instance.is_enabled = True
         instance.meta_data = {}
-    
+
     elif model_name == "MentalHealthLogModel":
         instance.log_type = "anxiety"
         instance.severity = 3
@@ -4978,7 +4978,7 @@ def test_database_constraints(model_class, db_session):
         instance.energy_level = 6
         instance.stress_level = 3
         instance.sleep_hours = 7.5
-    
+
     elif model_name == "StreakModel":
         instance.streak_type = "daily_login"
         instance.current_count = 1
@@ -4988,19 +4988,19 @@ def test_database_constraints(model_class, db_session):
         instance.current_streak = 3
         instance.last_activity = datetime.now()
         instance.is_active = True
-    
+
     elif model_name == "PointsModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.total_points = 100
         instance.level = 1
-    
+
     elif model_name == "BadgeModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.name = "Test Badge"
         instance.category = "Test Category"
         instance.type = "Test Type"
         instance.earned_at = datetime.now()
-    
+
     elif model_name == "BodyDoublingSessionModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.host_id = parent_data.get("user_id", str(uuid4()))
@@ -5009,14 +5009,14 @@ def test_database_constraints(model_class, db_session):
         instance.status = "active"
         instance.start_time = datetime.now() - timedelta(minutes=30)
         instance.end_time = datetime.now()
-    
+
     elif model_name == "NLPModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.text = "Test text"
         instance.parsed_data = {}
         instance.confidence_score = 0.9
         instance.entities = []
-    
+
     elif model_name == "ScheduleBlock":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.title = "Test Block"
@@ -5028,7 +5028,7 @@ def test_database_constraints(model_class, db_session):
         instance.is_flexible = True
         instance.buffer_before = 15
         instance.buffer_after = 15
-    
+
     elif model_name == "HyperfocusSessionModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.start_time = datetime.now()
@@ -5038,7 +5038,7 @@ def test_database_constraints(model_class, db_session):
         instance.duration_minutes = 120
         instance.purpose = "Focus"
         instance.focus_area = "General"
-    
+
     elif model_name == "CalendarEventModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.calendar_id = parent_data.get("calendar_id", str(uuid4()))
@@ -5048,7 +5048,7 @@ def test_database_constraints(model_class, db_session):
         instance.event_type = EventType.MEETING.value
         instance.status = EventStatus.SCHEDULED.value
         instance.duration = 60
-    
+
     elif model_name == "CalendarSyncModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.calendar_id = parent_data.get("calendar_id", str(uuid4()))
@@ -5057,13 +5057,13 @@ def test_database_constraints(model_class, db_session):
         instance.source = SyncSource.LOCAL.value
         instance.sync_direction = SyncDirection.TWO_WAY
         instance.status = SyncStatus.PENDING.value
-    
+
     elif model_name == "TimeBlockModel":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.title = "Test Block"
         instance.start_time = datetime.now()
         instance.end_time = datetime.now() + timedelta(hours=1)
-    
+
     elif model_name == "MindfulnessSessionModel":
         instance.duration = 15
         instance.start_time = datetime.now() - timedelta(minutes=15)
@@ -5072,13 +5072,13 @@ def test_database_constraints(model_class, db_session):
         instance.session_type = "meditation"
         instance.timestamp = datetime.now()
         instance.user_id = parent_data.get("user_id", str(uuid4()))
-    
+
     elif model_name == "EnergyLog":
         instance.user_id = parent_data.get("user_id", str(uuid4()))
         instance.level = 7
         instance.timestamp = datetime.now()
         instance.notes = "Test energy log"
-    
+
     else:
         # For any other model, just use the base data
         pass
@@ -5112,7 +5112,7 @@ def test_database_constraints(model_class, db_session):
             except Exception as e:
                 # Skip attributes that can't be accessed or modified
                 pass
-    
+
     # Add the instance to the session and flush
     db_session.add(instance)
     try:
@@ -5120,27 +5120,27 @@ def test_database_constraints(model_class, db_session):
     except Exception as e:
         db_session.rollback()
         pytest.fail(f"Failed to create instance of {model_name}: {str(e)}")
-    
+
     # Store the ID of the instance for later testing
     instance_id = getattr(instance, 'id', None)
-    
+
     # Now test primary key constraint in a clean session to avoid identity conflicts
     db_session.expunge_all()  # Remove all objects from the session
-    
+
     # Create a duplicate instance with the same ID
     duplicate = model_class()
-    
+
     # Set only necessary attributes to trigger the constraint violation
     if hasattr(duplicate, 'id') and instance_id is not None:
         duplicate.id = instance_id
-        
+
         # Add the duplicate to the session
         db_session.add(duplicate)
-        
+
         # This should raise an IntegrityError due to duplicate primary key
         with pytest.raises(IntegrityError):
             db_session.flush()
-    
+
     # Clean up the session
     db_session.rollback()
 ```
@@ -5206,7 +5206,7 @@ def test_schema_inheritance(schema_class):
     # Silently skip Enum classes without generating warnings
     if isinstance(schema_class, Enum) or (isinstance(schema_class, type) and issubclass(schema_class, Enum)):
         return
-    
+
     assert issubclass(schema_class, (BaseSchema, BaseModel)), \
         f"{schema_class.__name__} does not inherit from BaseSchema or BaseModel"
 ```
@@ -5251,7 +5251,7 @@ def test_uuid_schema(sample_uuid):
     """Test UUIDSchema functionality."""
     schema = UUIDSchema(id=sample_uuid)
     assert schema.id == sample_uuid
-    
+
     with pytest.raises(ValidationError):
         UUIDSchema(id="invalid-uuid")
 ```
@@ -5406,7 +5406,7 @@ def test_time_range(sample_datetime):
     )
     assert time_range.start == sample_datetime
     assert time_range.end == end_time
-    
+
     # Test validation
     with pytest.raises(ValidationError):
         TimeRange(
@@ -5434,11 +5434,11 @@ Test schemas with energy_level field.
 def test_energy_level_field(schema_class):
     """Test schemas with energy_level field."""
     print(f"\nTesting energy_level field for schema: {schema_class.__name__}")
-    
+
     try:
         # Create base valid data
         valid_data = create_valid_data(schema_class)
-        
+
         # Add required UUID fields for Response schemas
         if any(x in schema_class.__name__ for x in ['Response', 'TimeManagementBlock']):
             valid_data.update({
@@ -5447,16 +5447,16 @@ def test_energy_level_field(schema_class):
                 'user_id': str(uuid4())
             })
             print(f"Added UUID fields for Response schema: {valid_data}")
-        
+
         # Set energy level
         valid_data["energy_level"] = EnergyLevel.MODERATE
         print(f"Set energy_level to: {EnergyLevel.MODERATE}")
-        
+
         # Create instance
         instance = schema_class(**valid_data)
         print(f"Successfully created instance")
         assert instance.energy_level == EnergyLevel.MODERATE
-            
+
     except ValidationError as e:
         print(f"Validation error for {schema_class.__name__}: {str(e)}")
         print(f"Current valid_data: {valid_data}")
@@ -5481,10 +5481,10 @@ Test schemas with status field.
 def test_status_field(schema_class):
     """Test schemas with status field."""
     print(f"\nTesting status field for schema: {schema_class.__name__}")
-    
+
     try:
         valid_data = create_valid_data(schema_class)
-        
+
         # Add required UUID fields for Response schemas
         if any(x in schema_class.__name__ for x in ['Response', 'TimeManagementBlock']):
             valid_data.update({
@@ -5493,7 +5493,7 @@ def test_status_field(schema_class):
                 'user_id': str(uuid4())
             })
             print(f"Added UUID fields for Response schema: {valid_data}")
-        
+
         if 'task' in schema_class.__name__.lower():
             valid_data["status"] = TaskStatus.TODO
             instance = schema_class(**valid_data)
@@ -5502,7 +5502,7 @@ def test_status_field(schema_class):
             valid_data["status"] = SessionStatus.ACTIVE
             instance = schema_class(**valid_data)
             assert instance.status == SessionStatus.ACTIVE
-            
+
     except ValidationError as e:
         print(f"Validation error for {schema_class.__name__}: {str(e)}")
         print(f"Current valid_data: {valid_data}")
@@ -5576,7 +5576,7 @@ def test_schema_validation(schema_class):
     """Test schema validation with valid data."""
     if isinstance(schema_class, Enum) or issubclass(schema_class, Enum):
         return  # Silently skip Enum classes without generating warnings
-    
+
     try:
         valid_data = create_valid_data(schema_class)
         instance = schema_class(**valid_data)
@@ -5615,7 +5615,7 @@ def test_interaction_schema():
         date=datetime.utcnow(),
         duration_minutes=30
     )
-    
+
     assert interaction.interaction_type == InteractionType.CHAT
     assert interaction.outcome == InteractionOutcome.POSITIVE
     assert interaction.notes == "Test interaction"
@@ -5650,18 +5650,18 @@ def test_points_schema(sample_uuid):
         total_points=100,
         level=5
     )
-    
+
     assert points.id == sample_uuid
     assert points.user_id == sample_uuid
     assert points.total_points == 100
     assert points.level == 5
-    
+
     # Test optional fields
     empty_points = PointsSchema()
     assert empty_points.id is None
     assert empty_points.user_id is None
     assert empty_points.total_points is None
-    assert empty_points.level is None 
+    assert empty_points.level is None
 ```
 
 **Assertions:**
@@ -5710,7 +5710,7 @@ def test_time_range():
     """Test time range validation."""
     now = datetime.utcnow()
     later = now + timedelta(hours=1)
-    
+
     # Test valid time range
     block = TimeBlock(
         title="Test",
@@ -5749,7 +5749,7 @@ def test_schema_validation():
     """Test schema validation for various field types."""
     # Print available SessionType values for debugging
     print(f"\nAvailable SessionType values: {list(SessionType)}")
-    
+
     class TestSchema(BaseModel):
         str_field: str = Field(default="test")
         int_field: int = Field(ge=0, default=1)
@@ -5924,12 +5924,12 @@ def test_complex_validation():
     # Test invalid data
     with pytest.raises(ValidationError):
         ComplexSchema(**{**valid_data, "break_intervals": [timedelta(minutes=15)] * 6})
-    
+
     with pytest.raises(ValidationError):
         ComplexSchema(**{**valid_data, "impact_score": 1.5})
-    
+
     with pytest.raises(ValidationError):
-        ComplexSchema(**{**valid_data, "status": "unknown"}) 
+        ComplexSchema(**{**valid_data, "status": "unknown"})
 ```
 
 **Assertions:**
@@ -5954,19 +5954,19 @@ def test_invalid_inputs(schema_class):
     # Silently skip Enum classes without generating warnings
     if isinstance(schema_class, type) and (issubclass(schema_class, Enum) or schema_class == Enum):
         return
-        
+
     print(f"\nTesting invalid inputs for schema: {schema_class.__name__}")
-    
+
     try:
         # Get field info
         schema_fields = schema_class.model_fields if hasattr(schema_class, 'model_fields') else {}
-        
+
         # Test with invalid string lengths
         for field_name, field in schema_fields.items():
             if str(field.annotation) == "<class 'str'>":
                 invalid_data = create_valid_data(schema_class)
                 invalid_data[field_name] = "a" * 1001  # Very long string
-                
+
                 try:
                     schema_class(**invalid_data)
                     # Only fail if the field has max_length constraint
@@ -5974,38 +5974,38 @@ def test_invalid_inputs(schema_class):
                         pytest.fail(f"Expected ValidationError for long string in {field_name}")
                 except ValidationError:
                     pass  # Expected behavior
-                    
+
         # Test with negative numbers
         for field_name, field in schema_fields.items():
             if str(field.annotation) == "<class 'int'>":
                 invalid_data = create_valid_data(schema_class)
                 invalid_data[field_name] = -1
-                
+
                 try:
                     schema_class(**invalid_data)
                     # Check field constraints using Pydantic v2 methods
                     if hasattr(field, 'constraints'):
                         constraints = field.constraints
                         if constraints and (
-                            getattr(constraints, 'gt', -1) >= 0 or 
+                            getattr(constraints, 'gt', -1) >= 0 or
                             getattr(constraints, 'ge', -1) >= 0
                         ):
                             pytest.fail(f"Expected ValidationError for negative number in {field_name}")
                 except ValidationError:
                     pass  # Expected behavior
-                    
+
         # Test with invalid dates
         for field_name, field in schema_fields.items():
             if str(field.annotation) == "<class 'datetime.datetime'>":
                 invalid_data = create_valid_data(schema_class)
                 invalid_data[field_name] = "invalid_date"
-                
+
                 try:
                     schema_class(**invalid_data)
                     pytest.fail(f"Expected ValidationError for invalid date in {field_name}")
                 except ValidationError:
                     pass  # Expected behavior
-                    
+
     except Exception as e:
         print(f"Unexpected error testing invalid inputs: {str(e)}")
         print(f"Field type: {type(field)}")
@@ -6034,23 +6034,23 @@ def test_large_scale_json():
         # Create a valid item for the test
         base_schema = next(s for s in schema_classes if hasattr(s, 'model_fields'))
         valid_item = create_valid_data(base_schema)
-        
+
         large_data = {
             "items": [valid_item for _ in range(1000)],
             "total": 1000,
             "page": 1,
             "per_page": 1000
         }
-        
+
         start_time = datetime.now()
         # Use a schema that actually exists in your codebase
         instance = base_schema(**valid_item)  # Create single instance instead of PaginatedResponse
         end_time = datetime.now()
-        
+
         processing_time = (end_time - start_time).total_seconds()
         print(f"\nProcessing time for large payload: {processing_time} seconds")
         assert processing_time < 1.0, "Processing took too long"
-        
+
     except Exception as e:
         print(f"Performance test error: {str(e)}")
         pytest.fail(f"Performance test failed: {str(e)}")
@@ -6076,28 +6076,28 @@ def test_fuzz_inputs(random_string, random_int):
     for schema_class in schema_classes:
         if isinstance(schema_class, type) and (issubclass(schema_class, Enum) or schema_class == Enum):
             continue
-            
+
         # Skip SchemaManagerSchema as it requires special initialization
         if schema_class.__name__ == "SchemaManagerSchema":
             continue
-            
+
         try:
             test_data = create_valid_data(schema_class)
-            
+
             # Add some random data
             for field_name, field in schema_class.model_fields.items():
                 if str(field.annotation) == "<class 'str'>":
                     test_data[field_name] = random_string
                 elif str(field.annotation) == "<class 'int'>":
                     test_data[field_name] = random_int
-                    
+
             try:
                 schema_class(**test_data)
             except ValidationError:
                 pass  # Expected for invalid data
             except Exception as e:
                 print(f"Unexpected error in {schema_class.__name__}: {str(e)}")
-                
+
         except Exception as e:
             if "SchemaManagerSchema" not in str(e):  # Skip SchemaManagerSchema errors
                 print(f"Fuzz testing error for {schema_class.__name__}: {str(e)}")
@@ -6119,14 +6119,14 @@ def test_real_world_serialization():
     for schema_class in schema_classes:
         if isinstance(schema_class, type) and (issubclass(schema_class, Enum) or schema_class == Enum):
             continue
-            
+
         try:
             # Skip problematic schemas
             if schema_class.__name__ in ['SchemaManagerSchema', 'PaginatedResponse']:
                 continue
-                
+
             valid_data = create_valid_data(schema_class)
-            
+
             try:
                 # Test serialization/deserialization
                 instance = schema_class(**valid_data)
@@ -6137,9 +6137,9 @@ def test_real_world_serialization():
                 pass  # Expected for some schemas
             except Exception as e:
                 print(f"Serialization error for {schema_class.__name__}: {str(e)}")
-                
+
         except Exception as e:
-            print(f"Real-world serialization error for {schema_class.__name__}: {str(e)}") 
+            print(f"Real-world serialization error for {schema_class.__name__}: {str(e)}")
 ```
 
 **Assertions:**
@@ -6265,10 +6265,10 @@ Test fitting with insufficient data.
         """Test fitting with insufficient data."""
         # Mock _get_historical_data to return empty list
         predictor._get_historical_data = AsyncMock(return_value=[])
-        
+
         # Fit should log an error and return without error
         await predictor.fit("test-user-1")
-        
+
         # Verify that _get_historical_data was called
         predictor._get_historical_data.assert_called_once_with("test-user-1")
 ```
@@ -6331,7 +6331,7 @@ Test fitting with sufficient data.
                 "location": "store"
             }
         ]
-        
+
         # Mock methods
         predictor._get_historical_data = AsyncMock(return_value=historical_data)
         original_extract_features = predictor._extract_features
@@ -6350,15 +6350,15 @@ Test fitting with sufficient data.
             np.array([90, 60, 45])  # Estimated durations
         )
         predictor._calculate_feature_importances = MagicMock()
-        
+
         # Fit the model
         await predictor.fit("test-user-1")
-        
+
         # Verify method calls
         predictor._get_historical_data.assert_called_once_with("test-user-1")
         predictor._extract_features.assert_called_once()
         predictor._calculate_feature_importances.assert_called_once()
-        
+
         # Restore original method
         predictor._extract_features = original_extract_features
 ```
@@ -6389,10 +6389,10 @@ Test prediction functionality.
             difficulty=3,
             estimated_duration=60
         )
-        
+
         # Prepare model attributes for prediction
         predictor.feature_names = [
-            "focus_required", "energy_required", "difficulty", 
+            "focus_required", "energy_required", "difficulty",
             "day_of_week", "hour_of_day", "category_work", "category_personal"
         ]
         predictor.feature_importances = {
@@ -6404,11 +6404,11 @@ Test prediction functionality.
             "category_work": 0.05,
             "category_personal": 0.05
         }
-        
+
         # Mock extract task features
         predictor._extract_task_features = AsyncMock()
         predictor._extract_task_features.return_value = np.array([5, 4, 3, 2, 15, 1, 0])
-        
+
         # Mock getting prediction factors
         predictor._get_prediction_factors = MagicMock()
         predictor._get_prediction_factors.return_value = {
@@ -6417,17 +6417,17 @@ Test prediction functionality.
             "difficulty": 1.1,
             "category_work": 1.05
         }
-        
+
         # Mock fit to avoid database queries
         predictor.fit = AsyncMock()
-        
+
         # Create mock trace
-        predictor.trace = {"alpha": np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]]), 
+        predictor.trace = {"alpha": np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]]),
                           "sigma": np.array([0.5])}
-        
+
         # Make prediction
         result = await predictor.predict("task-4", "test-user-1")
-        
+
         # Verify results
         assert "predicted_duration" in result
         assert "confidence_interval" in result
@@ -6465,7 +6465,7 @@ Test model evaluation.
         """Test model evaluation."""
         # Replace the evaluate method with a simple mock
         original_evaluate = predictor.evaluate
-        
+
         # Create a simple mock that returns fixed metrics
         async def mock_evaluate(user_id):
             return {
@@ -6478,14 +6478,14 @@ Test model evaluation.
                 "r2": 0.75,
                 "num_samples": 3
             }
-        
+
         # Apply the mock
         predictor.evaluate = mock_evaluate
-        
+
         try:
             # Run evaluation with our mock
             metrics = await predictor.evaluate("test-user-1")
-            
+
             # Check metrics
             assert metrics["mae"] == 10.0
             assert metrics["rmse"] == 12.5
@@ -6531,20 +6531,20 @@ Test updating the model with a new observation.
             estimated_duration=60
         )
         predictor._get_task = AsyncMock(return_value=task)
-        
+
         # Mock extract task features
         predictor._extract_task_features = AsyncMock()
         predictor._extract_task_features.return_value = np.array([5, 4, 3, 2, 15, 1, 0])
-        
+
         # Mock fit method
         predictor.fit = AsyncMock()
-        
+
         # Update with new observation
         result = await predictor.update_with_observation("task-4", 70)
-        
+
         # Verify the result contains expected data
         assert isinstance(result, dict)
-        assert "success" in result 
+        assert "success" in result
         assert result.get("task_id") == "task-4" or "message" in result
 ```
 
@@ -6624,10 +6624,10 @@ Test feature extraction from historical data.
                 "estimated_duration": 60
             }
         ]
-    
+
         # Extract features
         X, y_actual, y_estimated = predictor._extract_features(historical_data)
-        
+
         # Verify feature extraction
         assert isinstance(X, pd.DataFrame)
         assert len(X) == 2
@@ -6635,7 +6635,7 @@ Test feature extraction from historical data.
         assert len(y_estimated) == 2
         assert y_actual[0] == 110
         assert y_estimated[0] == 90
-        
+
         # Check for expected features
         expected_features = [
             "priority", "difficulty", "energy_required", "focus_required",
@@ -6643,7 +6643,7 @@ Test feature extraction from historical data.
             "time_block_mental_health", "has_buffer_before", "has_buffer_after",
             "is_flexible"
         ]
-        
+
         for feature in expected_features:
             assert feature in X.columns, f"Expected feature {feature} not found in DataFrame columns"
 ```
@@ -6683,7 +6683,7 @@ Test extracting features from a single task.
             difficulty=2,
             estimated_duration=45
         )
-        
+
         # Set feature names - these should match what the method returns
         predictor.feature_names = [
             "priority", "difficulty", "energy_required", "focus_required",
@@ -6691,16 +6691,16 @@ Test extracting features from a single task.
             "time_block_mental_health", "has_buffer_before", "has_buffer_after",
             "is_flexible", "day_of_week", "hour_of_day", "is_morning", "is_afternoon"
         ]
-        
+
         # Mock feature importances to match our expected features
         predictor.feature_importances = {name: 0.1 for name in predictor.feature_names}
-        
+
         # Mock the trace to ensure feature_importances is used
         predictor.trace = MagicMock()
-        
+
         # Use a real datetime object rather than patching it
         real_now = datetime.now()
-        
+
         # Mock the database execute to return None for time block
         # This avoids the SQLAlchemy error with complex model loading
         # and lets us test the code path with no time block
@@ -6708,20 +6708,20 @@ Test extracting features from a single task.
             mock_result = MagicMock()
             mock_result.first.return_value = None
             mock_execute.return_value = mock_result
-            
+
             # Extract features
             features = await predictor._extract_task_features(task, "test-user-1")
-            
+
             # Check that correct features are extracted
             assert isinstance(features, np.ndarray)
             assert len(features) == len(predictor.feature_names)
-            
+
             # Check a few key features
             feature_dict = dict(zip(predictor.feature_names, features))
             assert feature_dict["focus_required"] == 2
             assert feature_dict["energy_required"] == 3
             assert feature_dict["difficulty"] == 2
-            
+
             # These will vary based on the current time, so just check they exist
             assert "day_of_week" in feature_dict
             assert "hour_of_day" in feature_dict
@@ -6753,21 +6753,21 @@ Test retrieving a task from the database.
         # Patch the task retrieval to avoid database errors
         expected_task = create_mock_task_model(
             task_id="task-test",
-            user_id="test-user-1", 
+            user_id="test-user-1",
             title="Test Task",
-            description="Test Description", 
-            focus_required=3, 
+            description="Test Description",
+            focus_required=3,
             energy_required=3,
             difficulty=3
         )
         predictor._get_task = AsyncMock(return_value=expected_task)
-        
+
         # Test with existing task
         task = await predictor._get_task("task-test")
         assert task is not None
         assert task.id == "task-test"
         assert task.user_id == "test-user-1"
-        
+
         # Test with non-existent task by setting return value to None
         predictor._get_task.return_value = None
         task = await predictor._get_task("non-existent-task")
@@ -6796,17 +6796,17 @@ Test calculation of feature importances.
         """Test calculation of feature importances."""
         # Set up feature names
         predictor.feature_names = [
-            "focus_required", "energy_required", "difficulty", 
+            "focus_required", "energy_required", "difficulty",
             "day_of_week", "hour_of_day", "category_work", "category_personal"
         ]
-        
+
         # Create a mock model with feature importances
         predictor.model = MagicMock()
         predictor.model.feature_importances_ = np.array([0.3, 0.2, 0.25, 0.1, 0.05, 0.05, 0.05])
-        
+
         # Calculate feature importances
         predictor._calculate_feature_importances(predictor.feature_names)
-        
+
         # Verify importances
         assert predictor.feature_importances is not None
         assert len(predictor.feature_importances) == 7
@@ -6838,7 +6838,7 @@ Test calculation of prediction factors.
         """Test calculation of prediction factors."""
         # Set up feature names and importances
         predictor.feature_names = [
-            "focus_required", "energy_required", "difficulty", 
+            "focus_required", "energy_required", "difficulty",
             "day_of_week", "hour_of_day", "category_work", "category_personal"
         ]
         predictor.feature_importances = {
@@ -6850,22 +6850,22 @@ Test calculation of prediction factors.
             "category_work": 0.05,
             "category_personal": 0.05
         }
-        
+
         # Set feature importance threshold
         predictor.feature_importance_threshold = 0.1
-        
+
         # Create a feature vector with some significant deviations
         features = np.array([5, 4, 3, 2, 15, 1, 0])
-        
+
         # Calculate prediction factors
         factors = predictor._get_prediction_factors(features)
-        
+
         # Verify that only important features are included
         assert len(factors) <= 4  # Only features with importance >= 0.1
         assert "focus_required" in factors
         assert "energy_required" in factors
         assert "difficulty" in factors
-        
+
         # Features below threshold should be excluded
         assert "hour_of_day" not in factors
         assert "category_work" not in factors
@@ -6897,7 +6897,7 @@ Test saving and loading the model.
         """Test saving and loading the model."""
         # Set up model state
         predictor.feature_names = [
-            "focus_required", "energy_required", "difficulty", 
+            "focus_required", "energy_required", "difficulty",
             "day_of_week", "hour_of_day", "category_work", "category_personal"
         ]
         predictor.feature_importances = {
@@ -6910,36 +6910,36 @@ Test saving and loading the model.
             "category_personal": 0.05
         }
         predictor.model = MagicMock()
-        
+
         # Mock pickle.dump for model
         with patch('pickle.dump') as mock_dump, \
              patch('builtins.open', create=True) as mock_open, \
              patch('pickle.load') as mock_load, \
              patch('os.path.exists') as mock_exists:
-            
+
             # Setup for save
             mock_open.return_value.__enter__.return_value = MagicMock()
-            
+
             # Set up for load
             mock_exists.return_value = True
             mock_load.return_value = predictor.model
-            
+
             # Save the model
             with tempfile.NamedTemporaryFile() as temp:
                 filepath = temp.name
                 predictor.save(filepath)
-                
+
                 # Verify save was called
                 mock_dump.assert_called()
-                
+
                 # Load the model
                 loaded_predictor = BayesianDurationPredictor.load(filepath)
-                
+
                 # Verify load was called
                 mock_load.assert_called()
-                
+
                 # Check that loaded model has the same parameters
-                assert loaded_predictor is not None 
+                assert loaded_predictor is not None
 ```
 
 **Assertions:**
@@ -6962,22 +6962,22 @@ Create a mock task with the given properties.
 
 ```python
 def create_mock_task(
-    task_id=None, 
-    user_id=None, 
-    title="Test Task", 
-    description="This is a test task", 
-    category="work", 
-    focus_required=3, 
-    energy_required=3, 
-    difficulty=3, 
-    estimated_duration=60, 
-    actual_duration=None, 
-    day_of_week=None, 
-    hour_of_day=None, 
-    location="home", 
-    tools_required=None,  # Named consistently with the test errors 
+    task_id=None,
+    user_id=None,
+    title="Test Task",
+    description="This is a test task",
+    category="work",
+    focus_required=3,
+    energy_required=3,
+    difficulty=3,
+    estimated_duration=60,
+    actual_duration=None,
+    day_of_week=None,
+    hour_of_day=None,
+    location="home",
+    tools_required=None,  # Named consistently with the test errors
     tools_needed=None,    # Keep original for backward compatibility
-    is_collaborative=False, 
+    is_collaborative=False,
     focus_type="analytical",
     complexity=None,
     stress_factors=None,
@@ -6988,13 +6988,13 @@ def create_mock_task(
         task_id = f"task-{uuid.uuid4().hex[:8]}"
     if user_id is None:
         user_id = f"user-{uuid.uuid4().hex[:8]}"
-    
+
     # Handle both tools_needed and tools_required for compatibility
     if tools_needed is None and tools_required is None:
         tools_needed = []
     elif tools_needed is None and tools_required is not None:
         tools_needed = tools_required
-    
+
     if day_of_week is None:
         day_of_week = datetime.now().weekday()
     if hour_of_day is None:
@@ -7003,15 +7003,15 @@ def create_mock_task(
         actual_duration = estimated_duration
     if stress_factors is None:
         stress_factors = {
-            "time_pressure": 3, 
-            "task_complexity": difficulty, 
+            "time_pressure": 3,
+            "task_complexity": difficulty,
             "fatigue": 2
         }
     if complexity is None:
         complexity = difficulty
     if base_duration is None:
         base_duration = estimated_duration
-        
+
     return {
         "id": task_id,
         "user_id": user_id,
@@ -7048,21 +7048,21 @@ Create a mock TaskModel for testing.
 
 ```python
 def create_mock_task_model(
-    task_id=None, 
-    user_id=None, 
-    title="Test Task", 
-    description="This is a test task", 
-    category="work", 
-    focus_required=3, 
-    energy_required=3, 
-    difficulty=3, 
-    estimated_duration=60, 
-    actual_duration=None, 
-    day_of_week=None, 
-    hour_of_day=None, 
-    location="home", 
-    tools_needed=None, 
-    is_collaborative=False, 
+    task_id=None,
+    user_id=None,
+    title="Test Task",
+    description="This is a test task",
+    category="work",
+    focus_required=3,
+    energy_required=3,
+    difficulty=3,
+    estimated_duration=60,
+    actual_duration=None,
+    day_of_week=None,
+    hour_of_day=None,
+    location="home",
+    tools_needed=None,
+    is_collaborative=False,
     focus_type="analytical",
     complexity=None,
     stress_factors=None,
@@ -7086,18 +7086,18 @@ def create_mock_task_model(
         actual_duration = estimated_duration
     if stress_factors is None:
         stress_factors = {
-            "time_pressure": 3, 
-            "task_complexity": difficulty, 
+            "time_pressure": 3,
+            "task_complexity": difficulty,
             "fatigue": 2
         }
     if complexity is None:
         complexity = difficulty
     if base_duration is None:
         base_duration = estimated_duration
-    
+
     # Create a TaskModel instance
     task = MagicMock(spec=TaskModel)
-    
+
     # Set attributes
     task.id = task_id
     task.user_id = user_id
@@ -7121,7 +7121,7 @@ def create_mock_task_model(
     task.subtasks = subtasks or []
     task.is_recurring = is_recurring
     task.priority = priority
-    
+
     return task
 ```
 
@@ -7145,17 +7145,17 @@ def create_mock_user(
 ) -> UserModel:
     """Create a mock user with the given properties."""
     user_id = user_id or str(uuid.uuid4())
-    
+
     user = MagicMock(spec=UserModel)
     user.id = user_id
     user.username = username
     user.email = email
     user.resting_heart_rate = resting_heart_rate
-    
+
     # Add any additional attributes
     for key, value in kwargs.items():
         setattr(user, key, value)
-    
+
     return user
 ```
 
@@ -7188,7 +7188,7 @@ def create_mock_health_metrics(
     metric_id = metric_id or str(uuid.uuid4())
     user_id = user_id or str(uuid.uuid4())
     timestamp = timestamp or datetime.now()
-    
+
     metric = MagicMock(spec=HealthMetrics)
     metric.id = metric_id
     metric.user_id = user_id
@@ -7201,11 +7201,11 @@ def create_mock_health_metrics(
     metric.anxiety_level = anxiety_level
     metric.social_pressure = social_pressure
     metric.environment_data = environment_data or {}
-    
+
     # Add any additional attributes
     for key, value in kwargs.items():
         setattr(metric, key, value)
-    
+
     return metric
 ```
 
@@ -7223,7 +7223,7 @@ Fixture to create a mock database with test data.
 def mock_db():
     """Fixture to create a mock database with test data."""
     db = AsyncMock()
-    
+
     # Create sample tasks
     user_id = "test-user-1"
     tasks = {
@@ -7274,7 +7274,7 @@ def mock_db():
             focus_type="routine"
         )
     }
-    
+
     # Create sample user
     users = {
         user_id: create_mock_user(
@@ -7283,7 +7283,7 @@ def mock_db():
             email="test@example.com"
         )
     }
-    
+
     # Create sample health metrics
     health_metrics = {
         f"hm-{i}": create_mock_health_metrics(
@@ -7295,14 +7295,14 @@ def mock_db():
             focus_level=6 - (i % 4)
         ) for i in range(24)
     }
-    
+
     # Setup execute method to return task, user, or health metrics
     async def mock_execute(statement):
         result = AsyncMock()
-        
+
         # Mock scalar results for different queries
         scalar_result = AsyncMock()
-        
+
         if 'TaskModel' in str(statement):
             # Extract task_id from statement for simple WHERE id = X queries
             task_id = None
@@ -7311,7 +7311,7 @@ def mock_db():
                 for task_id in tasks:
                     if task_id in str(statement.whereclause):
                         break
-            
+
             if task_id and task_id in tasks:
                 # Single task query
                 scalar_result.all.return_value = [tasks[task_id]]
@@ -7322,7 +7322,7 @@ def mock_db():
                 scalar_result.all.return_value = list(tasks.values())
                 result.scalars.return_value = scalar_result
                 result.all.return_value = [(task,) for task in tasks.values()]
-        
+
         elif 'UserModel' in str(statement):
             # Extract user_id from statement
             user_id = None
@@ -7331,19 +7331,19 @@ def mock_db():
                     if uid in str(statement.whereclause):
                         user_id = uid
                         break
-            
+
             if user_id and user_id in users:
                 # Single user query
                 result.first.return_value = (users[user_id],)
             else:
                 # All users query
                 result.all.return_value = [(user,) for user in users.values()]
-        
+
         elif 'HealthMetrics' in str(statement):
             # Health metrics query - return all for simplicity
             scalar_result.all.return_value = list(health_metrics.values())
             result.scalars.return_value = scalar_result
-        
+
         # Mock transition observations
         elif 'transition_observations' in str(statement):
             # Mock transition query results
@@ -7351,19 +7351,19 @@ def mock_db():
                 {
                     "id": f"transition-{i}",
                     "user_id": user_id,
-                    "from_task_id": "task-1", 
-                    "to_task_id": "task-2", 
-                    "predicted_minutes": 15, 
-                    "actual_minutes": 20, 
+                    "from_task_id": "task-1",
+                    "to_task_id": "task-2",
+                    "predicted_minutes": 15,
+                    "actual_minutes": 20,
                     "timestamp": datetime.now() - timedelta(days=i)
                 } for i in range(5)
             ]
-            
+
         return result
-    
+
     # Set the execute method on the db mock
     db.execute = mock_execute
-    
+
     return db
 ```
 
@@ -7380,7 +7380,7 @@ Helper function to run an async test.
 ```python
 async def run_async_test(coroutine):
     """Helper function to run an async test."""
-    return await coroutine 
+    return await coroutine
 ```
 
 ---
@@ -7394,7 +7394,7 @@ Args:
     mean: Mean of the distribution
     std: Standard deviation of the distribution
     size: Number of samples
-    
+
 Returns:
     A numpy array of samples from a normal distribution
 ```
@@ -7404,12 +7404,12 @@ Returns:
 ```python
 def create_mock_model_result(mean=30.0, std=5.0, size=100):
     """Create a mock model result with normal distribution samples
-    
+
     Args:
         mean: Mean of the distribution
         std: Standard deviation of the distribution
         size: Number of samples
-        
+
     Returns:
         A numpy array of samples from a normal distribution
     """
@@ -7425,7 +7425,7 @@ Create a mock PyMC3 trace object with specified values
 
 Args:
     value_dict: Dictionary of variable names to values
-    
+
 Returns:
     A mock trace object
 ```
@@ -7435,25 +7435,25 @@ Returns:
 ```python
 def create_mock_pymc3_trace(value_dict=None):
     """Create a mock PyMC3 trace object with specified values
-    
+
     Args:
         value_dict: Dictionary of variable names to values
-        
+
     Returns:
         A mock trace object
     """
     if value_dict is None:
         value_dict = {'duration': np.random.normal(30.0, 5.0, 100)}
-        
+
     mock_trace = MagicMock()
     mock_trace.varnames = list(value_dict.keys())
-    
+
     def get_values_side_effect(varname, **kwargs):
         return value_dict.get(varname, np.array([]))
-    
+
     mock_trace.get_values.side_effect = get_values_side_effect
     mock_trace.__len__.return_value = 100
-    
+
     return mock_trace
 ```
 
@@ -7469,7 +7469,7 @@ Args:
     locations: List of locations for the tasks
     base_durations: List of base durations for the tasks
     complexities: List of complexity scores for the tasks
-    
+
 Returns:
     A list of task dictionaries
 ```
@@ -7477,41 +7477,41 @@ Returns:
 **Source code:**
 
 ```python
-def create_mock_task_sequence(num_tasks=3, locations=None, 
+def create_mock_task_sequence(num_tasks=3, locations=None,
                              base_durations=None, complexities=None):
     """Create a sequence of mock tasks for testing
-    
+
     Args:
         num_tasks: Number of tasks to create
         locations: List of locations for the tasks
         base_durations: List of base durations for the tasks
         complexities: List of complexity scores for the tasks
-        
+
     Returns:
         A list of task dictionaries
     """
     if locations is None:
         locations = ["Home", "Office", "Cafe", "Home"]
-    
+
     if base_durations is None:
         base_durations = [30, 60, 45, 90]
-        
+
     if complexities is None:
         complexities = [0.3, 0.5, 0.7, 0.4]
-        
+
     tasks = []
     for i in range(num_tasks):
         loc_idx = i % len(locations)
         dur_idx = i % len(base_durations)
         comp_idx = i % len(complexities)
-        
+
         tasks.append(create_mock_task(
             complexity=complexities[comp_idx],
             base_duration=base_durations[dur_idx],
             location=locations[loc_idx]
         ))
-    
-    return tasks 
+
+    return tasks
 ```
 
 ---
@@ -7526,8 +7526,8 @@ Create a mock TimeBlockModel for testing.
 
 ```python
 def create_mock_time_block_model(
-    id="time-block-1", 
-    user_id="test-user-1", 
+    id="time-block-1",
+    user_id="test-user-1",
     title="Test Time Block",
     description="Test Time Block Description",
     start_time=None,
@@ -7543,13 +7543,13 @@ def create_mock_time_block_model(
     """Create a mock TimeBlockModel for testing."""
     # Create a mock
     mock_time_block = MagicMock(spec="TimeBlockModel")
-    
+
     # Set default times if not provided
     if start_time is None:
         start_time = datetime.now()
     if end_time is None:
         end_time = start_time + timedelta(minutes=60)
-    
+
     # Set all the attributes
     mock_time_block.id = id
     mock_time_block.user_id = user_id
@@ -7564,8 +7564,8 @@ def create_mock_time_block_model(
     mock_time_block.buffer_after = buffer_after
     mock_time_block.is_flexible = is_flexible
     mock_time_block.task_id = task_id
-    
-    return mock_time_block 
+
+    return mock_time_block
 ```
 
 ---
@@ -7620,12 +7620,12 @@ def extract_test_methods(test_file):
     """
     with open(test_file, 'r') as f:
         content = f.read()
-    
+
     # Find all test methods using regex
     # Pattern matches "def test_something" with optional whitespace and supports async def
     method_pattern = re.compile(r"(?:async\s+)?def\s+(test_\w+)\s*\(")
     matches = method_pattern.findall(content)
-    
+
     return matches
 ```
 
@@ -7647,51 +7647,51 @@ def verify_test_coverage(component):
     Returns a tuple (success, report).
     """
     test_file = os.path.join(TEST_DIR, f"test_{component}.py")
-    
+
     if not os.path.exists(test_file):
         return False, f"❌ Test file {test_file} does not exist."
-    
+
     try:
         # Extract all test methods
         test_methods = extract_test_methods(test_file)
-        
+
         # Get expectations for this component
         expectations = COVERAGE_EXPECTATIONS.get(component, {})
         required_methods = expectations.get("required_methods", [])
         test_count_minimum = expectations.get("test_count_minimum", 5)
-        
+
         # Verify test count
         test_count = len(test_methods)
         test_count_ok = test_count >= test_count_minimum
-        
+
         # Verify required methods
         missing_methods = []
         for required in required_methods:
             # Check if any test method starts with the required prefix
             if not any(method.startswith(required) for method in test_methods):
                 missing_methods.append(required)
-        
+
         # Create the report
         report_lines = []
         report_lines.append(f"Test File: {os.path.basename(test_file)}")
         report_lines.append(f"Total Test Methods: {test_count} {'✅' if test_count_ok else '❌'} (minimum expected: {test_count_minimum})")
-        
+
         if missing_methods:
             report_lines.append(f"Missing Required Test Methods: {'❌'}")
             for missing in missing_methods:
                 report_lines.append(f"  - {missing}")
         else:
             report_lines.append(f"Required Test Methods: ✅ All present")
-        
+
         # List all test methods found
         report_lines.append("\nTest Methods Found:")
         for method in sorted(test_methods):
             required = "✅" if any(method.startswith(req) for req in required_methods) else "  "
             report_lines.append(f"  {required} {method}")
-        
+
         success = test_count_ok and not missing_methods
         return success, "\n".join(report_lines)
-    
+
     except Exception as e:
         return False, f"❌ Error analyzing test file {test_file}: {e}"
 ```
@@ -7726,7 +7726,7 @@ Create a StochasticTimeEstimationEngine instance for testing.
         mock_complexity_analyzer = MagicMock()
         mock_stressor_detector = MagicMock()
         mock_buffer_calculator = MagicMock()
-        
+
         # Configure default return values for common methods
         mock_duration_predictor.predict.return_value = (30.0, 5.0)
         mock_complexity_analyzer.analyze_task.return_value = {
@@ -7747,7 +7747,7 @@ Create a StochasticTimeEstimationEngine instance for testing.
             'time_impact': 1.15
         }
         mock_buffer_calculator.calculate_buffer.return_value = (10.0, 0.8)
-        
+
         engine = StochasticTimeEstimationEngine(
             db=mock_db,
             duration_predictor=mock_duration_predictor,
@@ -7755,7 +7755,7 @@ Create a StochasticTimeEstimationEngine instance for testing.
             stressor_detector=mock_stressor_detector,
             buffer_calculator=mock_buffer_calculator
         )
-        
+
         return engine
 ```
 
@@ -7808,7 +7808,7 @@ Test the estimation of a single task's duration.
             estimated_duration=60,
             location="Office"
         )
-        
+
         # Mock component returns
         engine.duration_predictor.predict.return_value = (45.0, 10.0)
         engine.complexity_analyzer.analyze_task.return_value = {
@@ -7819,23 +7819,23 @@ Test the estimation of a single task's duration.
             'overall_stress': 0.5,
             'time_impact': 1.2
         }
-        
+
         # Test the method
         result = await engine.estimate_task_duration(task["id"])
-        
+
         # Verify interactions
         engine.duration_predictor.predict.assert_called_once_with(task["id"], user_id=None)
         engine.complexity_analyzer.analyze_task.assert_called_once_with(task["id"])
         engine.stressor_detector.detect_current_stress.assert_called_once_with(
             task["id"], user_id=None
         )
-        
+
         # Verify results
         assert "base_estimate" in result
         assert "confidence_interval" in result
         assert "factors" in result
         assert isinstance(result["factors"], dict)
-        
+
         # The result should reflect the combination of the mocked component outputs
         assert result["base_estimate"] > 45.0  # Should be adjusted by complexity and stress
 ```
@@ -7868,15 +7868,15 @@ Test estimation of a sequence of tasks with transitions.
             base_durations=[30, 60, 45],
             complexities=[0.4, 0.7, 0.5]
         )
-        
+
         task_ids = [task["id"] for task in tasks]
-        
+
         # Mock the buffer calculator
         engine.buffer_calculator.calculate_buffers_for_task_sequence.return_value = [
             (5.0, 0.9),
             (15.0, 0.7)
         ]
-        
+
         # Mock individual task estimates
         async def mock_estimate_task_duration(task_id):
             for i, task in enumerate(tasks):
@@ -7893,22 +7893,22 @@ Test estimation of a sequence of tasks with transitions.
                             "location_familiarity": 0.8 - (0.2 * i)
                         }
                     }
-        
+
         engine.estimate_task_duration = AsyncMock(side_effect=mock_estimate_task_duration)
-        
+
         # Test the method
         result = await engine.estimate_schedule(task_ids)
-        
+
         # Verify calls
         assert engine.estimate_task_duration.call_count == len(tasks)
         engine.buffer_calculator.calculate_buffers_for_task_sequence.assert_called_once_with(task_ids)
-        
+
         # Verify results
         assert "tasks" in result
         assert "total_duration" in result
         assert "confidence_interval" in result
         assert "buffers" in result
-        
+
         assert len(result["tasks"]) == len(tasks)
         assert isinstance(result["total_duration"], (int, float))
         assert len(result["buffers"]) == len(tasks) - 1
@@ -7940,10 +7940,10 @@ Test updating the model with actual task durations.
         """Test updating the model with actual task durations."""
         task_id = "task-123"
         actual_duration = 75
-        
+
         # Test the method
         await engine.update_with_actual_duration(task_id, actual_duration)
-        
+
         # Verify all components were updated
         engine.duration_predictor.update_with_observation.assert_called_once_with(task_id, actual_duration)
         engine.complexity_analyzer.update_with_observation.assert_called_once_with(task_id, actual_duration)
@@ -7966,10 +7966,10 @@ Test updating the model with actual transition times.
         from_task_id = "task-123"
         to_task_id = "task-456"
         transition_time = 12
-        
+
         # Test the method
         await engine.update_with_transition_time(from_task_id, to_task_id, transition_time)
-        
+
         # Verify buffer calculator was updated
         engine.buffer_calculator.update_with_observation.assert_called_once_with(
             from_task_id, to_task_id, transition_time
@@ -7990,7 +7990,7 @@ Test analysis of factors affecting task duration.
     async def test_analyze_task_factors(self, engine):
         """Test analysis of factors affecting task duration."""
         task_id = "task-123"
-        
+
         # Mock component returns for detailed analysis
         engine.complexity_analyzer.analyze_task.return_value = {
             'complexity_score': 0.65,
@@ -8001,7 +8001,7 @@ Test analysis of factors affecting task duration.
             'topics': ['coding', 'testing'],
             'time_impact': 1.25
         }
-        
+
         engine.stressor_detector.detect_current_stress.return_value = {
             'overall_stress': 0.45,
             'physiological': 0.4,
@@ -8011,7 +8011,7 @@ Test analysis of factors affecting task duration.
             'social': 0.4,
             'time_impact': 1.18
         }
-        
+
         engine.duration_predictor.get_prediction_factors.return_value = {
             'location_factor': 1.1,
             'time_of_day_factor': 0.95,
@@ -8024,21 +8024,21 @@ Test analysis of factors affecting task duration.
                 'location': 0.05
             }
         }
-        
+
         # Test the method
         result = await engine.analyze_task_factors(task_id)
-        
+
         # Verify interactions
         engine.complexity_analyzer.analyze_task.assert_called_once_with(task_id)
         engine.stressor_detector.detect_current_stress.assert_called_once_with(task_id, user_id=None)
         engine.duration_predictor.get_prediction_factors.assert_called_once_with(task_id)
-        
+
         # Verify result structure
         assert "complexity_factors" in result
         assert "stress_factors" in result
         assert "prediction_factors" in result
         assert "overall_impact" in result
-        
+
         # Verify the overall impact calculation
         assert isinstance(result["overall_impact"], dict)
         assert "total_factor" in result["overall_impact"]
@@ -8069,7 +8069,7 @@ Test retrieval of historical prediction accuracy statistics.
     async def test_get_historical_accuracy(self, engine):
         """Test retrieval of historical prediction accuracy statistics."""
         user_id = "user-123"
-        
+
         # Mock component method
         engine.duration_predictor.evaluate.return_value = {
             'mean_absolute_error': 8.5,
@@ -8080,18 +8080,18 @@ Test retrieval of historical prediction accuracy statistics.
             'accuracy_trend': [0.75, 0.78, 0.82, 0.79],
             'sample_count': 35
         }
-        
+
         # Test the method
         result = await engine.get_historical_accuracy(user_id)
-        
+
         # Verify interactions
         engine.duration_predictor.evaluate.assert_called_once_with(user_id=user_id)
-        
+
         # Verify results structure
         assert "overall_metrics" in result
         assert "trend" in result
         assert "sample_size" in result
-        
+
         # Verify specific metrics
         assert "accuracy_percentage" in result["overall_metrics"]
         assert result["sample_size"] == 35
@@ -8119,16 +8119,16 @@ Test saving and loading the entire engine state.
     def test_save_and_load(self, engine, tmp_path):
         """Test saving and loading the entire engine state."""
         save_path = str(tmp_path / "engine_state")
-        
+
         # Test save method
         engine.save(save_path)
-        
+
         # Verify components' save methods were called
         engine.duration_predictor.save.assert_called_once()
         engine.complexity_analyzer.save.assert_called_once()
         engine.stressor_detector.save.assert_called_once()
         engine.buffer_calculator.save.assert_called_once()
-        
+
         # Reset mock call counts
         for component in [
             engine.duration_predictor,
@@ -8138,15 +8138,15 @@ Test saving and loading the entire engine state.
         ]:
             component.save.reset_mock()
             component.load.reset_mock()
-        
+
         # Test load method
         engine.load(save_path)
-        
+
         # Verify components' load methods were called
         engine.duration_predictor.load.assert_called_once()
         engine.complexity_analyzer.load.assert_called_once()
         engine.stressor_detector.load.assert_called_once()
-        engine.buffer_calculator.load.assert_called_once() 
+        engine.buffer_calculator.load.assert_called_once()
 ```
 
 ---
@@ -8257,10 +8257,10 @@ Test buffer calculation with non-existent tasks.
         """Test buffer calculation with non-existent tasks."""
         # Mock _get_task to return None
         calculator._get_task = AsyncMock(return_value=None)
-    
+
         # Calculate buffer
         buffer = await calculator.calculate_buffer("non-existent-task-1", "non-existent-task-2")
-        
+
         # Verify result
         assert buffer["error"] == "One or both tasks not found"
         assert buffer["buffer_minutes"] == calculator.min_buffer_minutes
@@ -8287,10 +8287,10 @@ Test buffer calculation for the same task.
         # Mock _get_task to return the same task twice
         task = create_mock_task_model(task_id="task-1")
         calculator._get_task = AsyncMock(return_value=task)
-    
+
         # Calculate buffer
         buffer = await calculator.calculate_buffer("task-1", "task-1")
-        
+
         # Verify result
         assert buffer["buffer_minutes"] == calculator.min_buffer_minutes
 ```
@@ -8325,7 +8325,7 @@ Test buffer calculation with no transition history.
             tools_needed=["phone", "notepad"],
             energy_required=4
         )
-        
+
         # Use AsyncMock with side_effect to handle different task IDs
         async def mock_get_task(task_id):
             if task_id == "task-1":
@@ -8333,12 +8333,12 @@ Test buffer calculation with no transition history.
             elif task_id == "task-2":
                 return task2
             return None
-        
+
         calculator._get_task = AsyncMock(side_effect=mock_get_task)
-        
+
         # Mock _get_transition_stats to return None
         calculator._get_transition_stats = AsyncMock(return_value=None)
-        
+
         # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string
         calculator._analyze_transition_difficulty = AsyncMock(return_value=(
             TransitionDifficulty.MODERATE,  # Use enum instead of string
@@ -8350,10 +8350,10 @@ Test buffer calculation with no transition history.
                 "difficulty_score": 4.4
             }
         ))
-        
+
         # Calculate buffer
         buffer = await calculator.calculate_buffer("task-1", "task-2")
-        
+
         # Verify result
         assert buffer["buffer_minutes"] >= calculator.min_buffer_minutes
         # Changed assertion to handle the case where base_transition_times uses enum values as keys
@@ -8392,7 +8392,7 @@ Test buffer calculation with transition history.
             tools_needed=["phone", "notepad"],
             energy_required=4
         )
-        
+
         # Use AsyncMock with side_effect to handle different task IDs
         async def mock_get_task(task_id):
             if task_id == "task-1":
@@ -8400,9 +8400,9 @@ Test buffer calculation with transition history.
             elif task_id == "task-2":
                 return task2
             return None
-        
+
         calculator._get_task = AsyncMock(side_effect=mock_get_task)
-        
+
         # Mock _get_transition_stats to return history
         transition_stats = {
             "count": 5,
@@ -8415,7 +8415,7 @@ Test buffer calculation with transition history.
             ]
         }
         calculator._get_transition_stats = AsyncMock(return_value=transition_stats)
-        
+
         # Mock _analyze_transition_difficulty with AsyncMock to return the enum instead of string
         calculator._analyze_transition_difficulty = AsyncMock(return_value=(
             TransitionDifficulty.MODERATE,  # Use enum instead of string
@@ -8427,10 +8427,10 @@ Test buffer calculation with transition history.
                 "difficulty_score": 4.4
             }
         ))
-        
+
         # Calculate buffer
         buffer = await calculator.calculate_buffer("task-1", "task-2")
-        
+
         # Verify result
         assert buffer["buffer_minutes"] >= calculator.min_buffer_minutes
         assert "transition_difficulty" in buffer
@@ -8466,7 +8466,7 @@ Test updating the model with a new transition observation.
         """Test updating the model with a new transition observation."""
         # Mock _get_task (not _get_tasks) to return task objects
         original_get_task = calculator._get_task
-        
+
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
                 return create_mock_task_model(
@@ -8479,20 +8479,20 @@ Test updating the model with a new transition observation.
                     user_id="test-user-1"
                 )
             return None
-        
+
         calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)
-        
+
         # Mock _store_transition_observation
         calculator._store_transition_observation = AsyncMock()
-        
+
         try:
             # Update with observation
             result = await calculator.update_with_observation("task-1", "task-2", 18.5)
-            
+
             # Verify method calls - it's called 4 times because calculate_buffer also calls it
             assert calculator._get_task.call_count >= 2
             calculator._store_transition_observation.assert_called_once()
-            
+
             # Check the result
             assert result["current_task_id"] == "task-1"
             assert result["next_task_id"] == "task-2"
@@ -8531,7 +8531,7 @@ Test calculating buffers for a sequence of tasks.
             {"buffer_minutes": 15.0},
             {"buffer_minutes": 12.0}
         ]
-    
+
         # Custom implementation of calculate_buffers_for_task_sequence
         async def calculate_buffers_for_task_sequence(task_ids):
             result = []
@@ -8539,11 +8539,11 @@ Test calculating buffers for a sequence of tasks.
                 buffer = await calculator.calculate_buffer(task_ids[i], task_ids[i + 1])
                 result.append(buffer["buffer_minutes"])
             return result
-            
+
         # Calculate buffers for sequence
         task_ids = ["task-1", "task-2", "task-3", "task-4"]
         buffers = await calculate_buffers_for_task_sequence(task_ids)
-        
+
         # Verify result
         assert len(buffers) == 3
         assert buffers == [10.0, 15.0, 12.0]
@@ -8574,21 +8574,21 @@ Test analyzing transition difficulty.
             energy_required=2,
             focus_required=3
         )
-        
+
         task2 = create_mock_task_model(
             location="office",
             tools_needed=["whiteboard", "projector"],
             energy_required=4,
             focus_required=5
         )
-        
+
         # Create async function to call _analyze_transition_difficulty
         async def run_analysis():
             return await calculator._analyze_transition_difficulty(task1, task2)
-            
+
         # Run analysis
         difficulty, result = asyncio.run(run_analysis())
-        
+
         # Verify result
         assert difficulty in TransitionDifficulty
         assert "location_change" in result
@@ -8630,20 +8630,20 @@ Test analyzing context changes between tasks.
             tools_needed=["computer"],
             category="work"
         )
-        
+
         task2 = create_mock_task_model(
             location="home",  # Same location
             tools_needed=["computer", "notebook"],  # Different tools
             category="personal"  # Different category
         )
-        
+
         # Create async function to call _calculate_context_changes
         async def run_analysis():
             return await calculator._calculate_context_changes(task1, task2)
-            
+
         # Run analysis
         changes = asyncio.run(run_analysis())
-        
+
         # Verify result
         assert "location" in changes
         assert changes["location"]["change_factor"] == 0.0  # Same location
@@ -8678,15 +8678,15 @@ Test calculating energy shift between tasks.
         # Create tasks with different energy requirements
         task1 = create_mock_task_model(energy_required=2)
         task2 = create_mock_task_model(energy_required=4)
-        
+
         # Create async function to call _calculate_context_changes
         async def run_analysis():
             changes = await calculator._calculate_context_changes(task1, task2)
             return changes[ContextChangeType.ENERGY_LEVEL.value]["change_factor"]
-            
+
         # Test with energy increase
         energy_shift = asyncio.run(run_analysis())
-        
+
         # Verify results
         assert energy_shift > 0.0  # Energy increased, should be positive
 ```
@@ -8717,15 +8717,15 @@ Test calculating mental context shift between tasks.
             focus_type="creative",
             category="personal"
         )
-        
+
         # Create async function to call _calculate_context_changes
         async def run_analysis():
             changes = await calculator._calculate_context_changes(task1, task2)
             return changes[ContextChangeType.MENTAL_CONTEXT.value]["change_factor"]
-            
+
         # Test with focus type and category change
         mental_shift = asyncio.run(run_analysis())
-        
+
         # Verify results
         assert mental_shift > 0.0  # Mental context changed, should be positive
 ```
@@ -8747,7 +8747,7 @@ Test retrieving tasks from the database.
 ```python
     async def test_get_task(self, calculator):
         """Test retrieving tasks from the database."""
-        
+
         # Mock up a task directly in the db fixture
         if hasattr(calculator.db, 'tasks'):
             # Use the mock db's tasks dictionary directly if it exists
@@ -8757,10 +8757,10 @@ Test retrieving tasks from the database.
                     user_id="test-user-1"
                 )
             }
-        
-        # Directly mock the _get_task method just for this test 
+
+        # Directly mock the _get_task method just for this test
         original_get_task = calculator._get_task
-        
+
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
                 return create_mock_task_model(
@@ -8768,20 +8768,20 @@ Test retrieving tasks from the database.
                     user_id="test-user-1"
                 )
             return None
-        
+
         calculator._get_task = mock_get_task_side_effect
-        
+
         try:
             # Test with existing task
             task = await calculator._get_task("task-1")
-            
+
             # Verify result
             assert task is not None
             assert task.id == "task-1"
-            
+
             # Test with non-existent task
             task = await calculator._get_task("non-existent-task")
-            
+
             # Verify result
             assert task is None
         finally:
@@ -8820,13 +8820,13 @@ Test retrieving transition statistics.
                 "predicted_minutes": 15
             }
         ]
-        
+
         # Create an async method that simulates the internal method that gets transition history
         calculator._get_transition_history = AsyncMock(return_value=transitions)
-        
+
         # Call method
         stats = await calculator.get_user_transition_stats(user_id)
-        
+
         # Verify
         assert stats is not None
         assert "average_transition_time" in stats
@@ -8856,13 +8856,13 @@ Test saving a transition observation.
         next_task_id = "task-2"
         predicted_minutes = 15
         actual_minutes = 20
-        
+
         # Mock methods
         calculator._store_transition_observation = AsyncMock()
-        
+
         # Mock _get_task to return task objects
         original_get_task = calculator._get_task
-        
+
         async def mock_get_task_side_effect(task_id):
             if task_id == "task-1":
                 return create_mock_task_model(
@@ -8875,28 +8875,28 @@ Test saving a transition observation.
                     user_id="test-user-1"
                 )
             return None
-        
+
         calculator._get_task = AsyncMock(side_effect=mock_get_task_side_effect)
-        
+
         # Make sure calculate_buffer returns a valid result
         calculator.calculate_buffer = AsyncMock(return_value={"buffer_minutes": 15})
-        
+
         try:
             # Test - update signature to match actual method
             result = await calculator.update_with_observation(
-                current_task_id=current_task_id, 
-                next_task_id=next_task_id, 
+                current_task_id=current_task_id,
+                next_task_id=next_task_id,
                 actual_transition_minutes=actual_minutes,
                 user_id=user_id
             )
-            
+
             # Verify the method completed successfully
             assert isinstance(result, dict)
             assert "current_task_id" in result
             assert "next_task_id" in result
             assert result["current_task_id"] == current_task_id
             assert result["next_task_id"] == next_task_id
-            
+
             # The _store_transition_observation should have been called
             assert calculator._store_transition_observation.call_count >= 1
         finally:
@@ -8942,27 +8942,27 @@ Test saving and loading the calculator.
             "energy_level": 1.4
         }
         calculator.adaptation_rate = 0.2
-        
+
         # Create temp file for saving
         with tempfile.NamedTemporaryFile(delete=False) as temp:
             filepath = temp.name
-            
+
             # Save calculator
             calculator.save(filepath)
-            
+
             # Check that file exists and has content
             assert os.path.exists(filepath)
             assert os.path.getsize(filepath) > 0
-            
+
             # Load calculator
             loaded_calculator = TimeBufferCalculator.load(filepath)
-            
+
             # Verify loaded parameters
             assert loaded_calculator.min_buffer_minutes == calculator.min_buffer_minutes
             assert loaded_calculator.base_transition_times == calculator.base_transition_times
             assert loaded_calculator.context_change_weights == calculator.context_change_weights
             assert loaded_calculator.adaptation_rate == calculator.adaptation_rate
-            
+
             # Clean up
             os.unlink(filepath)
 ```
@@ -8995,7 +8995,7 @@ Test impact of context change weights.
         assert "tools" in calculator.context_change_weights
         assert "mental_context" in calculator.context_change_weights
         assert "energy_level" in calculator.context_change_weights
-        
+
         # Test the _calculate_context_impact_factor method
         context_changes = {
             "location": {"change_factor": 1.0, "details": {}},
@@ -9003,11 +9003,11 @@ Test impact of context change weights.
             "mental_context": {"change_factor": 0.0, "details": {}},
             "energy_level": {"change_factor": 0.0, "details": {}}
         }
-        
+
         # Should increase the factor based on the changes
         impact_factor = calculator._calculate_context_impact_factor(context_changes)
         assert impact_factor > 1.0
-        
+
         # Empty changes should result in no impact
         assert calculator._calculate_context_impact_factor({}) == 1.0
 ```
@@ -9060,7 +9060,7 @@ Test adaptation rate for transition time updates.
         """Test adaptation rate for transition time updates."""
         # Verify adaptation rate is set
         assert calculator.adaptation_rate > 0
-        assert calculator.adaptation_rate < 1.0 
+        assert calculator.adaptation_rate < 1.0
 ```
 
 **Assertions:**
@@ -9091,7 +9091,7 @@ Test analyzing context changes between tasks.
             focus_required=5,
             focus_type="analytical"
         )
-        
+
         to_task = create_mock_task_model(
             task_id="task-2",
             category="personal",
@@ -9101,13 +9101,13 @@ Test analyzing context changes between tasks.
             focus_required=3,
             focus_type="creative"
         )
-        
+
         # Run analysis synchronously through an async wrapper
         async def run_analysis():
             return await calculator._analyze_context_changes(from_task, to_task)
-        
+
         result = asyncio.run(run_analysis())
-        
+
         # Verify result structure
         assert isinstance(result, dict)
         assert ContextChangeType.LOCATION.value in result
@@ -9115,17 +9115,17 @@ Test analyzing context changes between tasks.
         assert ContextChangeType.MENTAL_CONTEXT.value in result
         assert ContextChangeType.ENERGY_LEVEL.value in result
         assert "total_context_change_score" in result
-        
+
         # Verify sensible values
         assert result[ContextChangeType.LOCATION.value]["change_factor"] > 0  # Different locations
         assert result[ContextChangeType.TOOLS.value]["change_factor"] > 0  # Different tools
         assert result[ContextChangeType.MENTAL_CONTEXT.value]["change_factor"] > 0  # Different categories
         assert result["total_context_change_score"] > 0
-        
+
         # Test with identical tasks (should have minimal context change)
         async def run_same_analysis():
             return await calculator._analyze_context_changes(from_task, from_task)
-            
+
         same_result = asyncio.run(run_same_analysis())
         assert same_result["total_context_change_score"] < result["total_context_change_score"]
 ```
@@ -9232,7 +9232,7 @@ Test detecting current stress levels.
             user_id="user-123",
             resting_heart_rate=65
         )
-        
+
         # Mock recent health metrics
         metrics = [
             MockHealthMetrics(
@@ -9254,19 +9254,19 @@ Test detecting current stress levels.
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Mock methods
         detector._get_user = AsyncMock(return_value=user)
         detector._get_recent_health_metrics = AsyncMock(return_value=metrics)
         detector._determine_stress_trend = AsyncMock(return_value="stable")
-        
+
         # Test the method
         result = await detector.detect_current_stress("user-123")
-        
+
         # Verify method calls
         detector._get_user.assert_called_once_with("user-123")
         detector._get_recent_health_metrics.assert_called_once_with("user-123")
-        
+
         # Verify result structure
         assert "overall_stress_level" in result
         assert "stress_score" in result
@@ -9274,7 +9274,7 @@ Test detecting current stress levels.
         assert "time_impact_factor" in result
         assert "trend" in result
         assert "analysis_timestamp" in result
-        
+
         # Verify sensible values
         assert isinstance(result["stress_score"], int)
         assert 0 <= result["stress_score"] <= 100
@@ -9309,13 +9309,13 @@ Test detecting stress with no metrics available.
         # Mock user retrieval
         user = create_mock_user(user_id="user-123")
         detector._get_user = AsyncMock(return_value=user)
-        
+
         # Mock empty metrics
         detector._get_recent_health_metrics = AsyncMock(return_value=[])
-        
+
         # Test the method
         result = await detector.detect_current_stress("user-123")
-        
+
         # Verify result contains expected fallback values
         assert "error" in result
         assert result["overall_stress_level"] == "low"
@@ -9350,7 +9350,7 @@ Test getting stress-based adjustment factor for a task.
             difficulty=4,  # Higher difficulty
             focus_required=5  # High focus requirement
         )
-        
+
         # Mock methods
         detector._get_task = AsyncMock(return_value=task)
         detector.detect_current_stress = AsyncMock(return_value={
@@ -9361,14 +9361,14 @@ Test getting stress-based adjustment factor for a task.
             "detected_stressors": []
         })
         detector._calculate_task_stress_sensitivity = MagicMock(return_value=0.7)
-        
+
         # Test the method
         result = await detector.get_task_stress_adjustment("task-123")
-        
+
         # Verify method calls
         detector._get_task.assert_called_once_with("task-123")
         detector.detect_current_stress.assert_called_once_with("user-123")
-        
+
         # Verify result is a sensible adjustment factor
         assert isinstance(result, float)
         assert 1.0 <= result <= 2.0
@@ -9412,10 +9412,10 @@ Test analyzing physiological stress from health metrics.
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_physiological_stress(metrics, resting_hr=65)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "physiological"
@@ -9424,7 +9424,7 @@ Test analyzing physiological stress from health metrics.
         assert "details" in result
         assert "heart_rate" in result["details"]
         assert "hrv" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
         assert result["details"]["heart_rate"]["value"] == 90  # Latest value
@@ -9494,17 +9494,17 @@ Test analyzing environmental stress from metrics.
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_environmental_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "environmental"
         assert "stress_level" in result
         assert "stress_score" in result
         assert "details" in result
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
 ```
@@ -9546,10 +9546,10 @@ Test analyzing cognitive stress from focus metrics.
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_cognitive_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "cognitive"
@@ -9557,7 +9557,7 @@ Test analyzing cognitive stress from focus metrics.
         assert "stress_score" in result
         assert "details" in result
         assert "focus_level" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
 ```
@@ -9603,10 +9603,10 @@ Test analyzing emotional stress from mood and anxiety metrics.
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_emotional_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "emotional"
@@ -9615,7 +9615,7 @@ Test analyzing emotional stress from mood and anxiety metrics.
         assert "details" in result
         assert "mood_level" in result["details"]
         assert "anxiety_level" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
 ```
@@ -9662,15 +9662,15 @@ Test calculating overall stress from multiple stressors.
                 "stress_score": 25
             }
         ]
-        
+
         # Test the method
         stress_score, stress_level = detector._calculate_overall_stress(stressors)
-        
+
         # Verify results
         assert isinstance(stress_score, int)
         assert 0 <= stress_score <= 100
         assert stress_level in ["low", "moderate", "high", "extreme"]
-        
+
         # Test with empty stressors
         empty_score, empty_level = detector._calculate_overall_stress([])
         assert empty_score == 0
@@ -9702,7 +9702,7 @@ Test calculating time impact factor from stress score.
         assert detector._calculate_stress_time_impact(0) == 1.0  # No stress = no impact
         assert detector._calculate_stress_time_impact(50) == 1.5  # Moderate stress = 50% more time
         assert detector._calculate_stress_time_impact(100) == 2.0  # Extreme stress = double time
-        
+
         # Test with values in between
         impact_25 = detector._calculate_stress_time_impact(25)
         impact_75 = detector._calculate_stress_time_impact(75)
@@ -9760,12 +9760,12 @@ Test saving and loading model parameters.
         # Setup custom thresholds
         detector.stress_threshold_hr = {"low": 0.15, "moderate": 0.25, "high": 0.35, "extreme": 0.45}
         detector.lookback_period = 36
-        
+
         # Save to a temporary file
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as temp:
             filepath = temp.name
             detector.save(filepath)
-            
+
             # Verify file exists and contains data
             assert os.path.exists(filepath)
             with open(filepath, 'r') as f:
@@ -9773,14 +9773,14 @@ Test saving and loading model parameters.
                 assert "stress_threshold_hr" in data
                 assert "lookback_period" in data
                 assert data["lookback_period"] == 36
-        
+
         # Load parameters to a new detector
         loaded_detector = ContextualStressorDetector.load(filepath)
-        
+
         # Verify loaded parameters match saved ones
         assert loaded_detector.stress_threshold_hr == detector.stress_threshold_hr
         assert loaded_detector.lookback_period == detector.lookback_period
-        
+
         # Clean up
         os.unlink(filepath)
 ```
@@ -9815,7 +9815,7 @@ def mock_components():
          patch("app.ml.stochastic_time_estimation.NLPComplexityAnalyzer") as mock_nca, \
          patch("app.ml.stochastic_time_estimation.ContextualStressorDetector") as mock_csd, \
          patch("app.ml.stochastic_time_estimation.TimeBufferCalculator") as mock_tbc:
-        
+
         # Configure mock instances
         mock_bdp_instance = MagicMock()
         mock_bdp_instance.predict = AsyncMock()  # Replace with AsyncMock
@@ -9824,7 +9824,7 @@ def mock_components():
             "confidence_interval": (45.0, 75.0),
             "factors": {"complexity": 1.2, "user_history": 1.1}
         }
-        
+
         mock_nca_instance = MagicMock()
         mock_nca_instance.analyze_task = AsyncMock()  # Replace with AsyncMock
         mock_nca_instance.analyze_task.return_value = {
@@ -9835,7 +9835,7 @@ def mock_components():
         }
         mock_nca_instance.get_time_factor = AsyncMock()  # Replace with AsyncMock
         mock_nca_instance.get_time_factor.return_value = 1.2
-        
+
         mock_csd_instance = MagicMock()
         mock_csd_instance.detect_current_stress = AsyncMock()  # Replace with AsyncMock
         mock_csd_instance.detect_current_stress.return_value = {
@@ -9845,19 +9845,19 @@ def mock_components():
         }
         mock_csd_instance.get_task_stress_adjustment = AsyncMock()  # Replace with AsyncMock
         mock_csd_instance.get_task_stress_adjustment.return_value = 1.3
-        
+
         mock_tbc_instance = MagicMock()
         mock_tbc_instance.calculate_buffer = AsyncMock()  # Replace with AsyncMock
         mock_tbc_instance.calculate_buffer.return_value = 15.0
         mock_tbc_instance.calculate_buffers_for_task_sequence = AsyncMock()  # Replace with AsyncMock
         mock_tbc_instance.calculate_buffers_for_task_sequence.return_value = [10.0, 15.0, 12.0]
-        
+
         # Configure mock constructors to return mock instances
         mock_bdp.return_value = mock_bdp_instance
         mock_nca.return_value = mock_nca_instance
         mock_csd.return_value = mock_csd_instance
         mock_tbc.return_value = mock_tbc_instance
-        
+
         yield {
             "bayesian_predictor": mock_bdp_instance,
             "nlp_analyzer": mock_nca_instance,
@@ -9895,31 +9895,31 @@ Test the complete estimation pipeline from task creation to schedule.
             description="Meeting with the development team",
             estimated_duration=30.0
         )
-        
+
         user = create_mock_user(user_id="test-user-1")
-        
+
         # Get components
         bdp = mock_components["bayesian_predictor"]
         nca = mock_components["nlp_analyzer"]
         csd = mock_components["stressor_detector"]
         tbc = mock_components["buffer_calculator"]
-        
+
         # Simulate the estimation pipeline
-        
+
         # Step 1: Analyze task complexity
         complexity_results = []
         for task in [task1, task2, task3]:
             # Access dictionary key rather than attribute
             complexity_result = await nca.analyze_task(task["id"])
             complexity_results.append(complexity_result)
-            
+
         # Step 2: Get duration predictions
         duration_predictions = []
         for task in [task1, task2, task3]:
             # Access dictionary key rather than attribute
             prediction = await bdp.predict(task["id"])
             duration_predictions.append(prediction)
-        
+
         # Step 3: Apply stress adjustments
         stress_result = await csd.detect_current_stress(user.id)
         adjusted_durations = []
@@ -9927,15 +9927,15 @@ Test the complete estimation pipeline from task creation to schedule.
             task_adjustment = await csd.get_task_stress_adjustment(task["id"])
             adjusted_duration = prediction["estimated_duration"] * task_adjustment
             adjusted_durations.append(adjusted_duration)
-        
+
         # Step 4: Calculate transition buffers
         task_sequence = [task1["id"], task2["id"], task3["id"]]
         transition_buffers = await tbc.calculate_buffers_for_task_sequence(task_sequence)
-        
+
         # Step 5: Create the final schedule
         schedule = []
         current_time = datetime.now().replace(microsecond=0)
-        
+
         for i, (task, duration) in enumerate(zip([task1, task2, task3], adjusted_durations)):
             # Add task to schedule
             end_time = current_time + timedelta(minutes=int(duration))
@@ -9945,23 +9945,23 @@ Test the complete estimation pipeline from task creation to schedule.
                 "end_time": end_time,
                 "duration_minutes": int(duration)
             })
-            
+
             # Add transition buffer if not the last task
             if i < len(transition_buffers):
                 buffer_minutes = transition_buffers[i]
                 current_time = end_time + timedelta(minutes=int(buffer_minutes))
             else:
                 current_time = end_time
-        
+
         # Verify the results
-        
+
         # Check if all tasks are in the schedule
         assert len(schedule) == 3
-        
+
         # Check if durations were adjusted
         for i, original_task in enumerate([task1, task2, task3]):
             assert schedule[i]["duration_minutes"] != int(original_task["estimated_duration"])
-        
+
         # Check if timings are consistent
         for i in range(1, len(schedule)):
             previous_end = schedule[i-1]["end_time"]
@@ -9969,7 +9969,7 @@ Test the complete estimation pipeline from task creation to schedule.
             assert current_start > previous_end
             buffer = (current_start - previous_end).total_seconds() / 60
             assert buffer > 0
-            
+
         # Verify all components were called
         assert nca.analyze_task.call_count == 3
         assert bdp.predict.call_count == 3
@@ -10009,17 +10009,17 @@ Test how different stress levels impact duration estimates.
             description="Complete a detailed analysis report",
             estimated_duration=60.0
         )
-        
+
         # Get components
         bdp = mock_components["bayesian_predictor"]
         csd = mock_components["stressor_detector"]
-        
+
         # Configure stress detector for different stress levels
         stress_levels = ["low", "moderate", "high", "extreme"]
         time_impacts = [1.05, 1.3, 1.6, 2.0]
-        
+
         durations = []
-        
+
         for stress_level, time_impact in zip(stress_levels, time_impacts):
             # Update the mock to return different stress levels
             csd.detect_current_stress.return_value = {
@@ -10028,17 +10028,17 @@ Test how different stress levels impact duration estimates.
                 "time_impact_factor": time_impact
             }
             csd.get_task_stress_adjustment.return_value = time_impact
-            
+
             # Get the prediction and apply stress adjustment
             prediction = await bdp.predict(task["id"])
             task_adjustment = await csd.get_task_stress_adjustment(task["id"])
             adjusted_duration = prediction["estimated_duration"] * task_adjustment
             durations.append(adjusted_duration)
-        
+
         # Verify durations increase with stress level
         for i in range(1, len(durations)):
             assert durations[i] > durations[i-1]
-        
+
         # Verify highest stress level significantly impacts duration
         assert durations[-1] >= durations[0] * 1.5
 ```
@@ -10079,15 +10079,15 @@ Test how task complexity analysis impacts duration estimates.
                 estimated_duration=120.0
             )
         ]
-        
+
         # Get components
         nca = mock_components["nlp_analyzer"]
         bdp = mock_components["bayesian_predictor"]
-        
+
         # Configure complexity analyzer for different complexity levels
         complexity_scores = [0.3, 0.6, 0.9]
         time_impacts = [0.9, 1.2, 1.5]
-        
+
         # Make predictions for each task
         adjusted_durations = []
         for i, task in enumerate(tasks):
@@ -10099,7 +10099,7 @@ Test how task complexity analysis impacts duration estimates.
                 "time_impact": time_impacts[i]
             }
             nca.get_time_factor.return_value = time_impacts[i]
-            
+
             # Configure predictor to take complexity into account
             base_duration = task["estimated_duration"]
             bdp.predict.return_value = {
@@ -10107,11 +10107,11 @@ Test how task complexity analysis impacts duration estimates.
                 "confidence_interval": (base_duration * 0.8, base_duration * 1.2),
                 "factors": {"complexity": time_impacts[i], "user_history": 1.0}
             }
-            
+
             # Get the prediction
             prediction = await bdp.predict(task["id"])
             adjusted_durations.append(prediction["estimated_duration"])
-        
+
         # Verify that complexity impacts duration
         ratio_simple_to_complex = adjusted_durations[2] / adjusted_durations[0]
         assert ratio_simple_to_complex > (tasks[2]["estimated_duration"] / tasks[0]["estimated_duration"])
@@ -10149,14 +10149,14 @@ Test buffer calculation adapts to task characteristics.
         )
         coffee_task = create_mock_task(
             task_id="coffee-task",
-            location="coffee shop", 
+            location="coffee shop",
             tools_required=["notebook", "phone"],
             energy_required=3
         )
-        
+
         # Get buffer calculator
         tbc = mock_components["buffer_calculator"]
-        
+
         # Configure buffer calculator with different responses for different transitions
         transition_responses = {
             ("home-task", "office-task"): 25.0,  # Location change
@@ -10165,13 +10165,13 @@ Test buffer calculation adapts to task characteristics.
             ("home-task", "home-task"): 5.0,  # Same location
             ("office-task", "office-task"): 5.0,  # Same location
         }
-        
+
         async def mock_calculate_buffer(task1_id, task2_id):
             key = (task1_id, task2_id)
             return transition_responses.get(key, 10.0)
-        
+
         tbc.calculate_buffer.side_effect = mock_calculate_buffer
-        
+
         # Test different transitions
         buffers = []
         for from_task, to_task in [
@@ -10183,20 +10183,20 @@ Test buffer calculation adapts to task characteristics.
         ]:
             buffer = await tbc.calculate_buffer(from_task["id"], to_task["id"])
             buffers.append(buffer)
-        
+
         # Verify location changes require more buffer time
         assert buffers[0] > buffers[3]  # home->office > home->home
         assert buffers[1] > buffers[4]  # office->coffee > office->office
-        
+
         # Test sequence calculation
         task_sequence = [home_task["id"], office_task["id"], coffee_task["id"], home_task["id"]]
         tbc.calculate_buffers_for_task_sequence.return_value = [buffers[0], buffers[1], buffers[2]]
-        
+
         sequence_buffers = await tbc.calculate_buffers_for_task_sequence(task_sequence)
-        
+
         # Verify sequence buffers match individual buffer calculations
         assert sequence_buffers == [buffers[0], buffers[1], buffers[2]]
-        assert sum(sequence_buffers) == buffers[0] + buffers[1] + buffers[2] 
+        assert sum(sequence_buffers) == buffers[0] + buffers[1] + buffers[2]
 ```
 
 **Assertions:**
@@ -10257,13 +10257,13 @@ def mock_imports():
         'app.ml.stochastic_time_estimation.contextual_stressor_detector': create_mock_module('app.ml.stochastic_time_estimation.contextual_stressor_detector'),
         'app.ml.stochastic_time_estimation.time_buffer_calculator': create_mock_module('app.ml.stochastic_time_estimation.time_buffer_calculator')
     }
-    
+
     # Create mock classes for all components
     mocks['app.ml.stochastic_time_estimation'].BayesianDurationPredictor = type('BayesianDurationPredictor', (), {})
     mocks['app.ml.stochastic_time_estimation'].NLPComplexityAnalyzer = type('NLPComplexityAnalyzer', (), {})
     mocks['app.ml.stochastic_time_estimation'].ContextualStressorDetector = type('ContextualStressorDetector', (), {})
     mocks['app.ml.stochastic_time_estimation'].TimeBufferCalculator = type('TimeBufferCalculator', (), {})
-    
+
     # Add StressLevel and StressorType enums
     StressLevel = type('StressLevel', (), {
         'LOW': type('EnumValue', (), {'value': 'low'}),
@@ -10278,10 +10278,10 @@ def mock_imports():
         'EMOTIONAL': type('EnumValue', (), {'value': 'emotional'}),
         'SOCIAL': type('EnumValue', (), {'value': 'social'})
     })
-    
+
     mocks['app.ml.stochastic_time_estimation.contextual_stressor_detector'].StressLevel = StressLevel
     mocks['app.ml.stochastic_time_estimation.contextual_stressor_detector'].StressorType = StressorType
-    
+
     return mocks
 ```
 
@@ -10299,47 +10299,47 @@ Verify that a test file exists and has the expected structure.
 def verify_test_file(component):
     """Verify that a test file exists and has the expected structure."""
     test_file = os.path.join(TEST_DIR, f"test_{component}.py")
-    
+
     if not os.path.exists(test_file):
         print(f"❌ Test file {test_file} does not exist.")
         return False
-    
+
     try:
         with open(test_file, 'r') as f:
             content = f.read()
-        
+
         # Check for test class pattern
         class_pattern = re.compile(r"class\s+Test\w+")
         if not class_pattern.search(content):
             print(f"❌ No test class found in {test_file}.")
             return False
-        
+
         # Check for test method pattern
         method_pattern = re.compile(r"def\s+test_\w+")
         if not method_pattern.search(content):
             print(f"❌ No test methods found in {test_file}.")
             return False
-        
+
         # Check for pytest.fixture
         fixture_pattern = re.compile(r"@pytest\.fixture")
         if not fixture_pattern.search(content):
             print(f"❌ No pytest fixtures found in {test_file}.")
             return False
-        
+
         # Check for pytest.mark.asyncio (for async tests)
         asyncio_pattern = re.compile(r"@pytest\.mark\.asyncio")
         if not asyncio_pattern.search(content):
             print(f"⚠️ No async tests found in {test_file}.")
-        
+
         # Check for assertions
         assert_pattern = re.compile(r"assert\s+")
         if not assert_pattern.search(content):
             print(f"❌ No assertions found in {test_file}.")
             return False
-        
+
         print(f"✅ Test file {test_file} has the expected structure.")
         return True
-    
+
     except Exception as e:
         print(f"❌ Error verifying test file {test_file}: {e}")
         return False
@@ -10365,7 +10365,7 @@ Create an NLPComplexityAnalyzer instance for testing.
         # Create mock spaCy pipeline
         mock_nlp = MagicMock()
         mock_nlp.return_value = MagicMock()
-        
+
         with patch('spacy.load', return_value=mock_nlp):
             return NLPComplexityAnalyzer(
                 db=mock_db,
@@ -10434,19 +10434,19 @@ Test analyzing a task.
             energy_required=3,
             difficulty=4
         )
-        
+
         # Mock _get_task to return our task
         analyzer._get_task = AsyncMock(return_value=task)
-        
+
         # Mock _get_existing_analysis to return None (no existing analysis)
         analyzer._get_existing_analysis = AsyncMock(return_value=None)
-        
+
         # Mock the NLP processing
         mock_doc = MagicMock()
         mock_doc.__len__ = lambda self: 10  # 10 tokens
         analyzer.nlp = MagicMock()
         analyzer.nlp.return_value = mock_doc
-        
+
         # Mock complexity features extraction and scoring
         analyzer._extract_complexity_features = MagicMock()
         analyzer._extract_complexity_features.return_value = {
@@ -10456,29 +10456,29 @@ Test analyzing a task.
             "ambiguity": 0.4,
             "steps_count": 0.5
         }
-        
+
         analyzer._calculate_complexity_score = MagicMock(return_value=0.65)
         analyzer._estimate_cognitive_load = MagicMock(return_value=0.75)
         analyzer._estimate_steps = MagicMock(return_value=4)
         analyzer._calculate_ambiguity = MagicMock(return_value=0.4)
-        
+
         analyzer._determine_focus_requirements = MagicMock()
         analyzer._determine_focus_requirements.return_value = {
             "sustained_attention": 0.8,
             "context_switching": 0.6,
             "detail_orientation": 0.7
         }
-        
+
         analyzer._extract_topics = MagicMock(return_value=["report", "analysis", "project"])
-        
+
         analyzer._calculate_time_impact = MagicMock(return_value=1.4)
-        
+
         # Mock store_analysis
         analyzer._store_analysis = AsyncMock()
-        
+
         # Run the analysis
         result = await analyzer.analyze_task("task-1")
-        
+
         # Verify results
         assert "task_id" in result
         assert result["task_id"] == "task-1"
@@ -10491,7 +10491,7 @@ Test analyzing a task.
         assert "estimated_steps" in result
         assert "focus_requirements" in result
         assert "topics" in result
-        
+
         # Verify method calls
         analyzer._get_task.assert_called_once_with("task-1")
         analyzer._get_existing_analysis.assert_called_once_with("task-1")
@@ -10535,19 +10535,19 @@ Test analyzing a task with existing analysis.
             description="Write a detailed report on project progress",
             category="work"
         )
-        
+
         # Mock _get_task
         analyzer._get_task = AsyncMock(return_value=task)
-        
+
         # Create a mock existing analysis
         mock_analysis = MagicMock()
         mock_analysis.complexity_level = 0.65  # Match the field in TaskAnalysis
         mock_analysis.time_estimate = 45  # Match the field in TaskAnalysis
         mock_analysis.focus_requirements = {"sustained_attention": 0.8, "deep_work": 0.7}
-        
+
         # Mock _get_existing_analysis to return an existing analysis
         analyzer._get_existing_analysis = AsyncMock(return_value=mock_analysis)
-        
+
         # Mock _format_analysis_result
         expected_result = {
             "task_id": "task-1",
@@ -10560,16 +10560,16 @@ Test analyzing a task with existing analysis.
             "topics": ["topic1", "topic2", "topic3"],
             "is_cached": True
         }
-        
+
         # Set up the analyzer's _format_analysis_result to return our expected result
         analyzer._format_analysis_result = MagicMock(return_value=expected_result)
-        
+
         # Run the analysis
         result = await analyzer.analyze_task("task-1")
-        
+
         # Verify results match expected format
         assert result == expected_result
-        
+
         # Verify method calls
         analyzer._get_task.assert_called_once_with("task-1")
         analyzer._get_existing_analysis.assert_called_once_with("task-1")
@@ -10601,12 +10601,12 @@ Test analyzing multiple tasks in a batch.
                 "cognitive_load": 0.75,
                 "time_impact_factor": 1.4
             }
-        
+
         analyzer.analyze_task = AsyncMock(side_effect=mock_analyze)
-        
+
         # Run batch analysis
         results = await analyzer.analyze_tasks_batch(["task-1", "task-2", "task-3"])
-        
+
         # Verify results
         assert len(results) == 3
         assert "task-1" in results
@@ -10614,7 +10614,7 @@ Test analyzing multiple tasks in a batch.
         assert "task-3" in results
         assert results["task-1"]["complexity_score"] == 0.65
         assert results["task-2"]["time_impact_factor"] == 1.4
-        
+
         # Verify method calls
         assert analyzer.analyze_task.call_count == 3
 ```
@@ -10648,13 +10648,13 @@ Test getting time factor for a task.
             "task_id": "task-1",
             "time_impact_factor": 1.4
         }
-        
+
         # Get time factor
         time_factor = await analyzer.get_time_factor("task-1")
-        
+
         # Verify result
         assert time_factor == 1.4
-        
+
         # Verify method call
         analyzer.analyze_task.assert_called_once_with("task-1")
 ```
@@ -10678,27 +10678,27 @@ Test extraction of complexity features from text.
         """Test extraction of complexity features from text."""
         # Setup mock document
         mock_doc = MagicMock()
-        
+
         # Mock token-related properties
         mock_doc.__len__ = lambda self: 20  # 20 tokens
         mock_doc._.readability = MagicMock()
         mock_doc._.readability.flesch_kincaid_grade_level = 10.5
-        
+
         # Simple text for testing
         text = "Write a detailed report on project progress with comprehensive analysis."
-        
+
         # Mock methods used in feature extraction
         analyzer._calculate_ambiguity = MagicMock(return_value=0.4)
-        
+
         # Extract features
         features = analyzer._extract_complexity_features(mock_doc, text)
-        
+
         # Verify features
         assert "sentence_length" in features
         assert "vocabulary_complexity" in features
         assert "syntactic_complexity" in features
         assert "ambiguity" in features
-        
+
         # Features should be normalized between 0 and 1
         for feature_name, value in features.items():
             assert 0.0 <= value <= 1.0
@@ -10733,7 +10733,7 @@ Test calculation of complexity score from features.
             "ambiguity": 0.15,
             "steps_count": 0.1
         }
-        
+
         # Sample features
         features = {
             "sentence_length": 0.7,
@@ -10742,10 +10742,10 @@ Test calculation of complexity score from features.
             "ambiguity": 0.4,
             "steps_count": 0.5
         }
-        
+
         # Calculate score
         score = analyzer._calculate_complexity_score(features)
-        
+
         # Verify score calculation
         expected_score = (
             0.7 * 0.2 +
@@ -10755,7 +10755,7 @@ Test calculation of complexity score from features.
             0.5 * 0.1
         )
         assert round(score, 4) == round(expected_score, 4)
-        
+
         # Score should be between 0 and 1
         assert 0.0 <= score <= 1.0
 ```
@@ -10786,13 +10786,13 @@ Test estimation of cognitive load from text.
             token.is_stop = i % 2 == 0  # Every other token is a stop word
             token._.is_technical = i % 5 == 0  # Every fifth token is technical
             mock_tokens.append(token)
-        
+
         mock_doc.__iter__ = lambda self: iter(mock_tokens)
         mock_doc.__len__ = lambda self: len(mock_tokens)
-        
+
         # Calculate cognitive load
         load = analyzer._estimate_cognitive_load(mock_doc, "Sample text for testing cognitive load estimation.")
-        
+
         # Verify load is between 0 and 1
         assert 0.0 <= load <= 1.0
 ```
@@ -10816,30 +10816,30 @@ Test estimation of steps from text.
         """Test estimation of steps from text."""
         # Setup mock document with step indicators
         mock_doc = MagicMock()
-        
+
         # Text with step indicators
         text = """To complete this task:
         1. First, gather requirements
         2. Then, analyze data
         3. Finally, write report
-        
+
         Also make sure to:
         - Review for errors
         - Get feedback
         """
-        
+
         # Mock necessary properties for step detection
         mock_sents = []
         for i in range(8):
             sent = MagicMock()
             sent.text = f"Step {i+1}: Do something"
             mock_sents.append(sent)
-        
+
         mock_doc.sents = mock_sents
-        
+
         # Estimate steps
         steps = analyzer._estimate_steps(mock_doc, text)
-        
+
         # Verify steps count
         assert steps > 0
         assert isinstance(steps, int)
@@ -10865,7 +10865,7 @@ Test calculation of ambiguity score.
         """Test calculation of ambiguity score."""
         # Setup mock document
         mock_doc = MagicMock()
-        
+
         # Mock necessary properties
         mock_tokens = []
         for i in range(20):
@@ -10873,13 +10873,13 @@ Test calculation of ambiguity score.
             # Ambiguous words typically have multiple meanings
             token._.has_multiple_meanings = i % 3 == 0  # Every third token is ambiguous
             mock_tokens.append(token)
-        
+
         mock_doc.__iter__ = lambda self: iter(mock_tokens)
         mock_doc.__len__ = lambda self: len(mock_tokens)
-        
+
         # Calculate ambiguity
         ambiguity = analyzer._calculate_ambiguity(mock_doc, "Sample text with some ambiguous terms.")
-        
+
         # Verify ambiguity score is between 0 and 1
         assert 0.0 <= ambiguity <= 1.0
 ```
@@ -10903,19 +10903,19 @@ Test determination of focus requirements.
         """Test determination of focus requirements."""
         # Mock document
         mock_doc = MagicMock()
-        
+
         # Call the method
         focus_reqs = analyzer._determine_focus_requirements(
-            mock_doc, 
-            complexity_score=0.7, 
+            mock_doc,
+            complexity_score=0.7,
             cognitive_load=0.8
         )
-        
+
         # Verify focus requirements
         assert "sustained_attention" in focus_reqs
         assert "context_switching" in focus_reqs
         assert "detail_orientation" in focus_reqs
-        
+
         # Factors should be between 0 and 1
         for factor, value in focus_reqs.items():
             assert 0.0 <= value <= 1.0
@@ -10943,19 +10943,19 @@ Test extraction of topics from text.
         """Test extraction of topics from text."""
         # Create a real list of expected topics (matching the default values)
         expected_topics = ["topic1", "topic2", "topic3"]
-        
+
         # Mock document with no noun_chunks attribute
         mock_doc = MagicMock(spec=[])
-        
+
         # Extract topics - should return default values
         extracted_topics = analyzer._extract_topics(mock_doc)
-        
+
         # Verify default topics are returned when doc has no noun_chunks
         assert extracted_topics == expected_topics
-        
+
         # Now test with a properly structured mock doc
         mock_doc_with_chunks = MagicMock()
-        
+
         # Create mock noun chunks
         mock_chunks = []
         topics = ["project", "report", "analysis", "metrics"]
@@ -10965,13 +10965,13 @@ Test extraction of topics from text.
             chunk.root = MagicMock()
             chunk.root.lemma_ = topic  # Set lemma to the topic name
             mock_chunks.append(chunk)
-        
+
         # Set the noun_chunks attribute
         mock_doc_with_chunks.noun_chunks = mock_chunks
-        
+
         # Extract topics
         extracted_topics = analyzer._extract_topics(mock_doc_with_chunks)
-        
+
         # Verify topics from the chunks are returned
         assert len(extracted_topics) > 0
         assert isinstance(extracted_topics, list)
@@ -11007,7 +11007,7 @@ Test calculation of time impact factor.
             estimated_steps=5,
             ambiguity_score=0.4
         )
-        
+
         # Verify impact factor
         assert impact >= 1.0  # Should increase time
         assert isinstance(impact, float)
@@ -11034,27 +11034,27 @@ Test retrieving a task from the database.
         # Mock the db.execute method
         result = MagicMock()
         first_result = MagicMock()
-        
+
         # Setup for existing task
         mock_task = MagicMock()
         mock_task.id = "task-1"
         first_result.first.return_value = (mock_task,)
-        
+
         # For the first call, return an existing task
         analyzer.db.execute = AsyncMock(return_value=first_result)
-        
+
         # Test with existing task
         task = await analyzer._get_task("task-1")
         assert task is not None
         assert task.id == "task-1"
-        
+
         # Setup for non-existent task
         second_result = MagicMock()
         second_result.first.return_value = None
-        
+
         # For the second call, return None (no task found)
         analyzer.db.execute = AsyncMock(return_value=second_result)
-        
+
         # Test with non-existent task
         task = await analyzer._get_task("non-existent-task")
         assert task is None
@@ -11083,21 +11083,21 @@ Test retrieving existing analysis.
         result = MagicMock()
         result.first.return_value = None  # No existing analysis
         analyzer.db.execute = AsyncMock(return_value=result)
-        
+
         # Get analysis
         analysis = await analyzer._get_existing_analysis("task-1")
-        
+
         # Verify result
         assert analysis is None
-        
+
         # Test with existing analysis
         mock_analysis = MagicMock()
         result.first.return_value = (mock_analysis,)
         analyzer.db.execute = AsyncMock(return_value=result)
-        
+
         # Get analysis again
         analysis = await analyzer._get_existing_analysis("task-1")
-        
+
         # Verify result
         assert analysis is not None
         assert analysis == mock_analysis
@@ -11145,7 +11145,7 @@ Test formatting of analysis result.
         """Test formatting of analysis result."""
         # Create mock task and analysis
         task = create_mock_task(task_id="task-1", title="Test Task")
-        
+
         mock_analysis = MagicMock()
         mock_analysis.id = "analysis-1"
         mock_analysis.task_id = "task-1"
@@ -11157,10 +11157,10 @@ Test formatting of analysis result.
         mock_analysis.energy_level_recommendation = "medium"
         mock_analysis.adhd_friendly_score = 0.3
         mock_analysis.created_at = "2023-01-01"
-        
+
         # Format result
         result = analyzer._format_analysis_result(mock_analysis, task)
-        
+
         # Verify result format
         assert "task_id" in result
         assert result["task_id"] == "task-1"
@@ -11214,16 +11214,16 @@ Test saving and loading the model.
             "medium": 1.5,
             "high": 2.0
         }
-        
+
         # Mock json operations
         with patch('json.dump') as mock_dump, \
              patch('builtins.open', create=True) as mock_open, \
              patch('json.load') as mock_load, \
              patch('os.path.exists') as mock_exists:
-            
+
             # Setup for save
             mock_open.return_value.__enter__.return_value = MagicMock()
-            
+
             # Set up for load
             mock_exists.return_value = True
             mock_load.return_value = {
@@ -11231,22 +11231,22 @@ Test saving and loading the model.
                 "cognitive_load_mapping": analyzer.cognitive_load_mapping,
                 "store_analysis": True
             }
-            
+
             # Save the model
             with tempfile.NamedTemporaryFile() as temp:
                 filepath = temp.name
                 analyzer.save(filepath)
-                
+
                 # Verify save was called
                 mock_dump.assert_called()
-                
+
                 # Load the model
                 with patch('spacy.load'):  # Mock spaCy load during model loading
                     loaded_analyzer = NLPComplexityAnalyzer.load(filepath)
-                
+
                 # Verify load was called
                 mock_load.assert_called()
-                
+
                 # Check that loaded model has the same parameters
                 assert loaded_analyzer is not None
 ```
@@ -11814,7 +11814,7 @@ def mock_imports():
         'tensorflow_federated': MockTFF(),
         'app.ml.models.federated_learning_model': Mock(),
     }
-    
+
     with patch.dict('sys.modules', modules):
         yield
 ```
@@ -11891,7 +11891,7 @@ def test_create_preprocessing_function(federated_model):
     """Test creating preprocessing functions for federated learning."""
     preprocess_fn = federated_model.create_preprocessing_function()
     assert callable(preprocess_fn)
-    
+
     # Test the preprocessing function
     sample_data = np.random.rand(10, 10)
     processed_data = preprocess_fn(sample_data)
@@ -11919,12 +11919,12 @@ def test_generate_synthetic_data(federated_model):
     synthetic_data = federated_model.generate_synthetic_data()
     assert isinstance(synthetic_data, dict)
     assert "client_1" in synthetic_data
-    
+
     # Check the data structure
     client_data = synthetic_data["client_1"]
     assert isinstance(client_data, tuple)
     assert len(client_data) == 2
-    
+
     # Check features and labels
     features, labels = client_data
     assert features.shape[1] == federated_model.input_shape[0]
@@ -12031,11 +12031,11 @@ Test saving and loading the model.
 def test_save_and_load_model(federated_model, tmp_path):
     """Test saving and loading the model."""
     save_path = tmp_path / "test_model"
-    
+
     # Save the model
     save_result = federated_model.save_model(save_path)
     assert save_result is True
-    
+
     # Load the model
     load_result = federated_model.load_model(save_path)
     assert load_result is True
@@ -12150,13 +12150,13 @@ Test model architecture structure.
 def test_model_build_structure(lstm_model):
     """Test model architecture structure."""
     model = lstm_model.model
-    
+
     # Check input shape
     assert model.inputs[0].shape.as_list() == [None, 7, 10]
-    
+
     # Check output structure
     assert len(model.outputs) == 5
-    
+
     # Check output names
     output_names = [output.name.split('/')[0] for output in model.outputs]
     expected_names = ['completion_rate', 'focus_level', 'energy_level', 'optimal_time', 'bottleneck_score']
@@ -12184,7 +12184,7 @@ Test bottleneck detection.
 def test_detect_productivity_bottlenecks(lstm_model, historical_blocks):
     """Test bottleneck detection."""
     bottlenecks = lstm_model.detect_productivity_bottlenecks(historical_blocks)
-    
+
     # Should detect hour 12 as a bottleneck
     assert len(bottlenecks) == 1
     assert bottlenecks[0]['hour'] == 12
@@ -12220,19 +12220,19 @@ def test_analyze_flexible_blocks(lstm_model):
         'optimal_time': np.zeros((1, 24)),
         'bottleneck_score': np.array([[0.2]])
     }
-    
+
     # Set optimal hours
     predictions['optimal_time'][0, 9] = 0.9  # 9am
     predictions['optimal_time'][0, 14] = 0.8  # 2pm
     predictions['optimal_time'][0, 16] = 0.7  # 4pm
-    
+
     # Test with time constraints
     recommendations = lstm_model.analyze_flexible_blocks(
         flexible_block_indices=[0, 1, 2],
         predictions=predictions,
         time_constraints={'start_hour': 9, 'end_hour': 17}
     )
-    
+
     assert len(recommendations) == 3
     assert recommendations[0]['recommended_hour'] == 9  # First choice
     assert recommendations[1]['recommended_hour'] == 14  # Second choice
@@ -12267,18 +12267,18 @@ def test_detect_optimal_windows(lstm_model):
         'optimal_time': np.zeros((1, 24)),
         'bottleneck_score': np.array([[0.2]])
     }
-    
+
     # Set optimal hours
     predictions['optimal_time'][0, 9] = 0.9  # 9am
     predictions['optimal_time'][0, 14] = 0.8  # 2pm
     predictions['optimal_time'][0, 16] = 0.6  # 4pm (below threshold)
-    
+
     windows = lstm_model.detect_optimal_windows(
         predictions=predictions,
         threshold=0.7,
         min_focus_level=6.0
     )
-    
+
     assert len(windows) == 2  # Only 9am and 2pm are above threshold
     assert windows[0]['hour'] == 9
     assert windows[0]['confidence'] == 0.9
@@ -12318,7 +12318,7 @@ async def test_get_mental_health_data(db_session, test_user, sample_data):
     # Await the sample_data fixture
     sample = await sample_data
     collector = DataCollector(db_session)
-    
+
     # Create mock data with the expected structure
     mock_data = [
         {
@@ -12331,13 +12331,13 @@ async def test_get_mental_health_data(db_session, test_user, sample_data):
             "timestamp": datetime.now()
         }
     ]
-    
+
     # Replace the method with a mock that returns our data
     collector.get_mental_health_data = AsyncMock(return_value=mock_data)
-    
+
     # Call the method
     data = await collector.get_mental_health_data(test_user.id)
-    
+
     # Verify the result
     assert isinstance(data, list)
     assert len(data) > 0
@@ -12366,7 +12366,7 @@ async def test_get_energy_data(db_session, test_user, sample_data):
     # Await the sample_data fixture
     sample = await sample_data
     collector = DataCollector(db_session)
-    
+
     # Create mock data with the expected structure
     mock_data = [
         {
@@ -12375,13 +12375,13 @@ async def test_get_energy_data(db_session, test_user, sample_data):
             "notes": "Morning energy"
         }
     ]
-    
+
     # Replace the method with a mock that returns our data
     collector.get_energy_data = AsyncMock(return_value=mock_data)
-    
+
     # Call the method
     data = await collector.get_energy_data(test_user.id)
-    
+
     # Verify the result
     assert isinstance(data, list)
     assert len(data) > 0
@@ -12410,7 +12410,7 @@ async def test_get_task_data(db_session, test_user, sample_data):
     # Await the sample_data fixture
     sample = await sample_data
     collector = DataCollector(db_session)
-    
+
     # Create mock data with the expected structure
     mock_data = [
         {
@@ -12424,13 +12424,13 @@ async def test_get_task_data(db_session, test_user, sample_data):
             "created_at": datetime.now()
         }
     ]
-    
+
     # Replace the method with a mock that returns our data
     collector.get_task_data = AsyncMock(return_value=mock_data)
-    
+
     # Call the method
     data = await collector.get_task_data(test_user.id)
-    
+
     # Verify the result
     assert isinstance(data, list)
     assert len(data) > 0
@@ -12459,7 +12459,7 @@ async def test_get_calendar_data(db_session, test_user, sample_data):
     # Await the sample_data fixture
     sample = await sample_data
     collector = DataCollector(db_session)
-    
+
     # Create mock data with the expected structure
     mock_data = [
         {
@@ -12474,13 +12474,13 @@ async def test_get_calendar_data(db_session, test_user, sample_data):
             "energy_level": 3
         }
     ]
-    
+
     # Replace the method with a mock that returns our data
     collector.get_calendar_data = AsyncMock(return_value=mock_data)
-    
+
     # Call the method
     data = await collector.get_calendar_data(test_user.id)
-    
+
     # Verify the result
     assert isinstance(data, list)
     assert len(data) > 0
@@ -12509,45 +12509,45 @@ async def test_prepare_features(db_session, test_user, sample_data):
     # Await the sample_data fixture
     sample = await sample_data
     collector = DataCollector(db_session)
-    
+
     # Mock the get methods to return predefined data
     mental_health_data = [
         {
-            "mood_score": 4, 
-            "focus_level": 3, 
+            "mood_score": 4,
+            "focus_level": 3,
             "anxiety_level": 2,
             "stress_level": 3,
             "energy_level": 4,
             "timestamp": datetime.now()
         },
         {
-            "mood_score": 5, 
-            "focus_level": 4, 
+            "mood_score": 5,
+            "focus_level": 4,
             "anxiety_level": 1,
             "stress_level": 2,
             "energy_level": 5,
             "timestamp": datetime.now() - timedelta(days=1)
         }
     ]
-    
+
     energy_data = [
         {
-            "level": 4, 
-            "time_of_day": "morning", 
+            "level": 4,
+            "time_of_day": "morning",
             "timestamp": datetime.now()
         },
         {
-            "level": 3, 
-            "time_of_day": "evening", 
+            "level": 3,
+            "time_of_day": "evening",
             "timestamp": datetime.now() - timedelta(days=1)
         }
     ]
-    
+
     task_data = [
         {
-            "title": "Task 1", 
-            "priority": 3, 
-            "status": "completed", 
+            "title": "Task 1",
+            "priority": 3,
+            "status": "completed",
             "estimated_duration": 30,
             "actual_duration": 35,
             "energy_required": 4,
@@ -12555,9 +12555,9 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "created_at": datetime.now()
         },
         {
-            "title": "Task 2", 
-            "priority": 4, 
-            "status": "pending", 
+            "title": "Task 2",
+            "priority": 4,
+            "status": "pending",
             "estimated_duration": 60,
             "actual_duration": 0,
             "energy_required": 3,
@@ -12565,11 +12565,11 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "created_at": datetime.now() - timedelta(days=1)
         }
     ]
-    
+
     calendar_data = [
         {
-            "title": "Meeting", 
-            "start_time": datetime.now(), 
+            "title": "Meeting",
+            "start_time": datetime.now(),
             "end_time": datetime.now() + timedelta(hours=1),
             "duration": 60,
             "energy_required": 3,
@@ -12578,8 +12578,8 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "energy_level": 3
         },
         {
-            "title": "Appointment", 
-            "start_time": datetime.now() - timedelta(days=1), 
+            "title": "Appointment",
+            "start_time": datetime.now() - timedelta(days=1),
             "end_time": datetime.now() - timedelta(days=1) + timedelta(hours=1),
             "duration": 60,
             "energy_required": 2,
@@ -12588,20 +12588,20 @@ async def test_prepare_features(db_session, test_user, sample_data):
             "energy_level": 4
         }
     ]
-    
+
     # Patch the collection methods to return our test data
     collector.get_mental_health_data = AsyncMock(return_value=mental_health_data)
     collector.get_energy_data = AsyncMock(return_value=energy_data)
     collector.get_task_data = AsyncMock(return_value=task_data)
     collector.get_calendar_data = AsyncMock(return_value=calendar_data)
-    
+
     # Test feature preparation
     features = collector.prepare_features(mental_health_data, energy_data, task_data, calendar_data)
-    
+
     # Verify the features DataFrame
     assert isinstance(features, pd.DataFrame)
     assert not features.empty
-    
+
     # Check that the index is datetime
     assert isinstance(features.index, pd.DatetimeIndex)
 ```
@@ -12636,7 +12636,7 @@ def mock_imports():
         'app.ml.preprocessing.data_preprocessor': Mock(),
         'app.ml.preprocessing.data_preprocessor.DataPreprocessor': MockDataPreprocessor,
     }
-    
+
     with patch.dict('sys.modules', modules):
         yield
 ```
@@ -12655,7 +12655,7 @@ Patch the EnsembleLearnerModel with our mock implementation.
 def patch_ensemble_learner_model(monkeypatch):
     """Patch the EnsembleLearnerModel with our mock implementation."""
     monkeypatch.setattr(
-        'app.ml.models.ensemble_learner_model.EnsembleLearnerModel', 
+        'app.ml.models.ensemble_learner_model.EnsembleLearnerModel',
         MockEnsembleLearnerModel
     )
 ```
@@ -12674,13 +12674,13 @@ Test that the EnsembleLearnerModel initializes correctly.
 def test_model_initialization():
     """Test that the EnsembleLearnerModel initializes correctly."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     # Test with default parameters
     model = EnsembleLearnerModel()
     assert isinstance(model, EnsembleLearnerModel)
     assert model.feature_models == []
     assert model.meta_model is None
-    
+
     # Test with custom parameters
     custom_model = EnsembleLearnerModel(
         meta_learner_type='random_forest',
@@ -12715,22 +12715,22 @@ Test adding feature models to the ensemble.
 def test_add_feature_model():
     """Test adding feature models to the ensemble."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Create a simple TF model
     input_layer = tf.keras.layers.Input(shape=(5,))
     dense = tf.keras.layers.Dense(10, activation='relu')(input_layer)
     output = tf.keras.layers.Dense(1)(dense)
     tf_model = tf.keras.Model(inputs=input_layer, outputs=output)
-    
+
     # Add the model to the ensemble
     model.add_feature_model(
-        tf_model, 
-        'energy_predictor', 
+        tf_model,
+        'energy_predictor',
         feature_names=['hour', 'day', 'sleep', 'activity', 'stress']
     )
-    
+
     # Verify the model was added
     assert len(model.feature_models) == 1
     assert model.feature_models[0]['name'] == 'energy_predictor'
@@ -12759,16 +12759,16 @@ Test building the meta-learner model.
 def test_build_meta_learner():
     """Test building the meta-learner model."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Build meta learner with default parameters (neural network)
     model.build_meta_learner(input_dim=3)
-    
+
     # Verify the meta learner was built
     assert model.meta_model is not None
     assert isinstance(model.meta_model, tf.keras.Model)
-    
+
     # Test with different meta-learner type
     model = EnsembleLearnerModel(meta_learner_type='linear')
     model.build_meta_learner(input_dim=3)
@@ -12795,29 +12795,29 @@ Test generating predictions from base models.
 def test_generate_base_predictions(sample_features, sample_target):
     """Test generating predictions from base models."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Create and add mock feature models
     for i, feature_type in enumerate(['mental_health', 'energy', 'productivity']):
         # Create a simple model that returns predetermined values
         mock_model = MagicMock()
         mock_model.predict.return_value = np.array([[i + 1]] * 30)  # Each model returns different values
-        
+
         model.add_feature_model(
             mock_model,
             f"{feature_type}_model",
             feature_names=list(sample_features[feature_type].columns[1:])  # Skip timestamp
         )
-    
+
     # Generate base predictions
     with patch.object(model, '_prepare_features_for_model', return_value=np.zeros((30, 5))):
         base_predictions = model.generate_base_predictions(sample_features)
-        
+
         # Verify the predictions
         assert isinstance(base_predictions, np.ndarray)
         assert base_predictions.shape == (30, 3)  # 30 samples, 3 base models
-        
+
         # Each column should contain the corresponding mock prediction value
         assert np.all(base_predictions[:, 0] == 1)
         assert np.all(base_predictions[:, 1] == 2)
@@ -12846,28 +12846,28 @@ Test training the ensemble model.
 def test_train_ensemble(sample_features, sample_target):
     """Test training the ensemble model."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Add mock feature models
     for feature_type in ['mental_health', 'energy', 'productivity']:
         mock_model = MagicMock()
         mock_model.predict.return_value = np.random.rand(30, 1)
-        
+
         model.add_feature_model(
             mock_model,
             f"{feature_type}_model",
             feature_names=list(sample_features[feature_type].columns[1:])
         )
-    
+
     # Mock the methods that would be called during training
     with patch.object(model, 'generate_base_predictions', return_value=np.random.rand(30, 3)), \
          patch.object(model, 'build_meta_learner'), \
          patch.object(tf.keras.Model, 'fit', return_value=MagicMock()):
-        
+
         # Train the ensemble
         history = model.train(sample_features, sample_target['productivity_score'].values)
-        
+
         # Verify the model was trained
         assert history is not None
 ```
@@ -12890,16 +12890,16 @@ Test calculating feature importance.
 def test_feature_importance():
     """Test calculating feature importance."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Add mock feature models with different feature names
     feature_sets = [
         ['mood', 'anxiety', 'stress'],
         ['energy', 'sleep'],
         ['tasks', 'focus', 'distractions']
     ]
-    
+
     for i, features in enumerate(feature_sets):
         mock_model = MagicMock()
         model.add_feature_model(
@@ -12907,18 +12907,18 @@ def test_feature_importance():
             f"model_{i}",
             feature_names=features
         )
-    
+
     # Set mock weights for the meta model
     model.meta_model = MagicMock()
     model.meta_model.get_weights.return_value = [np.array([[0.5], [0.3], [0.2]])]
-    
+
     # Calculate feature importance
     importance = model.calculate_feature_importance()
-    
+
     # Verify the importance results
     assert isinstance(importance, dict)
     assert len(importance) == sum(len(fs) for fs in feature_sets)
-    
+
     # Check that all features are included
     for feature_set in feature_sets:
         for feature in feature_set:
@@ -12947,29 +12947,29 @@ Test generating predictions using the full ensemble.
 def test_predict_combined(sample_features):
     """Test generating predictions using the full ensemble."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Add mock feature models
     for i, feature_type in enumerate(['mental_health', 'energy', 'productivity']):
         mock_model = MagicMock()
         mock_model.predict.return_value = np.ones((30, 1)) * (i + 1)
-        
+
         model.add_feature_model(
             mock_model,
             f"{feature_type}_model",
             feature_names=list(sample_features[feature_type].columns[1:])
         )
-    
+
     # Create mock meta model that returns the sum of base predictions
     model.meta_model = MagicMock()
     model.meta_model.predict.return_value = np.array([[6]] * 30)  # Sum of 1, 2, and 3
-    
+
     # Generate predictions
-    with patch.object(model, 'generate_base_predictions', 
+    with patch.object(model, 'generate_base_predictions',
                      return_value=np.array([[1, 2, 3]] * 30)):
         predictions = model.predict(sample_features)
-        
+
         # Verify predictions
         assert predictions.shape == (30, 1)
         assert np.all(predictions == 6)
@@ -12994,37 +12994,37 @@ Test cross-validation of the ensemble model.
 def test_cross_validation(sample_features, sample_target):
     """Test cross-validation of the ensemble model."""
     from app.ml.models.ensemble_learner_model import EnsembleLearnerModel
-    
+
     model = EnsembleLearnerModel()
-    
+
     # Add mock feature models
     for feature_type in ['mental_health', 'energy', 'productivity']:
         mock_model = MagicMock()
         mock_model.predict.return_value = np.random.rand(30, 1)
-        
+
         model.add_feature_model(
             mock_model,
             f"{feature_type}_model",
             feature_names=list(sample_features[feature_type].columns[1:])
         )
-    
+
     # Mock the train and predict methods
     with patch.object(model, 'train'), \
          patch.object(model, 'predict', return_value=np.random.rand(6, 1)):
-        
+
         # Perform cross-validation
         cv_results = model.cross_validate(
-            sample_features, 
+            sample_features,
             sample_target['productivity_score'].values,
             k_folds=5
         )
-        
+
         # Verify the results
         assert isinstance(cv_results, dict)
         assert 'scores' in cv_results
         assert 'mean' in cv_results
         assert 'std' in cv_results
-        assert len(cv_results['scores']) == 5  # 5-fold CV 
+        assert len(cv_results['scores']) == 5  # 5-fold CV
 ```
 
 **Assertions:**
@@ -13328,17 +13328,17 @@ def test_model_compilation(model_factory):
     # Test mood predictor compilation
     mood_model = model_factory.create_mood_predictor(input_shape)
     assert mood_model.optimizer.__class__.__name__ == "Adam"
-    
+
     # Instead of checking metrics directly, we'll verify the model can be compiled
     assert mood_model._is_compiled
     assert hasattr(mood_model, 'loss')
-    
+
     # Test energy predictor compilation
     energy_model = model_factory.create_energy_predictor(input_shape)
     assert energy_model.optimizer.__class__.__name__ == "Adam"
     assert energy_model._is_compiled
     assert hasattr(energy_model, 'loss')
-    
+
     # Test task predictor compilation
     task_model = model_factory.create_task_predictor(input_shape)
     assert task_model.optimizer.__class__.__name__ == "Adam"
@@ -13351,7 +13351,7 @@ def test_model_compilation(model_factory):
     assert activity_model.optimizer.__class__.__name__ == "Adam"
     assert activity_model._is_compiled
     assert hasattr(activity_model, 'loss')
-    
+
     # Compile the model with metrics if needed
     if not any('accuracy' in metric.name for metric in activity_model.metrics):
         activity_model.compile(
@@ -13399,7 +13399,7 @@ def mock_imports():
         'app.schemas.scheduling_schema.EnergySchedulingPattern': Mock(),
         'app.schemas.scheduling_schema.WorkHours': Mock(),
     }
-    
+
     with patch.dict('sys.modules', modules):
         yield
 ```
@@ -13418,7 +13418,7 @@ Patch the CircadianRhythmModel with our mock implementation.
 def patch_circadian_rhythm_model(monkeypatch):
     """Patch the CircadianRhythmModel with our mock implementation."""
     monkeypatch.setattr(
-        'app.ml.models.energy_optimizer_model.CircadianRhythmModel', 
+        'app.ml.models.energy_optimizer_model.CircadianRhythmModel',
         MockCircadianRhythmModel
     )
 ```
@@ -13437,17 +13437,17 @@ Test that the CircadianRhythmModel initializes correctly with default and custom
 def test_model_initialization():
     """Test that the CircadianRhythmModel initializes correctly with default and custom parameters."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     # Test with default parameters
     model = CircadianRhythmModel()
     assert model.window_size == 24  # Default window size
     assert model.time_features == 3  # Default time features
-    
+
     # Test with custom parameters
     custom_model = CircadianRhythmModel(window_size=48, time_features=5)
     assert custom_model.window_size == 48
     assert custom_model.time_features == 5
-    
+
     # Verify model attributes
     assert hasattr(model, 'model')
     assert model.model is None  # Model should be None until built
@@ -13476,14 +13476,14 @@ Test that the model builds with the correct architecture.
 def test_build_model():
     """Test that the model builds with the correct architecture."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
     model.build()
-    
+
     # Verify the model has been built
     assert model.model is not None
     assert isinstance(model.model, tf.keras.Model)
-    
+
     # Check that the model is compiled with the expected optimizer and loss
     assert model.model._is_compiled
     assert isinstance(model.model.optimizer, tf.keras.optimizers.Adam)
@@ -13510,24 +13510,24 @@ Test the preprocessing of energy data.
 def test_preprocess_energy_data(sample_energy_data):
     """Test the preprocessing of energy data."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
-    
+
     # Process the sample data
     processed_data = model.preprocess_energy_data(sample_energy_data)
-    
+
     # Verify the processed data has the expected structure
     assert isinstance(processed_data, tuple)
     assert len(processed_data) == 2  # Should return X and y
-    
+
     X, y = processed_data
-    
+
     # X should be a 3D array for LSTM input (samples, time steps, features)
     assert len(X.shape) == 3
-    
+
     # y should be a 1D array with energy levels
     assert len(y.shape) == 1
-    
+
     # Check that time features are extracted
     assert X.shape[2] >= 3  # At least hour, day of week, and energy level
 ```
@@ -13554,16 +13554,16 @@ Test the prediction of energy patterns throughout the day.
 def test_predict_energy_patterns(sample_energy_data):
     """Test the prediction of energy patterns throughout the day."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
     model.build()
-    
+
     # Train the model with sample data
     model.train(sample_energy_data)
-    
+
     # Generate predictions for a 24-hour period
     predictions = model.predict_energy_patterns()
-    
+
     # Verify predictions
     assert len(predictions) == 24  # 24 hours
     assert all(0 <= p <= 10 for p in predictions)  # Energy should be in range 0-10
@@ -13588,25 +13588,25 @@ Test detection of optimal time windows for tasks based on energy levels.
 def test_detect_optimal_windows():
     """Test detection of optimal time windows for tasks based on energy levels."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
-    
+
     # Get optimal windows for high energy tasks
     high_energy_windows = model.detect_optimal_windows(energy_threshold=7, min_duration=2)
-    
+
     # Verify high energy windows
     assert isinstance(high_energy_windows, list)
-    
+
     # Check format of windows - each should be (start_hour, end_hour)
     for window in high_energy_windows:
         assert len(window) == 2
         assert 0 <= window[0] < 24
         assert 0 <= window[1] <= 24
         assert window[0] < window[1]  # Start should be before end
-    
+
     # Get optimal windows for medium energy tasks
     medium_energy_windows = model.detect_optimal_windows(energy_threshold=4, min_duration=3)
-    
+
     # Verify medium energy windows
     assert isinstance(medium_energy_windows, list)
 ```
@@ -13634,23 +13634,23 @@ Test optimization of task scheduling based on energy patterns.
 def test_optimize_task_schedule(sample_task_data):
     """Test optimization of task scheduling based on energy patterns."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
-    
+
     # Sample tasks needing scheduling
     tasks_to_schedule = [
         {'id': 1, 'title': 'High Energy Task', 'energy_required': 8, 'duration': 60},
         {'id': 2, 'title': 'Medium Energy Task', 'energy_required': 5, 'duration': 30},
         {'id': 3, 'title': 'Low Energy Task', 'energy_required': 3, 'duration': 45}
     ]
-    
+
     # Get optimized schedule
     schedule = model.optimize_task_schedule(tasks_to_schedule)
-    
+
     # Verify the schedule
     assert isinstance(schedule, list)
     assert len(schedule) == len(tasks_to_schedule)
-    
+
     # Check that each task has been assigned a start time
     for task_schedule in schedule:
         assert 'id' in task_schedule
@@ -13680,22 +13680,22 @@ Test analysis of completed tasks against energy levels.
 def test_analyze_completed_tasks(sample_task_data, sample_energy_data):
     """Test analysis of completed tasks against energy levels."""
     from app.ml.models.energy_optimizer_model import CircadianRhythmModel
-    
+
     model = CircadianRhythmModel()
-    
+
     # Analyze task completion patterns
     analysis = model.analyze_completed_tasks(sample_task_data)
-    
+
     # Verify analysis results
     assert isinstance(analysis, dict)
     assert 'optimal_completion_rate' in analysis
     assert 'suboptimal_completion_rate' in analysis
     assert 'average_success_optimal' in analysis
     assert 'average_success_suboptimal' in analysis
-    
+
     # Rates should be between 0 and 1
     assert 0 <= analysis['optimal_completion_rate'] <= 1
-    assert 0 <= analysis['suboptimal_completion_rate'] <= 1 
+    assert 0 <= analysis['suboptimal_completion_rate'] <= 1
 ```
 
 **Assertions:**
@@ -13731,7 +13731,7 @@ async def test_data_preprocessing():
             "user_id": str(uuid4()),
             "mood": 4,
             "anxiety_level": 2,
-            "focus_level": 3, 
+            "focus_level": 3,
             "energy_level": 4,
             "stress_level": 3,
             "sleep_quality": 7,
@@ -13750,7 +13750,7 @@ async def test_data_preprocessing():
             "date": datetime.now().date()
         },
     ]
-    
+
     energy_data = [
         {
             "user_id": str(uuid4()),
@@ -13769,7 +13769,7 @@ async def test_data_preprocessing():
             "date": datetime.now().date()
         },
     ]
-    
+
     task_data = [
         {
             "user_id": str(uuid4()),
@@ -13794,15 +13794,15 @@ async def test_data_preprocessing():
             "date": datetime.now().date()
         },
     ]
-    
+
     # Create preprocessor with sample data
     preprocessor = DataPreprocessor(
         mental_health_data=mental_health_data,
         energy_data=energy_data,
-        task_data=task_data, 
+        task_data=task_data,
         calendar_data=[]
     )
-    
+
     # Test preprocessing - if the data format doesn't match exactly, at least check that methods run
     features_df = None
     try:
@@ -13811,16 +13811,16 @@ async def test_data_preprocessing():
         # If the preprocessor's exact format isn't matched, it might raise an exception
         # For test purposes, we'll just ensure the methods themselves don't crash
         pass
-    
+
     # Test specific feature preparation methods
     mh_features, mh_targets = preprocessor.prepare_mental_health_features(mental_health_data)
     assert len(mh_features) > 0
     assert len(mh_targets) > 0
-    
+
     energy_features, energy_targets = preprocessor.prepare_energy_features(energy_data)
     assert len(energy_features) > 0
     assert len(energy_targets) > 0
-    
+
     task_features, task_targets = preprocessor.prepare_task_features(task_data)
     assert len(task_features) > 0
     assert len(task_targets) > 0
@@ -14011,4 +14011,3 @@ File: `tests/services/pomodoro/__init__.py`
 ## __init__.py
 
 File: `__tests__/__init__.py`
-

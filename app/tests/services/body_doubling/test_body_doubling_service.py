@@ -265,12 +265,12 @@ class TestBodyDoublingService:
         user3_id = UUID("33333333-3333-3333-3333-333333333333")
         session2_id = UUID("44444444-4444-4444-4444-444444444444")
         session3_id = UUID("55555555-5555-5555-5555-555555555555")
-        
+
         matches = [
             {"user_id": str(user2_id), "score": 15, "session_id": str(session2_id), "activity_type": "WORK"},
             {"user_id": str(user3_id), "score": 12, "session_id": str(session3_id), "activity_type": "STUDY"},
         ]
-        
+
         mock_matching_engine.request_match.return_value = sample_session
         mock_matching_engine.find_matching_users.return_value = matches
 
@@ -290,21 +290,21 @@ class TestBodyDoublingService:
         """Test accepting a match."""
         # Arrange
         mock_matching_engine.accept_match.return_value = sample_session
-        
+
         # Replace the _send_match_acceptance_notifications with a test implementation
         original_method = body_doubling_service._send_match_acceptance_notifications
-        
+
         async def mock_send_notifications(session, partner_id):
             # Call the notification directly for testing
             await mock_notification_service.notify_match_accepted(session.id, partner_id)
-        
+
         body_doubling_service._send_match_acceptance_notifications = mock_send_notifications
         body_doubling_service.matching_engine = mock_matching_engine
-        
+
         try:
             # Act
             result = await body_doubling_service.accept_match(sample_user_id, sample_session_id)
-            
+
             # Assert
             assert result == sample_session
             mock_matching_engine.accept_match.assert_called_once_with(sample_user_id, sample_session_id)
@@ -357,14 +357,14 @@ class TestBodyDoublingService:
             planned_duration=60,
             description="Group study session for math"
         )
-        
+
         # Override the session manager's create_session to return our sample_session
         body_doubling_service.session_manager = mock_session_manager
         mock_session_manager.create_session.return_value = sample_session
-        
+
         # Act
         result = await body_doubling_service.create_group_session(group_data)
-        
+
         # Assert
         assert result == sample_session
         mock_session_manager.create_session.assert_called_once_with(group_data)
@@ -382,10 +382,10 @@ class TestBodyDoublingService:
             "preferred_activity_types": ["WORK", "STUDY"]
         }
         mock_session_manager.get_session_by_id.return_value = sample_session
-        
+
         # Act
         result = await body_doubling_service.update_preferences(sample_session_id, preferences)
-        
+
         # Assert
         mock_session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
         mock_session_manager.update_preferences.assert_called_once_with(sample_session_id, preferences)
@@ -402,11 +402,11 @@ class TestBodyDoublingService:
             "preferred_activity_types": ["WORK", "STUDY"]
         }
         mock_session_manager.get_session_by_id.return_value = None
-        
+
         # Act & Assert
         with pytest.raises(HTTPException) as exc_info:
             await body_doubling_service.update_preferences(sample_session_id, preferences)
-        
+
         # Verify that only the session check was called, not the update
         mock_session_manager.get_session_by_id.assert_called_once_with(sample_session_id)
         mock_session_manager.update_preferences.assert_not_called()
@@ -447,5 +447,5 @@ class TestBodyDoublingService:
         # Assert
         assert result == sample_session
         assert mock_session_manager.get_session_by_id.call_count >= 1
-        # We don't need to check exact call count since the implementation might need 
-        # to call get_session_by_id multiple times 
+        # We don't need to check exact call count since the implementation might need
+        # to call get_session_by_id multiple times

@@ -87,8 +87,8 @@ export const useADHDFocusTracking = () => {
       },
     };
 
-    setSessions(prev => 
-      prev.map(s => 
+    setSessions(prev =>
+      prev.map(s =>
         s.startTime === currentSession.startTime ? updatedSession : s
       )
     );
@@ -217,13 +217,13 @@ export const useADHDFocusTracking = () => {
 const calculateEndEnergyLevel = (session: FocusSession): number => {
   const lastFluctuation = session.energyLevels.fluctuations.slice(-1)[0];
   if (lastFluctuation) return lastFluctuation.level;
-  
+
   // If no fluctuations recorded, estimate based on duration and distractions
-  const duration = session.endTime 
+  const duration = session.endTime
     ? (session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60)
     : 0;
   const distractionImpact = session.distractions.reduce((sum, d) => sum + d.impact, 0);
-  
+
   return Math.max(1, Math.min(10,
     session.energyLevels.start - (duration / 30) - (distractionImpact / 2)
   ));
@@ -246,7 +246,7 @@ const findLongestStreak = (sessions: FocusSession[]): number => {
 
 const analyzeDistractions = (sessions: FocusSession[]): { type: string; frequency: number }[] => {
   const distractionCounts = new Map<string, number>();
-  
+
   sessions.forEach(session => {
     session.distractions.forEach(distraction => {
       const count = distractionCounts.get(distraction.type) || 0;
@@ -261,7 +261,7 @@ const analyzeDistractions = (sessions: FocusSession[]): { type: string; frequenc
 
 const findOptimalConditions = (sessions: FocusSession[]) => {
   const highFocusSessions = sessions.filter(s => s.focusLevel >= 7);
-  
+
   if (highFocusSessions.length === 0) {
     return {
       timeOfDay: [],
@@ -315,7 +315,7 @@ const analyzeProductiveHours = (sessions: FocusSession[]): { hour: number; produ
 const findOptimalTimeRanges = (sessions: FocusSession[]): string[] => {
   // Group sessions by hour and find hours with consistently high focus
   const hourlyFocus = new Map<number, number[]>();
-  
+
   sessions.forEach(session => {
     const hour = session.startTime.getHours();
     const focusLevels = hourlyFocus.get(hour) || [];
@@ -330,7 +330,7 @@ const findOptimalTimeRanges = (sessions: FocusSession[]): string[] => {
 
 const findCommonLocations = (sessions: FocusSession[]): string[] => {
   const locationCounts = new Map<string, number>();
-  
+
   sessions.forEach(session => {
     const count = locationCounts.get(session.environment.location) || 0;
     locationCounts.set(session.environment.location, count + 1);
@@ -345,4 +345,4 @@ const findCommonLocations = (sessions: FocusSession[]): string[] => {
 const average = (numbers: number[]): number => {
   if (numbers.length === 0) return 0;
   return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
-}; 
+};

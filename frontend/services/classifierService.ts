@@ -169,7 +169,7 @@ class ClassifierService {
     // Check semantic similarity with existing patterns
     this.patterns.forEach(pattern => {
       let confidence = this.calculateSemanticSimilarity(input, pattern.pattern);
-      
+
       // Boost confidence based on context matches
       if (contexts.length > 0) {
         const patternContexts = this.analyzeContext(pattern.pattern);
@@ -219,7 +219,7 @@ class ClassifierService {
     };
 
     // Helper to check for phrase matches
-    const containsPhrase = (text: string, phrase: string) => 
+    const containsPhrase = (text: string, phrase: string) =>
       text.toLowerCase().includes(phrase.toLowerCase());
 
     // Join words to check for multi-word phrases
@@ -263,7 +263,7 @@ class ClassifierService {
       if (score > maxScore) {
         maxScore = score;
         bestCategory = category;
-        
+
         // Collect matched terms for the winning category
         Object.values(this.contextualKeywords[category]).flat().forEach((term: string) => {
           if (containsPhrase(text, term)) {
@@ -274,7 +274,7 @@ class ClassifierService {
     });
 
     // Calculate confidence based on score and text length
-    const confidence = maxScore > 0 
+    const confidence = maxScore > 0
       ? Math.min(maxScore / (words.length * 0.75), 1)
       : 0;
 
@@ -401,10 +401,10 @@ class ClassifierService {
   private calculateSemanticSimilarity(text1: string, text2: string): number {
     const words1 = new Set(text1.toLowerCase().split(/\s+/));
     const words2 = new Set(text2.toLowerCase().split(/\s+/));
-    
+
     const intersection = new Set([...words1].filter(word => words2.has(word)));
     const union = new Set([...words1, ...words2]);
-    
+
     return intersection.size / union.size;
   }
 
@@ -469,7 +469,7 @@ class ClassifierService {
     const total = positiveCount + negativeCount;
     if (total === 0) return { sentiment: 'neutral', intensity: 0 };
 
-    const sentiment = positiveCount > negativeCount ? 'positive' : 
+    const sentiment = positiveCount > negativeCount ? 'positive' :
                      negativeCount > positiveCount ? 'negative' : 'neutral';
     const intensity = Math.abs(positiveCount - negativeCount) / words.length;
 
@@ -479,22 +479,22 @@ class ClassifierService {
   // Add context awareness
   private analyzeContext(text: string): string[] {
     const contexts: string[] = [];
-    
+
     // Time context
     if (text.match(/\b(morning|afternoon|evening|night|today|tomorrow|weekend)\b/i)) {
       contexts.push('time_specific');
     }
-    
+
     // Location context
     if (text.match(/\b(at|in|from|to)\s+\w+(?:\s+\w+){0,2}\b/i)) {
       contexts.push('location_specific');
     }
-    
+
     // People context
     if (text.match(/\b(with|and|team|group|colleague|friend|family)\b/i)) {
       contexts.push('people_involved');
     }
-    
+
     // Energy level context
     if (text.match(/\b(tired|energetic|exhausted|fresh|sleepy|alert)\b/i)) {
       contexts.push('energy_related');
@@ -504,4 +504,4 @@ class ClassifierService {
   }
 }
 
-export const classifierService = new ClassifierService(); 
+export const classifierService = new ClassifierService();

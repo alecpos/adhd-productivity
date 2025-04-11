@@ -6,11 +6,11 @@ import { Stack } from 'expo-router';
 export default function CommitmentTrackerScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: 'Commitment Tracker',
           headerShown: true
-        }} 
+        }}
       />
       <CommitmentTracker />
     </SafeAreaView>
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-}); 
+});

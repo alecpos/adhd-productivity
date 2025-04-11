@@ -86,4 +86,4 @@ As we implement new features, we should be aware of these potential sources of t
 
 ---
 
-*This document should be reviewed and updated regularly during sprint planning and retrospectives.* 
+*This document should be reviewed and updated regularly during sprint planning and retrospectives.*

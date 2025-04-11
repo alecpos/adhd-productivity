@@ -32,7 +32,7 @@ class LLMService:
 
     def __init__(self, max_retries: int = 1, retry_delay: int = 5, offline_mode: bool = False):
         """Initialize LLM service with retry logic.
-        
+
         Args:
             max_retries: Maximum number of retries when connecting to HuggingFace
             retry_delay: Delay between retries in seconds
@@ -41,11 +41,11 @@ class LLMService:
         self.api = HfApi()
         self.text_generation_model = None
         self.offline_mode = offline_mode
-        
+
         # Check if OFFLINE_MODE environment variable is set
         if os.environ.get("OFFLINE_MODE", "").lower() in ("true", "1", "yes"):
             self.offline_mode = True
-            
+
         if self.offline_mode:
             logger.info("LLM Service initialized in offline mode")
         else:
@@ -57,7 +57,7 @@ class LLMService:
             try:
                 # First try to get model info to verify access
                 model_info("deepseek-ai/DeepSeek-R1")
-                
+
                 # Then initialize the inference client
                 self.text_generation_model = InferenceClient(
                     model="deepseek-ai/DeepSeek-R1",
@@ -92,7 +92,7 @@ class LLMService:
         if self.offline_mode or not self.text_generation_model:
             logger.warning("Text generation model not available, using fallback")
             return self._fallback_generate_text(prompt, max_length)
-            
+
         try:
             response = self.text_generation_model.text_generation(
                 prompt,
@@ -103,15 +103,15 @@ class LLMService:
                     "do_sample": True
                 }
             )
-            
+
             if isinstance(response, list) and response:
                 return response[0]["generated_text"]
             return None
-            
+
         except Exception as e:
             logger.error(f"Error generating text: {str(e)}")
             return self._fallback_generate_text(prompt, max_length)
-            
+
     def _fallback_generate_text(self, prompt: str, max_length: int = 100) -> str:
         """Fallback text generation when the model is not available."""
         logger.info("Using fallback text generation")
@@ -128,7 +128,7 @@ class LLMService:
         if self.offline_mode or not self.text_generation_model:
             logger.warning("Text generation model not available, using fallback")
             return self._fallback_generate_response(prompt, context, system_prompt)
-        
+
         try:
             # Construct the full prompt
             full_prompt = ""
@@ -152,22 +152,22 @@ class LLMService:
                 inputs=full_prompt,
                 params=generation_params
             )
-            
+
             return response[0]["generated_text"].strip()
-            
+
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
             return self._fallback_generate_response(prompt, context, system_prompt)
-            
+
     def _fallback_generate_response(
-        self, 
-        prompt: str, 
+        self,
+        prompt: str,
         context: Optional[str] = None,
         system_prompt: Optional[str] = None
     ) -> str:
         """Fallback response generation when the model is not available."""
         logger.info("Using fallback response generation")
-        
+
         # Include a generic response that's contextually relevant
         if "analyze" in prompt.lower() or "task complexity" in prompt.lower():
             return "This is a medium complexity task requiring moderate focus."
@@ -182,12 +182,12 @@ class LLMService:
             if self.offline_mode or not self.text_generation_model:
                 logger.warning("Using fallback task complexity analysis")
                 return self._fallback_task_complexity_analysis(task_description)
-                
+
             # Create a structured prompt for task analysis
             analysis_prompt = f"""
             Analyze the following task for ADHD considerations:
             Task: {task_description}
-            
+
             Provide analysis in the following areas:
             1. Task complexity
             2. Focus requirements
@@ -217,11 +217,11 @@ class LLMService:
         except Exception as e:
             logger.error(f"Error analyzing task complexity: {str(e)}")
             return self._fallback_task_complexity_analysis(task_description)
-            
+
     def _fallback_task_complexity_analysis(self, task_description: str) -> Dict[str, Any]:
         """Provide fallback task complexity analysis when model is unavailable."""
         # Simplified heuristic approach based on task description length and keywords
-        
+
         # Determine complexity based on description length
         description_length = len(task_description)
         if description_length < 50:
@@ -233,7 +233,7 @@ class LLMService:
         else:
             complexity = 4
             time_estimate = 45
-            
+
         # Default values as fallback
         return {
             "complexity_level": complexity,
@@ -255,13 +255,13 @@ class LLMService:
             if self.offline_mode or not self.text_generation_model:
                 logger.warning("Using fallback focus strategies")
                 return self._fallback_focus_strategies(user_profile, task_type)
-                
+
             # Create a structured prompt for strategy generation
             strategy_prompt = f"""
             Generate ADHD-friendly focus strategies for:
             Task Type: {task_type}
             User Profile: {user_profile}
-            
+
             Consider:
             1. User's performance history
             2. Preferred work styles
@@ -299,10 +299,10 @@ class LLMService:
         except Exception as e:
             logger.error(f"Error generating focus strategies: {str(e)}")
             return self._fallback_focus_strategies(user_profile, task_type)
-            
+
     def _fallback_focus_strategies(
-        self, 
-        user_profile: Dict[str, Any], 
+        self,
+        user_profile: Dict[str, Any],
         task_type: str
     ) -> List[Dict[str, Any]]:
         """Provide fallback focus strategies when model is unavailable."""
@@ -317,7 +317,7 @@ class LLMService:
                 "tools": ["timer", "noise-canceling headphones"]
             }
         ]
-        
+
         # Add task-specific strategies
         if task_type.lower() in ["creative", "writing", "brainstorming"]:
             common_strategies.append({
@@ -346,7 +346,7 @@ class LLMService:
                 "environment": ["organized workspace", "good lighting"],
                 "tools": ["checklist", "task timer"]
             })
-            
+
         return common_strategies
 
     def is_model_available(self) -> bool:
@@ -358,25 +358,25 @@ class LLMService:
         if self.offline_mode:
             logger.warning("Operating in offline mode, model info not available")
             return {"name": "offline-fallback", "status": "offline"}
-            
+
         try:
             return model_info("deepseek-ai/DeepSeek-R1")
         except Exception as e:
             logger.error(f"Error getting model info: {str(e)}")
             return {"name": "unknown", "status": "error", "error": str(e)}
-            
+
     async def extract_structured_data(self, text: str) -> Dict[str, Any]:
         """Extract structured data from text input."""
         if self.offline_mode or not self.text_generation_model:
             logger.warning("Using fallback structured data extraction")
             return self._fallback_extract_structured_data(text)
-            
+
         try:
             # Create a structured prompt for data extraction
             extraction_prompt = f"""
             Extract structured data from the following text:
             Text: {text}
-            
+
             Extract the following elements if present:
             1. Task names
             2. Dates and times
@@ -390,7 +390,7 @@ class LLMService:
                 prompt=extraction_prompt,
                 params={"temperature": 0.3}
             )
-            
+
             # Mock parsed data (in production, you would parse the actual response)
             return {
                 "confidence": 0.85,
@@ -400,40 +400,40 @@ class LLMService:
                 ],
                 "intent": "task_creation"
             }
-            
+
         except Exception as e:
             logger.error(f"Error extracting structured data: {str(e)}")
             return self._fallback_extract_structured_data(text)
-    
+
     def _fallback_extract_structured_data(self, text: str) -> Dict[str, Any]:
         """Provide fallback structured data extraction when model is unavailable."""
         # Very basic extraction using simple string matching
         entities = []
-        
+
         # Check for basic date keywords
-        date_keywords = ["today", "tomorrow", "monday", "tuesday", "wednesday", 
+        date_keywords = ["today", "tomorrow", "monday", "tuesday", "wednesday",
                          "thursday", "friday", "saturday", "sunday"]
         for keyword in date_keywords:
             if keyword.lower() in text.lower():
                 entities.append({"type": "date", "value": keyword, "confidence": 0.7})
-                
+
         # Check for time patterns (very simplistic)
         if "am" in text.lower() or "pm" in text.lower():
             entities.append({"type": "time", "value": "time_mentioned", "confidence": 0.6})
-            
+
         # Assume task creation intent for simplicity
         return {
             "confidence": 0.6,
             "entities": entities,
             "intent": "task_creation"
         }
-        
+
     async def analyze_text(self, text: str) -> Dict[str, Any]:
         """Analyze text for sentiment, complexity, key phrases, etc."""
         if self.offline_mode or not self.text_generation_model:
             logger.warning("Using fallback text analysis")
             return self._fallback_analyze_text(text)
-            
+
         try:
             # In a real implementation, you would call the LLM here
             # For now, return mock data
@@ -449,26 +449,26 @@ class LLMService:
         except Exception as e:
             logger.error(f"Error analyzing text: {str(e)}")
             return self._fallback_analyze_text(text)
-    
+
     def _fallback_analyze_text(self, text: str) -> Dict[str, Any]:
         """Provide fallback text analysis when model is unavailable."""
         # Very basic analysis
         words = text.split()
         word_count = len(words)
-        
+
         # Simple sentiment based on positive/negative word counts
         positive_words = ["good", "great", "excellent", "happy", "excited", "love", "best"]
         negative_words = ["bad", "terrible", "awful", "sad", "angry", "hate", "worst"]
-        
+
         positive_count = sum(1 for word in words if word.lower() in positive_words)
         negative_count = sum(1 for word in words if word.lower() in negative_words)
-        
+
         # Calculate simple sentiment score
         if positive_count + negative_count > 0:
             sentiment = positive_count / (positive_count + negative_count)
         else:
             sentiment = 0.5  # Neutral
-            
+
         return {
             "sentiment": sentiment,
             "complexity": min(1.0, word_count / 100),  # Simple complexity based on length

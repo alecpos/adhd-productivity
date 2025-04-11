@@ -12,7 +12,7 @@ export class AppError extends Error {
 export const errorHandler = (error: any): AppError => {
     // Convert various error types to AppError
     if (error instanceof AppError) return error;
-    
+
     if (error.response) {
         // API error response
         return new AppError(
@@ -21,7 +21,7 @@ export const errorHandler = (error: any): AppError => {
             error.response.data
         );
     }
-    
+
     if (error.request) {
         // Network error
         return new AppError(
@@ -30,11 +30,11 @@ export const errorHandler = (error: any): AppError => {
             error.request
         );
     }
-    
+
     // Default error
     return new AppError(
         error.message || 'An unknown error occurred',
         'UNKNOWN_ERROR',
         error
     );
-}; 
+};

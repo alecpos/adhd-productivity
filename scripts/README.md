@@ -92,4 +92,4 @@ When creating new scripts:
 - Include proper error handling and exit codes
 - Provide meaningful output and logging
 - Support both interactive and non-interactive usage
-- Add help text for command-line arguments 
+- Add help text for command-line arguments

@@ -238,4 +238,4 @@ A: You can always drag and drop tasks after optimization, lock specific tasks in
 
 **Temporal Pattern**: Recurring patterns in productivity, focus, or task completion over time
 
-**Rebalancing**: The process of rearranging tasks to better align with energy patterns or to accommodate changes 
+**Rebalancing**: The process of rearranging tasks to better align with energy patterns or to accommodate changes

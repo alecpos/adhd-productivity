@@ -49,15 +49,15 @@ function ScheduleView() {
 export default function SchedulingScreen() {
   return (
     <Tabs>
-      <Tabs.Screen 
-        name="schedule" 
+      <Tabs.Screen
+        name="schedule"
         component={ScheduleView}
         options={{
           title: 'My Schedule'
         }}
       />
-      <Tabs.Screen 
-        name="ai-assistant" 
+      <Tabs.Screen
+        name="ai-assistant"
         component={AISchedulingAssistant}
         options={{
           title: 'AI Assistant'
@@ -74,4 +74,4 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
-}); 
+});

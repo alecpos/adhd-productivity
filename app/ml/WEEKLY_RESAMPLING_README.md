@@ -84,4 +84,4 @@ Potential enhancements to the weekly resampling functionality:
 1. Add seasonal analysis (monthly, quarterly patterns)
 2. Implement anomaly detection for unusually difficult transitions
 3. Provide personalized recommendations based on discovered patterns
-4. Integrate with machine learning models for predictive analytics 
+4. Integrate with machine learning models for predictive analytics

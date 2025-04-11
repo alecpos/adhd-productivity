@@ -6,7 +6,7 @@
         <Package stochastic_time_estimation>
           <Module test_bayesian_duration_predictor.py>
             Tests for the Bayesian Duration Predictor
-            
+
             This module contains unit and integration tests for the BayesianDurationPredictor
             class that implements Bayesian inference for task duration prediction.
             <Class TestBayesianDurationPredictor>
@@ -37,7 +37,7 @@
                 Test saving and loading the model.
           <Module test_contextual_stressor_detector.py>
             Tests for the Contextual Stressor Detector module.
-            
+
             This module contains unit and integration tests for the ContextualStressorDetector
             class that detects stress levels from health metrics and wearable data.
             <Class TestContextualStressorDetector>
@@ -70,7 +70,7 @@
                 Test saving and loading model parameters.
           <Module test_integration.py>
             Integration Tests for Stochastic Time Estimation Engine
-            
+
             This module contains integration tests that verify the different components
             of the stochastic time estimation engine work together correctly.
             <Class TestStochasticTimeEstimationIntegration>
@@ -125,7 +125,7 @@
                 Test saving and loading the model.
           <Module test_stochastic_time_estimation_engine.py>
             Tests for the Stochastic Time Estimation Engine
-            
+
             This module contains unit and integration tests for the StochasticTimeEstimationEngine
             class that integrates various predictive components to estimate task durations
             with uncertainty quantification.
@@ -149,7 +149,7 @@
                 Test saving and loading the entire engine state.
           <Module test_time_buffer_calculator.py>
             Tests for the Time Buffer Calculator
-            
+
             This module contains unit and integration tests for the TimeBufferCalculator
             class that calculates buffer times between tasks.
             <Class TestTimeBufferCalculator>

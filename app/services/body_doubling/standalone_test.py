@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Standalone test for Body Doubling AnalyticsService.
 
-This script sets up proper mocks for missing models to avoid 
+This script sets up proper mocks for missing models to avoid
 SQLAlchemy relationship initialization errors.
 """
 
@@ -36,7 +36,7 @@ from app.services.body_doubling.analytics_service import AnalyticsService
 # Mock Body Doubling Session Model
 class MockBodyDoublingSessionModel:
     """Mock for the BodyDoublingSessionModel."""
-    
+
     def __init__(
         self,
         id=None,
@@ -74,37 +74,37 @@ class MockBodyDoublingSessionModel:
 # Mock DB Session
 class MockDBSession:
     """Mock database session for testing without a real database."""
-    
+
     def __init__(self):
         """Initialize with empty collections."""
         self.sessions = {}
-    
+
     async def execute(self, query):
         """Mock query execution."""
         return self
-    
+
     async def commit(self):
         """Mock commit."""
         pass
-    
+
     async def refresh(self, obj):
         """Mock refresh."""
         pass
-    
+
     def scalars(self):
         """Return self for chaining."""
         return self
-    
+
     def all(self):
         """Return all sessions."""
         return list(self.sessions.values())
-    
+
     def scalar_one_or_none(self):
         """Return the session for the given ID."""
         if not self.sessions:
             return None
         return list(self.sessions.values())[0]
-    
+
     def add_session(self, session):
         """Add a session to the mock database."""
         self.sessions[str(session.id)] = session
@@ -113,17 +113,17 @@ class MockDBSession:
 async def test_analytics_service():
     """Test the analytics service with mocked models."""
     print("Starting standalone test for AnalyticsService...")
-    
+
     # Create mock DB session
     db_session = MockDBSession()
-    
+
     # Create analytics service
     analytics_service = AnalyticsService(db_session)
-    
+
     # Create a user and session
     user_id = uuid.uuid4()
     session_id = uuid.uuid4()
-    
+
     # Create test session
     session = MockBodyDoublingSessionModel(
         id=session_id,
@@ -136,16 +136,16 @@ async def test_analytics_service():
         focus_rating=None,
         productivity_rating=None
     )
-    
+
     # Add session to mock DB
     db_session.add_session(session)
-    
+
     # Test calculate trend
     values = [1, 2, 3, 4, 5]
     trend = analytics_service._calculate_trend(values)
     print(f"Trend calculation with increasing values: {trend}")
     assert trend == "improving", f"Expected 'improving' but got '{trend}'"
-    
+
     # Test add feedback
     print("\nTesting add_session_feedback...")
     feedback_data = {
@@ -154,14 +154,14 @@ async def test_analytics_service():
         "distraction_level": 2,
         "notes": "This was a productive test session"
     }
-    
+
     try:
         await analytics_service.add_session_feedback(session_id, user_id, feedback_data)
         print("Successfully added feedback! ✅")
     except Exception as e:
         print(f"Error adding feedback: {e}")
-    
+
     print("\nStandalone test completed successfully!")
 
 if __name__ == "__main__":
-    asyncio.run(test_analytics_service()) 
+    asyncio.run(test_analytics_service())

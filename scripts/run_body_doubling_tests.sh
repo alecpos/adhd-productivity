@@ -132,4 +132,4 @@ python -m pytest "$TEST_DIR" --cov=app.services.body_doubling --cov-report=term-
 echo
 
 echo -e "${GREEN}All tests passed successfully!${NC}"
-echo -e "${CYAN}For more testing options, see scripts/README_TESTS.md${NC}" 
+echo -e "${CYAN}For more testing options, see scripts/README_TESTS.md${NC}"

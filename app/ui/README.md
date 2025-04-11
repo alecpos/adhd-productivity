@@ -96,4 +96,4 @@ The backend UI components integrate with the React Native frontend through:
 - [Template System](../../docs/template_system.md)
 - [Admin Interface Guide](../../docs/admin_interface.md)
 - [Email Template Guide](../../docs/email_templates.md)
-- [UI/UX Guidelines](../../docs/ui_guidelines.md) 
+- [UI/UX Guidelines](../../docs/ui_guidelines.md)

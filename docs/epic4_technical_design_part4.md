@@ -182,40 +182,40 @@ Unit tests cover key algorithmic components:
 ```typescript
 describe('CircadianRhythmModel', () => {
   let model;
-  
+
   beforeEach(() => {
     model = new CircadianRhythmModel(TEST_USER_ID);
     jest.spyOn(model, '_load_base_parameters').mockReturnValue(TEST_BASE_PARAMS);
     jest.spyOn(model, '_load_user_parameters').mockReturnValue(TEST_USER_PARAMS);
   });
-  
+
   describe('predict_energy_levels', () => {
     it('should predict energy levels correctly for morning time', () => {
       const morning = new Date('2023-09-01T09:00:00Z');
       const predictions = model.predict_energy_levels(morning);
-      
+
       expect(predictions.energy_level).toBeCloseTo(7.2, 1);
       expect(predictions.focus_capacity).toBeCloseTo(8.1, 1);
       expect(predictions.creative_capacity).toBeCloseTo(6.5, 1);
       expect(predictions.executive_function_capacity).toBeCloseTo(7.8, 1);
     });
-    
+
     it('should predict energy levels correctly for afternoon slump', () => {
       const afternoon = new Date('2023-09-01T14:30:00Z');
       const predictions = model.predict_energy_levels(afternoon);
-      
+
       expect(predictions.energy_level).toBeCloseTo(5.1, 1);
       expect(predictions.focus_capacity).toBeCloseTo(4.2, 1);
       expect(predictions.creative_capacity).toBeCloseTo(6.8, 1);
       expect(predictions.executive_function_capacity).toBeCloseTo(4.5, 1);
     });
   });
-  
+
   describe('detect_optimal_windows', () => {
     it('should identify optimal focus windows correctly', () => {
       const date = new Date('2023-09-01');
       const windows = model.detect_optimal_windows(date, 'focus_capacity', 0.7);
-      
+
       expect(windows).toHaveLength(2);
       expect(windows[0].start.getHours()).toBe(9);
       expect(windows[0].end.getHours()).toBe(12);
@@ -240,40 +240,40 @@ describe('Schedule Optimization Integration', () => {
   let schedulingService;
   let circadianService;
   let taskService;
-  
+
   beforeEach(async () => {
     // Set up services with test data
     schedulingService = new SchedulingService();
     circadianService = new CircadianModelService();
     taskService = new TaskProfileService();
-    
+
     // Initialize test database
     await setupTestDatabase();
-    
+
     // Mock external dependencies
     jest.spyOn(circadianService, 'predictUserEnergy').mockImplementation(mockPredictUserEnergy);
     jest.spyOn(taskService, 'analyzeTaskCognitiveProfile').mockImplementation(mockAnalyzeTaskProfile);
   });
-  
+
   afterEach(async () => {
     await cleanupTestDatabase();
   });
-  
+
   it('should optimize a schedule using circadian patterns', async () => {
     const userId = 'test-user-123';
     const request = createTestOptimizationRequest();
-    
+
     const result = await schedulingService.optimizeSchedule(userId, request);
-    
+
     expect(result.schedule).toHaveLength(request.tasks.length);
     expect(result.quality_metrics.overall_score).toBeGreaterThan(0.7);
-    
+
     // Check that high-focus tasks are scheduled during peak focus periods
     const highFocusTasks = request.tasks.filter(t => t.focus_required >= 7);
-    const highFocusScheduled = result.schedule.filter(s => 
+    const highFocusScheduled = result.schedule.filter(s =>
       highFocusTasks.some(t => t.id === s.task_id)
     );
-    
+
     for (const item of highFocusScheduled) {
       const startHour = new Date(item.start_time).getHours();
       expect(startHour).toBeWithin([9, 10, 11, 16, 17]);
@@ -313,19 +313,19 @@ export let options = {
 export default function() {
   const BASE_URL = 'https://api-test.adhd-calendar.com/v1';
   const AUTH_TOKEN = `Bearer ${__ENV.AUTH_TOKEN}`;
-  
+
   const params = {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': AUTH_TOKEN,
     },
   };
-  
+
   // Generate a random date range for the next week
   const startDate = new Date();
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + 7);
-  
+
   // Create optimization request
   const optimizationRequest = {
     start_date: startDate.toISOString(),
@@ -336,14 +336,14 @@ export default function() {
       respect_existing_events: true,
     }
   };
-  
+
   // Request optimization
   let response = http.post(
     `${BASE_URL}/scheduling/circadian-optimize`,
     JSON.stringify(optimizationRequest),
     params
   );
-  
+
   check(response, {
     'optimization request successful': (r) => r.status === 200,
     'optimization response contains schedule': (r) => {
@@ -352,7 +352,7 @@ export default function() {
     },
     'response time under 2s': (r) => r.timings.duration < 2000,
   });
-  
+
   // Wait between requests
   sleep(Math.random() * 5 + 5);
 }
@@ -409,13 +409,13 @@ const featureFlags = {
 function isFeatureEnabledForUser(featureName, user) {
   const flag = featureFlags[featureName];
   if (!flag || !flag.enabled) return false;
-  
+
   // Check if user is explicitly enabled
   if (flag.enabledFor.some(group => user.groups.includes(group))) return true;
-  
+
   // Check if user is explicitly disabled
   if (flag.disabledFor.some(group => user.groups.includes(group))) return false;
-  
+
   // Apply percentage rollout
   const userHash = hashUserId(user.id);
   const userPercentile = userHash % 100;
@@ -477,13 +477,13 @@ The rollout includes continuous monitoring and rollback capabilities:
 function evaluateRolloutHealth(phase) {
   const metrics = getMetricsForPhase(phase);
   const criteria = rolloutSchedule.find(p => p.phase === phase).successCriteria;
-  
+
   const healthStatus = {
     pass: true,
     metrics: {},
     recommendations: []
   };
-  
+
   // Check each criterion
   if (metrics.errorRate > criteria.errorRate) {
     healthStatus.pass = false;
@@ -494,7 +494,7 @@ function evaluateRolloutHealth(phase) {
     };
     healthStatus.recommendations.push('Investigate high error rates');
   }
-  
+
   if (metrics.userSatisfaction < criteria.userSatisfaction) {
     healthStatus.pass = false;
     healthStatus.metrics.userSatisfaction = {
@@ -504,27 +504,27 @@ function evaluateRolloutHealth(phase) {
     };
     healthStatus.recommendations.push('Review user feedback');
   }
-  
+
   // Additional checks...
-  
+
   return healthStatus;
 }
 
 function shouldRollback(phase) {
   const health = evaluateRolloutHealth(phase);
-  
+
   // Automatic rollback criteria
   if (!health.pass) {
     const metrics = health.metrics;
-    
+
     // Critical failure conditions
     if (metrics.errorRate && metrics.errorRate.actual > 0.1) return true; // > 10% error rate
     if (metrics.userSatisfaction && metrics.userSatisfaction.actual < 2.5) return true; // < 2.5/5 satisfaction
-    
+
     // Allow for manual review for non-critical failures
     return false;
   }
-  
+
   return false;
 }
 ```
@@ -576,8 +576,8 @@ The following research areas are being explored:
 
 ## Conclusion
 
-The Dynamic Schedule Rebalancing system with Circadian Rhythm Optimization represents a significant advancement in personalized productivity tools. By aligning tasks with individual energy patterns, the system helps users with ADHD manage their unique cognitive patterns more effectively. 
+The Dynamic Schedule Rebalancing system with Circadian Rhythm Optimization represents a significant advancement in personalized productivity tools. By aligning tasks with individual energy patterns, the system helps users with ADHD manage their unique cognitive patterns more effectively.
 
 The technical design outlined in this document provides a robust foundation for implementing, deploying, and evolving this capability. Through a combination of machine learning, reinforcement learning, and user-centered design, the system offers an innovative approach to schedule optimization that adapts to each user's unique patterns.
 
-As the system collects more data and continues to evolve, it will provide increasingly personalized and effective scheduling assistance, helping users achieve their productivity goals while working in harmony with their natural energy patterns. 
+As the system collects more data and continues to evolve, it will provide increasingly personalized and effective scheduling assistance, helping users achieve their productivity goals while working in harmony with their natural energy patterns.

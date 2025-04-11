@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 5 API Reference
 
-**Version**: 1.0  
-**Last Updated**: 2025-06-15  
+**Version**: 1.0
+**Last Updated**: 2025-06-15
 **Target Audience**: Developers integrating with fairness components
 
 ## Overview
@@ -417,4 +417,4 @@ Each error includes:
 - **Fallback Protocol APIs**: 500 requests per minute
 - **Bias Auditing APIs**: 10 requests per minute
 
-For higher limits, please contact the platform team. 
+For higher limits, please contact the platform team.

@@ -44,7 +44,7 @@ export function useBlockSchedule() {
     const updateSchedule = async (id: string, data: Partial<BlockSchedule>) => {
         try {
             const response = await api.put<BlockSchedule>(`/api/schedules/${id}`, data);
-            setSchedules(prev => prev.map(schedule => 
+            setSchedules(prev => prev.map(schedule =>
                 schedule.id === id ? { ...schedule, ...response.data } : schedule
             ));
             return response.data;
@@ -73,4 +73,4 @@ export function useBlockSchedule() {
         updateSchedule,
         deleteSchedule
     };
-} 
+}

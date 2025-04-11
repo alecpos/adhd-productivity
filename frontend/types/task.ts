@@ -60,4 +60,4 @@ export interface TaskStats {
   average_duration?: number;
   average_quality?: number;
   most_productive_category?: string;
-} 
+}

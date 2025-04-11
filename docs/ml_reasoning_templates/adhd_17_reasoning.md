@@ -240,4 +240,4 @@ A story is complete when:
 - [ ] Documentation is complete and up-to-date
 - [ ] Ethical considerations addressed and documented
 - [ ] Integration with other components verified
-- [ ] Technical debt minimized or documented 
+- [ ] Technical debt minimized or documented

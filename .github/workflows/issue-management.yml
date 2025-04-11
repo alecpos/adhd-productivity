@@ -15,7 +15,7 @@ jobs:
           script: |
             const issue = context.issue
             const labels = context.payload.issue?.labels || []
-            
+
             // Add 'needs-triage' label to new issues
             if (context.eventName === 'issues' && context.payload.action === 'opened') {
               await github.rest.issues.addLabels({
@@ -25,7 +25,7 @@ jobs:
                 labels: ['needs-triage']
               })
             }
-            
+
             // Add 'bug' label if issue title contains 'bug' or 'error'
             if (context.eventName === 'issues' && context.payload.action === 'opened') {
               const title = context.payload.issue.title.toLowerCase()
@@ -57,4 +57,4 @@ jobs:
           only-pr-labels: ''
           operations-per-run: 30
           remove-stale-when-updated: true
-          debug-only: false 
+          debug-only: false

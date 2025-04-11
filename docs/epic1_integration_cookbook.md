@@ -114,14 +114,14 @@ optimizer = CircadianOptimizer()
 # Get optimal times for different task types
 user_id = "user123"
 focus_task_time = optimizer.get_optimal_time(
-    user_id, 
-    task_type="focus", 
+    user_id,
+    task_type="focus",
     duration_minutes=60
 )
 
 creative_task_time = optimizer.get_optimal_time(
-    user_id, 
-    task_type="creative", 
+    user_id,
+    task_type="creative",
     duration_minutes=90
 )
 
@@ -145,8 +145,8 @@ optimizer.update_model_with_wearables(user_id, sleep_data, activity_data)
 
 # Get enhanced optimal times
 enhanced_focus_time = optimizer.get_optimal_time(
-    user_id, 
-    task_type="focus", 
+    user_id,
+    task_type="focus",
     duration_minutes=60,
     use_wearable_data=True
 )
@@ -164,9 +164,9 @@ analyzer = MultiFactorAnalyzer()
 
 # Analyze correlations between multiple factors
 factors = [
-    "sleep_duration", 
-    "medication_timing", 
-    "exercise_minutes", 
+    "sleep_duration",
+    "medication_timing",
+    "exercise_minutes",
     "screen_time",
     "caffeine_intake"
 ]
@@ -197,9 +197,9 @@ custom_factors = {
 
 # Analyze with custom factors
 custom_analysis = analyzer.analyze_with_custom_factors(
-    user_id, 
+    user_id,
     standard_factors=factors,
-    custom_factors=custom_factors, 
+    custom_factors=custom_factors,
     target="focus_duration"
 )
 ```
@@ -362,4 +362,4 @@ secure_results = secure_tpr.get_productivity_insights(
 
 ---
 
-For additional examples and advanced use cases, refer to the [API Documentation](epic1_api.md) and [Implementation Details](epic1_implementation.md). 
+For additional examples and advanced use cases, refer to the [API Documentation](epic1_api.md) and [Implementation Details](epic1_implementation.md).

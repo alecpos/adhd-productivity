@@ -20,12 +20,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   action,
 }) => {
   const styles = useStyles();
-  
+
   return (
     <View style={styles.container}>
-      <Icon 
-        name={icon} 
-        type="material" 
+      <Icon
+        name={icon}
+        type="material"
         size={64}
         color={styles.icon.color}
       />
@@ -69,4 +69,4 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: theme.spacing.md,
   },
-})); 
+}));

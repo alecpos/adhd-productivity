@@ -3,7 +3,7 @@
 Technical Debt Detection Script for Pre-commit Integration.
 
 This script analyzes staged files to identify potential technical debt patterns
-and provides a severity-weighted assessment. It implements the Enhanced Static Analysis 
+and provides a severity-weighted assessment. It implements the Enhanced Static Analysis
 Integration approach from the research, combining regex patterns with more advanced
 code quality analysis.
 """
@@ -24,9 +24,9 @@ project_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_root))
 
 from app.utils.tech_debt import (
-    TechnicalDebtItem, 
-    DebtSeverity, 
-    DebtCategory, 
+    TechnicalDebtItem,
+    DebtSeverity,
+    DebtCategory,
     DebtStatus,
     MLDebtSubcategory,
     get_debt_manager
@@ -50,7 +50,7 @@ class AnalysisResult:
     message: str
     matched_text: str
     subcategory: Optional[MLDebtSubcategory] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -66,7 +66,7 @@ class AnalysisResult:
 
 class TechnicalDebtDetector:
     """Detect technical debt in code files."""
-    
+
     # Common technical debt patterns
     TECH_DEBT_PATTERNS = [
         # Todo comments
@@ -170,7 +170,7 @@ class TechnicalDebtDetector:
             'subcategory': MLDebtSubcategory.EVALUATION
         }
     ]
-    
+
     # File patterns to exclude
     EXCLUDE_PATTERNS = [
         r'.*\.git/.*',
@@ -180,34 +180,34 @@ class TechnicalDebtDetector:
         r'.*\.pytest_cache/.*',
         r'.*\.(json|md|txt|csv|yml|yaml)$'
     ]
-    
+
     def __init__(self, repository_root: Optional[str] = None):
         """Initialize the detector with optional repository root."""
         self.repository_root = repository_root or os.getcwd()
         self.git_repo = None
-        
+
         # Try to initialize git repository
         try:
             self.git_repo = git.Repo(self.repository_root)
         except (git.InvalidGitRepositoryError, git.NoSuchPathError):
             self.git_repo = None
-            
+
         # Load Epic 4 ML technical debt patterns if available
         self._load_epic4_patterns()
-        
+
         self.compiled_patterns = [
             {**pattern, 'compiled': re.compile(pattern['pattern'])}
             for pattern in self.TECH_DEBT_PATTERNS
         ]
         self.exclude_compiled = [re.compile(pattern) for pattern in self.EXCLUDE_PATTERNS]
         self.debt_manager = get_debt_manager()
-        
+
     def _load_epic4_patterns(self):
         """Load Epic 4 ML technical debt patterns if available."""
         if HAS_EPIC4_PATTERNS:
             # Add the Epic 4 patterns to our existing patterns
             epic4_patterns = get_epic4_tech_debt_patterns()
-            
+
             # Convert pattern format to match our existing patterns
             for pattern in epic4_patterns:
                 pattern_dict = {
@@ -217,22 +217,22 @@ class TechnicalDebtDetector:
                     'severity': getattr(DebtSeverity, pattern['severity']) if hasattr(DebtSeverity, pattern['severity']) else pattern['severity'],
                     'type': pattern['type']
                 }
-                
+
                 # Add subcategory if present
                 if 'subcategory' in pattern:
                     pattern_dict['subcategory'] = pattern['subcategory']
-                    
+
                 self.TECH_DEBT_PATTERNS.append(pattern_dict)
-                
+
             print(f"Loaded {len(epic4_patterns)} Epic 4 ML technical debt patterns.")
-            
+
     def is_excluded(self, file_path: str) -> bool:
         """Check if file should be excluded from analysis."""
         for pattern in self.exclude_compiled:
             if pattern.match(file_path):
                 return True
         return False
-    
+
     def get_staged_files(self) -> List[str]:
         """Get list of staged files in git repository."""
         try:
@@ -263,14 +263,14 @@ class TechnicalDebtDetector:
         """Analyze a file for technical debt patterns."""
         if self.is_excluded(file_path):
             return []
-        
+
         results = []
         full_path = os.path.join(self.repository_root, file_path)
-        
+
         try:
             with open(full_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
-                
+
             for line_num, line in enumerate(lines, 1):
                 for pattern in self.compiled_patterns:
                     matches = pattern['compiled'].findall(line)
@@ -278,10 +278,10 @@ class TechnicalDebtDetector:
                         for match in matches:
                             match_text = match[1] if isinstance(match, tuple) and len(match) > 1 else match
                             match_text = match_text if isinstance(match_text, str) else str(match_text)
-                            
+
                             # Format the message with the match
                             message = pattern['message'].format(match=match_text)
-                            
+
                             # Create an analysis result
                             result = AnalysisResult(
                                 file_path=file_path,
@@ -296,29 +296,29 @@ class TechnicalDebtDetector:
                             results.append(result)
         except Exception as e:
             print(f"Error analyzing file {file_path}: {e}")
-        
+
         return results
-    
+
     def analyze_all_files(self) -> List[AnalysisResult]:
         """Analyze all Python files for technical debt."""
         all_files = self.get_all_files()
         all_results = []
-        
+
         for file_path in all_files:
             if file_path and not self.is_excluded(file_path):
                 results = self.analyze_file(file_path)
                 all_results.extend(results)
-                
+
         return all_results
-    
+
     def register_technical_debt(self, results: List[AnalysisResult], auto_add: bool = False) -> List[str]:
         """Register detected technical debt in the debt manager."""
         added_items = []
-        
+
         for result in results:
             title = f"{result.pattern_type.replace('_', ' ').title()} in {result.file_path}"
             description = f"{result.message}\nFound at line {result.line_number}: {result.matched_text}"
-            
+
             if auto_add:
                 item = TechnicalDebtItem(
                     title=title,
@@ -331,24 +331,24 @@ class TechnicalDebtDetector:
                     subcategory=result.subcategory,
                     tags=[result.pattern_type]
                 )
-                
+
                 item_id = self.debt_manager.add_item(item)
                 added_items.append(item_id)
-                
+
         return added_items
-    
+
     def calculate_debt_score(self, results: List[AnalysisResult]) -> float:
         """
         Calculate a technical debt score based on the analysis results.
-        
+
         Uses the context-aware severity scoring from the research:
         Debt Score = (0.4 × File Criticality) + (0.3 × Commit Frequency) + (0.3 × User Impact)
-        
+
         For pre-commit simplification, we use a weighted severity approach.
         """
         if not results:
             return 0.0
-            
+
         # Severity weights based on research
         severity_weights = {
             DebtSeverity.LOW: 1,
@@ -356,7 +356,7 @@ class TechnicalDebtDetector:
             DebtSeverity.HIGH: 5,
             DebtSeverity.CRITICAL: 10
         }
-        
+
         # Calculate weighted severity score
         total_weight = 0
         for result in results:
@@ -364,29 +364,29 @@ class TechnicalDebtDetector:
             if isinstance(severity, str):
                 severity = DebtSeverity(severity)
             total_weight += severity_weights.get(severity, 1)
-            
+
         # Normalize by number of issues with a non-linear scaling
         # This approach increases score dramatically with more critical issues
         score = (total_weight / len(results)) * (1 + (len(results) / 10))
-        
+
         return round(score, 2)
-    
+
     def format_results_for_display(self, results: List[AnalysisResult], score: float) -> str:
         """Format analysis results for terminal display."""
         if not results:
             return "No technical debt detected in staged files."
-            
+
         # Group results by file
         files_dict = {}
         for result in results:
             if result.file_path not in files_dict:
                 files_dict[result.file_path] = []
             files_dict[result.file_path].append(result)
-            
+
         # Format output
         output = ["Technical Debt Analysis Results", "=" * 30]
         output.append(f"Debt Score: {score:.2f}")
-        
+
         # Determine color based on score
         if score < 5:
             score_color = "\033[92m"  # Green
@@ -394,20 +394,20 @@ class TechnicalDebtDetector:
             score_color = "\033[93m"  # Yellow
         else:
             score_color = "\033[91m"  # Red
-            
+
         output.append(f"Overall Assessment: {score_color}{self._get_assessment(score)}\033[0m")
         output.append("")
-        
+
         # Add file results
         for file_path, file_results in files_dict.items():
             output.append(f"File: {file_path}")
             output.append("-" * len(f"File: {file_path}"))
-            
+
             for result in file_results:
                 severity = result.severity
                 if isinstance(severity, DebtSeverity):
                     severity = severity.value
-                    
+
                 # Color code by severity
                 if severity == "low":
                     severity_text = "\033[94mLOW\033[0m"  # Blue
@@ -417,18 +417,18 @@ class TechnicalDebtDetector:
                     severity_text = "\033[91mHIGH\033[0m"  # Red
                 else:  # critical
                     severity_text = "\033[91;1mCRITICAL\033[0m"  # Bold Red
-                    
+
                 output.append(f"Line {result.line_number}: [{severity_text}] {result.message}")
                 output.append(f"  > {result.matched_text}")
                 output.append("")
-                
+
         # Add recommendations
         output.append("Recommendations:")
         for recommendation in self._get_recommendations(results, score):
             output.append(f"- {recommendation}")
-            
+
         return "\n".join(output)
-    
+
     def _get_assessment(self, score: float) -> str:
         """Get an overall assessment based on the debt score."""
         if score < 3:
@@ -439,11 +439,11 @@ class TechnicalDebtDetector:
             return "Warning - Significant technical debt detected."
         else:
             return "Critical - High levels of technical debt require attention."
-    
+
     def _get_recommendations(self, results: List[AnalysisResult], score: float) -> List[str]:
         """Generate recommendations based on analysis results."""
         recommendations = []
-        
+
         # Count issues by category
         categories = {}
         for result in results:
@@ -451,71 +451,71 @@ class TechnicalDebtDetector:
             if isinstance(category, DebtCategory):
                 category = category.value
             categories[category] = categories.get(category, 0) + 1
-            
+
         # Add general recommendation based on score
         if score >= 15:
             recommendations.append("Consider addressing critical and high severity issues before committing.")
-            
+
         # Add specific recommendations based on categories
         if categories.get("security", 0) > 0:
             recommendations.append("Address security-related debt immediately as it poses significant risk.")
-        
+
         if categories.get("ml_specific", 0) > 0:
             recommendations.append("Review ML-specific issues to ensure model reliability and reproducibility.")
-            
+
         if categories.get("code_quality", 0) > 5:
             recommendations.append("Significant code quality debt detected. Consider a focused refactoring session.")
-            
+
         # Add recommendation to register debt
         recommendations.append("Run with --auto-add to register these items in the technical debt system.")
-        
+
         return recommendations
 
     def analyze_staged_files(self) -> List[AnalysisResult]:
         """Analyze all staged files for technical debt."""
         staged_files = self.get_staged_files()
         all_results = []
-        
+
         for file_path in staged_files:
             if file_path and not self.is_excluded(file_path):
                 results = self.analyze_file(file_path)
                 all_results.extend(results)
-                
+
         return all_results
 
     def analyze_file_by_epic(self, file_path: str, epic: str) -> List[AnalysisResult]:
         """
         Analyze a file for technical debt specific to an epic.
-        
+
         Args:
             file_path: Path to the file to analyze
             epic: Epic identifier (e.g., 'Epic 4')
-            
+
         Returns:
             List of analysis results
         """
         results = []
-        
+
         if not os.path.isfile(file_path) or self.is_excluded(file_path):
             return results
-            
+
         # Filter patterns by epic
         epic_patterns = [p for p in self.TECH_DEBT_PATTERNS if p.get('epic') == epic]
-        
+
         if not epic_patterns:
             return results
-            
+
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                
+
             lines = content.split('\n')
-            
+
             for i, line in enumerate(lines):
                 for pattern in epic_patterns:
                     regex = re.compile(pattern['pattern'], re.IGNORECASE)
                     match = regex.search(line)
-                    
+
                     if match:
                         result = AnalysisResult(
                             file_path=file_path,
@@ -526,79 +526,79 @@ class TechnicalDebtDetector:
                             message=pattern['message'].format(match=match.group(0)),
                             matched_text=match.group(0)
                         )
-                        
+
                         # Add subcategory if present
                         if 'subcategory' in pattern:
                             result.subcategory = pattern['subcategory']
-                            
+
                         results.append(result)
         except Exception as e:
             print(f"Error analyzing file {file_path}: {e}")
-            
+
         return results
-        
+
     def analyze_epic4_files(self) -> List[AnalysisResult]:
         """
         Analyze all files for Epic 4 technical debt.
-        
+
         Returns:
             List of analysis results specific to Epic 4
         """
         results = []
         files = self.get_all_files()
-        
+
         for file_path in files:
             if self.is_excluded(file_path):
                 continue
-                
+
             file_results = self.analyze_file_by_epic(file_path, 'Epic 4')
             results.extend(file_results)
-            
+
         return results
-        
+
     def _get_recommendations_by_epic(self, results: List[AnalysisResult], epic: str) -> List[str]:
         """
         Get recommendations for technical debt issues specific to an epic.
-        
+
         Args:
             results: List of analysis results
             epic: Epic identifier (e.g., 'Epic 4')
-            
+
         Returns:
             List of recommendation strings
         """
         # Filter results by epic
         epic_results = [r for r in results if hasattr(r, 'epic') and r.epic == epic]
-        
+
         if not epic_results:
             return []
-            
+
         recommendations = []
-        
+
         # Group by subcategory
         subcategories = {}
         for result in epic_results:
             if not hasattr(result, 'subcategory') or result.subcategory is None:
                 continue
-                
+
             subcategory = result.subcategory
             if subcategory not in subcategories:
                 subcategories[subcategory] = []
-                
+
             subcategories[subcategory].append(result)
-            
+
         # Generate recommendations by subcategory
         for subcategory, results in subcategories.items():
             if len(results) > 2:
                 remediation = next((r.remediation for r in results if hasattr(r, 'remediation')), None)
                 if remediation:
                     recommendations.append(f"Consider focusing on {subcategory.value} issues: {len(results)} instances found. {remediation}")
-                    
+
         # Add research-backed recommendations
         research_refs = set(r.research_reference for r in epic_results if hasattr(r, 'research_reference') and r.research_reference)
         for ref in research_refs:
             recommendations.append(f"Research insight: {ref}")
-            
+
         return recommendations
 
 def main():
@@ -609,11 +609,11 @@ def main():
     parser.add_argument('--json', action='store_true', help='Output in JSON format')
     parser.add_argument('--auto-add', action='store_true', help='Automatically add detected issues to the debt tracking system')
     parser.add_argument('--epic', type=str, help='Scan only for technical debt specific to an epic (e.g., "Epic 4")')
-    
+
     args = parser.parse_args()
-    
+
     detector = TechnicalDebtDetector()
-    
+
     if args.epic:
         print(f"Scanning for technical debt specific to {args.epic}...")
         if args.epic.lower() == "epic 4":
@@ -630,10 +630,10 @@ def main():
     else:
         print("Scanning staged files for technical debt (default)...")
         results = detector.analyze_staged_files()
-    
+
     # Calculate overall debt score
     score = detector.calculate_debt_score(results)
-    
+
     if args.json:
         # Output results as JSON
         output = {
@@ -642,39 +642,39 @@ def main():
             'assessment': detector._get_assessment(score),
             'recommendations': detector._get_recommendations(results, score),
         }
-        
+
         if args.epic:
             output['epic_recommendations'] = detector._get_recommendations_by_epic(results, args.epic)
-            
+
         print(json.dumps(output, indent=2))
     else:
         # Output results as text
         print(detector.format_results_for_display(results, score))
-        
+
         if args.epic:
             epic_recommendations = detector._get_recommendations_by_epic(results, args.epic)
             if epic_recommendations:
                 print("\nEpic-Specific Recommendations:")
                 for rec in epic_recommendations:
                     print(f"- {rec}")
-    
+
     if args.auto_add:
         added_issues = detector.register_technical_debt(results, auto_add=True)
         if added_issues:
             print(f"\nAuto-added {len(added_issues)} technical debt issues to tracking system.")
         else:
             print("\nNo new technical debt issues to add to tracking system.")
-            
+
     # Return non-zero exit code if serious issues found
     critical_issues = [r for r in results if r.severity == DebtSeverity.CRITICAL]
     high_issues = [r for r in results if r.severity == DebtSeverity.HIGH]
-    
+
     if critical_issues:
         return 2
     elif high_issues and len(high_issues) > 3:
         return 1
-        
+
     return 0
 
 if __name__ == "__main__":
-    main() 
+    main()

@@ -190,7 +190,7 @@ Document schema fields:
 ```python
 class TaskSchema(BaseSchema):
     """Task schema for managing user tasks."""
-    
+
     title: str = Field(
         description="Task title",
         min_length=3,
@@ -281,4 +281,4 @@ try:
     new_schema = migrate_schema(old_schema)
 except MigrationError as e:
     handle_migration_error(e)
-``` 
+```

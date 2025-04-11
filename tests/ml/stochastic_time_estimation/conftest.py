@@ -30,4 +30,4 @@ mock_pymc3.theano = theano
 
 # Apply the mocks
 sys.modules['pymc3'] = mock_pymc3
-sys.modules['theano'] = theano 
+sys.modules['theano'] = theano

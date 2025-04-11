@@ -118,7 +118,7 @@ class TimeManagementService:
             hour_completion_rates[hour]['total'] += 1
             if block.is_completed:
                 hour_completion_rates[hour]['completed'] += 1
-        hour_rates = [(hour, stats['completed'] / stats['total'] * 100) 
-                     for hour, stats in hour_completion_rates.items() 
+        hour_rates = [(hour, stats['completed'] / stats['total'] * 100)
+                     for hour, stats in hour_completion_rates.items()
                      if stats['total'] > 0]
         return [hour for hour, rate in sorted(hour_rates, key=lambda x: x[1], reverse=True)]

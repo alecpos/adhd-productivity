@@ -51,7 +51,7 @@ global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
 // Mock fetch
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const fetchMock = require('jest-fetch-mock');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 fetchMock.enableMocks();
@@ -181,9 +181,9 @@ jest.mock('@rneui/themed', () => {
 
 // Configure React Test Renderer to handle refs
 global.createNodeMock = (element: ElementMock) => {
-  if (element.type === 'ScrollView' || 
-      element.type === 'Text' || 
-      element.type === 'View' || 
+  if (element.type === 'ScrollView' ||
+      element.type === 'Text' ||
+      element.type === 'View' ||
       element.type === 'RCTScrollView' ||
       element.type === 'RNGestureHandlerButton' ||
       typeof element.type === 'function') {
@@ -200,4 +200,4 @@ global.createNodeMock = (element: ElementMock) => {
     };
   }
   return null;
-}; 
+};

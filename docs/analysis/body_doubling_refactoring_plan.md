@@ -49,22 +49,22 @@ def _calculate_match_score(self, user1, user2):
 def _calculate_match_score(self, user1, user2):
     if not (user1.preferences and user2.preferences):
         return 0
-        
+
     score = self._score_preferences_match(user1.preferences, user2.preferences)
     score += self._score_history_compatibility(user1.session_history, user2.session_history)
     return score
-    
+
 def _score_preferences_match(self, preferences1, preferences2):
     score = 0
     score += 10 if preferences1.work_style == preferences2.work_style else 0
     score += 8 if preferences1.focus_level == preferences2.focus_level else 0
     # More flat scoring logic...
     return score
-    
+
 def _score_history_compatibility(self, history1, history2):
     if not (history1 and history2):
         return 0
-        
+
     for session1 in history1:
         if any(s.productivity_rating > 3 for s in history2):
             return 5
@@ -76,7 +76,7 @@ def _score_history_compatibility(self, history1, history2):
 #### Move to SessionManager
 - `create_session`
 - `join_session`
-- `leave_session` 
+- `leave_session`
 - `find_available_sessions`
 
 #### Move to MatchingEngine
@@ -129,4 +129,4 @@ For all deeply nested code:
 
 - Consider implementing Observer pattern for session notifications
 - Add a caching layer for frequently accessed user preferences
-- Implement a strategy pattern for different matching algorithms 
+- Implement a strategy pattern for different matching algorithms

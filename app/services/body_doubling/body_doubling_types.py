@@ -71,7 +71,7 @@ class GroupSessionInfo(NamedTuple):
 
 class MatchCriteria(NamedTuple):
     """Criteria for matching users in body doubling sessions."""
-    
+
     activity_type: Optional[str] = None
     session_type: Optional[str] = None
     min_duration: Optional[int] = None
@@ -84,7 +84,7 @@ class MatchCriteria(NamedTuple):
 
 class MatchResult(NamedTuple):
     """Result of a matching operation for body doubling sessions."""
-    
+
     success: bool
     session_id: Optional[str] = None
     matched_user_ids: List[str] = []
@@ -95,7 +95,7 @@ class MatchResult(NamedTuple):
 
 class SessionParticipant(NamedTuple):
     """Information about a participant in a body doubling session."""
-    
+
     user_id: str
     join_time: datetime
     leave_time: Optional[datetime] = None
@@ -107,7 +107,7 @@ class SessionParticipant(NamedTuple):
 
 class SessionStats(NamedTuple):
     """Statistics for body doubling sessions."""
-    
+
     total_sessions: int
     active_sessions: int
     completed_sessions: int
@@ -117,4 +117,4 @@ class SessionStats(NamedTuple):
     most_popular_time: Optional[str] = None
     most_popular_activity: Optional[str] = None
     total_focus_hours: float = 0.0
-    user_participation: Dict[str, int] = {} 
+    user_participation: Dict[str, int] = {}

@@ -45,4 +45,4 @@ docs/
     ├── jira_integration_improvements.md
     ├── next_steps.md
     └── future_work.md
-``` 
+```

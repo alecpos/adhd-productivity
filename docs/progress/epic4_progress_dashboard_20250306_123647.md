@@ -65,4 +65,3 @@
 | Story ID | convergence_rate | episode_length | reward |
 |----------|---------|---------|---------|
 | ADHD-17 | 0.16 | -18.20 | 4.30 |
-

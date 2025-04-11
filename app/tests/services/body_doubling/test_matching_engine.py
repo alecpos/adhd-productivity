@@ -151,7 +151,7 @@ class TestMatchingEngine:
         """Test scoring preferences match."""
         # Act
         score = matching_engine._score_preferences_match(sample_user_prefs, sample_match_prefs)
-        
+
         # Assert - should match on work_style, focus_level, some tasks, some activities
         assert score > 0
         assert score == 10.0 + 8.0 + 5.0 + 4.0  # Based on our algorithm
@@ -160,7 +160,7 @@ class TestMatchingEngine:
         """Test scoring preferences match with empty preferences."""
         # Act
         score = matching_engine._score_preferences_match({}, {})
-        
+
         # Assert
         assert score == 0.0
 
@@ -175,10 +175,10 @@ class TestMatchingEngine:
             {"productivity_rating": 4, "duration_minutes": 55},
             {"productivity_rating": 3, "duration_minutes": 50},
         ]
-        
+
         # Act
         score = matching_engine._score_history_compatibility(user_history, match_history)
-        
+
         # Assert - should match on productivity and similar duration
         assert score > 0
         assert score == 5.0 + 4.0  # Based on our algorithm
@@ -187,7 +187,7 @@ class TestMatchingEngine:
         """Test scoring history compatibility with no history."""
         # Act
         score = matching_engine._score_history_compatibility(None, None)
-        
+
         # Assert
         assert score == 0.0
 
@@ -197,12 +197,12 @@ class TestMatchingEngine:
         criteria = {"work_style_important": True}
         user_history = [{"productivity_rating": 4, "duration_minutes": 60}]
         match_history = [{"productivity_rating": 4, "duration_minutes": 55}]
-        
+
         # Act
         score = matching_engine._calculate_match_score(
             sample_user_prefs, sample_match_prefs, criteria, user_history, match_history
         )
-        
+
         # Assert
         assert score > 0
         # Base score + history score + criteria bonus
@@ -217,12 +217,12 @@ class TestMatchingEngine:
         """Test finding matching users."""
         # Arrange
         mock_session_manager.get_active_sessions.return_value = [sample_match_session]
-        
+
         # Act
         matches = await matching_engine.find_matching_users(
             sample_user_id, sample_user_prefs, sample_match_criteria
         )
-        
+
         # Assert
         assert len(matches) > 0
         assert matches[0]["user_id"] == str(sample_match_id)
@@ -236,10 +236,10 @@ class TestMatchingEngine:
         # Arrange
         mock_session_manager.get_active_sessions.return_value = []
         criteria = {"min_score": 10}
-        
+
         # Act
         matches = await matching_engine.find_matching_users(sample_user_id, sample_user_prefs, criteria)
-        
+
         # Assert
         assert len(matches) == 0
 
@@ -258,10 +258,10 @@ class TestMatchingEngine:
         )
         mock_session_manager.get_active_session.return_value = None
         mock_session_manager.create_session.return_value = sample_session
-        
+
         # Act
         result = await matching_engine.request_match(sample_user_id, sample_match_criteria)
-        
+
         # Assert
         assert result == sample_session
         assert mock_session_manager.get_active_session.called
@@ -275,7 +275,7 @@ class TestMatchingEngine:
         """Test requesting a match when user already has an active session."""
         # Arrange
         mock_session_manager.get_active_session.return_value = sample_session
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await matching_engine.request_match(sample_user_id, sample_match_criteria)
@@ -290,7 +290,7 @@ class TestMatchingEngine:
         # Arrange
         from sqlalchemy import Update
         from sqlalchemy.ext.asyncio import AsyncSession
-        
+
         # Create a session with empty metadata that will be updated
         request_session = BodyDoublingSessionModel(
             id=sample_request_id,
@@ -300,11 +300,11 @@ class TestMatchingEngine:
             status=SessionStatus.PENDING,
             meta_data={},
         )
-        
+
         # Mock the session_manager behavior
         mock_session_manager.get_session_by_id.return_value = request_session
         mock_session_manager.get_active_session.return_value = None
-        
+
         # Create a mock for db.execute to handle the update call
         async def mock_execute(query):
             # This simulates the database update by setting the session status to ACTIVE
@@ -313,17 +313,17 @@ class TestMatchingEngine:
                 request_session.meta_data['participants'] = []
             if str(sample_match_id) not in request_session.meta_data['participants']:
                 request_session.meta_data['participants'].append(str(sample_match_id))
-            
+
             # Return a mock result object compatible with SQLAlchemy's execute()
             result_mock = AsyncMock()
             return result_mock
-        
+
         # Set up the mock db
         mock_db.execute.side_effect = mock_execute
-        
+
         # Act
         result = await matching_engine.accept_match(sample_match_id, sample_request_id)
-        
+
         # Assert
         assert result == request_session
         assert result.status == SessionStatus.ACTIVE
@@ -338,7 +338,7 @@ class TestMatchingEngine:
         """Test accepting a match request that doesn't exist."""
         # Arrange
         mock_session_manager.get_session_by_id.return_value = None
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await matching_engine.accept_match(sample_match_id, sample_request_id)
@@ -355,7 +355,7 @@ class TestMatchingEngine:
             status=SessionStatus.ACTIVE,
         )
         mock_session_manager.get_session_by_id.return_value = request_session
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await matching_engine.accept_match(sample_match_id, sample_request_id)
@@ -381,9 +381,9 @@ class TestMatchingEngine:
         )
         mock_session_manager.get_session_by_id.return_value = request_session
         mock_session_manager.get_active_session.return_value = active_session
-        
+
         # Act/Assert
         with pytest.raises(HTTPException) as exc_info:
             await matching_engine.accept_match(sample_match_id, sample_request_id)
         assert exc_info.value.status_code == 400
-        assert "already has an active session" in exc_info.value.detail 
+        assert "already has an active session" in exc_info.value.detail

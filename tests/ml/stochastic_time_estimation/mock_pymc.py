@@ -15,10 +15,10 @@ class MockModel:
         self.observed_RVs = []
         self.deterministics = []
         self.potentials = []
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, *args):
         pass
 
@@ -27,11 +27,11 @@ class MockTrace:
     def __init__(self, *args, **kwargs):
         self.varnames = []
         self._straces = {}
-    
+
     def get_values(self, varname, **kwargs):
         """Return mock values for variable"""
         return np.random.normal(size=(100,))
-    
+
     def __len__(self):
         return 100
 
@@ -47,18 +47,18 @@ class MockTheano:
     @staticmethod
     def shared(*args, **kwargs):
         return np.array([])
-    
+
     class tensor:
         """Mock implementation of Theano tensor module"""
         @staticmethod
         def as_tensor_variable(*args, **kwargs):
             return np.array([])
-        
+
         class dscalar:
             """Mock implementation of Theano dscalar"""
             def __init__(self, *args, **kwargs):
                 pass
-        
+
         class dvector:
             """Mock implementation of Theano dvector"""
             def __init__(self, *args, **kwargs):
@@ -103,12 +103,12 @@ class ADVI:
     """Mock ADVI method"""
     def __init__(self, *args, **kwargs):
         pass
-    
+
     def fit(self, *args, **kwargs):
         return self
-    
+
     def sample(self, *args, **kwargs):
         return MockTrace()
 
 # Export mock theano
-theano = MockTheano 
+theano = MockTheano

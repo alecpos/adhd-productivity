@@ -24,14 +24,14 @@ class TestCalendarCircadianIntegration:
         # Create test data
         now = datetime.now()
         event_id = str(uuid4())
-        
+
         # Create test request
         request = CircadianCalendarOptimizationRequest(
             start_date=now,
             end_date=now + timedelta(days=1),
             only_flexible_events=True
         )
-        
+
         # Expected response structure
         expected_response = CircadianCalendarOptimizationResponse(
             optimized_schedule=[
@@ -56,14 +56,14 @@ class TestCalendarCircadianIntegration:
             events_optimized=1,
             message="Calendar events optimized with circadian rhythm awareness"
         )
-        
+
         # Assert that the response structure contains all the fields we need
         assert hasattr(expected_response, 'optimized_schedule')
         assert hasattr(expected_response, 'energy_curve')
         assert hasattr(expected_response, 'events_analyzed')
         assert hasattr(expected_response, 'events_optimized')
         assert hasattr(expected_response, 'message')
-        
+
         # Verify that each optimization result has necessary fields
         optimization = expected_response.optimized_schedule[0]
         assert hasattr(optimization, 'event_id')
@@ -76,7 +76,7 @@ class TestCalendarCircadianIntegration:
         assert hasattr(optimization, 'suitability_score')
         assert hasattr(optimization, 'cognitive_category')
         assert hasattr(optimization, 'energy_level')
-        
+
     @pytest.mark.asyncio
     async def test_apply_circadian_optimization(self):
         """Test flow for applying circadian optimization to calendar events."""
@@ -84,7 +84,7 @@ class TestCalendarCircadianIntegration:
         now = datetime.now()
         event_id1 = str(uuid4())
         event_id2 = str(uuid4())
-        
+
         # Create request
         request = ApplyCircadianOptimizationRequest(
             optimization_results=[
@@ -114,7 +114,7 @@ class TestCalendarCircadianIntegration:
                 )
             ]
         )
-        
+
         # Expected response
         expected_response = ApplyCircadianOptimizationResponse(
             success=True,
@@ -124,7 +124,7 @@ class TestCalendarCircadianIntegration:
             errors=[],
             total_errors=0
         )
-        
+
         # Assert that the response structure contains all the fields we need
         assert hasattr(expected_response, 'success')
         assert hasattr(expected_response, 'message')
@@ -132,7 +132,7 @@ class TestCalendarCircadianIntegration:
         assert hasattr(expected_response, 'skipped_count')
         assert hasattr(expected_response, 'errors')
         assert hasattr(expected_response, 'total_errors')
-        
+
         # Create error case response
         error_response = ApplyCircadianOptimizationResponse(
             success=False,
@@ -142,9 +142,9 @@ class TestCalendarCircadianIntegration:
             errors=["Event not found", "User does not own event"],
             total_errors=2
         )
-        
+
         # Assert error response structure
         assert hasattr(error_response, 'success')
         assert not error_response.success
         assert hasattr(error_response, 'errors')
-        assert len(error_response.errors) == 2 
+        assert len(error_response.errors) == 2

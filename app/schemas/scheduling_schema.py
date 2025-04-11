@@ -15,7 +15,7 @@ from enum import Enum
 
 class WorkHours(BaseModel):
     """Work hours schema."""
-    
+
     start_time: time = Field(..., description="Start time of work hours")
     end_time: time = Field(..., description="End time of work hours")
     days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
@@ -23,7 +23,7 @@ class WorkHours(BaseModel):
 # Add WorkHoursSchema that inherits from BaseSchema for compatibility
 class WorkHoursSchema(BaseSchema):
     """Work hours schema with BaseSchema inheritance."""
-    
+
     start_time: time = Field(..., description="Start time of work hours")
     end_time: time = Field(..., description="End time of work hours")
     days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
@@ -37,7 +37,7 @@ class EnergyLevel(str, Enum):
 # Add BreakSchema that wraps the Break class from shared_components_schema
 class BreakSchema(BaseSchema):
     """Break schema that inherits from BaseSchema."""
-    
+
     start_time: datetime
     end_time: Optional[datetime] = None
     duration: int = Field(..., description="Duration in minutes", ge=1)
@@ -47,7 +47,7 @@ class BreakSchema(BaseSchema):
 # Add InterruptionSchema that wraps the Interruption class
 class InterruptionSchema(BaseSchema):
     """Interruption schema with BaseSchema inheritance."""
-    
+
     time: datetime
     type: str = Field(..., min_length=1, max_length=50)
     duration: int = Field(..., description="Duration in minutes", ge=1)
@@ -82,7 +82,7 @@ class EnergySchedulingPattern(BaseSchema):
 # Add SchedulePreferencesSchema that wraps the SchedulePreferences class
 class SchedulePreferencesSchema(BaseSchema):
     """Schedule preferences schema with BaseSchema inheritance."""
-    
+
     preferred_start_time: time = Field(default=time(9, 0))
     preferred_end_time: time = Field(default=time(17, 0))
     preferred_break_duration: int = Field(default=15, ge=5)  # minutes
@@ -121,15 +121,15 @@ class ScheduleBlock(BaseSchema):
     focus_requirement: Optional[int] = Field(None, ge=1, le=10)
     breaks: Optional[List[Break]] = None
     environmental_requirements: Optional[EnvironmentalFactors] = None
-    
+
     # Performance tracking
     analytics: Optional[SessionAnalytics] = None
     interruptions: Optional[List[Interruption]] = None
-    
+
     # References
     task_id: Optional[UUID] = None
     calendar_event_id: Optional[UUID] = None
-    
+
     meta_data: Optional[Dict[str, Any]] = None
 
 class ScheduleOptimizationRequest(BaseSchema):
@@ -255,7 +255,7 @@ class ApplyCircadianOptimizationResponse(BaseSchema):
 # Add GenerateScheduleRequest class
 class GenerateScheduleRequest(BaseSchema):
     """Request schema for generating a schedule."""
-    
+
     user_id: UUID
     start_date: datetime
     end_date: datetime

@@ -40,7 +40,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
         try:
             # Extract structured data using LLM
             parsed_data = await self.llm.extract_structured_data(text)
-            
+
             # Create NLP model instance
             nlp_record = NLPModel(
                 user_id=user_id,
@@ -50,15 +50,15 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
                 entities=parsed_data.get('entities', []),
                 intent=parsed_data.get('intent')
             )
-            
+
             # Save to database
             self.db.add(nlp_record)
             await self.db.commit()
             await self.db.refresh(nlp_record)
-            
+
             # Convert to response schema
             return NLPParserResponseSchema.from_orm(nlp_record)
-            
+
         except Exception as e:
             self.metrics.increment('parse_text.error')
             raise e
@@ -73,13 +73,13 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
             )
             result = await self.db.execute(query)
             nlp_record = result.scalar_one_or_none()
-            
+
             if not nlp_record:
                 raise ValueError(f"No NLP record found for text_id: {text_id}")
-            
+
             # Perform detailed analysis using LLM
             analysis = await self.llm.analyze_text(nlp_record.text)
-            
+
             return NLPAnalysisSchema(
                 id=UUID(),
                 text_id=text_id,
@@ -92,7 +92,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
                 meta_data=analysis.get('meta_data', {}),
                 created_at=datetime.utcnow()
             )
-            
+
         except Exception as e:
             self.metrics.increment('get_analysis.error')
             raise e
@@ -102,7 +102,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
         try:
             # Get ADHD-specific analysis from LLM
             analysis = await self.llm.analyze_task_complexity(task_description)
-            
+
             return TaskComplexityAnalysisSchema(
                 task_id=UUID(),
                 complexity_level=analysis.get('complexity_level', 3),
@@ -113,7 +113,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
                 energy_level_recommendation=analysis.get('energy_level', 'medium'),
                 adhd_friendly_score=analysis.get('adhd_friendly_score', 0.5)
             )
-            
+
         except Exception as e:
             self.metrics.increment('analyze_task_complexity.error')
             raise e
@@ -125,7 +125,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
         try:
             # Get personalized strategies from LLM
             strategies = await self.llm.generate_focus_strategies(user_profile, task_type)
-            
+
             return [
                 FocusStrategySchema(
                     strategy_id=UUID(),
@@ -141,7 +141,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
                 )
                 for strategy in strategies
             ]
-            
+
         except Exception as e:
             self.metrics.increment('generate_focus_strategies.error')
             raise e
@@ -151,7 +151,7 @@ class NLPService(BaseService[NLPModel, NLPParserResponseSchema, NLPTaskParseSche
         if not self.llm.is_model_available():
             logger.warning("LLM service not available, using fallback processing")
             return self._fallback_processing(text)
-            
+
         return await self.llm.generate_text(text)
 
     def _fallback_processing(self, text: str) -> str:

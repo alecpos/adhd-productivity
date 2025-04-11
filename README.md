@@ -291,4 +291,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Research papers and methodology referenced in implementation summaries
 - Contributors to the ADHD Calendar project
-- The neurodiversity community for valuable feedback and insights 
+- The neurodiversity community for valuable feedback and insights

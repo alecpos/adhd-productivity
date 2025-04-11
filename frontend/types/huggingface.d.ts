@@ -32,4 +32,4 @@ declare module '@huggingface/inference' {
       generated_text: string;
     }>;
   }
-} 
+}

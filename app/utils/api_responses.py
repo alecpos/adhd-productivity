@@ -31,7 +31,7 @@ class CollectionResponse(BaseModel, Generic[T]):
 # Use RootModel instead of __root__ field for field-specific errors
 class ErrorDetails(RootModel[Dict[str, List[str]]]):
     """Details for field-specific errors.
-    
+
     Maps field names to lists of error messages.
     """
     model_config = {
@@ -55,10 +55,10 @@ class ErrorResponse(BaseModel):
 def create_response(data: Any) -> Dict[str, Any]:
     """
     Create a standard success response.
-    
+
     Args:
         data: The response data
-        
+
     Returns:
         A formatted success response
     """
@@ -73,18 +73,18 @@ def create_collection_response(
 ) -> CollectionResponse:
     """
     Create a standard collection response with pagination.
-    
+
     Args:
         items: The collection items
         total: Total number of items across all pages
         page: Current page number (1-based)
         page_size: Number of items per page
-        
+
     Returns:
         A formatted collection response with pagination metadata
     """
     pages = (total + page_size - 1) // page_size if page_size > 0 else 0
-    
+
     pagination = PaginationMetadata(
         total=total,
         page=page,
@@ -93,7 +93,7 @@ def create_collection_response(
         has_next=page < pages,
         has_prev=page > 1
     )
-    
+
     return CollectionResponse(
         items=items,
         pagination=pagination
@@ -108,13 +108,13 @@ def create_error_response(
 ) -> Dict[str, Union[str, Dict[str, List[str]]]]:
     """
     Create a standard error response.
-    
+
     Args:
         code: Error code for programmatic handling
         message: Human-readable error message
         details: Field-specific error details
         status_code: HTTP status code (not included in response)
-        
+
     Returns:
         A formatted error response
     """
@@ -128,28 +128,28 @@ def create_error_response(
 def format_validation_errors(validation_error: Any) -> Dict[str, List[str]]:
     """
     Format Pydantic ValidationError into a field-specific error dict.
-    
+
     Args:
         validation_error: Pydantic ValidationError
-        
+
     Returns:
         Dict with field names as keys and lists of error messages as values
     """
     errors: Dict[str, List[str]] = {}
-    
+
     for error in validation_error.errors():
         location = error["loc"]
         field_name = location[-1] if len(location) > 0 else "non_field_error"
-        
+
         if isinstance(field_name, int):
             # Handle array validation errors
             field_name = f"{location[-2]}[{field_name}]"
-        
+
         if field_name not in errors:
             errors[field_name] = []
-            
+
         errors[field_name].append(error["msg"])
-    
+
     return errors
 
 
@@ -215,4 +215,4 @@ def rate_limit_response(retry_after: int) -> Dict[str, Any]:
         code="RATE_LIMIT_EXCEEDED",
         message=f"Rate limit exceeded. Try again after {retry_after} seconds",
         status_code=status.HTTP_429_TOO_MANY_REQUESTS
-    ) 
+    )

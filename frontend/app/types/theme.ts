@@ -8,4 +8,4 @@ export interface CustomTheme extends Theme {
         lg: number;
         xl: number;
     };
-} 
+}

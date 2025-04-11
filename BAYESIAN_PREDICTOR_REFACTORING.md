@@ -40,15 +40,15 @@ The `BayesianDurationPredictor` class in `app/ml/stochastic_time_estimation/baye
 ```python
 class BayesianModelBuilder:
     """Responsible for building and sampling from Bayesian models."""
-    
+
     def build_model(self, features, actual_values, estimated_values):
         """Build a PyMC3 model based on input data."""
         pass
-        
+
     def sample_posterior(self, model, sample_count=2000, tune_count=1000):
         """Sample from the posterior distribution."""
         pass
-        
+
     def extract_coefficients(self, trace):
         """Extract model coefficients from the trace."""
         pass
@@ -58,23 +58,23 @@ class BayesianModelBuilder:
 ```python
 class FeatureProcessor:
     """Handles feature extraction and processing for the Bayesian model."""
-    
+
     def __init__(self, feature_importance_threshold=0.05):
         self.feature_importance_threshold = feature_importance_threshold
         self.feature_engineer = FeatureEngineer()
-        
+
     async def prepare_historical_features(self, historical_data):
         """Extract features from historical task data."""
         pass
-        
+
     async def prepare_prediction_features(self, task, user_id, context_data=None):
         """Extract features for prediction."""
         pass
-        
+
     def calculate_feature_importances(self, trace, feature_names):
         """Calculate importance of each feature based on the model trace."""
         pass
-        
+
     def filter_features_by_importance(self, features, importances):
         """Filter features based on importance threshold."""
         pass
@@ -84,18 +84,18 @@ class FeatureProcessor:
 ```python
 class PredictionResultFormatter:
     """Formats prediction results and confidence intervals."""
-    
+
     def __init__(self, confidence_level=0.95):
         self.confidence_level = confidence_level
-        
+
     def format_prediction(self, expected_ratio, prediction_interval, estimated_duration, factors=None):
         """Format the prediction results into a standardized output format."""
         pass
-        
+
     def calculate_prediction_interval(self, samples, confidence_level=None):
         """Calculate prediction interval from posterior samples."""
         pass
-        
+
     def format_prediction_factors(self, features, feature_importances):
         """Format the factors that influenced the prediction."""
         pass
@@ -109,7 +109,7 @@ class BayesianDurationPredictor(BaseMLModel):
     """
     Bayesian network for predicting realistic task durations.
     """
-    
+
     def __init__(
         self,
         db=None,
@@ -124,12 +124,12 @@ class BayesianDurationPredictor(BaseMLModel):
         self.confidence_level = confidence_level
         self.min_history_points = min_history_points
         self.max_history_points = max_history_points
-        
+
         # Initialize components
         self.feature_processor = FeatureProcessor(feature_importance_threshold)
         self.model_builder = BayesianModelBuilder()
         self.result_formatter = PredictionResultFormatter(confidence_level)
-        
+
         # Model state
         self.trace = None
         self.model = None
@@ -142,37 +142,37 @@ class BayesianDurationPredictor(BaseMLModel):
 async def fit(self, user_id: str) -> None:
     """
     Fit the Bayesian model using historical task data for a user.
-    
+
     Args:
         user_id: ID of the user to fit the model for
     """
     # Get historical data
     historical_data = await self._get_historical_data(user_id)
-    
+
     if not self._validate_historical_data(historical_data):
         return
-    
+
     # Process features
     train_features, train_actual, train_estimated = self.feature_processor.prepare_historical_features(historical_data)
-    
+
     # Calculate deviation ratios
     train_deviation_ratios = self._calculate_deviation_ratios(train_actual, train_estimated)
-    
+
     # Build and sample from model
     self.model = self.model_builder.build_model(train_features, train_deviation_ratios)
     self.trace = self.model_builder.sample_posterior(self.model)
-    
+
     # Update state
     self.last_updated = datetime.now()
     self.feature_importances = self.feature_processor.calculate_feature_importances(self.trace, train_features.columns)
-    
+
     logger.info(f"Successfully fit Bayesian duration model for user {user_id}")
 ```
 
 ### 3.3 Refactor `predict()` Method
 ```python
 async def predict(
-    self, 
+    self,
     task_id: str,
     user_id: str,
     context_data: Optional[Dict[str, Any]] = None
@@ -181,25 +181,25 @@ async def predict(
     # Ensure model is fitted
     if not self._ensure_model_fitted(user_id):
         return self._error_response("Insufficient historical data for prediction")
-    
+
     # Get task
     task = await self._get_task(task_id)
     if task is None:
         return self._error_response(f"Task {task_id} not found")
-    
+
     # Extract features
     features = await self.feature_processor.prepare_prediction_features(task, user_id, context_data)
-    
+
     # Make prediction
     expected_ratio = self._calculate_expected_ratio(features)
     prediction_interval = self._calculate_prediction_interval(features)
-    
+
     # Get original estimate
     estimated_duration = task.estimated_duration or 60  # Default to 1 hour
-    
+
     # Format result
     prediction_factors = self.feature_processor.get_prediction_factors(features, self.feature_importances)
-    
+
     return self.result_formatter.format_prediction(
         expected_ratio,
         prediction_interval,
@@ -221,12 +221,12 @@ def _validate_historical_data(self, historical_data):
         )
         return False
     return True
-    
+
 def _ensure_model_fitted(self, user_id):
     """Ensure model is fitted, attempt to fit if not."""
     if self.trace is None:
         await self.fit(user_id)
-        
+
     return self.trace is not None
 ```
 
@@ -235,27 +235,27 @@ def _ensure_model_fitted(self, user_id):
 def _calculate_deviation_ratios(self, actual_durations, estimated_durations):
     """Calculate ratio of actual to estimated durations."""
     return actual_durations / estimated_durations
-    
+
 def _calculate_expected_ratio(self, features):
     """Calculate expected ratio using model coefficients."""
     alpha_samples = self.trace['alpha']
     return np.dot(features, alpha_samples.mean(axis=0))
-    
+
 def _calculate_prediction_interval(self, features):
     """Calculate prediction interval for the given features."""
     alpha_samples = self.trace['alpha']
     sigma_samples = self.trace['sigma']
-    
+
     # Calculate expected ratios for all samples
     expected_ratios = np.dot(features, alpha_samples.T)
-    
+
     # Add noise according to the model
     predicted_ratios = np.random.normal(
-        loc=expected_ratios[:, np.newaxis], 
-        scale=sigma_samples, 
+        loc=expected_ratios[:, np.newaxis],
+        scale=sigma_samples,
         size=(len(features), len(sigma_samples))
     )
-    
+
     return self.result_formatter.calculate_prediction_interval(predicted_ratios)
 ```
 
@@ -308,4 +308,4 @@ def _error_response(self, error_message):
 - Phase 3: Days 6-8
 - Phase 4: Days 9-10
 - Phase 5: Days 11-12
-- Phase 6: Day 13 
+- Phase 6: Day 13

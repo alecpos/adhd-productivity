@@ -64,4 +64,4 @@ When extending or modifying ML models:
 - [TPR Models Documentation](../../docs/tpr_models.md)
 - [Time Estimation Documentation](../../docs/time_estimation.md)
 - [Forgetfulness Mitigation Documentation](../../docs/forgetfulness_mitigation.md)
-- [Hyperfold Module Documentation](../../docs/hyperfold_module.md) 
+- [Hyperfold Module Documentation](../../docs/hyperfold_module.md)

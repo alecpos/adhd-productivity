@@ -16,24 +16,42 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables and .env file."""
-    
+
     # General settings
     APP_NAME: str = "ADHD Calendar"
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
-    
+
     # Database settings
-    DB_CONNECTION_STRING: str = "sqlite:///./adhd_calendar.db"
-    
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "")
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "adhd_calendar")
+    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
+
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construct database URL from environment variables."""
+        if os.getenv("DATABASE_URL"):
+            return os.getenv("DATABASE_URL")
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+    @property
+    def TEST_DATABASE_URL(self) -> str:
+        """Construct test database URL from environment variables."""
+        if os.getenv("TEST_DATABASE_URL"):
+            return os.getenv("TEST_DATABASE_URL")
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}_test"
+
     # Security settings
-    SECRET_KEY: str = "change_this_in_production"
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 60 * 24  # 24 hours
-    
+
     # ML model settings
     MODEL_DIRECTORY: str = "app/ml/models"
     FAIRNESS_AUDIT_DIRECTORY: str = "app/ml/audit_reports"
-    
+
     # Fairness thresholds
     FAIRNESS_THRESHOLDS: Dict[str, float] = {
         "disparate_impact": 0.8,
@@ -41,25 +59,24 @@ class Settings(BaseSettings):
         "equal_opportunity_difference": 0.1,
         "average_odds_difference": 0.1,
     }
-    
+
     # Explanation settings
     EXPLANATION_MIN_CONFIDENCE: float = 0.6
     EXPLANATION_VISUAL_ENABLED: bool = True
-    
+
     # Fallback settings
     FALLBACK_DEFAULT_CONFIDENCE_THRESHOLD: float = 0.7
     FALLBACK_TIMEOUT_SECONDS: float = 5.0
-    
+
     # Logging settings
     LOG_LEVEL: str = "INFO"
-    
+
     # App settings
     PROJECT_NAME: str = "ADHD Calendar API"
     APP_ENV: str = os.getenv("APP_ENV", "development")
     TESTING: bool = os.getenv("TESTING", "false").lower() == "true"
     API_V1_STR: str = "/api/v1"
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     SERVER_NAME: str = "localhost"
     SERVER_HOST: AnyHttpUrl = "http://localhost:8000"
@@ -81,26 +98,15 @@ class Settings(BaseSettings):
     HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
     HUGGINGFACE_TEXT_MODEL: str = os.getenv("HUGGINGFACE_TEXT_MODEL", "deepseek-ai/DeepSeek-R1")
     HUGGINGFACE_SENTIMENT_MODEL: str = os.getenv(
-        "HUGGINGFACE_SENTIMENT_MODEL", 
+        "HUGGINGFACE_SENTIMENT_MODEL",
         "distilbert-base-uncased-finetuned-sst-2-english"
     )
     HUGGINGFACE_TASK_MODEL: str = os.getenv(
-        "HUGGINGFACE_TASK_MODEL", 
+        "HUGGINGFACE_TASK_MODEL",
         "microsoft/deberta-v3-base"
     )
 
     # Database settings
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "adhd_calendar")
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/adhd_calendar",
-    )
-    TEST_DATABASE_URL: str = os.getenv(
-        "TEST_DATABASE_URL",
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/adhd_calendar_test",
-    )
     DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "20"))
     DB_POOL_MIN_SIZE: int = int(os.getenv("DB_POOL_MIN_SIZE", "5"))
     DB_POOL_MAX_OVERFLOW: int = int(os.getenv("DB_POOL_MAX_OVERFLOW", "10"))
@@ -121,7 +127,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = secrets.token_urlsafe(32)
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
     JWT_REFRESH_SECRET_KEY: str = os.getenv(
-        "JWT_REFRESH_SECRET_KEY", "your-refresh-secret-key-for-testing"
+        "JWT_REFRESH_SECRET_KEY", secrets.token_urlsafe(32)
     )
 
     # Security settings
@@ -146,18 +152,18 @@ class Settings(BaseSettings):
     GOOGLE_TOKEN_PATH: Path = Path("token.json")
 
     # BioAuth-25 configuration
-    BIOAUTH_API_BASE_URL: str = "https://api.bioauth.example.com/v1"
-    BIOAUTH_API_KEY: str = "dummy_api_key"
-    BIOAUTH_CLIENT_ID: str = "adhd_calendar_app"
-    BIOAUTH_CLIENT_SECRET: str = secrets.token_urlsafe(32)
+    BIOAUTH_API_BASE_URL: str = os.getenv("BIOAUTH_API_BASE_URL", "")
+    BIOAUTH_API_KEY: str = os.getenv("BIOAUTH_API_KEY", "")
+    BIOAUTH_CLIENT_ID: str = os.getenv("BIOAUTH_CLIENT_ID", "")
+    BIOAUTH_CLIENT_SECRET: str = os.getenv("BIOAUTH_CLIENT_SECRET", secrets.token_urlsafe(32))
     BIOAUTH_ENABLED: bool = True
-    
+
     # Post-Quantum Cryptography Configuration
     PQ_ENABLED: bool = True
     PQ_DEFAULT_ALGORITHM: str = "ml_kem_768"  # ML-KEM-768 (NIST level 3)
     PQ_TLS_MIN_VERSION: str = "TLS1.3"
     PQ_HYBRID_MODE: bool = True  # Use both classical and PQ crypto
-    
+
     # ML Services Configuration
     ML_MODEL_DIR: str = "app/ml/saved_models"
     ML_DATA_DIR: str = "app/ml/data"
@@ -173,9 +179,6 @@ class Settings(BaseSettings):
         extra = "allow"
 
 
-# Create global settings instance
-settings = Settings()
-
 def get_settings() -> Settings:
     """Get application settings."""
-    return settings
+    return Settings()

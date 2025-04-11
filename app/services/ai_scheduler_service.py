@@ -35,6 +35,5 @@ def schedule_tasks(tasks: List[dict], user_energy_profile: Dict[str, List[int]])
         else:
             task.scheduled_time = task.due_date - timedelta(hours=1)
         scheduled_tasks.append(task)
-    
-    return scheduled_tasks
 
+    return scheduled_tasks

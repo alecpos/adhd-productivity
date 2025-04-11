@@ -48,29 +48,29 @@ CLEANUP_AFTER_TEST = True
 
 async def setup_test_data(db) -> Tuple[List[uuid.UUID], List[uuid.UUID]]:
     """Set up test data for performance testing.
-    
+
     Returns:
         Tuple containing lists of user IDs and session IDs
     """
     logger.info(f"Setting up test data: {NUM_USERS} users with {SESSIONS_PER_USER} sessions each")
     user_ids = []
     session_ids = []
-    
+
     # Create users
     for _ in range(NUM_USERS):
         user_ids.append(uuid.uuid4())
-    
+
     # Activity types and session types
     activity_types = ["Programming", "Reading", "Writing", "Studying", "Creative Work"]
     session_types = [SessionType.WORKING, SessionType.STUDYING, SessionType.CREATIVE]
-    
+
     # Create sessions for each user
     for user_id in user_ids:
         for i in range(SESSIONS_PER_USER):
             now = datetime.now()
             days_ago = random.randint(1, 30)  # Random session between 1 and 30 days ago
             hours_duration = random.randint(1, 4)  # Random duration between 1 and 4 hours
-            
+
             # Create a session
             session = BodyDoublingSessionModel(
                 id=uuid.uuid4(),
@@ -90,11 +90,11 @@ async def setup_test_data(db) -> Tuple[List[uuid.UUID], List[uuid.UUID]]:
                     "feedback": []
                 }
             )
-            
+
             # Add the session to the database
             db.add(session)
             session_ids.append(session.id)
-            
+
             # Add feedback to the session
             for j in range(FEEDBACK_PER_SESSION):
                 feedback = {
@@ -105,16 +105,16 @@ async def setup_test_data(db) -> Tuple[List[uuid.UUID], List[uuid.UUID]]:
                     "notes": f"Feedback {j+1} for session {i+1}",
                     "timestamp": (datetime.now() - timedelta(days=days_ago-1)).isoformat()
                 }
-                
+
                 if "feedback" not in session.meta_data:
                     session.meta_data["feedback"] = []
-                
+
                 session.meta_data["feedback"].append(feedback)
-    
+
     # Commit all changes
     await db.commit()
     logger.info(f"Created {len(session_ids)} sessions for {len(user_ids)} users")
-    
+
     return user_ids, session_ids
 
 async def cleanup_test_data(db, session_ids):
@@ -122,7 +122,7 @@ async def cleanup_test_data(db, session_ids):
     if not CLEANUP_AFTER_TEST:
         logger.info("Cleanup skipped as configured")
         return
-    
+
     logger.info(f"Cleaning up {len(session_ids)} test sessions")
     for session_id in session_ids:
         try:
@@ -131,14 +131,14 @@ async def cleanup_test_data(db, session_ids):
                 await db.delete(session)
         except Exception as e:
             logger.warning(f"Error deleting session {session_id}: {e}")
-    
+
     await db.commit()
     logger.info("Cleanup completed")
 
 async def measure_performance(analytics_service, user_ids, session_ids):
     """Measure the performance of AnalyticsService methods."""
     results = {}
-    
+
     # Measure get_user_analytics performance
     start_time = time.time()
     for user_id in user_ids:
@@ -151,7 +151,7 @@ async def measure_performance(analytics_service, user_ids, session_ids):
         "operations": len(user_ids)
     }
     logger.info(f"get_user_analytics: avg {avg_time:.4f} seconds per call")
-    
+
     # Measure get_session_analytics performance
     start_time = time.time()
     sample_sessions = random.sample(session_ids, min(len(session_ids), 20))
@@ -165,7 +165,7 @@ async def measure_performance(analytics_service, user_ids, session_ids):
         "operations": len(sample_sessions)
     }
     logger.info(f"get_session_analytics: avg {avg_time:.4f} seconds per call")
-    
+
     # Measure get_session_feedback performance
     start_time = time.time()
     for session_id in sample_sessions:
@@ -178,7 +178,7 @@ async def measure_performance(analytics_service, user_ids, session_ids):
         "operations": len(sample_sessions)
     }
     logger.info(f"get_session_feedback: avg {avg_time:.4f} seconds per call")
-    
+
     # Measure get_focus_pattern_insights performance
     start_time = time.time()
     for user_id in user_ids:
@@ -191,7 +191,7 @@ async def measure_performance(analytics_service, user_ids, session_ids):
         "operations": len(user_ids)
     }
     logger.info(f"get_focus_pattern_insights: avg {avg_time:.4f} seconds per call")
-    
+
     # Measure add_session_feedback performance
     start_time = time.time()
     sample_sessions = random.sample(session_ids, min(len(session_ids), 10))
@@ -214,37 +214,37 @@ async def measure_performance(analytics_service, user_ids, session_ids):
         "operations": feedback_count
     }
     logger.info(f"add_session_feedback: avg {avg_time:.4f} seconds per call")
-    
+
     return results
 
 async def run_performance_tests():
     """Run all performance tests."""
     logger.info("=== Starting AnalyticsService Performance Tests ===")
-    
+
     # Initialize database if needed
     try:
         await init_db()
     except Exception as e:
         logger.warning(f"Database initialization error (may be already initialized): {e}")
-    
+
     # Create a db session
     session_ids = []
     try:
         # Set up test data
         async with get_session() as db:
             user_ids, session_ids = await setup_test_data(db)
-        
+
         # Run performance tests
         async with get_session() as db:
             analytics_service = AnalyticsService(db)
             results = await measure_performance(analytics_service, user_ids, session_ids)
-        
+
         # Display results summary
         logger.info("\nPerformance Test Results Summary:")
         logger.info(f"{'Method':<30} {'Avg Time (s)':<15} {'Total Time (s)':<15} {'Operations':<10}")
         for method, metrics in results.items():
             logger.info(f"{method:<30} {metrics['avg_time']:<15.4f} {metrics['total_time']:<15.4f} {metrics['operations']:<10}")
-    
+
     except Exception as e:
         logger.error(f"Error during performance tests: {e}")
     finally:
@@ -255,9 +255,9 @@ async def run_performance_tests():
                     await cleanup_test_data(db, session_ids)
             except Exception as e:
                 logger.error(f"Error during cleanup: {e}")
-    
+
     logger.info("=== AnalyticsService Performance Tests Completed ===")
 
 if __name__ == "__main__":
     # Run the async tests
-    asyncio.run(run_performance_tests()) 
+    asyncio.run(run_performance_tests())

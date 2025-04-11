@@ -12,7 +12,7 @@ from app.schemas.shared_components_schema import Break, EnvironmentalFactors
 
 class FocusSessionBase(BaseSchema):
     """Base schema for focus sessions."""
-    
+
     user_id: UUID
     task_id: Optional[UUID] = None
     duration: int = Field(..., description="Duration in minutes", ge=1)
@@ -32,7 +32,7 @@ class FocusSessionCreateSchema(FocusSessionBase):
 
 class FocusSessionUpdate(BaseSchema):
     """Schema for updating a focus session."""
-    
+
     focus_level: Optional[int] = Field(None, description="Focus level from 1-10", ge=1, le=10)
     energy_level: Optional[int] = Field(None, description="Energy level from 1-10", ge=1, le=10)
     notes: Optional[str] = None
@@ -42,7 +42,7 @@ class FocusSessionUpdate(BaseSchema):
 
 class FocusSessionSchema(FocusSessionBase, TimestampedSchema):
     """Schema for focus session responses."""
-    
+
     status: str = Field(..., description="Current status of the focus session")
     start_time: datetime
     end_time: Optional[datetime] = None
@@ -56,4 +56,4 @@ __all__ = [
     "FocusSessionSchema",
     "FocusSessionCreateSchema",
     "FocusSessionUpdate",
-] 
+]

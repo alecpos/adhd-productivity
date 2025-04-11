@@ -59,7 +59,7 @@ class AuthService:
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt
-        
+
     def create_expired_token(
         self, data: Dict[str, Any]
     ) -> str:
@@ -320,7 +320,7 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db)
 ) -> UserModel:
     """Get the current user from a token.
-    
+
     This is a FastAPI dependency that can be used in route handlers to get the authenticated user.
     It uses AuthService internally but presents a simpler interface for route handlers.
     """

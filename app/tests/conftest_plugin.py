@@ -19,10 +19,10 @@ def pytest_configure(config):
     else:
         # For MacOS and Linux, use the default policy but make sure event loops can be created
         policy = asyncio.get_event_loop_policy()
-        
+
         # Patch the policy if needed to avoid "There is no current event loop in thread" errors
         original_get_event_loop = policy.get_event_loop
-        
+
         def patched_get_event_loop():
             """Patched get_event_loop that creates a new loop if none exists."""
             try:
@@ -33,9 +33,9 @@ def pytest_configure(config):
                 loop = policy.new_event_loop()
                 asyncio.set_event_loop(loop)
                 return loop
-        
+
         # Apply the patch to the policy
         policy.get_event_loop = patched_get_event_loop
 
 # Force the right event loop policy when this module is imported
-pytest_configure(None) 
+pytest_configure(None)

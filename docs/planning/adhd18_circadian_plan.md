@@ -46,4 +46,4 @@ Implement a circadian-aware module that will optimize task scheduling based on i
 
 ## Research Insights Applied
 - "Dynamic reward shaping improves adherence in ADHD populations"
-- "Circadian optimization can improve cognitive performance by up to 26% in individuals with ADHD" 
+- "Circadian optimization can improve cognitive performance by up to 26% in individuals with ADHD"

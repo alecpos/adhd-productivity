@@ -48,26 +48,26 @@ const epicComponents = [
 
 export default function App(): JSX.Element {
   const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
-  
+
   // Render the selected component or show a list of components
   const renderContent = () => {
     if (selectedComponent) {
       const ComponentToRender = epicComponents.find(c => c.name === selectedComponent)?.component;
-      
+
       return (
         <View style={styles.componentContainer}>
-          <Button 
-            title="← Back to Components" 
-            type="clear" 
+          <Button
+            title="← Back to Components"
+            type="clear"
             onPress={() => setSelectedComponent(null)}
             containerStyle={styles.backButton}
           />
-          
+
           {ComponentToRender ? <ComponentToRender /> : <Text>Component not found</Text>}
         </View>
       );
     }
-    
+
     // Component selector
     return (
       <ScrollView style={styles.container}>
@@ -77,7 +77,7 @@ export default function App(): JSX.Element {
             Select a component to view:
           </Text>
         </View>
-        
+
         <View style={styles.componentList}>
           {epicComponents.map(comp => (
             <TouchableOpacity
@@ -92,7 +92,7 @@ export default function App(): JSX.Element {
       </ScrollView>
     );
   };
-  
+
   return (
     <SafeAreaProvider>
       <ThemeProvider theme={theme}>
@@ -160,4 +160,4 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
   },
-}); 
+});

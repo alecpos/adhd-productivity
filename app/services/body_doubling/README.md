@@ -142,4 +142,4 @@ When contributing to this service:
 - Sends session event notifications
 - Manages notification preferences
 - Handles delivery to multiple channels
-- Provides notification templates 
+- Provides notification templates

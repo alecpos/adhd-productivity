@@ -30,15 +30,15 @@ def process_task(task):
     if not condition1:
         # Handle not condition1
         return
-        
+
     if not condition2:
         # Handle not condition2
         return
-        
+
     if not condition3:
         # Handle not condition3
         return
-        
+
     # Process task
 ```
 
@@ -49,13 +49,13 @@ def process_task(task):
 # Use in SyncService
 async def sync_tasks(self, user_id, integration, result, options):
     commands = []
-    
+
     if options.get("import", False):
         commands.append(ImportTasksCommand(user_id, integration, result))
-        
+
     if options.get("export", False):
         commands.append(ExportTasksCommand(user_id, integration, result))
-        
+
     for command in commands:
         await command.execute()
 ```
@@ -66,7 +66,7 @@ async def sync_tasks(self, user_id, integration, result, options):
 class TaskProcessor:
     def __init__(self, strategy):
         self.strategy = strategy
-        
+
     async def process_task(self, task, context):
         await self.strategy.process(task, context)
 ```
@@ -82,4 +82,4 @@ class TaskProcessor:
 1. Reduce nesting in task manager (1-2 weeks)
 2. Apply strategy pattern (2-3 weeks)
 3. Improve service structure (3-4 weeks)
-4. Complete test coverage (ongoing) 
+4. Complete test coverage (ongoing)

@@ -15,4 +15,4 @@ declare module '@microsoft/microsoft-graph-client' {
   export const Client: {
     init(options: { authProvider: AuthProvider }): Client;
   };
-} 
+}

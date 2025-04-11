@@ -177,5 +177,5 @@ class DataCollector:
             )
         features = pd.concat([mh_df, energy_df, task_df, calendar_df], axis=1)
         features = features.ffill().bfill().fillna(0)
-        
+
         return features

@@ -29,4 +29,4 @@ module.exports = {
     '!**/babel.config.js',
     '!**/jest.setup.js',
   ],
-}; 
+};

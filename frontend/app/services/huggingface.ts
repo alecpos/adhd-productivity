@@ -79,7 +79,7 @@ class HuggingFaceService {
         model: 'tiiuae/falcon-7b-instruct',
         inputs: `Break down this ADHD task into smaller, manageable steps:
         ${prompt}
-        
+
         Format the response as a list of steps, with each step being specific and actionable.
         Consider executive function challenges and provide clear, concrete steps.`,
         parameters: {
@@ -107,7 +107,7 @@ class HuggingFaceService {
   private calculateSentimentScore(emotions: EmotionClassification | EmotionClassification[]): number {
     // If emotions is a single object, wrap it in an array
     const emotionsArray = Array.isArray(emotions) ? emotions : [emotions];
-    
+
     const positiveEmotions = ['joy', 'love', 'optimism', 'relief'];
     const negativeEmotions = ['sadness', 'fear', 'anger', 'disgust'];
 
@@ -132,4 +132,4 @@ class HuggingFaceService {
 }
 
 export const huggingFaceService = new HuggingFaceService();
-export default huggingFaceService; 
+export default huggingFaceService;

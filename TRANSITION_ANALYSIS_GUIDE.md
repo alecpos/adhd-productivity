@@ -182,4 +182,4 @@ The repository includes several demo files to help you understand and implement 
 - Integration with calendar optimization algorithms
 - Interactive dashboards for real-time monitoring
 - Personalized recommendations for scheduling based on transition patterns
-- Mobile notifications to help prepare for difficult transitions 
+- Mobile notifications to help prepare for difficult transitions

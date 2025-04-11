@@ -12,4 +12,4 @@ class OutlookCalendarService(BaseService[CalendarEventModel, EventResponseSchema
     def __init__(self, db_session: AsyncSession):
         """Initialize Outlook Calendar service."""
         super().__init__(db_session, CalendarEventModel, EventResponseSchema)
-        # TODO: Add Outlook Calendar API client initialization 
+        # TODO: Add Outlook Calendar API client initialization

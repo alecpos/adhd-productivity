@@ -70,7 +70,7 @@ technical_debt:
         low: 0.4
         medium: 0.6
         high: 0.8
-    
+
     # Priority refactoring areas
     priority_modules:
       - app/services/body_doubling_service.py

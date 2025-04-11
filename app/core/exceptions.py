@@ -21,7 +21,7 @@ class ServiceError(BaseAPIException):
 
 class ServiceException(Exception):
     """Generic service exception not tied to HTTP status codes."""
-    
+
     def __init__(self, message: str = "Service operation failed"):
         """Initialize the exception with a descriptive message."""
         super().__init__(message)

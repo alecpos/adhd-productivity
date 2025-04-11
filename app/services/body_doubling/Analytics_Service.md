@@ -74,13 +74,13 @@ from app.services.body_doubling import AnalyticsService
 
 async def analyze_user_data(db_session, user_id):
     analytics_service = AnalyticsService(db_session)
-    
+
     # Get comprehensive user analytics
     user_analytics = await analytics_service.get_user_analytics(user_id)
     print(f"User has completed {user_analytics.total_sessions} sessions")
     print(f"Total focus time: {user_analytics.total_focus_time} minutes")
     print(f"Average productivity: {user_analytics.avg_productivity}/5")
-    
+
     # Get focus pattern insights
     insights = await analytics_service.get_focus_pattern_insights(user_id)
     for insight in insights["insights"]:
@@ -127,4 +127,4 @@ Planned enhancements for the AnalyticsService:
 
 ---
 
-*Last updated: November 15, 2023* 
+*Last updated: November 15, 2023*

@@ -1,6 +1,7 @@
 """Rate limiting utilities."""
 
-
+from datetime import datetime, timedelta
+from typing import Dict, List
 
 from starlette.responses import JSONResponse
 
@@ -29,10 +30,11 @@ class RateLimiter:
 
         # Check rate limit
         if len(self._requests[key]) >= max_requests:
-    pass
+            return True
 
         # Add new request
         self._requests[key].append(now)
+        return False
 
 
 # Global rate limiter instance
@@ -65,4 +67,6 @@ def rate_limit(max_requests: int, window_seconds: int = 60):
 
             return await func(*args, **kwargs)
 
+        return wrapper
 
+    return decorator

@@ -13,7 +13,7 @@ from app.schemas.base_schema import BaseSchema
 
 class MindfulnessSessionBaseSchema(BaseSchema):
     """Base schema for mindfulness sessions."""
-    
+
     user_id: UUID
     session_type: str = Field(..., description="Type of mindfulness session (meditation, breathing, etc.)")
     duration: int = Field(..., ge=1, description="Duration in minutes")
@@ -32,13 +32,13 @@ class MindfulnessSessionBaseSchema(BaseSchema):
 
 class MindfulnessSessionCreateSchema(MindfulnessSessionBaseSchema):
     """Schema for creating a new mindfulness session."""
-    
+
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the session started")
 
 
 class MindfulnessSessionResponseSchema(MindfulnessSessionBaseSchema):
     """Schema for mindfulness session response."""
-    
+
     id: UUID
     created_at: datetime
     updated_at: datetime
@@ -48,7 +48,7 @@ class MindfulnessSessionResponseSchema(MindfulnessSessionBaseSchema):
 
 class MindfulnessSuggestionSchema(BaseSchema):
     """Schema for mindfulness break suggestions."""
-    
+
     suggestion_type: str = Field(..., description="Type of mindfulness activity")
     title: str = Field(..., description="Title of the suggestion")
     description: str = Field(..., description="Detailed description of the activity")
@@ -63,7 +63,7 @@ class MindfulnessSuggestionSchema(BaseSchema):
 
 class MindfulnessStatsSchema(BaseSchema):
     """Schema for mindfulness statistics."""
-    
+
     user_id: UUID
     total_sessions: int = Field(..., description="Total number of sessions")
     total_minutes: int = Field(..., description="Total minutes spent in mindfulness")

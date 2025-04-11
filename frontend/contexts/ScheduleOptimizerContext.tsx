@@ -316,7 +316,7 @@ export const ScheduleOptimizerProvider: React.FC<{ children: React.ReactNode }> 
         user_id: user.id,
         ...adjustments
       });
-      setCurrentSchedule(prev => prev.map(block => 
+      setCurrentSchedule(prev => prev.map(block =>
         block.id === blockId ? { ...block, ...response.data } : block
       ));
       setError(null);
@@ -521,4 +521,4 @@ export const useScheduleOptimizer = () => {
     throw new Error('useScheduleOptimizer must be used within a ScheduleOptimizerProvider');
   }
   return context;
-}; 
+};

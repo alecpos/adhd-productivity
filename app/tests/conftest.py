@@ -92,13 +92,13 @@ def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
     # Create a new event loop
     policy = asyncio.get_event_loop_policy()
     loop = policy.new_event_loop()
-    
+
     # Set the loop as the current event loop
     asyncio.set_event_loop(loop)
-    
+
     # Yield the loop for the tests to use
     yield loop
-    
+
     # Clean up
     loop.close()
     asyncio.set_event_loop(None)  # Reset the event loop after all tests
@@ -108,16 +108,16 @@ def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
 async def db_engine():
     """Create a test database engine."""
     engine = create_async_engine(TEST_DATABASE_URL, echo=True)
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
@@ -206,7 +206,7 @@ async def body_doubling_service(db_session: AsyncSession) -> BodyDoublingService
     matching_engine = MatchingEngine(session_manager=session_manager)
     analytics_service = AnalyticsService(session_manager=session_manager)
     notification_service = NotificationService(session_manager=session_manager)
-    
+
     return BodyDoublingService(
         session_manager=session_manager,
         matching_engine=matching_engine,
@@ -507,27 +507,27 @@ def patch_imports():
     sys.modules['pymc3'] = MagicMock()
     sys.modules['theano'] = MockTheano()
     sys.modules['theano.tensor'] = MagicMock()
-    
+
     # Patch app.models.mental_health_model to include MentalHealthModel
     mental_health_module = MagicMock()
     mental_health_module.MentalHealthModel = MockMentalHealthModel
     sys.modules['app.models.mental_health_model'] = mental_health_module
-    
+
     # Patch app.models.energy_model
     energy_module = MagicMock()
     energy_module.EnergyModel = MockEnergyModel
     sys.modules['app.models.energy_model'] = energy_module
-    
+
     # Patch ML base models
     ml_models_module = MagicMock()
     ml_models_module.BaseMLModel = MockBaseMLModel
     sys.modules['app.ml.models'] = ml_models_module
-    
+
     # Patch feature engineering
     feature_eng_module = MagicMock()
     feature_eng_module.FeatureEngineer = MockFeatureEngineer
     sys.modules['app.ml.feature_engineering'] = feature_eng_module
-    
+
     # Patch numpy bool
     try:
         import numpy as np
@@ -535,12 +535,12 @@ def patch_imports():
             np.bool_ = bool
     except ImportError:
         pass
-    
+
     yield
-    
+
     # Clean up after tests complete
     for module in [
-        'pymc3', 'theano', 'theano.tensor', 
+        'pymc3', 'theano', 'theano.tensor',
         'app.models.mental_health_model', 'app.models.energy_model',
         'app.ml.models', 'app.ml.feature_engineering'
     ]:
@@ -576,19 +576,19 @@ def mock_db():
 
 def run_async_test(coroutine):
     """Run an async test within an event loop.
-    
+
     This function ensures that async test functions are properly awaited when run
     outside of pytest's automatic asyncio handling.
-    
+
     Args:
         coroutine: The async function to run
-        
+
     Returns:
         The result of the awaited coroutine
     """
     # Get the current policy
     policy = asyncio.get_event_loop_policy()
-    
+
     try:
         # Try to get the current event loop
         loop = asyncio.get_event_loop()
@@ -596,7 +596,7 @@ def run_async_test(coroutine):
         # If there's no event loop in the current thread, create one
         loop = policy.new_event_loop()
         asyncio.set_event_loop(loop)
-    
+
     if loop.is_running():
         # If the loop is already running (e.g., in an async environment),
         # use run_coroutine_threadsafe

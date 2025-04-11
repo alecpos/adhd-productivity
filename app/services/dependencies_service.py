@@ -19,4 +19,4 @@ async def get_current_user(
 ) -> UserModel:
     """Get the current authenticated user."""
     auth_service = AuthService(db)
-    return await auth_service.get_current_user(token) 
+    return await auth_service.get_current_user(token)

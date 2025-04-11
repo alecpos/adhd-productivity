@@ -146,4 +146,4 @@ When adding or modifying assets:
 - [Image Usage Guide](../docs/image_usage.md)
 - [Asset Management](../docs/asset_management.md)
 - [Icon System](../docs/icon_system.md)
-- [App Branding](../docs/app_branding.md) 
+- [App Branding](../docs/app_branding.md)

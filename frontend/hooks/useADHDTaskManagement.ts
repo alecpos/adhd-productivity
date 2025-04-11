@@ -103,7 +103,7 @@ export const useADHDTaskManagement = () => {
   }, [tasks, updateTask]);
 
   // ... rest of the implementation
-  
+
   return {
     taskMetrics,
     loading,
@@ -111,4 +111,4 @@ export const useADHDTaskManagement = () => {
     breakdownTask,
     updateTaskWithADHDMetrics
   };
-}; 
+};

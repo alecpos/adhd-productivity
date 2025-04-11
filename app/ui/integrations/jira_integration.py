@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 
 class JiraIntegration(ProjectToolIntegration):
     """Integration with Atlassian Jira."""
-    
+
     def __init__(self, config: ProjectToolConfig):
         """
         Initialize the Jira integration.
-        
+
         Args:
             config: Configuration for the Jira integration
         """
@@ -41,20 +41,20 @@ class JiraIntegration(ProjectToolIntegration):
         self.query_builder = JiraQueryBuilder()
         self.task_mapper = JiraTaskMapper()
         self.error_handler = JiraErrorHandler()
-    
+
     async def authenticate(self) -> bool:
         """
         Authenticate with Jira using the provided credentials.
-        
+
         Returns:
             True if authentication successful, False otherwise
         """
         return await self.authenticator.authenticate()
-    
+
     async def fetch_tasks(self) -> List[ExternalTask]:
         """
         Fetch issues from Jira and convert them to ExternalTask objects.
-        
+
         Returns:
             List of ExternalTask objects
         """
@@ -62,28 +62,28 @@ class JiraIntegration(ProjectToolIntegration):
             # Build JQL query
             jql = self.query_builder.build_jql_query(self.config)
             logger.info(f"Fetching Jira issues with query: {jql}")
-            
+
             # Fetch issues using API client
             issues = await self.api_client.get_issues(jql)
             logger.info(f"Retrieved {len(issues)} issues from Jira")
-            
+
             # Map issues to ExternalTask objects
             return [
-                self.task_mapper.jira_to_external_task(issue, self.config.api_url) 
+                self.task_mapper.jira_to_external_task(issue, self.config.api_url)
                 for issue in issues
             ]
-            
+
         except Exception as e:
             self.error_handler.handle_error("Error fetching Jira tasks", e)
             return []
-    
+
     async def create_task(self, task: Dict[str, Any]) -> ExternalTask:
         """
         Create a new issue in Jira.
-        
+
         Args:
             task: Task data to create
-            
+
         Returns:
             ExternalTask representing the created Jira issue
         """
@@ -91,54 +91,54 @@ class JiraIntegration(ProjectToolIntegration):
             # Add project information if not present
             if not task.get("project_key") and self.config.project_ids:
                 task["project_key"] = self.config.project_ids[0]
-            
+
             # Convert to Jira format
             issue_data = self.task_mapper.internal_to_jira_issue(task)
-            
+
             # Create using API client
             result = await self.api_client.create_issue(issue_data)
             logger.info(f"Created Jira issue {result.get('key')}")
-            
+
             # Return as ExternalTask
             return self._create_external_task_from_result(result, task)
-            
+
         except Exception as e:
             self.error_handler.handle_error("Error creating Jira task", e)
             raise
-    
+
     async def update_task(self, external_id: str, task_data: Dict[str, Any]) -> ExternalTask:
         """
         Update an existing issue in Jira.
-        
+
         Args:
             external_id: Jira issue key
             task_data: Updated task data
-            
+
         Returns:
             ExternalTask representing the updated Jira issue
         """
         try:
             # Convert to Jira format
             issue_data = self.task_mapper.internal_to_jira_issue(task_data)
-            
+
             # Update using API client
             result = await self.api_client.update_issue(external_id, issue_data)
             logger.info(f"Updated Jira issue {external_id}")
-            
+
             # Return as ExternalTask
             return self._create_external_task_from_result(result, task_data)
-            
+
         except Exception as e:
             self.error_handler.handle_error(f"Error updating Jira task {external_id}", e)
             raise
-    
+
     async def delete_task(self, external_id: str) -> bool:
         """
         Delete a task in Jira.
-        
+
         Args:
             external_id: Jira issue key
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -149,11 +149,11 @@ class JiraIntegration(ProjectToolIntegration):
         except Exception as e:
             self.error_handler.handle_error(f"Error deleting Jira task {external_id}", e)
             return False
-    
+
     async def get_projects(self) -> List[Dict[str, Any]]:
         """
         Get available projects from Jira.
-        
+
         Returns:
             List of Jira projects
         """
@@ -164,14 +164,14 @@ class JiraIntegration(ProjectToolIntegration):
         except Exception as e:
             self.error_handler.handle_error("Error fetching Jira projects", e)
             return []
-    
+
     async def get_task_details(self, external_id: str) -> Optional[ExternalTask]:
         """
         Get detailed information about a specific task.
-        
+
         Args:
             external_id: Jira issue key
-            
+
         Returns:
             ExternalTask or None if not found
         """
@@ -179,20 +179,20 @@ class JiraIntegration(ProjectToolIntegration):
             issue = await self.api_client.get_issue(external_id)
             if not issue:
                 return None
-                
+
             return self.task_mapper.jira_to_external_task(issue, self.config.api_url)
         except Exception as e:
             self.error_handler.handle_error(f"Error fetching Jira task {external_id}", e)
             return None
-    
+
     def _create_external_task_from_result(self, result: Dict[str, Any], task_data: Dict[str, Any]) -> ExternalTask:
         """
         Create an ExternalTask from Jira API result and task data.
-        
+
         Args:
             result: Result from Jira API
             task_data: Original task data
-            
+
         Returns:
             ExternalTask representing the Jira issue
         """
@@ -200,7 +200,7 @@ class JiraIntegration(ProjectToolIntegration):
         project_id = task_data.get("project_key")
         if not project_id and self.config.project_ids:
             project_id = self.config.project_ids[0]
-            
+
         return ExternalTask(
             external_id=result["key"],
             title=task_data["title"],
@@ -216,11 +216,11 @@ class JiraIntegration(ProjectToolIntegration):
             tool_type=ProjectToolType.JIRA,
             additional_data={"key": result["key"]}
         )
-    
+
     def get_health_metrics(self) -> Dict[str, Any]:
         """
         Get health metrics for the integration.
-        
+
         Returns:
             Dictionary of health metrics
         """
@@ -231,4 +231,4 @@ class JiraIntegration(ProjectToolIntegration):
                 "project_ids": self.config.project_ids,
                 "last_sync": self.config.last_sync.isoformat() if self.config.last_sync else None,
             }
-        } 
+        }

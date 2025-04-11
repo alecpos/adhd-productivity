@@ -40,7 +40,7 @@ This document outlines the refactoring plan for high-complexity ML and integrati
 
 **Refactoring Strategy:**
 1. **Extract specialized strategy classes:**
-   - Create `TransitionDifficultyCalculator` 
+   - Create `TransitionDifficultyCalculator`
    - Extract `ContextChangeAnalyzer`
    - Create `UserAdjustmentProcessor`
 
@@ -157,4 +157,4 @@ This document outlines the refactoring plan for high-complexity ML and integrati
 1. Implement automated complexity checking in CI pipeline
 2. Add pre-commit hooks for complexity thresholds
 3. Regular refactoring sprints for technical debt reduction
-4. Training on clean code principles and design patterns 
+4. Training on clean code principles and design patterns

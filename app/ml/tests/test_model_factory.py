@@ -158,17 +158,17 @@ def test_model_compilation(model_factory):
     # Test mood predictor compilation
     mood_model = model_factory.create_mood_predictor(input_shape)
     assert mood_model.optimizer.__class__.__name__ == "Adam"
-    
+
     # Instead of checking metrics directly, we'll verify the model can be compiled
     assert mood_model._is_compiled
     assert hasattr(mood_model, 'loss')
-    
+
     # Test energy predictor compilation
     energy_model = model_factory.create_energy_predictor(input_shape)
     assert energy_model.optimizer.__class__.__name__ == "Adam"
     assert energy_model._is_compiled
     assert hasattr(energy_model, 'loss')
-    
+
     # Test task predictor compilation
     task_model = model_factory.create_task_predictor(input_shape)
     assert task_model.optimizer.__class__.__name__ == "Adam"
@@ -181,7 +181,7 @@ def test_model_compilation(model_factory):
     assert activity_model.optimizer.__class__.__name__ == "Adam"
     assert activity_model._is_compiled
     assert hasattr(activity_model, 'loss')
-    
+
     # Compile the model with metrics if needed
     if not any('accuracy' in metric.name for metric in activity_model.metrics):
         activity_model.compile(

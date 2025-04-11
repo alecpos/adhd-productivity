@@ -30,7 +30,7 @@ class MockMentalHealthModel:
     energy_level = 6
     stress_level = 4
     sleep_hours = 7.5
-    
+
     def to_dict(self):
         """Convert to dictionary."""
         return {
@@ -53,7 +53,7 @@ class MockEnergyModel:
     afternoon_energy = 8
     evening_energy = 6
     overall_energy = 7.0
-    
+
     def to_dict(self):
         """Convert to dictionary."""
         return {
@@ -68,23 +68,23 @@ class MockEnergyModel:
 # Mock BaseMLModel
 class MockBaseMLModel:
     """Mock implementation of BaseMLModel."""
-    
+
     def __init__(self, model_path=None):
         self.model_path = model_path
         self.model = None
-    
+
     async def fit(self, *args, **kwargs):
         """Mock implementation of fit method."""
         return None
-    
+
     async def predict(self, *args, **kwargs):
         """Mock implementation of predict method."""
         return {"predicted_value": 100}
-    
+
     def save(self, filepath):
         """Mock implementation of save method."""
         return None
-    
+
     @classmethod
     def load(cls, filepath):
         """Mock implementation of load method."""
@@ -101,7 +101,7 @@ from uuid import uuid4
 # Mock HealthMetrics
 class MockHealthMetrics:
     """Mock HealthMetrics for testing."""
-    
+
     def __init__(self, **kwargs):
         self.id = str(uuid4())
         self.user_id = 'user-test-123'
@@ -115,11 +115,11 @@ class MockHealthMetrics:
         self.heart_rate_variability = 50
         self.anxiety_level = 3
         self.environment_data = {}
-        
+
         # Override defaults with any provided values
         for key, value in kwargs.items():
             setattr(self, key, value)
-    
+
     @property
     def is_low_energy(self) -> bool:
         """Check if energy level is low."""
@@ -133,11 +133,11 @@ class MockHealthMetrics:
 # Mock FeatureEngineer
 class MockFeatureEngineer:
     """Mock implementation of FeatureEngineer."""
-    
+
     def extract_features(self, data, *args, **kwargs):
         """Mock implementation of extract_features."""
         return {"feature1": 1.0, "feature2": 2.0, "feature3": 3.0}
-    
+
     def transform(self, features, *args, **kwargs):
         """Mock implementation of transform method."""
         return features
@@ -205,7 +205,7 @@ from app.ml.stochastic_time_estimation import ContextualStressorDetector
 
 class TestContextualStressorDetector:
     """Tests for the ContextualStressorDetector class."""
-    
+
     @pytest.fixture
     def detector(self, mock_db):
         """Create a ContextualStressorDetector instance for testing."""
@@ -232,7 +232,7 @@ class TestContextualStressorDetector:
                 "social": 0.1
             }
         )
-    
+
     @pytest.mark.asyncio
     async def test_init(self, detector):
         """Test initialization of the detector."""
@@ -241,7 +241,7 @@ class TestContextualStressorDetector:
         assert "low" in detector.stress_threshold_hr
         assert "physiological" in detector.stress_impact_weights
         assert "noise_level" in detector.env_thresholds
-    
+
     @pytest.mark.asyncio
     async def test_detect_current_stress(self, detector):
         """Test detecting current stress levels."""
@@ -250,7 +250,7 @@ class TestContextualStressorDetector:
             user_id="user-123",
             resting_heart_rate=65
         )
-        
+
         # Mock recent health metrics
         metrics = [
             MockHealthMetrics(
@@ -272,19 +272,19 @@ class TestContextualStressorDetector:
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Mock methods
         detector._get_user = AsyncMock(return_value=user)
         detector._get_recent_health_metrics = AsyncMock(return_value=metrics)
         detector._determine_stress_trend = AsyncMock(return_value="stable")
-        
+
         # Test the method
         result = await detector.detect_current_stress("user-123")
-        
+
         # Verify method calls
         detector._get_user.assert_called_once_with("user-123")
         detector._get_recent_health_metrics.assert_called_once_with("user-123")
-        
+
         # Verify result structure
         assert "overall_stress_level" in result
         assert "stress_score" in result
@@ -292,31 +292,31 @@ class TestContextualStressorDetector:
         assert "time_impact_factor" in result
         assert "trend" in result
         assert "analysis_timestamp" in result
-        
+
         # Verify sensible values
         assert isinstance(result["stress_score"], int)
         assert 0 <= result["stress_score"] <= 100
         assert result["time_impact_factor"] >= 1.0
-    
+
     @pytest.mark.asyncio
     async def test_detect_current_stress_no_metrics(self, detector):
         """Test detecting stress with no metrics available."""
         # Mock user retrieval
         user = create_mock_user(user_id="user-123")
         detector._get_user = AsyncMock(return_value=user)
-        
+
         # Mock empty metrics
         detector._get_recent_health_metrics = AsyncMock(return_value=[])
-        
+
         # Test the method
         result = await detector.detect_current_stress("user-123")
-        
+
         # Verify result contains expected fallback values
         assert "error" in result
         assert result["overall_stress_level"] == "low"
         assert result["stress_score"] == 0
         assert result["time_impact_factor"] == 1.0
-    
+
     @pytest.mark.asyncio
     async def test_get_task_stress_adjustment(self, detector):
         """Test getting stress-based adjustment factor for a task."""
@@ -327,7 +327,7 @@ class TestContextualStressorDetector:
             difficulty=4,  # Higher difficulty
             focus_required=5  # High focus requirement
         )
-        
+
         # Mock methods
         detector._get_task = AsyncMock(return_value=task)
         detector.detect_current_stress = AsyncMock(return_value={
@@ -338,19 +338,19 @@ class TestContextualStressorDetector:
             "detected_stressors": []
         })
         detector._calculate_task_stress_sensitivity = MagicMock(return_value=0.7)
-        
+
         # Test the method
         result = await detector.get_task_stress_adjustment("task-123")
-        
+
         # Verify method calls
         detector._get_task.assert_called_once_with("task-123")
         detector.detect_current_stress.assert_called_once_with("user-123")
-        
+
         # Verify result is a sensible adjustment factor
         assert isinstance(result, float)
         assert 1.0 <= result <= 2.0
         assert result > 1.3  # Should be higher than the base factor due to task difficulty
-    
+
     def test_analyze_physiological_stress(self, detector):
         """Test analyzing physiological stress from health metrics."""
         # Create health metrics with elevated heart rate
@@ -371,10 +371,10 @@ class TestContextualStressorDetector:
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_physiological_stress(metrics, resting_hr=65)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "physiological"
@@ -383,17 +383,17 @@ class TestContextualStressorDetector:
         assert "details" in result
         assert "heart_rate" in result["details"]
         assert "hrv" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
         assert result["details"]["heart_rate"]["value"] == 90  # Latest value
-    
+
     def test_analyze_physiological_stress_no_metrics(self, detector):
         """Test analyzing physiological stress with no metrics."""
         # Test with empty metrics
         result = detector._analyze_physiological_stress([], resting_hr=65)
         assert result is None
-    
+
     def test_analyze_environmental_stress(self, detector):
         """Test analyzing environmental stress from metrics."""
         # Create health metrics with environment data
@@ -413,20 +413,20 @@ class TestContextualStressorDetector:
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_environmental_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "environmental"
         assert "stress_level" in result
         assert "stress_score" in result
         assert "details" in result
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
-    
+
     def test_analyze_cognitive_stress(self, detector):
         """Test analyzing cognitive stress from focus metrics."""
         # Create health metrics with focus data
@@ -444,10 +444,10 @@ class TestContextualStressorDetector:
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_cognitive_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "cognitive"
@@ -455,10 +455,10 @@ class TestContextualStressorDetector:
         assert "stress_score" in result
         assert "details" in result
         assert "focus_level" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
-    
+
     def test_analyze_emotional_stress(self, detector):
         """Test analyzing emotional stress from mood and anxiety metrics."""
         # Create health metrics with mood and anxiety data
@@ -479,10 +479,10 @@ class TestContextualStressorDetector:
                 timestamp=datetime.now()
             )
         ]
-        
+
         # Test the method
         result = detector._analyze_emotional_stress(metrics)
-        
+
         # Verify result
         assert result is not None
         assert result["stressor_type"] == "emotional"
@@ -491,10 +491,10 @@ class TestContextualStressorDetector:
         assert "details" in result
         assert "mood_level" in result["details"]
         assert "anxiety_level" in result["details"]
-        
+
         # Verify sensible values
         assert 0 <= result["stress_score"] <= 100
-    
+
     def test_calculate_overall_stress(self, detector):
         """Test calculating overall stress from multiple stressors."""
         # Create stressors with different levels
@@ -515,32 +515,32 @@ class TestContextualStressorDetector:
                 "stress_score": 25
             }
         ]
-        
+
         # Test the method
         stress_score, stress_level = detector._calculate_overall_stress(stressors)
-        
+
         # Verify results
         assert isinstance(stress_score, int)
         assert 0 <= stress_score <= 100
         assert stress_level in ["low", "moderate", "high", "extreme"]
-        
+
         # Test with empty stressors
         empty_score, empty_level = detector._calculate_overall_stress([])
         assert empty_score == 0
         assert empty_level == "low"
-    
+
     def test_calculate_stress_time_impact(self, detector):
         """Test calculating time impact factor from stress score."""
         # Test with various stress scores
         assert detector._calculate_stress_time_impact(0) == 1.0  # No stress = no impact
         assert detector._calculate_stress_time_impact(50) == 1.5  # Moderate stress = 50% more time
         assert detector._calculate_stress_time_impact(100) == 2.0  # Extreme stress = double time
-        
+
         # Test with values in between
         impact_25 = detector._calculate_stress_time_impact(25)
         impact_75 = detector._calculate_stress_time_impact(75)
         assert 1.0 < impact_25 < impact_75 < 2.0  # Verify monotonic relationship
-    
+
     def test_stress_level_to_numeric(self, detector):
         """Test conversion of stress level strings to numeric values."""
         assert detector.stress_level_to_numeric("low") == 1
@@ -548,18 +548,18 @@ class TestContextualStressorDetector:
         assert detector.stress_level_to_numeric("high") == 3
         assert detector.stress_level_to_numeric("extreme") == 4
         assert detector.stress_level_to_numeric("unknown") == 0  # Invalid values
-    
+
     def test_save_and_load(self, detector):
         """Test saving and loading model parameters."""
         # Setup custom thresholds
         detector.stress_threshold_hr = {"low": 0.15, "moderate": 0.25, "high": 0.35, "extreme": 0.45}
         detector.lookback_period = 36
-        
+
         # Save to a temporary file
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as temp:
             filepath = temp.name
             detector.save(filepath)
-            
+
             # Verify file exists and contains data
             assert os.path.exists(filepath)
             with open(filepath, 'r') as f:
@@ -567,13 +567,13 @@ class TestContextualStressorDetector:
                 assert "stress_threshold_hr" in data
                 assert "lookback_period" in data
                 assert data["lookback_period"] == 36
-        
+
         # Load parameters to a new detector
         loaded_detector = ContextualStressorDetector.load(filepath)
-        
+
         # Verify loaded parameters match saved ones
         assert loaded_detector.stress_threshold_hr == detector.stress_threshold_hr
         assert loaded_detector.lookback_period == detector.lookback_period
-        
+
         # Clean up
         os.unlink(filepath)

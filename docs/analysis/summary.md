@@ -65,4 +65,4 @@ Based on this analysis, we should prioritize:
 3. Breaking down large classes into smaller, more focused components
 4. Addressing deep nesting throughout the codebase
 
-See [Next Steps](../refactoring/next_steps.md) for more detailed refactoring plans. 
+See [Next Steps](../refactoring/next_steps.md) for more detailed refactoring plans.

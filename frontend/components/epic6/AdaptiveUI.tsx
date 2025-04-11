@@ -85,7 +85,7 @@ export const AdaptiveUI = () => {
       type: 'toggle'
     }
   ]);
-  
+
   const [achievements, setAchievements] = useState<AchievementItem[]>([
     {
       id: '1',
@@ -138,7 +138,7 @@ export const AdaptiveUI = () => {
       category: 'learning'
     }
   ]);
-  
+
   const [motivationProfile, setMotivationProfile] = useState({
     achievement: 80,
     social: 35,
@@ -149,7 +149,7 @@ export const AdaptiveUI = () => {
   const [scale] = useState(new Animated.Value(1));
   const [rewardPoints, setRewardPoints] = useState(0);
   const [showReward, setShowReward] = useState(false);
-  
+
   useEffect(() => {
     const storedPreferences = {
       reduce_motion: false,
@@ -160,14 +160,14 @@ export const AdaptiveUI = () => {
       notification_style: 'standard',
       reading_guide: false
     };
-    
+
     // Apply stored preferences (mock)
     setUiPreferences(prev => prev.map(pref => ({
       ...pref,
       value: storedPreferences[pref.id as keyof typeof storedPreferences] ?? pref.value
     })));
   }, []);
-  
+
   // Simulate focus rewards
   useFocusEffect(
     React.useCallback(() => {
@@ -179,22 +179,22 @@ export const AdaptiveUI = () => {
       return () => {};
     }, [activeTab])
   );
-  
+
   const handlePreferenceChange = (id: string, value: boolean | number | string) => {
-    setUiPreferences(prev => 
+    setUiPreferences(prev =>
       prev.map(pref => pref.id === id ? { ...pref, value } : pref)
     );
-    
+
     // In a real app, save to storage and apply changes
     if (id === 'reduce_motion' && typeof value === 'boolean' && value) {
       addRewardPoints(5); // Reward for using accessibility features
     }
   };
-  
+
   const addRewardPoints = (points: number) => {
     setRewardPoints(points);
     setShowReward(true);
-    
+
     Animated.sequence([
       Animated.timing(scale, {
         toValue: 1.2,
@@ -207,12 +207,12 @@ export const AdaptiveUI = () => {
         useNativeDriver: true
       })
     ]).start();
-    
+
     setTimeout(() => {
       setShowReward(false);
     }, 2000);
   };
-  
+
   const getProgressColor = (progress: number) => {
     if (progress < 33) return '#DA4747';
     if (progress < 66) return '#DAA147';
@@ -228,7 +228,7 @@ export const AdaptiveUI = () => {
       default: return '#90CAF9';
     }
   };
-  
+
   const renderPreferenceControl = (preference: UiPreference) => {
     switch (preference.type) {
       case 'toggle':
@@ -240,7 +240,7 @@ export const AdaptiveUI = () => {
             thumbColor={preference.value ? '#ffffff' : '#f5f5f5'}
           />
         );
-      
+
       case 'slider':
         return (
           <View style={styles.sliderContainer}>
@@ -261,7 +261,7 @@ export const AdaptiveUI = () => {
             />
           </View>
         );
-      
+
       case 'select':
         return (
           <View style={styles.optionsContainer}>
@@ -304,12 +304,12 @@ export const AdaptiveUI = () => {
             ))}
           </View>
         );
-      
+
       default:
         return null;
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
@@ -330,7 +330,7 @@ export const AdaptiveUI = () => {
             UI Preferences
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.tab, activeTab === 'gamification' && styles.activeTab]}
           onPress={() => setActiveTab('gamification')}
@@ -349,9 +349,9 @@ export const AdaptiveUI = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {showReward && (
-        <Animated.View 
+        <Animated.View
           style={[
             styles.rewardContainer,
             { transform: [{ scale }] }
@@ -360,7 +360,7 @@ export const AdaptiveUI = () => {
           <Text style={styles.rewardText}>+{rewardPoints} points</Text>
         </Animated.View>
       )}
-      
+
       <ScrollView style={styles.scrollContainer}>
         {activeTab === 'preferences' ? (
           <>
@@ -369,7 +369,7 @@ export const AdaptiveUI = () => {
               <Text style={styles.subtitle}>
                 Customize your app experience to match your needs and preferences.
               </Text>
-              
+
               {uiPreferences.map((preference) => (
                 <View key={preference.id} style={styles.preferenceItem}>
                   <View style={styles.preferenceInfo}>
@@ -382,15 +382,15 @@ export const AdaptiveUI = () => {
                 </View>
               ))}
             </Card>
-            
+
             <Card containerStyle={styles.card}>
               <Card.Title>Current Energy Level</Card.Title>
               <Text style={styles.subtitle}>
                 The UI will adapt to your energy level throughout the day.
               </Text>
-              
+
               <View style={styles.energyLevelContainer}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.energyButton, styles.energyButtonLow]}
                   onPress={() => {
                     // Apply low energy UI adaptations
@@ -400,8 +400,8 @@ export const AdaptiveUI = () => {
                   <Icon name="battery-low" type="material-community" color="white" size={24} />
                   <Text style={styles.energyButtonText}>Low</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={[styles.energyButton, styles.energyButtonMedium]}
                   onPress={() => {
                     // Apply medium energy UI adaptations
@@ -412,8 +412,8 @@ export const AdaptiveUI = () => {
                   <Icon name="battery-medium" type="material-community" color="white" size={24} />
                   <Text style={styles.energyButtonText}>Medium</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={[styles.energyButton, styles.energyButtonHigh]}
                   onPress={() => {
                     // Apply high energy UI adaptations
@@ -425,7 +425,7 @@ export const AdaptiveUI = () => {
                   <Text style={styles.energyButtonText}>High</Text>
                 </TouchableOpacity>
               </View>
-              
+
               <Text style={styles.energyExplanation}>
                 Select your current energy level to optimize the interface.
                 Low energy settings reduce visual stimulation, while high energy
@@ -445,76 +445,76 @@ export const AdaptiveUI = () => {
                   textStyle={styles.levelBadgeText}
                 />
               </View>
-              
+
               <Text style={styles.subtitle}>
                 Your personal rewards are tailored to your motivation style.
               </Text>
-              
+
               <View style={styles.motivationContainer}>
                 <View style={styles.motivationItem}>
                   <View style={styles.motivationBarContainer}>
-                    <View 
+                    <View
                       style={[
-                        styles.motivationBar, 
+                        styles.motivationBar,
                         { height: `${motivationProfile.achievement}%`, backgroundColor: '#4782DA' }
-                      ]} 
+                      ]}
                     />
                   </View>
                   <Text style={styles.motivationLabel}>Achievement</Text>
                 </View>
-                
+
                 <View style={styles.motivationItem}>
                   <View style={styles.motivationBarContainer}>
-                    <View 
+                    <View
                       style={[
-                        styles.motivationBar, 
+                        styles.motivationBar,
                         { height: `${motivationProfile.social}%`, backgroundColor: '#DA9647' }
-                      ]} 
+                      ]}
                     />
                   </View>
                   <Text style={styles.motivationLabel}>Social</Text>
                 </View>
-                
+
                 <View style={styles.motivationItem}>
                   <View style={styles.motivationBarContainer}>
-                    <View 
+                    <View
                       style={[
-                        styles.motivationBar, 
+                        styles.motivationBar,
                         { height: `${motivationProfile.mastery}%`, backgroundColor: '#8047DA' }
-                      ]} 
+                      ]}
                     />
                   </View>
                   <Text style={styles.motivationLabel}>Mastery</Text>
                 </View>
-                
+
                 <View style={styles.motivationItem}>
                   <View style={styles.motivationBarContainer}>
-                    <View 
+                    <View
                       style={[
-                        styles.motivationBar, 
+                        styles.motivationBar,
                         { height: `${motivationProfile.progression}%`, backgroundColor: '#47DA96' }
-                      ]} 
+                      ]}
                     />
                   </View>
                   <Text style={styles.motivationLabel}>Progression</Text>
                 </View>
               </View>
-              
+
               <Text style={styles.motivationExplanation}>
                 Your primary motivators are Achievement and Progression.
                 We'll focus on milestone tracking and visible progress indicators.
               </Text>
             </Card>
-            
+
             <Card containerStyle={styles.card}>
               <Card.Title>Your Achievements</Card.Title>
               <Text style={styles.subtitle}>
                 Track your progress and earn rewards for using the app effectively.
               </Text>
-              
+
               {achievements.map((achievement) => (
-                <View 
-                  key={achievement.id} 
+                <View
+                  key={achievement.id}
                   style={[
                     styles.achievementItem,
                     achievement.isUnlocked && styles.unlockedAchievement
@@ -528,22 +528,22 @@ export const AdaptiveUI = () => {
                       size={28}
                     />
                   </View>
-                  
+
                   <View style={styles.achievementContent}>
                     <View style={styles.achievementHeader}>
                       <Text style={styles.achievementTitle}>{achievement.title}</Text>
                       <Text style={styles.achievementPoints}>+{achievement.points}</Text>
                     </View>
-                    
+
                     <Text style={styles.achievementDescription}>{achievement.description}</Text>
-                    
+
                     <View style={styles.progressContainer}>
                       <View style={styles.progressBar}>
-                        <View 
+                        <View
                           style={[
                             styles.progressFill,
                             { width: `${achievement.progress}%`, backgroundColor: getProgressColor(achievement.progress) }
-                          ]} 
+                          ]}
                         />
                       </View>
                       <Text style={styles.progressText}>{achievement.progress}%</Text>
@@ -551,7 +551,7 @@ export const AdaptiveUI = () => {
                   </View>
                 </View>
               ))}
-              
+
               <Button
                 title="View All Achievements"
                 type="outline"
@@ -864,4 +864,4 @@ const styles = StyleSheet.create({
   viewAllButtonContainer: {
     marginTop: 5,
   },
-}); 
+});

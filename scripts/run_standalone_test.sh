@@ -57,7 +57,7 @@ done
 if [ "$TEST_TYPE" == "ai" ]; then
     echo -e "${YELLOW}Running Body Doubling AnalyticsService tests with AI-powered insights...${NC}"
     echo -e "${CYAN}This test will use Hugging Face transformers if available, otherwise will fall back to mock insights.${NC}"
-    
+
     # Add Mac-specific guidance
     if [[ "$OSTYPE" == "darwin"* ]]; then
         echo -e "${YELLOW}Mac OS detected. If you encounter TensorFlow/Metal plugin issues:${NC}"
@@ -67,7 +67,7 @@ if [ "$TEST_TYPE" == "ai" ]; then
         echo -e "${CYAN}To enable AI-powered insights, ensure you have installed: pip install transformers torch${NC}"
     fi
     echo
-    
+
     # Run the mock test with AI integration, passing the PyTorch flag if set
     if [ -n "$PYTORCH_ONLY" ]; then
         echo -e "${BLUE}Running in PyTorch-only mode (no TensorFlow)${NC}"
@@ -79,7 +79,7 @@ else
     echo -e "${YELLOW}Running standalone test for Body Doubling AnalyticsService...${NC}"
     echo -e "${CYAN}This test uses mocked models to avoid database dependency issues.${NC}"
     echo
-    
+
     # Run the standalone test with mock model injection
     python -m app.services.body_doubling.standalone_test
 fi
@@ -93,4 +93,4 @@ echo -e "\n${GREEN}Tests completed successfully!${NC}"
 echo -e "${CYAN}For AI-powered insight testing, run: $0 --ai${NC}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo -e "${CYAN}For Mac users with TensorFlow issues, run: $0 --ai --pytorch${NC}"
-fi 
+fi

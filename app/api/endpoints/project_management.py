@@ -40,14 +40,14 @@ class ProjectToolConfig(BaseModel):
     enabled: bool = True
     sync_direction: SyncDirection = SyncDirection.IMPORT
     sync_frequency: SyncFrequency = SyncFrequency.MANUAL
-    
+
 class SyncResult(BaseModel):
     tool_type: ProjectToolType
     tasks_synced: int
     success: bool
     timestamp: datetime
     error_message: Optional[str] = None
-    
+
 class ExternalTask(BaseModel):
     id: str
     title: str
@@ -62,25 +62,25 @@ class ExternalTask(BaseModel):
 class ProjectManagementService:
     async def get_user_integrations(self, user_id: str) -> List[ProjectToolConfig]:
         return [ProjectToolConfig(user_id=user_id, tool_type=ProjectToolType.JIRA)]
-        
+
     async def register_integration(self, user_id: str, config: Dict[str, Any]) -> ProjectToolConfig:
         return ProjectToolConfig(user_id=user_id, tool_type=ProjectToolType.JIRA)
-        
+
     async def remove_integration(self, user_id: str, tool_type: ProjectToolType) -> bool:
         return True
-        
+
     async def sync_tasks(self, user_id: str, tool_types: Optional[List[ProjectToolType]] = None) -> Dict[ProjectToolType, int]:
         return {ProjectToolType.JIRA: 5}
-        
+
     async def get_sync_status(self, user_id: str) -> Dict[str, Any]:
         return {"last_sync": datetime.now().isoformat(), "status": "completed"}
-        
+
     async def get_available_projects(self, user_id: str, tool_type: ProjectToolType) -> List[Dict[str, Any]]:
         return [{"id": "PROJ-1", "name": "Sample Project"}]
-        
+
     async def create_task(self, user_id: str, tool_type: ProjectToolType, task_data: Dict[str, Any]) -> Dict[str, Any]:
         return {"id": "TASK-123", "title": task_data.get("title", "New Task")}
-        
+
     async def update_task(self, user_id: str, tool_type: ProjectToolType, task_id: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
         return {"id": task_id, "title": task_data.get("title", "Updated Task")}
 
@@ -170,10 +170,10 @@ async def create_task_in_external_tool(
     result = await project_management_service.create_task_in_external_tool(
         current_user.id, tool_type, task_data
     )
-    
+
     if result is None:
         raise HTTPException(status_code=400, detail="Failed to create task")
-    
+
     return result
 
 
@@ -190,8 +190,8 @@ async def update_task_in_external_tool(
     result = await project_management_service.update_task_in_external_tool(
         current_user.id, tool_type, external_id, task_data
     )
-    
+
     if result is None:
         raise HTTPException(status_code=400, detail="Failed to update task")
-    
-    return result 
+
+    return result

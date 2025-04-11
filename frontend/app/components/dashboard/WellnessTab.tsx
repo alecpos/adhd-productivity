@@ -51,7 +51,7 @@ export default function WellnessTab() {
       </View>
 
       <View style={styles.section}>
-        <MentalHealthLogForm 
+        <MentalHealthLogForm
           onSubmit={handleMoodSubmit}
           quickMode={true}
         />
@@ -84,4 +84,4 @@ const useStyles = makeStyles((theme) => ({
     shadowRadius: 3.84,
     elevation: 5,
   },
-})); 
+}));

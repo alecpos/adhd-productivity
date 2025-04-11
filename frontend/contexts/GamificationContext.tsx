@@ -159,7 +159,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const params = new URLSearchParams();
       if (category) params.append('category', category);
       if (timeframe) params.append('timeframe', timeframe);
-      
+
       const response = await api.get<APIResponse<LeaderboardSchema>>(`/api/gamification/leaderboard?${params}`);
       setLeaderboard(response.data.data.rankings || []);
     } catch (err) {
@@ -231,4 +231,4 @@ export const useGamification = () => {
     throw new Error('useGamification must be used within a GamificationProvider');
   }
   return context;
-}; 
+};

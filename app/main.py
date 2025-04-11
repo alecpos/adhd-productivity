@@ -80,7 +80,7 @@ def setup_routers(app: FastAPI) -> None:
     # Add legacy router
     logger.info("Including the legacy api_router")
     app.include_router(legacy_api_router, prefix=settings.API_V1_STR)
-    
+
     # Add new router
     logger.info("Including the new API router")
     app.include_router(new_api_router, prefix=settings.API_V1_STR)
@@ -89,7 +89,7 @@ def setup_middleware(app: FastAPI) -> None:
     """Configure middleware for the application."""
     # Set up error handling middleware
     setup_error_handling(app)
-    
+
     # Add request logging middleware
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
@@ -124,7 +124,7 @@ def setup_endpoints(app: FastAPI) -> None:
     async def health():
         """Health check endpoint."""
         return {"status": "ok"}
-    
+
     @app.get("/health", tags=["Health"])
     async def health_check():
         """Health check endpoint."""

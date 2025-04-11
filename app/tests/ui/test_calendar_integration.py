@@ -21,7 +21,7 @@ from app.ui.calendar_integration import (
 
 class TestCalendarIntegrationConfig:
     """Test the CalendarIntegrationConfig model."""
-    
+
     def test_default_config(self):
         """Test that default configuration values are set correctly."""
         config = CalendarIntegrationConfig(
@@ -30,7 +30,7 @@ class TestCalendarIntegrationConfig:
             calendar_id="primary",
             display_name="My Calendar"
         )
-        
+
         assert config.user_id == "test_user"
         assert config.platform == CalendarPlatform.GOOGLE
         assert config.calendar_id == "primary"
@@ -46,7 +46,7 @@ class TestCalendarIntegrationConfig:
         assert config.sync_events_days_forward == 90
         assert len(config.event_types_to_sync) > 0  # Should contain all EventType values
         assert config.custom_sync_settings == {}
-    
+
     def test_custom_config(self):
         """Test that custom configuration can be set."""
         config = CalendarIntegrationConfig(
@@ -61,7 +61,7 @@ class TestCalendarIntegrationConfig:
             event_types_to_sync={EventType.MEETING, EventType.APPOINTMENT},
             custom_sync_settings={"include_declined": False}
         )
-        
+
         assert config.platform == CalendarPlatform.OUTLOOK
         assert config.calendar_id == "work@example.com"
         assert config.display_name == "Work Calendar"
@@ -77,7 +77,7 @@ class TestCalendarIntegrationConfig:
 
 class TestExternalEvent:
     """Test the ExternalEvent model."""
-    
+
     def test_minimal_event(self):
         """Test creation of a minimal external event."""
         now = datetime.now()
@@ -89,7 +89,7 @@ class TestExternalEvent:
             end_time=now + timedelta(hours=1),
             platform=CalendarPlatform.GOOGLE
         )
-        
+
         assert event.event_id == "event123"
         assert event.calendar_id == "primary"
         assert event.title == "Test Event"
@@ -105,7 +105,7 @@ class TestExternalEvent:
         assert event.transparency is False
         assert event.platform == CalendarPlatform.GOOGLE
         assert event.additional_data == {}
-    
+
     def test_complete_event(self):
         """Test creation of a fully populated external event."""
         now = datetime.now()
@@ -137,7 +137,7 @@ class TestExternalEvent:
             platform=CalendarPlatform.GOOGLE,
             additional_data={"conference_solution": "Google Meet"}
         )
-        
+
         assert event.event_id == "event456"
         assert event.title == "Comprehensive Event"
         assert event.description == "This is a detailed event for testing"
@@ -157,7 +157,7 @@ class TestExternalEvent:
 
 class TestGoogleCalendarIntegration:
     """Test the GoogleCalendarIntegration class."""
-    
+
     @pytest.fixture
     def google_config(self):
         """Create a Google Calendar configuration for testing."""
@@ -168,53 +168,53 @@ class TestGoogleCalendarIntegration:
             display_name="My Calendar",
             auth_token="test_token"
         )
-    
+
     @pytest.fixture
     def google_integration(self, google_config):
         """Create a GoogleCalendarIntegration instance for testing."""
         return GoogleCalendarIntegration(google_config)
-    
+
     def test_init(self, google_integration, google_config):
         """Test that the integration initializes correctly."""
         assert google_integration.config == google_config
         assert google_integration.name == "Google"
-    
+
     @pytest.mark.asyncio
     @patch("app.ui.calendar_integration.logger")
     async def test_authenticate_success(self, mock_logger, google_integration):
         """Test successful authentication."""
         result = await google_integration.authenticate()
-        
+
         assert result is True
         mock_logger.info.assert_called_once()
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, '_refresh_token')
     async def test_authenticate_refresh_token(self, mock_refresh_token, google_integration):
         """Test authentication with token refresh."""
         # Set expired token
         google_integration.config.auth_expiry = datetime.utcnow() - timedelta(hours=1)
-        
+
         result = await google_integration.authenticate()
-        
+
         assert result is True
         mock_refresh_token.assert_called_once()
-    
+
     @pytest.mark.asyncio
     async def test_get_sync_time_range(self, google_integration):
         """Test getting time range for sync."""
         start_date, end_date = await google_integration.get_sync_time_range()
-        
+
         # Start date should be in the past
         assert start_date < datetime.utcnow()
         # End date should be in the future
         assert end_date > datetime.utcnow()
         # The difference should match configuration
         assert (end_date - start_date).days == (
-            google_integration.config.sync_events_days_back + 
+            google_integration.config.sync_events_days_back +
             google_integration.config.sync_events_days_forward
         )
-    
+
     @pytest.mark.asyncio
     async def test_fetch_events(self, google_integration):
         """Test fetching events from Google Calendar."""
@@ -222,12 +222,12 @@ class TestGoogleCalendarIntegration:
         events = await google_integration.fetch_events(
             now - timedelta(days=7), now + timedelta(days=7)
         )
-        
+
         assert len(events) > 0
         assert isinstance(events[0], ExternalEvent)
         assert events[0].platform == CalendarPlatform.GOOGLE
         assert events[0].title == "Team Meeting"
-    
+
     @pytest.mark.asyncio
     async def test_create_event(self, google_integration):
         """Test creating an event in Google Calendar."""
@@ -245,9 +245,9 @@ class TestGoogleCalendarIntegration:
                 {"method": "popup", "minutes_before": 15}
             ]
         }
-        
+
         created_event = await google_integration.create_event(event_data)
-        
+
         assert isinstance(created_event, ExternalEvent)
         assert created_event.title == "New Event"
         assert created_event.description == "Event description"
@@ -255,7 +255,7 @@ class TestGoogleCalendarIntegration:
         assert len(created_event.attendees) == 1
         assert len(created_event.reminders) == 1
         assert created_event.platform == CalendarPlatform.GOOGLE
-    
+
     @pytest.mark.asyncio
     async def test_update_event(self, google_integration):
         """Test updating an event in Google Calendar."""
@@ -264,25 +264,25 @@ class TestGoogleCalendarIntegration:
             "start_time": datetime.utcnow(),
             "end_time": datetime.utcnow() + timedelta(hours=2)
         }
-        
+
         updated_event = await google_integration.update_event("event123", event_data)
-        
+
         assert isinstance(updated_event, ExternalEvent)
         assert updated_event.title == "Updated Event"
         assert updated_event.event_id == "event123"
-    
+
     @pytest.mark.asyncio
     async def test_delete_event(self, google_integration):
         """Test deleting an event from Google Calendar."""
         result = await google_integration.delete_event("event123")
-        
+
         assert result is True
-    
+
     @pytest.mark.asyncio
     async def test_get_calendars(self, google_integration):
         """Test getting calendars from Google Calendar."""
         calendars = await google_integration.get_calendars()
-        
+
         assert len(calendars) > 0
         assert "id" in calendars[0]
         assert "summary" in calendars[0]
@@ -291,17 +291,17 @@ class TestGoogleCalendarIntegration:
 
 class TestCalendarIntegrationService:
     """Test the CalendarIntegrationService class."""
-    
+
     @pytest.fixture
     def service(self):
         """Create a CalendarIntegrationService instance for testing."""
         return CalendarIntegrationService()
-    
+
     def test_init(self, service):
         """Test that the service initializes correctly."""
         assert service.integrations == {}
         assert CalendarPlatform.GOOGLE in service.integration_classes
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
     async def test_register_integration_success(self, mock_test_connection, service):
@@ -312,17 +312,17 @@ class TestCalendarIntegrationService:
             calendar_id="primary",
             display_name="My Calendar"
         )
-        
+
         result = await service.register_integration(config)
-        
+
         assert result is True
         assert "test_user" in service.integrations
         assert "google:primary" in service.integrations["test_user"]
         assert isinstance(
-            service.integrations["test_user"]["google:primary"], 
+            service.integrations["test_user"]["google:primary"],
             GoogleCalendarIntegration
         )
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=False)
     async def test_register_integration_connection_failure(self, mock_test_connection, service):
@@ -333,33 +333,33 @@ class TestCalendarIntegrationService:
             calendar_id="primary",
             display_name="My Calendar"
         )
-        
+
         result = await service.register_integration(config)
-        
+
         assert result is False
         assert "test_user" not in service.integrations
-    
+
     @pytest.mark.asyncio
     async def test_register_integration_unsupported_platform(self, service):
         """Test integration registration with unsupported platform."""
         # Temporarily remove GOOGLE from supported integrations
         original_classes = service.integration_classes
         service.integration_classes = {}
-        
+
         config = CalendarIntegrationConfig(
             user_id="test_user",
             platform=CalendarPlatform.GOOGLE,
             calendar_id="primary",
             display_name="My Calendar"
         )
-        
+
         result = await service.register_integration(config)
-        
+
         assert result is False
-        
+
         # Restore original classes
         service.integration_classes = original_classes
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
     async def test_get_user_integrations(self, mock_test_connection, service):
@@ -372,19 +372,19 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Get user integrations
         integrations = await service.get_user_integrations("test_user")
-        
+
         assert len(integrations) == 1
         assert integrations[0]["platform"] == "google"
         assert integrations[0]["calendar_id"] == "primary"
         assert integrations[0]["display_name"] == "My Calendar"
-        
+
         # Test with non-existent user
         empty_integrations = await service.get_user_integrations("nonexistent_user")
         assert empty_integrations == []
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
     async def test_remove_integration(self, mock_test_connection, service):
@@ -397,21 +397,21 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Remove integration
         result = await service.remove_integration(
             "test_user", "primary", CalendarPlatform.GOOGLE
         )
-        
+
         assert result is True
         assert "test_user" not in service.integrations
-        
+
         # Test with non-existent integration
         false_result = await service.remove_integration(
             "test_user", "primary", CalendarPlatform.GOOGLE
         )
         assert false_result is False
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
     @patch.object(GoogleCalendarIntegration, 'fetch_events', new_callable=AsyncMock, return_value=[
@@ -434,26 +434,26 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Sync calendars
         results = await service.sync_calendars("test_user")
-        
+
         assert len(results) == 1
         assert results[0].success is True
         assert results[0].platform == CalendarPlatform.GOOGLE
         assert results[0].calendar_id == "primary"
         assert results[0].events_imported == 1
-        
+
         # Test with specific platform and calendar_id
         specific_results = await service.sync_calendars(
             "test_user", CalendarPlatform.GOOGLE, "primary"
         )
         assert len(specific_results) == 1
-        
+
         # Test with non-existent user
         empty_results = await service.sync_calendars("nonexistent_user")
         assert empty_results == []
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'get_calendars', new_callable=AsyncMock, return_value=[
         {"id": "primary", "summary": "My Calendar", "backgroundColor": "#4285F4"}
@@ -469,18 +469,18 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Get calendars
         calendars = await service.get_available_calendars("test_user", CalendarPlatform.GOOGLE)
-        
+
         assert len(calendars) == 1
         assert calendars[0]["id"] == "primary"
         assert calendars[0]["summary"] == "My Calendar"
-        
+
         # Test with non-existent platform
         empty_calendars = await service.get_available_calendars("test_user", CalendarPlatform.OUTLOOK)
         assert empty_calendars == []
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'create_event', new_callable=AsyncMock)
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
@@ -496,7 +496,7 @@ class TestCalendarIntegrationService:
             platform=CalendarPlatform.GOOGLE
         )
         mock_create_event.return_value = event
-        
+
         # Register an integration
         config = CalendarIntegrationConfig(
             user_id="test_user",
@@ -505,18 +505,18 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Create event
         event_data = {"title": "New Event"}
         created_event = await service.create_event_in_external_calendar(
             "test_user", CalendarPlatform.GOOGLE, "primary", event_data
         )
-        
+
         assert created_event is not None
         assert created_event.title == "New Event"
         assert created_event.event_id == "event123"
         mock_create_event.assert_called_once_with(event_data)
-    
+
     @pytest.mark.asyncio
     @patch.object(GoogleCalendarIntegration, 'delete_event', new_callable=AsyncMock, return_value=True)
     @patch.object(GoogleCalendarIntegration, 'test_connection', new_callable=AsyncMock, return_value=True)
@@ -530,11 +530,11 @@ class TestCalendarIntegrationService:
             display_name="My Calendar"
         )
         await service.register_integration(config)
-        
+
         # Delete event
         result = await service.delete_event_in_external_calendar(
             "test_user", CalendarPlatform.GOOGLE, "primary", "event123"
         )
-        
+
         assert result is True
-        mock_delete_event.assert_called_once_with("event123") 
+        mock_delete_event.assert_called_once_with("event123")

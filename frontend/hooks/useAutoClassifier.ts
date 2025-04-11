@@ -12,12 +12,12 @@ export function useAutoClassifier() {
   const classifySubmission = useCallback((text: string): ClassificationResult => {
     // Automatically classify the input without user intervention
     const result = classifierService.classifyInput(text);
-    
+
     // If we have high confidence, automatically learn from this submission
     if (result.confidence > 0.7) {
       classifierService.learnFromFeedback(text, result.category);
     }
-    
+
     return result;
   }, []);
 
@@ -40,4 +40,4 @@ export function useAutoClassifier() {
     classifySubmission,
     getRecommendedActions,
   };
-} 
+}

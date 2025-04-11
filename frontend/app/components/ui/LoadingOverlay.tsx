@@ -23,9 +23,9 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     >
       <View style={styles.container}>
         <View style={styles.content}>
-          <ActivityIndicator 
-            size="large" 
-            color={theme.colors.primary} 
+          <ActivityIndicator
+            size="large"
+            color={theme.colors.primary}
           />
           {message && (
             <Text style={styles.message}>{message}</Text>
@@ -55,4 +55,4 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.fontSize.sm,
     color: theme.colors.grey1,
   },
-})); 
+}));

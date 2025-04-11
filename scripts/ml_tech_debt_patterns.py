@@ -59,7 +59,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'remediation': 'Incorporate momentum-aware mechanisms based on research insights',
         'research_reference': 'PMC5701950 - ADHD performance declines 37% faster than neurotypical baselines during sustained attention tasks'
     },
-    
+
     # Progress monitoring debt
     {
         'pattern': r'while.*?sleep\(\d+\).*?progress',
@@ -79,11 +79,11 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'severity': 'MEDIUM',
         'type': 'binary_progress',
         'subcategory': MLDebtSubcategory.MONITORING,
-        'epic': 'Epic 4', 
+        'epic': 'Epic 4',
         'remediation': 'Implement continuous or multi-stage progress tracking',
         'research_reference': 'Journal of Attention Disorders (2025) - task adherence metrics'
     },
-    
+
     # Opportunity cost debt
     {
         'pattern': r'opportunity_cost\s*=\s*\w+',
@@ -96,7 +96,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'remediation': 'Implement dynamic opportunity cost calculation based on context',
         'research_reference': 'Learning for Dynamics & Control Conference 2025'
     },
-    
+
     # Circadian-aware debt
     {
         'pattern': r'(morning|afternoon|evening)_block\s*=\s*\[\d+,\s*\d+\]',
@@ -120,7 +120,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'remediation': 'Implement ultradian cycle awareness based on research findings',
         'research_reference': 'Journal of Circadian Rhythms (2025) - ultradian cycle alignment as critical for ADHD populations'
     },
-    
+
     # Ethical debt
     {
         'pattern': r'class\s+\w+Scheduler.*?(?!bias_mitigation|fairness)',
@@ -144,7 +144,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'remediation': 'Add explainability methods such as SHAP or LIME',
         'research_reference': 'ADHD-23: Create SHAP-based explainability system for recommendations'
     },
-    
+
     # General ML debt relevant to Epic 4
     {
         'pattern': r'random\.(random|sample|choice).*?(?!seed)',
@@ -175,7 +175,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
         'severity': 'MEDIUM',
         'type': 'hardcoded_hyperparams',
         'subcategory': MLDebtSubcategory.MODEL_COMPLEXITY,
-        'epic': 'Epic 4', 
+        'epic': 'Epic 4',
         'remediation': 'Move hyperparameters to configuration files or use hyperparameter optimization',
         'research_reference': None
     }
@@ -184,7 +184,7 @@ EPIC4_TECH_DEBT_PATTERNS = [
 def get_epic4_tech_debt_patterns() -> List[Dict[str, Any]]:
     """
     Return technical debt patterns specific to Epic 4.
-    
+
     Returns:
         List of technical debt pattern dictionaries
     """
@@ -194,16 +194,16 @@ def get_epic4_tech_debt_patterns() -> List[Dict[str, Any]]:
 def get_tech_debt_by_subcategory(subcategory: MLDebtSubcategory) -> List[Dict[str, Any]]:
     """
     Return technical debt patterns filtered by subcategory.
-    
+
     Args:
         subcategory: The ML debt subcategory to filter by
-        
+
     Returns:
         List of technical debt pattern dictionaries for the specified subcategory
     """
     return [
-        pattern for pattern in EPIC4_TECH_DEBT_PATTERNS 
-        if pattern.get('subcategory') == subcategory or 
-           (isinstance(pattern.get('subcategory'), MLDebtSubcategory) and 
+        pattern for pattern in EPIC4_TECH_DEBT_PATTERNS
+        if pattern.get('subcategory') == subcategory or
+           (isinstance(pattern.get('subcategory'), MLDebtSubcategory) and
             pattern.get('subcategory') == subcategory)
-    ] 
+    ]

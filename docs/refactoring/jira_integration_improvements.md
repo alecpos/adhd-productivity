@@ -69,4 +69,4 @@ def map_task_fields(task, jira_issue):
 
 ## Conclusion
 
-The refactoring significantly improved the Jira integration components by applying better structure and design patterns, resulting in more maintainable and testable code. 
+The refactoring significantly improved the Jira integration components by applying better structure and design patterns, resulting in more maintainable and testable code.

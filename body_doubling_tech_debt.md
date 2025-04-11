@@ -15283,4 +15283,3 @@
   - Status: OPEN
   - Description: Pydantic v2 migration required for 11 files with deprecated API usage.
   - Resolution Plan: Update code to use Pydantic v2 API as detailed in the notes.
-

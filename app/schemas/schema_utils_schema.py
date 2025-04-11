@@ -23,7 +23,7 @@ def merge_schemas(*schemas: Type[BaseModel], name: str = "MergedSchema") -> Type
                     "default": field.default if field.default is not None else ...,
                     "description": field.description,
                 }
-                
+
                 # Handle extra schema attributes if they exist
                 if field.json_schema_extra:
                     field_kwargs.update(field.json_schema_extra)
@@ -40,7 +40,7 @@ def merge_schemas(*schemas: Type[BaseModel], name: str = "MergedSchema") -> Type
 def create_schema_subset(base_schema: Type[BaseModel], fields_to_include: List[str], name: str = "SubsetSchema") -> Type[BaseModel]:
     """Create a new schema with only specified fields from base schema."""
     fields: Dict[str, Any] = {}
-    
+
     for field_name in fields_to_include:
         if field_name in base_schema.model_fields:
             field = base_schema.model_fields[field_name]
@@ -48,7 +48,7 @@ def create_schema_subset(base_schema: Type[BaseModel], fields_to_include: List[s
                 "default": field.default if field.default is not None else ...,
                 "description": field.description,
             }
-            
+
             # Handle extra schema attributes if they exist
             if field.json_schema_extra:
                 field_kwargs.update(field.json_schema_extra)
@@ -120,7 +120,7 @@ def dict_to_schema(data: Dict[str, Any], schema_class: Type[T]) -> T:
     for field_name, field in schema_class.model_fields.items():
         if field_name in data:
             converted_data[field_name] = convert_value(
-                data[field_name], 
+                data[field_name],
                 field.annotation
             )
 

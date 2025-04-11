@@ -28,7 +28,7 @@ class BaseRouter(Generic[SchemaType, ServiceType, ModelType]):
         metrics: Optional[RouteMetricsSchema] = None,
     ):
         """Initialize the router with required components.
-        
+
         Args:
             prefix: URL prefix for all routes
             tags: OpenAPI tags for documentation

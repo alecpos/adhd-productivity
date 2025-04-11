@@ -147,7 +147,7 @@ Update existing data:
 ```python
 def upgrade():
     connection = op.get_bind()
-    
+
     # Update all task priorities
     connection.execute(
         sa.text("""
@@ -165,12 +165,12 @@ Handle complex data transformations:
 ```python
 def upgrade():
     connection = op.get_bind()
-    
+
     # Get existing data
     tasks = connection.execute(
         sa.text("SELECT * FROM old_tasks")
     ).fetchall()
-    
+
     # Transform and insert data
     for task in tasks:
         connection.execute(
@@ -254,7 +254,7 @@ def test_migration_upgrade():
     """Test migration upgrade path."""
     # Apply migration
     alembic.command.upgrade(config, "head")
-    
+
     # Verify schema
     inspector = inspect(engine)
     assert "user_preferences" in inspector.get_table_names()
@@ -269,7 +269,7 @@ def test_data_migration():
     """Test data transformation."""
     # Apply migration
     alembic.command.upgrade(config, "target_revision")
-    
+
     # Verify data
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM new_tasks"))
@@ -319,4 +319,4 @@ def check_migration_health():
         "pending_migrations": get_pending(),
         "last_migration_time": get_last_run()
     }
-``` 
+```

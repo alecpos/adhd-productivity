@@ -34,7 +34,7 @@ def patched_test_base_service_initialization(db_session):
         assert service.db == db_session
         assert service.model == TaskModel
         assert service.schema_class == TaskResponse
-    
+
     # Run with explicit event loop handling
     loop = setup_event_loop()
     return loop.run_until_complete(_test())
@@ -43,14 +43,14 @@ def patched_test_base_service_initialization(db_session):
 def run_patched_tests(db_session):
     """Run the patched tests with explicit event loop handling."""
     print("Running patched service tests...")
-    
+
     # Run the tests
     print("\nRunning test_base_service_initialization...")
     patched_test_base_service_initialization(db_session)
     print("✅ test_base_service_initialization PASSED")
-    
+
     print("\nAll patched tests passed!")
 
 if __name__ == "__main__":
     # This file should be run through pytest, which will provide db_session
-    pass 
+    pass

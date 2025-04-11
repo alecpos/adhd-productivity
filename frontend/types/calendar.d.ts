@@ -2,7 +2,7 @@ declare module 'react-native-calendars' {
 import { TextStyle } from 'react-native';
 
   import type { ViewStyle} from 'react-native';
-  
+
   export interface DayProps {
     dateString: string;
     day: number;
@@ -73,4 +73,4 @@ import { TextStyle } from 'react-native';
   }
 
   export class Calendar extends React.Component<CalendarProps> {}
-} 
+}

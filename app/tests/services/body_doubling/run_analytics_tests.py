@@ -33,7 +33,7 @@ class MockSessionStatus:
     COMPLETED = "completed"
     ACTIVE = "active"
     CANCELLED = "cancelled"
-    
+
 class MockSessionType:
     WORKING = "working"
     STUDYING = "studying"
@@ -87,7 +87,7 @@ def sample_session():
     """Create a sample session model."""
     now = datetime.now()
     user_id = uuid.uuid4()
-    
+
     return MockBodyDoublingSessionModel(
         id=uuid.uuid4(),
         user_id=user_id,
@@ -120,22 +120,22 @@ def sample_session():
 async def test_calculate_trend():
     """Test the trend calculation functionality."""
     service = AnalyticsService(AsyncMock())
-    
+
     # Improving trend
     assert service._calculate_trend([1, 2, 3, 4, 5]) == "improving"
-    
+
     # Declining trend
     assert service._calculate_trend([5, 4, 3, 2, 1]) == "declining"
-    
+
     # Stable trend
     assert service._calculate_trend([3, 3, 3, 3, 3]) == "stable"
-    
+
     # Small changes
     assert service._calculate_trend([3.0, 3.01, 3.02, 3.01, 3.0]) == "stable"
-    
+
     # Empty list
     assert service._calculate_trend([]) == "stable"
-    
+
     # Single value
     assert service._calculate_trend([4]) == "stable"
 
@@ -147,11 +147,11 @@ async def test_get_user_analytics_no_sessions(mock_db_session):
     mock_result = MagicMock()
     mock_result.scalars.return_value.all.return_value = []
     mock_db_session.execute.return_value = mock_result
-    
+
     # Execute
     analytics_service = AnalyticsService(mock_db_session)
     result = await analytics_service.get_user_analytics(user_id)
-    
+
     # Verify
     assert result.total_sessions == 0
     assert result.total_focus_time == 0
@@ -169,12 +169,12 @@ async def test_get_session_analytics_not_found(mock_db_session):
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = None
     mock_db_session.execute.return_value = mock_result
-    
+
     # Execute and verify exception
     analytics_service = AnalyticsService(mock_db_session)
     with pytest.raises(HTTPException) as exc_info:
         await analytics_service.get_session_analytics(session_id)
-    
+
     assert exc_info.value.status_code == 404
     assert f"Session {session_id}" in str(exc_info.value.detail)
 
@@ -185,15 +185,15 @@ async def test_add_session_feedback_success(mock_db_session, sample_session):
     session_id = sample_session.id
     user_id = sample_session.user_id
     feedback_data = {"focus_rating": 5, "productivity_rating": 5, "notes": "Great session"}
-    
+
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = sample_session
     mock_db_session.execute.return_value = mock_result
-    
+
     # Execute
     analytics_service = AnalyticsService(mock_db_session)
     result = await analytics_service.add_session_feedback(session_id, user_id, feedback_data)
-    
+
     # Verify
     assert result.id == session_id
     assert len(result.meta_data["feedback"]) == 2  # Original + new
@@ -202,10 +202,10 @@ async def test_add_session_feedback_success(mock_db_session, sample_session):
     assert result.meta_data["feedback"][-1]["productivity_rating"] == 5
     assert result.meta_data["feedback"][-1]["notes"] == "Great session"
     assert "timestamp" in result.meta_data["feedback"][-1]
-    
+
     # Verify DB operations
     mock_db_session.commit.assert_called_once()
     mock_db_session.refresh.assert_called_once_with(sample_session)
 
 if __name__ == "__main__":
-    pytest.main(["-xvs", __file__]) 
+    pytest.main(["-xvs", __file__])

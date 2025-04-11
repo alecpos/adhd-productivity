@@ -188,4 +188,4 @@ See the [Authentication Flow](./authentication_flow.md) for more details.
 
 - [API Documentation](./api_documentation.md)
 - [Authentication Flow](./authentication_flow.md)
-- [Error Handling Guide](./error_handling_guide.md) 
+- [Error Handling Guide](./error_handling_guide.md)

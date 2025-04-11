@@ -14,4 +14,4 @@ export default function Analytics() {
       <Text>Coming soon: Detailed analytics and insights about your productivity patterns</Text>
     </View>
   );
-} 
+}

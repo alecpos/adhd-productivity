@@ -245,4 +245,4 @@ When creating or modifying types:
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [TypeScript Style Guide](../docs/typescript_style_guide.md)
-- [API Type System](../docs/api_type_system.md) 
+- [API Type System](../docs/api_type_system.md)

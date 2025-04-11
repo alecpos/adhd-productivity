@@ -2,7 +2,7 @@
 BioAuth-25 API endpoints
 
 This module provides API endpoints for the BioAuth-25 wearable integration.
-It allows users to register devices, get biometric data, and manage their 
+It allows users to register devices, get biometric data, and manage their
 wearable connections according to the BioAuth-25 standard.
 """
 
@@ -14,9 +14,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.services.bioauth_service import (
-    BioAuthService, 
-    get_bioauth_service, 
-    BioAuthDeviceInfo, 
+    BioAuthService,
+    get_bioauth_service,
+    BioAuthDeviceInfo,
     BiometricDataPoint,
     BiometricType,
     WearableDeviceType
@@ -54,7 +54,7 @@ async def register_device(
 ):
     """
     Register a new wearable device with BioAuth-25 protocol.
-    
+
     This endpoint allows users to register their wearable devices by providing
     device information and an authorization code obtained from the device's
     pairing process.
@@ -85,7 +85,7 @@ async def get_user_devices(
 ):
     """
     Get all registered wearable devices for the current user.
-    
+
     Returns a list of all devices that have been registered by the user,
     including device information and connection status.
     """
@@ -114,7 +114,7 @@ async def get_biometric_data(
 ):
     """
     Get biometric data from a specific device and metric type.
-    
+
     This endpoint retrieves biometric data points for the specified device and metric,
     within the given time range. If no time range is specified, it returns the most
     recent data (last hour by default).
@@ -124,7 +124,7 @@ async def get_biometric_data(
         end_time = datetime.utcnow()
     if start_time is None:
         start_time = end_time - timedelta(hours=1)
-    
+
     try:
         data_points = await bioauth_service.get_recent_biometric_data(
             user_id=str(current_user.id),
@@ -151,10 +151,10 @@ async def bioauth_webhook(
 ):
     """
     Webhook endpoint for BioAuth-25 device notifications.
-    
+
     This endpoint receives webhook notifications from BioAuth-25 compatible devices
     and services. It processes data updates, status changes, and other notifications.
-    
+
     Note: This endpoint is not authenticated as it's called by external services
     with their own authentication mechanisms (signatures).
     """
@@ -176,7 +176,7 @@ async def get_stress_indicators(
 ):
     """
     Get stress indicators based on HRV data from wearable devices.
-    
+
     This endpoint provides an analysis of the user's stress levels based on
     heart rate variability (HRV) data collected from their wearable devices.
     It returns stress indicators that can be used for scheduling decisions.
@@ -202,7 +202,7 @@ async def get_cognitive_load(
 ):
     """
     Get cognitive load estimate based on biometric data.
-    
+
     This endpoint provides an estimate of the user's current cognitive load
     based on multiple biometric indicators. This can be used to schedule tasks
     of appropriate complexity based on the user's current cognitive capacity.
@@ -217,4 +217,4 @@ async def get_cognitive_load(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to retrieve cognitive load estimate: {str(e)}"
-        ) 
+        )

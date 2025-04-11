@@ -60,4 +60,4 @@ When modifying core components:
 ## Related Documentation
 
 - [Application Configuration Guide](../../docs/configuration_guide.md)
-- [Security Architecture](../../docs/security_architecture.md) 
+- [Security Architecture](../../docs/security_architecture.md)

@@ -41,14 +41,14 @@ describe('MentalHealthContext', () => {
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Setup auth mock
     (useAuth as jest.Mock).mockReturnValue({ user: mockUser });
-    
+
     // Setup service mock with direct mock functions
     const mockCreateLog = jest.fn().mockResolvedValue({ success: true });
     const mockGetUserStats = jest.fn().mockResolvedValue(mockStats);
-    
+
     (MentalHealthService as jest.Mock).mockImplementation(() => ({
       createLog: mockCreateLog,
       getUserStats: mockGetUserStats
@@ -84,7 +84,7 @@ describe('MentalHealthContext', () => {
 
     // Get the mock instance and its createLog method
     const mockServiceInstance = (MentalHealthService as jest.Mock).mock.results[0].value;
-    
+
     expect(mockServiceInstance.createLog).toHaveBeenCalledWith({
       userId: mockUser.id,
       mood: String(logData.moodScore),
@@ -116,7 +116,7 @@ describe('MentalHealthContext', () => {
   it('handles errors when creating log', async () => {
     const mockError = new Error('Failed to create log');
     const mockCreateLog = jest.fn().mockRejectedValue(mockError);
-    
+
     (MentalHealthService as jest.Mock).mockImplementation(() => ({
       createLog: mockCreateLog,
       getUserStats: jest.fn()
@@ -138,7 +138,7 @@ describe('MentalHealthContext', () => {
   it('handles errors when fetching stats', async () => {
     const mockError = new Error('Failed to fetch stats');
     const mockGetUserStats = jest.fn().mockRejectedValue(mockError);
-    
+
     (MentalHealthService as jest.Mock).mockImplementation(() => ({
       createLog: jest.fn(),
       getUserStats: mockGetUserStats
@@ -165,4 +165,4 @@ describe('MentalHealthContext', () => {
       renderHook(() => useMentalHealth());
     }).toThrow('useMentalHealth must be used within a MentalHealthProvider');
   });
-}); 
+});

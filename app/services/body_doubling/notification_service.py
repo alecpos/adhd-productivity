@@ -57,7 +57,7 @@ class NotificationService:
             SessionStatus.COMPLETED: "has ended",
             SessionStatus.CANCELLED: "has been cancelled",
         }.get(new_status, "has changed status")
-        
+
         print(f"Notification: Session {session_id} {status_message}")
         return True
 
@@ -93,4 +93,4 @@ class NotificationService:
     async def send_session_feedback_request(self, user_id: UUID, session_id: UUID) -> bool:
         """Send a request for session feedback."""
         print(f"Notification: Please provide feedback for your session {session_id}")
-        return True 
+        return True

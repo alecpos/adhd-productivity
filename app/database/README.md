@@ -67,4 +67,4 @@ When working with database components:
 
 - [Database Schema](../../docs/database_schema.md)
 - [Alembic Migration Guide](../../docs/alembic_guide.md)
-- [Repository Pattern Implementation](../../docs/repository_pattern.md) 
+- [Repository Pattern Implementation](../../docs/repository_pattern.md)

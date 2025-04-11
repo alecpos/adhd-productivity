@@ -487,4 +487,4 @@ secure_client.configure_data_retention(
 
 ---
 
-For additional examples and advanced use cases, refer to the [API Documentation](epic2_api.md) and [Implementation Details](epic2_implementation.md). 
+For additional examples and advanced use cases, refer to the [API Documentation](epic2_api.md) and [Implementation Details](epic2_implementation.md).

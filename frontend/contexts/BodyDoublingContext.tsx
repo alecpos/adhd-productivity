@@ -208,4 +208,4 @@ export const useBodyDoubling = () => {
     throw new Error('useBodyDoubling must be used within a BodyDoublingProvider');
   }
   return context;
-}; 
+};

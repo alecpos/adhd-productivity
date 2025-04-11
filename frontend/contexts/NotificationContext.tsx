@@ -40,7 +40,7 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
-  
+
   // Request permissions when the provider is mounted
   useEffect(() => {
     // For web or environments without notification permissions, we just mark it as true
@@ -48,7 +48,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       setIsPermissionGranted(true);
     }
   }, []);
-  
+
   // Function to request permissions - simplified implementation
   const requestPermissions = async (): Promise<boolean> => {
     try {
@@ -57,7 +57,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         setIsPermissionGranted(true);
         return true;
       }
-      
+
       // Simulate permission being granted
       setIsPermissionGranted(true);
       return true;
@@ -66,29 +66,29 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       return false;
     }
   };
-  
+
   // Add a notification
   const addNotification = (notification: Omit<Notification, 'id'>): void => {
     const newNotification: Notification = {
       ...notification,
       id: Math.random().toString(36).substring(2, 15),
     };
-    
+
     setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
   };
-  
+
   // Remove a notification
   const removeNotification = (id: string): void => {
-    setNotifications((prevNotifications) => 
+    setNotifications((prevNotifications) =>
       prevNotifications.filter((notification) => notification.id !== id)
     );
   };
-  
+
   // Clear all notifications
   const clearAllNotifications = (): void => {
     setNotifications([]);
   };
-  
+
   return (
     <NotificationContext.Provider
       value={{
@@ -105,4 +105,4 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   );
 };
 
-export default NotificationContext; 
+export default NotificationContext;

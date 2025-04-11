@@ -104,7 +104,7 @@ async def method_with_dependencies(self):
     try:
         result = await self.bulkhead(
             self._call_dependency,
-            arg1, 
+            arg1,
             arg2,
             timeout=3
         )
@@ -209,4 +209,4 @@ We test resilience patterns using the `resilience_tester.py` script, which:
 5. **Test resilience regularly**:
    - Use chaos testing to inject failures
    - Simulate dependency outages
-   - Verify system behavior during partial failures 
+   - Verify system behavior during partial failures

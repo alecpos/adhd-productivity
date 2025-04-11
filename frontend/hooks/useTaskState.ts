@@ -30,7 +30,7 @@ export const useTaskState = (task: Task): TaskStateHook => {
       const response = await api.patch(`/tasks/${currentTask.id}/status`, {
         status: newStatus
       });
-      
+
       setCurrentTask(response.data);
       return true;
     } catch (err) {
@@ -57,4 +57,4 @@ export const useTaskState = (task: Task): TaskStateHook => {
     getNextStates,
     canTransitionTo
   };
-}; 
+};

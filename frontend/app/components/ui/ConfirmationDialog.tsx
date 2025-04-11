@@ -32,12 +32,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       onClose={onCancel}
       footer={
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             title={cancelText}
             onPress={onCancel}
           />
-          <Button 
+          <Button
             title={confirmText}
             onPress={onConfirm}
           />

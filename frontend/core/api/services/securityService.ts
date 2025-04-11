@@ -75,11 +75,11 @@ export class SecurityService {
         data: data,
         key: key,
       });
-      
+
       console.log(`[SecurityService] Data exported successfully for key: ${key}`);
     } catch (error) {
       console.error('[SecurityService] Error exporting data:', error);
       throw new Error('Failed to export data');
     }
   }
-} 
+}

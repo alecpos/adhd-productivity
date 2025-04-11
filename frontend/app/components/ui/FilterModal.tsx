@@ -37,7 +37,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       const updated = current.includes(option)
         ? current.filter(item => item !== option)
         : [...current, option];
-      
+
       return {
         ...prev,
         [categoryId]: updated,
@@ -61,12 +61,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       title="Filters"
       footer={
         <View style={styles.footer}>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onPress={handleReset}
             title="Reset"
           />
-          <Button 
+          <Button
             onPress={handleApply}
             title="Apply Filters"
           />
@@ -117,4 +117,4 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'flex-end',
     gap: theme.spacing.sm,
   },
-})); 
+}));

@@ -34,10 +34,10 @@ def test_client():
 def test_some_endpoint(test_client):
     # Arrange
     # Set up test data, authentication, etc.
-    
+
     # Act
     response = test_client.get("/api/v1/some-endpoint")
-    
+
     # Assert
     assert response.status_code == 200
     data = response.json()
@@ -58,13 +58,13 @@ def test_get_task(test_client, mock_user, mock_db_session):
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z"
     }
-    
+
     # Mock the task service to return the mock task
     mock_db_session.query().filter().first.return_value = mock_task
-    
+
     # Act
     response = test_client.get(f"/api/v1/tasks/{task_id}", headers={"Authorization": f"Bearer {mock_user['token']}"})
-    
+
     # Assert
     assert response.status_code == 200
     data = response.json()
@@ -80,10 +80,10 @@ def test_get_task(test_client, mock_user, mock_db_session):
 def test_get_nonexistent_task(test_client, mock_user):
     # Arrange
     nonexistent_task_id = str(uuid4())
-    
+
     # Act
     response = test_client.get(f"/api/v1/tasks/{nonexistent_task_id}", headers={"Authorization": f"Bearer {mock_user['token']}"})
-    
+
     # Assert
     assert response.status_code == 404
     data = response.json()
@@ -96,10 +96,10 @@ def test_get_nonexistent_task(test_client, mock_user):
 def test_unauthorized_access(test_client):
     # Arrange
     task_id = str(uuid4())
-    
+
     # Act - No authorization header
     response = test_client.get(f"/api/v1/tasks/{task_id}")
-    
+
     # Assert
     assert response.status_code == 401
     data = response.json()
@@ -120,13 +120,13 @@ def test_forbidden_access(test_client, mock_user, other_mock_user, mock_db_sessi
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z"
     }
-    
+
     # Mock the task service
     mock_db_session.query().filter().first.return_value = mock_task
-    
+
     # Act - Authenticated as mock_user trying to access other_mock_user's task
     response = test_client.get(f"/api/v1/tasks/{task_id}", headers={"Authorization": f"Bearer {mock_user['token']}"})
-    
+
     # Assert
     assert response.status_code == 403
     data = response.json()
@@ -145,14 +145,14 @@ def test_create_task_validation_error(test_client, mock_user):
         "description": "Test Description",
         "estimated_duration": -5  # Invalid duration (must be positive)
     }
-    
+
     # Act
     response = test_client.post(
-        "/api/v1/tasks", 
-        json=invalid_task, 
+        "/api/v1/tasks",
+        json=invalid_task,
         headers={"Authorization": f"Bearer {mock_user['token']}"}
     )
-    
+
     # Assert
     assert response.status_code == 400
     data = response.json()
@@ -171,17 +171,17 @@ def test_get_tasks_pagination(test_client, mock_user, mock_db_session):
     # Arrange
     # Create mock tasks
     mock_tasks = [{"id": str(uuid4()), "title": f"Task {i}"} for i in range(30)]
-    
+
     # Mock the task service to return paginated results
     mock_db_session.query().filter().offset().limit().all.return_value = mock_tasks[:10]
     mock_db_session.query().filter().count.return_value = len(mock_tasks)
-    
+
     # Act
     response = test_client.get(
-        "/api/v1/tasks?page=1&page_size=10", 
+        "/api/v1/tasks?page=1&page_size=10",
         headers={"Authorization": f"Bearer {mock_user['token']}"}
     )
-    
+
     # Assert
     assert response.status_code == 200
     data = response.json()
@@ -275,23 +275,23 @@ def test_create_and_retrieve_task(test_client, test_db, authenticated_user):
         "description": "Testing the full task lifecycle",
         "estimated_duration": 30
     }
-    
+
     create_response = test_client.post(
-        "/api/v1/tasks", 
-        json=task_data, 
+        "/api/v1/tasks",
+        json=task_data,
         headers=authenticated_user["headers"]
     )
     assert create_response.status_code == 201
     created_task = assert_successful_response(create_response, 201)
     task_id = created_task["id"]
-    
+
     # Retrieve the task
     get_response = test_client.get(
-        f"/api/v1/tasks/{task_id}", 
+        f"/api/v1/tasks/{task_id}",
         headers=authenticated_user["headers"]
     )
     retrieved_task = assert_successful_response(get_response)
-    
+
     # Verify task data
     assert retrieved_task["id"] == task_id
     assert retrieved_task["title"] == task_data["title"]
@@ -302,4 +302,4 @@ def test_create_and_retrieve_task(test_client, test_db, authenticated_user):
 
 ## Conclusion
 
-By following these patterns and examples, you can create a comprehensive test suite for your API endpoints that ensures they conform to our standardized response format, handle errors consistently, and meet all functional requirements. 
+By following these patterns and examples, you can create a comprehensive test suite for your API endpoints that ensures they conform to our standardized response format, handle errors consistently, and meet all functional requirements.

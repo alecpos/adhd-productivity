@@ -5,6 +5,29 @@ from sklearn.preprocessing import StandardScaler
 from .models import ModelFactory
 from .preprocessing import DataPreprocessor
 
+import numpy as np
+from typing import List, Dict, Any
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# Set a fixed random seed for reproducibility
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+
+class EnsembleModel:
+    def __init__(self, n_estimators: int = 100, max_depth: int = 10):
+        self.rf_model = RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            random_state=RANDOM_SEED
+        )
+        self.gb_model = GradientBoostingClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            random_state=RANDOM_SEED
+        )
+
 
 class EnsembleLearner:
     """

@@ -23,4 +23,4 @@ export interface AuthContextType {
   signup: (email: string, password: string, name?: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
-} 
+}

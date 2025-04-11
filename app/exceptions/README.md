@@ -86,4 +86,4 @@ When working with exceptions:
 ## Related Documentation
 
 - [Error Handling Guide](../../docs/error_handling_guide.md)
-- [API Error Responses](../../docs/api_error_responses.md) 
+- [API Error Responses](../../docs/api_error_responses.md)

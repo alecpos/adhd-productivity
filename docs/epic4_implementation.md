@@ -222,7 +222,7 @@ Applies a generated optimization to the user's calendar:
 
 - **Method**: POST
 - **Request Body**: `ApplyCircadianOptimizationRequest`
-- **Response**: `ApplyCircadianOptimizationResponse` 
+- **Response**: `ApplyCircadianOptimizationResponse`
 - **Description**: Applies a previously generated schedule optimization to the user's actual calendar
 
 Implementation Location: `app/routes/scheduling_routes.py`
@@ -288,4 +288,4 @@ Implementation Location: `app/routes/scheduling_routes.py`
 - **Unit Tests**: Individual component testing with pytest
 - **Integration Tests**: End-to-end workflow testing
 - **Simulation Testing**: Model evaluation with simulated user data
-- **A/B Testing**: Comparing schedule adherence with and without circadian optimization 
+- **A/B Testing**: Comparing schedule adherence with and without circadian optimization

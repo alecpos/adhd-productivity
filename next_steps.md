@@ -127,4 +127,4 @@ We will track progress using the following metrics:
 
 The successful refactoring of the Jira integration component has demonstrated the value of a component-based architecture with clear separation of concerns. While our debt analysis tool may not immediately reflect all improvements in its scoring, the reduction in dependencies score (from 0.14 to 0.02) and the improved maintainability of the code indicate that we're on the right track.
 
-By continuing to apply these patterns and focusing on the priority areas outlined above, we can systematically reduce technical debt across the ADHD Calendar backend project, leading to a more maintainable, testable, and robust codebase. 
+By continuing to apply these patterns and focusing on the priority areas outlined above, we can systematically reduce technical debt across the ADHD Calendar backend project, leading to a more maintainable, testable, and robust codebase.

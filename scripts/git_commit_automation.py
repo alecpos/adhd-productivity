@@ -57,7 +57,7 @@ def get_git_tracked_files() -> List[str]:
             check=True
         )
         tracked_files = result.stdout.splitlines()
-        
+
         # Then get untracked files that aren't ignored
         result = subprocess.run(
             ['git', 'ls-files', '--others', '--exclude-standard'],
@@ -66,7 +66,7 @@ def get_git_tracked_files() -> List[str]:
             check=True
         )
         untracked_files = result.stdout.splitlines()
-        
+
         # Filter out certain file types and directories we don't want to track
         excluded_patterns = [
             '__pycache__',
@@ -81,10 +81,10 @@ def get_git_tracked_files() -> List[str]:
             'data/raw/',
             'data/processed/'
         ]
-        
+
         def should_include(file: str) -> bool:
             return not any(pattern in file for pattern in excluded_patterns)
-        
+
         return [f for f in (tracked_files + untracked_files) if should_include(f)]
     except subprocess.CalledProcessError as e:
         logger.error(f"Error getting Git tracked files: {e}")
@@ -126,7 +126,7 @@ def create_commit_for_date(
             for file in files:
                 top_dir = Path(file.path).parts[0] if Path(file.path).parts else 'root'
                 dirs[top_dir] += 1
-            
+
             changes = [f"{count} files in {dir_}" for dir_, count in dirs.items()]
             changes_str = ", ".join(changes)
             commit_message = f"Updates from {date}: {changes_str}"
@@ -148,7 +148,7 @@ def initialize_git_repo() -> bool:
         try:
             subprocess.run(['git', 'init'], check=True)
             logger.info("Initialized Git repository")
-            
+
             # Create a default .gitignore file for Python/ML project
             gitignore_content = """
 # Python
@@ -204,7 +204,7 @@ data/processed/
             with open('.gitignore', 'w') as f:
                 f.write(gitignore_content.strip())
             logger.info("Created .gitignore file")
-            
+
             return True
         except subprocess.CalledProcessError as e:
             logger.error(f"Error initializing Git repository: {e}")
@@ -299,4 +299,4 @@ def main():
         logger.info("Dry run completed - no commits were made")
 
 if __name__ == '__main__':
-    main() 
+    main()

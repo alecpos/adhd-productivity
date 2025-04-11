@@ -16,7 +16,7 @@ export default function TasksTab({ onSubmit }: TasksTabProps) {
 
   return (
     <View style={styles.container}>
-      <TaskList 
+      <TaskList
         tasks={tasks}
         onCompleteTask={completeTask}
         onDeleteTask={deleteTask}
@@ -31,4 +31,4 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     padding: theme.spacing.md,
   },
-})); 
+}));

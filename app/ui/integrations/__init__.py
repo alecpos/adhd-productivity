@@ -30,4 +30,4 @@ __all__ = [
     'CustomFieldMapper',
 ]
 
-# This init file marks this directory as a Python package 
+# This init file marks this directory as a Python package

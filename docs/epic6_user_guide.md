@@ -1,7 +1,7 @@
 # ADHD Calendar: Epic 6 User Guide
 
-**Version**: 1.0  
-**Last Updated**: 2025-03-15  
+**Version**: 1.0
+**Last Updated**: 2025-03-15
 **Target Audience**: End users of the ADHD Calendar application
 
 ## Introduction
@@ -246,46 +246,46 @@ External calendar events appear alongside your ADHD Calendar events:
 
 ### Adaptive Gamification
 
-**Q: Can I turn off gamification completely?**  
+**Q: Can I turn off gamification completely?**
 A: Yes, go to Settings > Gamification Preferences and toggle "Enable Gamification" to off.
 
-**Q: How does the system learn my motivation patterns?**  
+**Q: How does the system learn my motivation patterns?**
 A: The system analyzes which gamification elements you engage with most, what rewards motivate task completion, and your usage patterns over time.
 
-**Q: Can I reset my motivation profile?**  
+**Q: Can I reset my motivation profile?**
 A: Yes, go to Settings > Motivation Profile > Reset Profile to start fresh.
 
 ### Project Management Integration
 
-**Q: What project tools are currently supported?**  
+**Q: What project tools are currently supported?**
 A: We currently support Jira, Trello, Asana, Monday.com, and ClickUp. More integrations are being added regularly.
 
-**Q: How often do tasks sync automatically?**  
+**Q: How often do tasks sync automatically?**
 A: The default is every 30 minutes, but you can configure this from 15 minutes to 24 hours.
 
-**Q: What happens if I update a task in both systems?**  
+**Q: What happens if I update a task in both systems?**
 A: You'll receive a conflict notification and can choose which version to keep, or merge changes.
 
 ### Neurodiverse-Optimized UI
 
-**Q: Do my accessibility settings sync across devices?**  
+**Q: Do my accessibility settings sync across devices?**
 A: Yes, all settings are tied to your user account and will apply on any device you sign in to.
 
-**Q: Can I schedule different UI settings for different times of day?**  
+**Q: Can I schedule different UI settings for different times of day?**
 A: Yes, enable Context Adaptations and configure time-based settings under Settings > Accessibility > Context Adaptations > Time-Based Settings.
 
-**Q: How do I find the best accessibility settings for my needs?**  
+**Q: How do I find the best accessibility settings for my needs?**
 A: Try the ADHD preset that matches your type, then adjust individual settings based on your preferences.
 
 ### Calendar Integration
 
-**Q: Can I edit external calendar events in the ADHD Calendar?**  
+**Q: Can I edit external calendar events in the ADHD Calendar?**
 A: Yes, if you've enabled two-way sync and have appropriate permissions for the external calendar.
 
-**Q: What happens if I delete an external event?**  
+**Q: What happens if I delete an external event?**
 A: If two-way sync is enabled, the event will be deleted from the external calendar as well. You'll receive a confirmation prompt before deletion.
 
-**Q: Do task due dates appear on my external calendars?**  
+**Q: Do task due dates appear on my external calendars?**
 A: This is configurable. Go to Settings > Integrations > Calendars > Task Integration to control whether and how tasks appear on external calendars.
 
 ## Getting Help

@@ -1,8 +1,8 @@
 # ADHD Calendar: Epic 5 Technical Design
 
-**Document Status**: Draft  
-**Last Updated**: 2025-06-15  
-**Author**: AI Development Team  
+**Document Status**: Draft
+**Last Updated**: 2025-06-15
+**Author**: AI Development Team
 
 ## Overview
 
@@ -232,4 +232,4 @@ The system generates visualizations similar to:
 
 ### C. Architecture Diagram
 
-[See attached architecture diagram showing integration of fairness components with existing ML pipeline] 
+[See attached architecture diagram showing integration of fairness components with existing ML pipeline]

@@ -18,7 +18,7 @@ This document provides guidance on testing the `AnalyticsService` component of t
    ```bash
    # For most systems
    pip install transformers torch
-   
+
    # For Mac (to avoid TensorFlow/Metal issues)
    pip uninstall -y tensorflow tensorflow-macos
    pip install torch transformers
@@ -31,7 +31,7 @@ This document provides guidance on testing the `AnalyticsService` component of t
 Run all tests or specific components using pytest:
 
 ```bash
-# Run all Body Doubling Service tests 
+# Run all Body Doubling Service tests
 ./scripts/run_body_doubling_simple_tests.sh
 
 # Or run specific test modules
@@ -122,12 +122,12 @@ from app.database.session import get_db_session
 async def test_with_real_db():
     async with get_db_session() as db:
         analytics_service = AnalyticsService(db)
-        
+
         # Get user analytics
         user_id = "user_uuid_here"
         analytics = await analytics_service.get_user_analytics(user_id)
         print(f"Total sessions: {analytics.total_sessions}")
-        
+
         # Get focus pattern insights
         insights = await analytics_service.get_focus_pattern_insights(user_id)
         print(f"Insights: {insights}")
@@ -140,7 +140,7 @@ async def test_with_real_db():
 When you see errors like:
 
 ```
-sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[UserModel(users)], 
+sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[UserModel(users)],
 expression 'TaskCategoryModel' failed to locate a name ('TaskCategoryModel').
 ```
 
@@ -171,7 +171,7 @@ The test will automatically fall back to using static mock insights. If you want
 If you see errors like:
 
 ```
-dlopen(/opt/homebrew/lib/python3.11/site-packages/tensorflow-plugins/libmetal_plugin.dylib, 0x0006): 
+dlopen(/opt/homebrew/lib/python3.11/site-packages/tensorflow-plugins/libmetal_plugin.dylib, 0x0006):
 Symbol not found: __ZN3tsl8internal10LogMessageC1EPKcii
 ```
 
@@ -259,9 +259,9 @@ class InsightGenerator:
                 model_name = "distilgpt2"
                 tokenizer = AutoTokenizer.from_pretrained(model_name)
                 model = AutoModelForCausalLM.from_pretrained(model_name)
-                
+
                 self.text_generator = pipeline(
-                    "text-generation", 
+                    "text-generation",
                     model=model,
                     tokenizer=tokenizer,
                     max_length=50,
@@ -282,7 +282,7 @@ class SimplePyTorchGenerator:
             "your focus improves significantly in distraction-free environments.",
             # More predefined responses...
         ]
-    
+
     def __call__(self, prompt):
         # Use torch random to select a response
         idx = torch.randint(0, len(self.responses), (1,)).item()
@@ -314,7 +314,7 @@ class MockAnalyticsService:
     def _calculate_trend(self, values):
         # Implementation for trend calculation
         # ...
-    
+
     def generate_simple_insights(self, focus_ratings, productivity_ratings):
         # Generate insights based on ratings
         # ...
@@ -343,4 +343,4 @@ db_mock.execute.return_value = execute_mock
 To run performance tests:
 ```bash
 python -m app.services.body_doubling.performance_test
-``` 
+```

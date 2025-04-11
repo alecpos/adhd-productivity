@@ -50,7 +50,7 @@ def upgrade() -> None:
         sa.Index('ix_commitments_detected_at', 'detected_at'),
         sa.Index('ix_commitments_due_date', 'due_date')
     )
-    
+
     # Add related_commitment_id to the reminders table if it doesn't exist
     op.add_column('reminders', sa.Column('related_commitment_id', UUID(as_uuid=True), nullable=True))
     op.create_foreign_key('fk_reminder_commitment', 'reminders', 'commitments', ['related_commitment_id'], ['id'])
@@ -60,6 +60,6 @@ def downgrade() -> None:
     # Drop the foreign key on reminders first
     op.drop_constraint('fk_reminder_commitment', 'reminders', type_='foreignkey')
     op.drop_column('reminders', 'related_commitment_id')
-    
+
     # Then drop the commitments table
     op.drop_table('commitments')

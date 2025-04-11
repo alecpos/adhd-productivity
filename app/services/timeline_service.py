@@ -32,4 +32,4 @@ class TimelineService:
     async def get_timeline_analytics(self, user_id: UUID):
         """Get timeline analytics."""
         # TODO: Implement timeline analytics logic
-        pass 
+        pass

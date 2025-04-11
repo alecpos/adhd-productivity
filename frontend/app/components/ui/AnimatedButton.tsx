@@ -47,7 +47,7 @@ export function AnimatedButton({ scaleOnPress = true, ...props }: AnimatedButton
 
   const renderIcon = () => {
     if (!icon) return null;
-    
+
     if (React.isValidElement(icon)) {
       return icon;
     }
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: 0,
   },
-}); 
+});

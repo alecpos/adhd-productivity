@@ -698,7 +698,7 @@
 ```typescript
 // Example: Requesting a duration estimate for a task
 async function estimateTaskDuration(
-  taskDescription: string, 
+  taskDescription: string,
   taskCategory: string,
   userId: string
 ): Promise<DurationEstimate> {
@@ -717,13 +717,13 @@ async function estimateTaskDuration(
         include_confidence: true
       })
     });
-    
+
     if (!response.ok) {
       throw new Error(`Duration estimation request failed: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     return {
       estimatedMinutes: data.estimated_duration_minutes,
       confidenceLevel: data.confidence_level,
@@ -753,9 +753,9 @@ function generateFallbackEstimate(taskCategory: string): DurationEstimate {
     'email': 30,
     // other categories
   };
-  
+
   const baseEstimate = categoryDefaults[taskCategory] || 60;
-  
+
   return {
     estimatedMinutes: baseEstimate,
     confidenceLevel: 0.5, // Low confidence for fallback
@@ -789,13 +789,13 @@ async function analyzeTaskComplexity(
         subtask_threshold: 0.7
       })
     });
-    
+
     if (!response.ok) {
       throw new Error(`Complexity analysis request failed: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     return {
       overallComplexity: data.complexity_score,
       cognitiveLoad: data.cognitive_load,
@@ -818,20 +818,20 @@ async function analyzeTaskComplexity(
 
 // Simple fallback complexity analyzer
 function performBasicComplexityAnalysis(
-  taskDescription: string, 
+  taskDescription: string,
   taskType: string
 ): ComplexityAnalysis {
   // Very basic implementation
   const length = taskDescription.length;
   const sentenceCount = taskDescription.split(/[.!?]+/).length - 1;
   const technicalTerms = extractCommonTechnicalTerms(taskDescription);
-  
+
   // Simple complexity score based on length and sentence count
   const complexity = Math.min(
-    100, 
+    100,
     Math.round((length / 500) * 60 + (sentenceCount / 10) * 20 + (technicalTerms.length * 5))
   );
-  
+
   return {
     overallComplexity: complexity,
     cognitiveLoad: calculateBasicCognitiveLoad(taskDescription, taskType),
@@ -862,13 +862,13 @@ async function getCurrentStressors(userId: string): Promise<StressorData> {
         include_recommendations: true
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Stressor detection request failed: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     return {
       overallStressorLevel: data.overall_level,
       stressorCategories: data.categories.map(category => ({
@@ -909,28 +909,28 @@ class BufferedCalendarIntegration {
   private userId: string;
   private bufferService: TimeBufferService;
   private calendarService: CalendarService;
-  
+
   constructor(userId: string, bufferService: TimeBufferService, calendarService: CalendarService) {
     this.userId = userId;
     this.bufferService = bufferService;
     this.calendarService = calendarService;
   }
-  
+
   // Apply buffer times to an existing calendar
   async applyBuffersToCalendar(dateRange: DateRange): Promise<BufferApplicationResult> {
     try {
       // 1. Get all calendar events in the date range
       const events = await this.calendarService.getEventsInRange(this.userId, dateRange);
-      
+
       // 2. Sort events chronologically
       const sortedEvents = this.sortEventsByStartTime(events);
-      
+
       // 3. Calculate optimal buffers between events
       const bufferedSchedule = await this.calculateEventBuffers(sortedEvents);
-      
+
       // 4. Apply the buffers to the calendar
       const result = await this.insertBufferEvents(bufferedSchedule);
-      
+
       return {
         originalEventCount: events.length,
         buffersAdded: result.buffersAdded,
@@ -942,39 +942,39 @@ class BufferedCalendarIntegration {
       throw new Error(`Buffer application failed: ${error.message}`);
     }
   }
-  
+
   // Calculate optimal buffer times between events
   private async calculateEventBuffers(events: CalendarEvent[]): Promise<BufferedSchedule> {
     const bufferedEvents: BufferedEvent[] = [];
-    
+
     // Skip if there are no or just one event
     if (events.length <= 1) {
       return { events: events.map(e => ({ event: e })) };
     }
-    
+
     // For each adjacent pair of events, calculate buffer
     for (let i = 0; i < events.length - 1; i++) {
       const currentEvent = events[i];
       const nextEvent = events[i + 1];
-      
+
       // Add current event to the schedule
       bufferedEvents.push({ event: currentEvent });
-      
+
       // Skip buffer calculation if events are adjacent or overlapping
       if (nextEvent.startTime <= currentEvent.endTime) {
         continue;
       }
-      
+
       // Calculate available time between events
       const availableMinutes = Math.floor(
         (nextEvent.startTime.getTime() - currentEvent.endTime.getTime()) / (60 * 1000)
       );
-      
+
       // Skip if there's virtually no time between events
       if (availableMinutes < 5) {
         continue;
       }
-      
+
       // Request buffer calculation from the buffer service
       const buffer = await this.bufferService.calculateBuffer({
         userId: this.userId,
@@ -984,7 +984,7 @@ class BufferedCalendarIntegration {
         timeOfDay: currentEvent.endTime,
         currentStressors: await this.getCurrentStressors()
       });
-      
+
       // Add buffer to the schedule if one was recommended
       if (buffer && buffer.recommendedBufferMinutes > 0) {
         bufferedEvents.push({
@@ -997,25 +997,25 @@ class BufferedCalendarIntegration {
         });
       }
     }
-    
+
     // Add the last event
     bufferedEvents.push({ event: events[events.length - 1] });
-    
+
     return { events: bufferedEvents };
   }
-  
+
   // Insert buffer events into the calendar
   private async insertBufferEvents(schedule: BufferedSchedule): Promise<BufferInsertionResult> {
     let buffersAdded = 0;
     let conflicts = 0;
     let totalBufferMinutes = 0;
-    
+
     for (const item of schedule.events) {
       // Skip if this is a regular event (not a buffer)
       if (!item.buffer) {
         continue;
       }
-      
+
       try {
         // Create a buffer event in the calendar
         await this.calendarService.createEvent({
@@ -1028,7 +1028,7 @@ class BufferedCalendarIntegration {
           color: this.getBufferColor(item.buffer.bufferType),
           visibility: 'private'
         });
-        
+
         buffersAdded++;
         totalBufferMinutes += item.buffer.bufferMinutes;
       } catch (error) {
@@ -1036,10 +1036,10 @@ class BufferedCalendarIntegration {
         conflicts++;
       }
     }
-    
+
     return { buffersAdded, conflicts, totalBufferMinutes };
   }
-  
+
   // Get appropriate title for different buffer types
   private getBufferTitle(bufferType: string): string {
     const titles = {
@@ -1049,10 +1049,10 @@ class BufferedCalendarIntegration {
       'preparation': 'Preparation Time',
       'default': 'Buffer Time'
     };
-    
+
     return titles[bufferType] || titles.default;
   }
-  
+
   // Get appropriate color for different buffer types
   private getBufferColor(bufferType: string): string {
     const colors = {
@@ -1062,15 +1062,15 @@ class BufferedCalendarIntegration {
       'preparation': '#F3E5F5',  // Light purple
       'default': '#ECEFF1'     // Light gray
     };
-    
+
     return colors[bufferType] || colors.default;
   }
-  
+
   // Helper methods
   private sortEventsByStartTime(events: CalendarEvent[]): CalendarEvent[] {
     return [...events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
   }
-  
+
   private async getCurrentStressors(): Promise<StressorInfo[]> {
     try {
       const stressorData = await fetch(`${API_BASE_URL}/stressors/current?user_id=${this.userId}`);
@@ -1093,7 +1093,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
   const height = 500;
   const margin = 60;
   const radius = Math.min(width, height) / 2 - margin;
-  
+
   // Radar chart configuration
   const config = {
     w: width,
@@ -1104,7 +1104,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     roundStrokes: true,
     color: d3.scaleOrdinal().range(["#EDC951", "#CC333F", "#00A0B0", "#8C4E03", "#5DA5DA"])
   };
-  
+
   // Format data for radar chart
   const data = [
     {
@@ -1112,15 +1112,15 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
       axes: [
         { axis: "Cognitive Load", value: complexityData.cognitiveLoad },
         { axis: "Ambiguity", value: complexityData.ambiguityIndex },
-        { axis: "Technical Content", value: complexityData.technicalTermsScore || 
+        { axis: "Technical Content", value: complexityData.technicalTermsScore ||
                  Math.min(10, complexityData.technicalTerms.length * 2) },
         { axis: "Collaboration", value: complexityData.collaborationNeeded ? 8 : 3 },
-        { axis: "Decision Points", value: complexityData.decisionPointsScore || 
+        { axis: "Decision Points", value: complexityData.decisionPointsScore ||
                 calculateDecisionPoints(complexityData) }
       ]
     }
   ];
-  
+
   // Create SVG
   const svg = d3.select(`#${containerId}`)
     .append("svg")
@@ -1128,11 +1128,11 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .attr("height", height)
     .append("g")
     .attr("transform", `translate(${width/2},${height/2})`);
-  
+
   // Draw the circular grid
   const levels = config.levels;
   const axisGrid = svg.append("g").attr("class", "axisWrapper");
-  
+
   for (let j = 0; j < levels; j++) {
     const levelFactor = radius * ((j + 1) / levels);
     axisGrid.selectAll(".levels")
@@ -1148,7 +1148,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
       .style("stroke-opacity", "0.75")
       .style("stroke-width", "0.3px");
   }
-  
+
   // Draw the axes
   const angleSlice = Math.PI * 2 / data[0].axes.length;
   const axis = axisGrid.selectAll(".axis")
@@ -1156,7 +1156,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .enter()
     .append("g")
     .attr("class", "axis");
-  
+
   axis.append("line")
     .attr("x1", 0)
     .attr("y1", 0)
@@ -1165,7 +1165,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .attr("class", "line")
     .style("stroke", "grey")
     .style("stroke-width", "1px");
-  
+
   // Draw axis labels
   axis.append("text")
     .attr("class", "legend")
@@ -1175,25 +1175,25 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .attr("x", (d, i) => radius * 1.1 * Math.cos(angleSlice * i - Math.PI / 2))
     .attr("y", (d, i) => radius * 1.1 * Math.sin(angleSlice * i - Math.PI / 2))
     .text(d => d.axis);
-  
+
   // Draw the radar chart blobs
   const radarLine = d3.lineRadial()
     .radius(d => radius * (d.value / config.maxValue))
     .angle((d, i) => i * angleSlice);
-  
+
   // Create the radar path and fill it
   const blobWrapper = svg.selectAll(".radarWrapper")
     .data(data)
     .enter()
     .append("g")
     .attr("class", "radarWrapper");
-  
+
   blobWrapper.append("path")
     .attr("class", "radarArea")
     .attr("d", d => radarLine(d.axes))
     .style("fill", (d, i) => config.color(i))
     .style("fill-opacity", 0.35);
-  
+
   // Add circles at each data point
   blobWrapper.selectAll(".radarCircle")
     .data(d => d.axes)
@@ -1205,7 +1205,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .attr("cy", (d, i) => radius * (d.value / config.maxValue) * Math.sin(angleSlice * i - Math.PI / 2))
     .style("fill", "#ED174F")
     .style("fill-opacity", 0.9);
-  
+
   // Add title in the center
   svg.append("text")
     .attr("x", 0)
@@ -1213,7 +1213,7 @@ function renderComplexityRadarChart(containerId: string, complexityData: Complex
     .attr("text-anchor", "middle")
     .style("font-weight", "bold")
     .text(`Complexity Score: ${complexityData.overallComplexity}/100`);
-  
+
   // Helper function to calculate decision points
   function calculateDecisionPoints(complexity) {
     // Simple calculation based on ambiguity and cognitive load
@@ -1232,48 +1232,48 @@ class StressorAwareProductivityDashboard {
   private dashboardElement: HTMLElement;
   private updateInterval: number = 15 * 60 * 1000; // 15 minutes
   private intervalId: number;
-  
+
   constructor(dashboardElement: HTMLElement, userId: string, stressorService: StressorDetectionService) {
     this.dashboardElement = dashboardElement;
     this.userId = userId;
     this.stressorService = stressorService;
   }
-  
+
   // Initialize the dashboard with stressor awareness
   public initialize(): void {
     // Perform initial update
     this.updateDashboard();
-    
+
     // Set up periodic updates
     this.intervalId = window.setInterval(() => this.updateDashboard(), this.updateInterval);
-    
+
     // Add event listeners for real-time updates
     this.stressorService.on('stressor-change', () => this.updateDashboard());
     window.addEventListener('focus', () => this.updateDashboard());
   }
-  
+
   // Clean up resources
   public dispose(): void {
     window.clearInterval(this.intervalId);
     this.stressorService.off('stressor-change');
     window.removeEventListener('focus', () => this.updateDashboard());
   }
-  
+
   // Update the dashboard with current stressor information
   private async updateDashboard(): Promise<void> {
     try {
       // Get current stressor data
       const stressorData = await this.stressorService.getCurrentStressors(this.userId);
-      
+
       // Update visual indicators
       this.updateStressorIndicators(stressorData);
-      
+
       // Adjust task recommendations
       this.updateTaskRecommendations(stressorData);
-      
+
       // Update productivity forecast
       this.updateProductivityForecast(stressorData);
-      
+
       // Show interventions if necessary
       if (stressorData.overallStressorLevel > 70) {
         this.showStressInterventions(stressorData);
@@ -1284,15 +1284,15 @@ class StressorAwareProductivityDashboard {
       this.showOfflineState();
     }
   }
-  
+
   // Update visual stressor indicators
   private updateStressorIndicators(stressorData: StressorData): void {
     const indicatorElement = this.dashboardElement.querySelector('.stressor-indicator');
     if (!indicatorElement) return;
-    
+
     // Clear existing indicators
     indicatorElement.innerHTML = '';
-    
+
     // Overall stressor level indicator
     const overallLevel = document.createElement('div');
     overallLevel.className = 'overall-stressor-level';
@@ -1306,11 +1306,11 @@ class StressorAwareProductivityDashboard {
       </div>
     `;
     indicatorElement.appendChild(overallLevel);
-    
+
     // Individual stressor category indicators
     const categoriesContainer = document.createElement('div');
     categoriesContainer.className = 'stressor-categories';
-    
+
     stressorData.stressorCategories.forEach(category => {
       const categoryElement = document.createElement('div');
       categoryElement.className = 'stressor-category';
@@ -1322,27 +1322,27 @@ class StressorAwareProductivityDashboard {
       `;
       categoriesContainer.appendChild(categoryElement);
     });
-    
+
     indicatorElement.appendChild(categoriesContainer);
   }
-  
+
   // Other dashboard methods
   private updateTaskRecommendations(stressorData: StressorData): void {
     // Implementation details...
   }
-  
+
   private updateProductivityForecast(stressorData: StressorData): void {
     // Implementation details...
   }
-  
+
   private showStressInterventions(stressorData: StressorData): void {
     // Implementation details...
   }
-  
+
   private showOfflineState(): void {
     // Implementation details...
   }
-  
+
   // Helper methods
   private getStressorLevelClass(level: number): string {
     if (level < 30) return 'level-low';
@@ -1364,9 +1364,9 @@ class ReliableDurationEstimator {
   private localStorage: LocalStorage;
   private modelCache: ModelCache;
   private telemetry: TelemetryService;
-  
+
   constructor(
-    apiClient: ApiClient, 
+    apiClient: ApiClient,
     localStorage: LocalStorage,
     modelCache: ModelCache,
     telemetry: TelemetryService
@@ -1376,7 +1376,7 @@ class ReliableDurationEstimator {
     this.modelCache = modelCache;
     this.telemetry = telemetry;
   }
-  
+
   // Robust estimation with fallbacks
   async estimateTaskDuration(
     taskDescription: string,
@@ -1386,18 +1386,18 @@ class ReliableDurationEstimator {
     let estimate: DurationEstimate | null = null;
     let source = '';
     let confidenceAdjustment = 0;
-    
+
     try {
       // Step 1: Try to get from local cache first (fastest)
       const cacheKey = this.generateCacheKey(taskDescription, taskCategory, userId);
       estimate = await this.modelCache.get(cacheKey);
-      
+
       if (estimate) {
         source = 'cache';
         this.telemetry.trackEvent('duration_estimate_source', { source });
         return estimate;
       }
-      
+
       // Step 2: Try to get from API (most accurate)
       try {
         estimate = await this.apiClient.post('/time-estimation/predict', {
@@ -1406,7 +1406,7 @@ class ReliableDurationEstimator {
           task_category: taskCategory,
           include_factors: true
         });
-        
+
         // Cache successful result
         if (estimate) {
           await this.modelCache.set(cacheKey, estimate, { ttl: 3600 });
@@ -1416,22 +1416,22 @@ class ReliableDurationEstimator {
         }
       } catch (apiError) {
         // Log API error but continue to fallbacks
-        this.telemetry.trackException('api_duration_estimation_failed', { 
+        this.telemetry.trackException('api_duration_estimation_failed', {
           error: apiError.message,
           taskCategory
         });
-        
+
         // Adjust confidence for next fallbacks
         confidenceAdjustment -= 0.2;
       }
-      
+
       // Step 3: Try to use locally cached model
       try {
         const localModel = await this.modelCache.getModel('duration_estimation');
         if (localModel) {
           estimate = await this.runLocalModel(localModel, taskDescription, taskCategory);
           source = 'local_model';
-          
+
           // Adjust confidence downward
           if (estimate) {
             estimate.confidenceLevel = Math.max(0.1, estimate.confidenceLevel - 0.3);
@@ -1440,51 +1440,51 @@ class ReliableDurationEstimator {
           }
         }
       } catch (localModelError) {
-        this.telemetry.trackException('local_model_estimation_failed', { 
+        this.telemetry.trackException('local_model_estimation_failed', {
           error: localModelError.message,
           taskCategory
         });
-        
+
         // Further adjust confidence for next fallback
         confidenceAdjustment -= 0.1;
       }
-      
+
       // Step 4: Use local storage historical data
       try {
         const historicalData = await this.localStorage.getTasksByCategory(taskCategory, userId);
         if (historicalData && historicalData.length > 0) {
           estimate = this.calculateFromHistoricalData(historicalData, taskDescription);
           source = 'historical_data';
-          
+
           // Adjust confidence based on data quality
           if (estimate) {
-            estimate.confidenceLevel = Math.max(0.1, 
+            estimate.confidenceLevel = Math.max(0.1,
               Math.min(0.6, 0.3 + (historicalData.length / 20)) + confidenceAdjustment);
             this.telemetry.trackEvent('duration_estimate_source', { source });
             return estimate;
           }
         }
       } catch (storageError) {
-        this.telemetry.trackException('local_storage_access_failed', { 
+        this.telemetry.trackException('local_storage_access_failed', {
           error: storageError.message,
           taskCategory
         });
       }
-      
+
       // Step 5: Final fallback to category defaults
       estimate = this.getCategoryDefaults(taskCategory);
       source = 'defaults';
       estimate.confidenceLevel = 0.3 + confidenceAdjustment;
       this.telemetry.trackEvent('duration_estimate_source', { source });
       return estimate;
-      
+
     } catch (error) {
       // Catch-all for unexpected errors
-      this.telemetry.trackException('duration_estimation_failed', { 
+      this.telemetry.trackException('duration_estimation_failed', {
         error: error.message,
         taskCategory
       });
-      
+
       // Emergency fallback
       return {
         estimatedMinutes: 60, // 1 hour default
@@ -1497,23 +1497,23 @@ class ReliableDurationEstimator {
       };
     }
   }
-  
+
   // Helper methods
   private generateCacheKey(taskDescription: string, taskCategory: string, userId: string): string {
     // Implementation details...
     return `duration:${userId}:${taskCategory}:${this.hashString(taskDescription)}`;
   }
-  
+
   private async runLocalModel(model: any, taskDescription: string, taskCategory: string): Promise<DurationEstimate> {
     // Implementation details...
     return null;
   }
-  
+
   private calculateFromHistoricalData(historicalData: any[], taskDescription: string): DurationEstimate {
     // Implementation details...
     return null;
   }
-  
+
   private getCategoryDefaults(taskCategory: string): DurationEstimate {
     const categoryDefaults = {
       'meeting': 60,
@@ -1525,9 +1525,9 @@ class ReliableDurationEstimator {
       'research': 90,
       'default': 60
     };
-    
+
     const baseEstimate = categoryDefaults[taskCategory] || categoryDefaults.default;
-    
+
     return {
       estimatedMinutes: baseEstimate,
       confidenceLevel: 0.3,
@@ -1538,7 +1538,7 @@ class ReliableDurationEstimator {
       source: 'category_defaults'
     };
   }
-  
+
   private hashString(str: string): string {
     // Implementation details...
     return str.length.toString();
@@ -1554,7 +1554,7 @@ class TimeEstimationErrorHandler {
   private telemetry: TelemetryService;
   private notificationService: NotificationService;
   private retryPolicy: RetryPolicy;
-  
+
   constructor(
     telemetry: TelemetryService,
     notificationService: NotificationService,
@@ -1564,7 +1564,7 @@ class TimeEstimationErrorHandler {
     this.notificationService = notificationService;
     this.retryPolicy = retryPolicy;
   }
-  
+
   // Handle errors from various components consistently
   handleError(error: any, context: ErrorContext): ErrorResult {
     // Log the error with context
@@ -1577,7 +1577,7 @@ class TimeEstimationErrorHandler {
       taskId: context.taskId,
       timestamp: new Date().toISOString()
     });
-    
+
     // Determine error type and appropriate response
     if (this.isNetworkError(error)) {
       return this.handleNetworkError(error, context);
@@ -1591,13 +1591,13 @@ class TimeEstimationErrorHandler {
       return this.handleUnknownError(error, context);
     }
   }
-  
+
   // Handle network connectivity errors
   private handleNetworkError(error: any, context: ErrorContext): ErrorResult {
     // Check if we should retry
     if (this.retryPolicy.shouldRetry(context.operation, context.attempts)) {
       const nextRetryDelay = this.retryPolicy.getNextRetryDelay(context.operation, context.attempts);
-      
+
       return {
         type: 'retry',
         message: 'Connection issue. Retrying...',
@@ -1605,7 +1605,7 @@ class TimeEstimationErrorHandler {
         userVisible: context.attempts > 1
       };
     }
-    
+
     // If retries exhausted, suggest offline mode
     return {
       type: 'connectivity',
@@ -1614,7 +1614,7 @@ class TimeEstimationErrorHandler {
       userVisible: true
     };
   }
-  
+
   // Handle authentication/authorization errors
   private handleAuthError(error: any, context: ErrorContext): ErrorResult {
     return {
@@ -1624,12 +1624,12 @@ class TimeEstimationErrorHandler {
       userVisible: true
     };
   }
-  
+
   // Handle validation errors
   private handleValidationError(error: any, context: ErrorContext): ErrorResult {
     // Extract field-specific errors if available
     const fieldErrors = error.details?.fieldErrors || {};
-    
+
     // Show field-specific error messages
     if (Object.keys(fieldErrors).length > 0) {
       return {
@@ -1639,7 +1639,7 @@ class TimeEstimationErrorHandler {
         userVisible: true
       };
     }
-    
+
     // Generic validation error
     return {
       type: 'validation',
@@ -1647,14 +1647,14 @@ class TimeEstimationErrorHandler {
       userVisible: true
     };
   }
-  
+
   // Handle service errors (backend issues)
   private handleServiceError(error: any, context: ErrorContext): ErrorResult {
     // Notify operations team for critical service errors
     if (error.code === 'critical_service_failure') {
       this.notifyOperationsTeam(error, context);
     }
-    
+
     return {
       type: 'service_error',
       message: 'Estimation service is currently unavailable. Using best available estimates.',
@@ -1662,12 +1662,12 @@ class TimeEstimationErrorHandler {
       userVisible: true
     };
   }
-  
+
   // Handle unknown/unexpected errors
   private handleUnknownError(error: any, context: ErrorContext): ErrorResult {
     // Always notify about unknown errors
     this.notifyOperationsTeam(error, context);
-    
+
     return {
       type: 'unknown_error',
       message: 'Something went wrong. Using simplified estimation.',
@@ -1675,34 +1675,34 @@ class TimeEstimationErrorHandler {
       userVisible: true
     };
   }
-  
+
   // Helper methods for error detection
   private isNetworkError(error: any): boolean {
-    return error.name === 'NetworkError' || 
-           error.code === 'network_error' || 
+    return error.name === 'NetworkError' ||
+           error.code === 'network_error' ||
            error.message.includes('network') ||
            error.message.includes('connection');
   }
-  
+
   private isAuthError(error: any): boolean {
-    return error.status === 401 || 
-           error.status === 403 || 
+    return error.status === 401 ||
+           error.status === 403 ||
            error.code === 'unauthorized' ||
            error.code === 'forbidden';
   }
-  
+
   private isValidationError(error: any): boolean {
-    return error.status === 400 || 
+    return error.status === 400 ||
            error.code === 'validation_error' ||
            error.hasOwnProperty('details');
   }
-  
+
   private isServiceError(error: any): boolean {
-    return error.status === 500 || 
-           error.status === 503 || 
+    return error.status === 500 ||
+           error.status === 503 ||
            error.code === 'service_unavailable';
   }
-  
+
   private notifyOperationsTeam(error: any, context: ErrorContext): void {
     // Implementation details...
   }
@@ -1719,7 +1719,7 @@ describe('BayesianDurationPredictor', () => {
   let predictor: BayesianDurationPredictor;
   let mockDataService: any;
   let mockModelService: any;
-  
+
   beforeEach(() => {
     // Mock dependencies
     mockDataService = {
@@ -1742,7 +1742,7 @@ describe('BayesianDurationPredictor', () => {
         }
       ])
     };
-    
+
     mockModelService = {
       getPriors: jest.fn().mockResolvedValue({
         coding: { mean: 120, variance: 900 },
@@ -1751,21 +1751,21 @@ describe('BayesianDurationPredictor', () => {
       }),
       updateModel: jest.fn().mockResolvedValue(true)
     };
-    
+
     // Create predictor with mocked dependencies
     predictor = new BayesianDurationPredictor(mockDataService, mockModelService);
   });
-  
+
   describe('predictDuration', () => {
     it('should return a duration estimate with confidence intervals', async () => {
       // Arrange
       const taskDescription = 'Write unit tests for authentication module';
       const taskCategory = 'coding';
       const userId = 'user-123';
-      
+
       // Act
       const result = await predictor.predictDuration(taskDescription, taskCategory, userId);
-      
+
       // Assert
       expect(result).toBeDefined();
       expect(result.estimatedMinutes).toBeGreaterThan(0);
@@ -1778,45 +1778,45 @@ describe('BayesianDurationPredictor', () => {
         limit: 50
       });
     });
-    
+
     it('should adjust estimate based on complexity', async () => {
       // Arrange
       const taskDescription = 'Write complex authentication system with 2FA and biometrics';
       const taskCategory = 'coding';
       const userId = 'user-123';
-      
+
       // Mock complexity analyzer
       predictor.getTaskComplexity = jest.fn().mockResolvedValue({
         overallComplexity: 85, // High complexity
         cognitiveLoad: 8,
         ambiguityIndex: 3
       });
-      
+
       // Act
       const result = await predictor.predictDuration(taskDescription, taskCategory, userId);
       const baseResult = await predictor.predictDuration('Write simple authentication system', taskCategory, userId);
-      
+
       // Assert
       expect(result.estimatedMinutes).toBeGreaterThan(baseResult.estimatedMinutes);
       expect(result.adjustmentFactors).toContainEqual(
-        expect.objectContaining({ 
+        expect.objectContaining({
           factorName: 'complexity',
           impact: expect.any(Number),
           confidence: expect.any(Number)
         })
       );
     });
-    
+
     it('should handle cases with no historical data', async () => {
       // Arrange
       mockDataService.getHistoricalTasks.mockResolvedValue([]);
       const taskDescription = 'New task type with no history';
       const taskCategory = 'unknown';
       const userId = 'user-123';
-      
+
       // Act
       const result = await predictor.predictDuration(taskDescription, taskCategory, userId);
-      
+
       // Assert
       expect(result).toBeDefined();
       expect(result.estimatedMinutes).toBeGreaterThan(0);
@@ -1824,7 +1824,7 @@ describe('BayesianDurationPredictor', () => {
       expect(result.source).toBe('category_priors');
     });
   });
-  
+
   describe('recordActualDuration', () => {
     it('should update model with actual completion data', async () => {
       // Arrange
@@ -1833,10 +1833,10 @@ describe('BayesianDurationPredictor', () => {
       const actualMinutes = 150;
       const userId = 'user-123';
       const category = 'coding';
-      
+
       // Act
       await predictor.recordActualDuration(taskId, estimatedMinutes, actualMinutes, category, userId);
-      
+
       // Assert
       expect(mockModelService.updateModel).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1848,7 +1848,7 @@ describe('BayesianDurationPredictor', () => {
         })
       );
     });
-    
+
     it('should handle extremely short or long durations', async () => {
       // Arrange
       const taskId = 'task-123';
@@ -1856,13 +1856,13 @@ describe('BayesianDurationPredictor', () => {
       const actualMinutes = 600; // 10 hours, unusually long
       const userId = 'user-123';
       const category = 'coding';
-      
+
       // Spy on outlier detection method
       jest.spyOn(predictor as any, 'isOutlier').mockReturnValue(true);
-      
+
       // Act
       await predictor.recordActualDuration(taskId, estimatedMinutes, actualMinutes, category, userId);
-      
+
       // Assert
       expect(mockModelService.updateModel).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1890,19 +1890,19 @@ describe('TimeBufferCalculator Integration', () => {
   let mockTaskRepository: TaskRepository;
   let mockUserProfileRepository: UserProfileRepository;
   let mockStressorService: StressorDetectionService;
-  
+
   beforeAll(async () => {
     // Set up test database
     const testDb = new TestDatabase();
     await testDb.connect();
-    
+
     // Seed with test data
     await testDb.seed('./test/fixtures/buffer_calculator_test_data.json');
-    
+
     // Initialize repositories with test database
     mockTaskRepository = new TaskRepository(testDb);
     mockUserProfileRepository = new UserProfileRepository(testDb);
-    
+
     // Mock stressor service
     mockStressorService = {
       getCurrentStressors: jest.fn().mockResolvedValue({
@@ -1914,7 +1914,7 @@ describe('TimeBufferCalculator Integration', () => {
         ]
       })
     };
-    
+
     // Create calculator with real repositories and mocked services
     bufferCalculator = new TimeBufferCalculator(
       mockTaskRepository,
@@ -1922,18 +1922,18 @@ describe('TimeBufferCalculator Integration', () => {
       mockStressorService
     );
   });
-  
+
   afterAll(async () => {
     // Clean up test database
     await testDb.disconnect();
   });
-  
+
   it('should calculate appropriate buffers between different task types', async () => {
     // Arrange
     const userId = 'test-user-1';
     const prevTaskId = 'task-meeting-1';
     const nextTaskId = 'task-coding-1';
-    
+
     // Act
     const buffer = await bufferCalculator.calculateBuffer({
       userId,
@@ -1942,7 +1942,7 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: 60,
       timeOfDay: new Date('2023-06-15T14:00:00') // 2 PM
     });
-    
+
     // Assert
     expect(buffer).toBeDefined();
     expect(buffer.recommendedBufferMinutes).toBeGreaterThan(0);
@@ -1959,13 +1959,13 @@ describe('TimeBufferCalculator Integration', () => {
       })
     );
   });
-  
+
   it('should adjust buffers based on current stressors', async () => {
     // Arrange
     const userId = 'test-user-1';
     const prevTaskId = 'task-meeting-1';
     const nextTaskId = 'task-coding-1';
-    
+
     // First test with moderate stressors (default)
     const moderateBuffer = await bufferCalculator.calculateBuffer({
       userId,
@@ -1974,7 +1974,7 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: 60,
       timeOfDay: new Date('2023-06-15T14:00:00')
     });
-    
+
     // Then test with high stressors
     mockStressorService.getCurrentStressors.mockResolvedValue({
       overallStressorLevel: 75, // High level
@@ -1984,7 +1984,7 @@ describe('TimeBufferCalculator Integration', () => {
         { name: 'Deadline', level: 75 }
       ]
     });
-    
+
     const highStressBuffer = await bufferCalculator.calculateBuffer({
       userId,
       prevTaskId,
@@ -1992,7 +1992,7 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: 60,
       timeOfDay: new Date('2023-06-15T14:00:00')
     });
-    
+
     // Assert
     expect(highStressBuffer.recommendedBufferMinutes).toBeGreaterThan(
       moderateBuffer.recommendedBufferMinutes
@@ -2004,14 +2004,14 @@ describe('TimeBufferCalculator Integration', () => {
       })
     );
   });
-  
+
   it('should respect maximum available time', async () => {
     // Arrange
     const userId = 'test-user-1';
     const prevTaskId = 'task-meeting-1';
     const nextTaskId = 'task-coding-1';
     const limitedAvailableTime = 10; // Only 10 minutes available
-    
+
     // Act
     const buffer = await bufferCalculator.calculateBuffer({
       userId,
@@ -2020,20 +2020,20 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: limitedAvailableTime,
       timeOfDay: new Date('2023-06-15T14:00:00')
     });
-    
+
     // Assert
     expect(buffer.recommendedBufferMinutes).toBeLessThanOrEqual(limitedAvailableTime);
     expect(buffer.bufferComponents.reduce((sum, component) => sum + component.minutes, 0))
       .toBeLessThanOrEqual(limitedAvailableTime);
     expect(buffer.isConstrainedByAvailableTime).toBe(true);
   });
-  
+
   it('should learn from user feedback', async () => {
     // Arrange
     const userId = 'test-user-1';
     const prevTaskId = 'task-meeting-1';
     const nextTaskId = 'task-coding-1';
-    
+
     // Get initial buffer recommendation
     const initialBuffer = await bufferCalculator.calculateBuffer({
       userId,
@@ -2042,7 +2042,7 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: 60,
       timeOfDay: new Date('2023-06-15T14:00:00')
     });
-    
+
     // Submit feedback that buffer was too short
     await bufferCalculator.recordBufferFeedback({
       userId,
@@ -2050,7 +2050,7 @@ describe('TimeBufferCalculator Integration', () => {
       feedbackType: 'too_short',
       actualRequiredMinutes: initialBuffer.recommendedBufferMinutes + 10
     });
-    
+
     // Act - get new buffer recommendation for similar situation
     const updatedBuffer = await bufferCalculator.calculateBuffer({
       userId,
@@ -2059,11 +2059,11 @@ describe('TimeBufferCalculator Integration', () => {
       availableMinutes: 60,
       timeOfDay: new Date('2023-06-15T14:00:00')
     });
-    
+
     // Assert - buffer should be longer after feedback
     expect(updatedBuffer.recommendedBufferMinutes).toBeGreaterThan(
       initialBuffer.recommendedBufferMinutes
     );
   });
 });
-``` 
+```

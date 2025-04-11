@@ -102,4 +102,4 @@ export function getMentalHealthService(userId: string): MentalHealthService {
   return mentalHealthService;
 }
 
-export default getMentalHealthService; 
+export default getMentalHealthService;

@@ -51,4 +51,4 @@ echo -e "${YELLOW}Skipping manual test script (requires database setup)${NC}"
 echo
 
 echo -e "${GREEN}All tests completed successfully!${NC}"
-echo -e "${CYAN}For more comprehensive testing, set up a test database or use the ./scripts/run_standalone_test.sh script.${NC}" 
+echo -e "${CYAN}For more comprehensive testing, set up a test database or use the ./scripts/run_standalone_test.sh script.${NC}"

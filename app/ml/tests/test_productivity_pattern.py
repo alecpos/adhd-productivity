@@ -30,9 +30,9 @@ def sample_data():
     n_samples = 10
     sequence_length = 7
     n_features = 10
-    
+
     X = np.random.random((n_samples, sequence_length, n_features))
-    
+
     # Generate sample target data
     completion_rate = np.random.random((n_samples, 1))
     focus_level = np.random.random((n_samples, 1)) * 10
@@ -41,7 +41,7 @@ def sample_data():
     for i in range(n_samples):
         optimal_time[i, np.random.randint(0, 24)] = 1.0
     bottleneck_score = np.random.random((n_samples, 1))
-    
+
     y = {
         'completion_rate': completion_rate,
         'focus_level': focus_level,
@@ -49,7 +49,7 @@ def sample_data():
         'optimal_time': optimal_time,
         'bottleneck_score': bottleneck_score
     }
-    
+
     return X, y
 
 
@@ -57,7 +57,7 @@ def sample_data():
 def historical_blocks():
     """Generate sample historical time blocks."""
     now = datetime.now()
-    
+
     return [
         {
             'start_time': now.replace(hour=9),
@@ -105,13 +105,13 @@ def test_model_initialization(lstm_model):
 def test_model_build_structure(lstm_model):
     """Test model architecture structure."""
     model = lstm_model.model
-    
+
     # Check input shape
     assert model.inputs[0].shape.as_list() == [None, 7, 10]
-    
+
     # Check output structure
     assert len(model.outputs) == 5
-    
+
     # Check output names
     output_names = [output.name.split('/')[0] for output in model.outputs]
     expected_names = ['completion_rate', 'focus_level', 'energy_level', 'optimal_time', 'bottleneck_score']
@@ -122,7 +122,7 @@ def test_model_build_structure(lstm_model):
 def test_detect_productivity_bottlenecks(lstm_model, historical_blocks):
     """Test bottleneck detection."""
     bottlenecks = lstm_model.detect_productivity_bottlenecks(historical_blocks)
-    
+
     # Should detect hour 12 as a bottleneck
     assert len(bottlenecks) == 1
     assert bottlenecks[0]['hour'] == 12
@@ -140,19 +140,19 @@ def test_analyze_flexible_blocks(lstm_model):
         'optimal_time': np.zeros((1, 24)),
         'bottleneck_score': np.array([[0.2]])
     }
-    
+
     # Set optimal hours
     predictions['optimal_time'][0, 9] = 0.9  # 9am
     predictions['optimal_time'][0, 14] = 0.8  # 2pm
     predictions['optimal_time'][0, 16] = 0.7  # 4pm
-    
+
     # Test with time constraints
     recommendations = lstm_model.analyze_flexible_blocks(
         flexible_block_indices=[0, 1, 2],
         predictions=predictions,
         time_constraints={'start_hour': 9, 'end_hour': 17}
     )
-    
+
     assert len(recommendations) == 3
     assert recommendations[0]['recommended_hour'] == 9  # First choice
     assert recommendations[1]['recommended_hour'] == 14  # Second choice
@@ -169,18 +169,18 @@ def test_detect_optimal_windows(lstm_model):
         'optimal_time': np.zeros((1, 24)),
         'bottleneck_score': np.array([[0.2]])
     }
-    
+
     # Set optimal hours
     predictions['optimal_time'][0, 9] = 0.9  # 9am
     predictions['optimal_time'][0, 14] = 0.8  # 2pm
     predictions['optimal_time'][0, 16] = 0.6  # 4pm (below threshold)
-    
+
     windows = lstm_model.detect_optimal_windows(
         predictions=predictions,
         threshold=0.7,
         min_focus_level=6.0
     )
-    
+
     assert len(windows) == 2  # Only 9am and 2pm are above threshold
     assert windows[0]['hour'] == 9
     assert windows[0]['confidence'] == 0.9

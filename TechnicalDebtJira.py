@@ -4,7 +4,7 @@ import os
 def create_jira_csv():
     # Your email for assignments
     your_email = "alec@apintegrations.com"
-    
+
     # -------------------------------------------------------------------------
     # Technical Debt Sprint Plan: Organized by priority based on analysis results
     # -------------------------------------------------------------------------
@@ -354,27 +354,27 @@ def create_jira_csv():
 
     # Create CSV file
     csv_file = "technical_debt_jira.csv"
-    
+
     with open(csv_file, 'w', newline='') as file:
         writer = csv.writer(file)
-        
+
         # Write header row
         writer.writerow([
             'Summary', 'Issue Type', 'Description', 'Priority',
             'Labels', 'Epic Link', 'Issue ID', 'Parent', 'Assignee', 'Reporter'
         ])
-        
+
         epic_count = 0
         story_count = 0
-        
+
         for epic, stories in sprint_plan.items():
             epic_count += 1
             epic_id = f"TECHDEBT-{epic_count}"
-            
+
             # Add the epic
             writer.writerow([
                 epic,  # Summary
-                'Epic',  
+                'Epic',
                 (f"Technical debt reduction focused on improving code quality, performance, "
                  f"and maintainability based on analysis results.\n\n{epic}"),  # Epic description
                 'High',
@@ -385,25 +385,25 @@ def create_jira_csv():
                 your_email,
                 your_email
             ])
-            
+
             # Add the stories for this epic
             for story in stories:
                 story_count += 1
                 story_id = f"TECHDEBT-TASK-{story_count}"
-                
+
                 writer.writerow([
                     story["summary"],
                     'Story',
                     story["description"],
                     'Medium',
-                    'TechnicalDebt,Refactoring',  
+                    'TechnicalDebt,Refactoring',
                     epic,
                     story_id,
                     epic_id,
                     your_email,
                     your_email
                 ])
-    
+
     print(f"CSV file created: {os.path.abspath(csv_file)}")
     print(f"All tasks assigned to: {your_email}")
     print("\nInstructions for importing into Jira:")
@@ -421,4 +421,4 @@ def create_jira_csv():
 
 
 if __name__ == "__main__":
-    create_jira_csv() 
+    create_jira_csv()

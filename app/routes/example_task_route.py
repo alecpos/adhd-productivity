@@ -11,9 +11,9 @@ from uuid import UUID
 
 from app.models.task_model import TaskModel
 from app.schemas.task_schema import (
-    TaskCreate, 
-    TaskResponse, 
-    TaskUpdate, 
+    TaskCreate,
+    TaskResponse,
+    TaskUpdate,
     TaskListResponse,
     TaskStatsSchema
 )
@@ -49,7 +49,7 @@ async def get_task_service(db: AsyncSession = Depends(get_db)) -> TaskService:
     return TaskService(db)
 
 @router.get(
-    "/user/{user_id}", 
+    "/user/{user_id}",
     response_model=TaskListResponse,
     summary="Get User Tasks",
     description="Get all tasks for a specific user with optional filters",
@@ -68,7 +68,7 @@ async def get_user_tasks(
 ):
     """
     Retrieve all tasks for a specific user.
-    
+
     Args:
         user_id: The user ID
         current_user: The authenticated user
@@ -76,10 +76,10 @@ async def get_user_tasks(
         status: Optional filter by task status
         priority: Optional filter by task priority
         task_service: Task service dependency
-        
+
     Returns:
         A paginated list of tasks
-        
+
     Raises:
         403: If the current user doesn't have permission to view the tasks
         404: If the user is not found
@@ -87,7 +87,7 @@ async def get_user_tasks(
     # Check if the current user is authorized to view the tasks
     if user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to view this user's tasks")
-    
+
     # Get tasks from the service
     tasks, total = await task_service.get_user_tasks(
         user_id=user_id,
@@ -96,7 +96,7 @@ async def get_user_tasks(
         status=status,
         priority=priority,
     )
-    
+
     # Return paginated response
     return create_collection_response(
         items=tasks,
@@ -121,15 +121,15 @@ async def create_task(
 ):
     """
     Create a new task for the current user.
-    
+
     Args:
         task: The task data
         current_user: The authenticated user
         task_service: Task service dependency
-        
+
     Returns:
         The created task
-        
+
     Raises:
         400: If the task data is invalid
     """
@@ -153,30 +153,30 @@ async def get_task(
 ):
     """
     Retrieve a specific task by ID.
-    
+
     Args:
         task_id: The task ID
         current_user: The authenticated user
         task_service: Task service dependency
-        
+
     Returns:
         The requested task
-        
+
     Raises:
         403: If the current user doesn't have permission to view the task
         404: If the task is not found
     """
     # Get the task
     task = await task_service.get_task(task_id, current_user.id)
-    
+
     # Check if the task exists
     if task is None:
         raise not_found_error("Task", task_id)
-    
+
     # Check if the current user is authorized to view the task
     if task.user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to view this task")
-    
+
     return create_response(task)
 
 
@@ -195,16 +195,16 @@ async def update_task(
 ):
     """
     Update a specific task by ID.
-    
+
     Args:
         task_update: The task update data
         task_id: The task ID
         current_user: The authenticated user
         task_service: Task service dependency
-        
+
     Returns:
         The updated task
-        
+
     Raises:
         400: If the task update data is invalid
         403: If the current user doesn't have permission to update the task
@@ -212,15 +212,15 @@ async def update_task(
     """
     # Get the task
     task = await task_service.get_task(task_id, current_user.id)
-    
+
     # Check if the task exists
     if task is None:
         raise not_found_error("Task", task_id)
-    
+
     # Check if the current user is authorized to update the task
     if task.user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to update this task")
-    
+
     # Update the task
     updated_task = await task_service.update(task_id, task_update)
     return create_response(updated_task)
@@ -240,33 +240,33 @@ async def delete_task(
 ):
     """
     Delete a specific task by ID.
-    
+
     Args:
         task_id: The task ID
         current_user: The authenticated user
         task_service: Task service dependency
-        
+
     Returns:
         No content (204)
-        
+
     Raises:
         403: If the current user doesn't have permission to delete the task
         404: If the task is not found
     """
     # Get the task
     task = await task_service.get_task(task_id, current_user.id)
-    
+
     # Check if the task exists
     if task is None:
         raise not_found_error("Task", task_id)
-    
+
     # Check if the current user is authorized to delete the task
     if task.user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to delete this task")
-    
+
     # Delete the task
     deleted_task = await task_service.delete(task_id)
-    
+
     # Return no content (204)
     return create_response(deleted_task)
 
@@ -286,31 +286,31 @@ async def complete_task(
 ):
     """
     Mark a specific task as complete.
-    
+
     Args:
         task_id: The task ID
         current_user: The authenticated user
         actual_duration: The actual duration of the task in minutes
         task_service: Task service dependency
-        
+
     Returns:
         The updated task
-        
+
     Raises:
         403: If the current user doesn't have permission to complete the task
         404: If the task is not found
     """
     # Get the task
     task = await task_service.get_task(task_id, current_user.id)
-    
+
     # Check if the task exists
     if task is None:
         raise not_found_error("Task", task_id)
-    
+
     # Check if the current user is authorized to complete the task
     if task.user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to complete this task")
-    
+
     # Complete the task
     completed_task = await task_service.complete_task(
         task_id=task_id,
@@ -331,14 +331,14 @@ async def get_task_statistics(
 ):
     """
     Get statistics about tasks for the current user.
-    
+
     Args:
         current_user: The authenticated user
         task_service: Task service dependency
-        
+
     Returns:
         Task statistics
     """
     # Get task statistics
     stats = await task_service.get_task_statistics(current_user.id)
-    return create_response(stats) 
+    return create_response(stats)

@@ -8,4 +8,4 @@ const config: Config = {
   API_TIMEOUT: 10000,
 };
 
-export default config; 
+export default config;

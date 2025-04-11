@@ -36,7 +36,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
   const fetchEvents = useCallback(async () => {
     if (!user?.id) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -52,7 +52,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
   const createEvent = async (eventData: CreateCalendarEvent) => {
     if (!user?.id) return;
-    
+
     setError(null);
     try {
       const newEvent = await calendarService.createEvent({
@@ -70,7 +70,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const updatedEvent = await calendarService.updateEvent(eventId, eventData);
-      setEvents(prev => prev.map(event => 
+      setEvents(prev => prev.map(event =>
         event.id === eventId ? updatedEvent : event
       ));
     } catch (err) {
@@ -105,4 +105,4 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
       {children}
     </CalendarContext.Provider>
   );
-} 
+}

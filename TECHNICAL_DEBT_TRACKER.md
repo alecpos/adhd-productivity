@@ -132,4 +132,4 @@ Average Technical Debt Scores:
 - Dependencies: 0.02 (unchanged from previous improvement)
 - Structure: 0.88
 
-These scores are being addressed through the ongoing refactoring initiatives, with a focus on improving structure and reducing complexity. 
+These scores are being addressed through the ongoing refactoring initiatives, with a focus on improving structure and reducing complexity.

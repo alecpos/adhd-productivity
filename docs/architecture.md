@@ -178,4 +178,4 @@ from app.api.v1.routes.auth import AuthRouter
    - Run integration tests
    - Update dependencies
    - Deploy to staging
-   - Monitor metrics 
+   - Monitor metrics

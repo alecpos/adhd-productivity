@@ -14,7 +14,7 @@ import { Task } from '@/core/types';
 
 // Lazy load components using correct paths from the index
 const Analytics = React.lazy(() => import('@/app/components/Analytics'));
-const GamificationDashboard = React.lazy(() => 
+const GamificationDashboard = React.lazy(() =>
   import('@/app/components/gamification/components/GamificationDashboard')
 );
 
@@ -91,11 +91,11 @@ export default function HyperfocusScreen() {
           <>
             <Text h4>Session Active</Text>
             <Text style={styles.timerText}>Session in progress</Text>
-            <Button 
-              title="End Session" 
+            <Button
+              title="End Session"
               onPress={handleEndSession}
-              containerStyle={styles.buttonContainer} 
-              buttonStyle={styles.endButton} 
+              containerStyle={styles.buttonContainer}
+              buttonStyle={styles.endButton}
             />
           </>
         ) : (
@@ -113,13 +113,13 @@ export default function HyperfocusScreen() {
 
       <React.Suspense fallback={<LoadingSpinner />}>
         <Analytics />
-        <GamificationDashboard 
+        <GamificationDashboard
           streaks={{
             current_streak: stats?.total_sessions || 0,
             highest_streak: stats?.completion_rate || 0,
             badges: []
           }}
-          leaderboard={[]} 
+          leaderboard={[]}
         />
       </React.Suspense>
     </View>
@@ -158,10 +158,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.colors.error,
     borderRadius: theme.borderRadius.sm,
   },
-  streakText: { 
+  streakText: {
     marginTop: theme.spacing.lg,
     fontSize: theme.fontSize.md,
-    fontStyle: "italic", 
+    fontStyle: "italic",
     textAlign: "center",
     color: theme.colors.grey2,
   }

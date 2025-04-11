@@ -5,4 +5,4 @@ export const useAppTheme = () => {
   return theme;
 };
 
-export const createThemedStyle = makeStyles; 
+export const createThemedStyle = makeStyles;

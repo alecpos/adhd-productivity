@@ -687,7 +687,7 @@ try {
       request_id: requestId
     });
   }
-  
+
   if (error instanceof BusinessLogicError) {
     return response.status(error.statusCode).json({
       error: {
@@ -698,7 +698,7 @@ try {
       request_id: requestId
     });
   }
-  
+
   // Unexpected error
   logger.error('Unexpected error in schedule optimization', {
     error: error.toString(),
@@ -706,11 +706,10 @@ try {
     request: sanitizeRequest(request),
     requestId
   });
-  
+
   return response.status(500).json({
     error: {
       code: 'INTERNAL_ERROR',
       message: 'An unexpected error occurred',
       details: {}
     },
- 

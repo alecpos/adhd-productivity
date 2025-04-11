@@ -89,9 +89,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem('auth_token');
-      
+
       logAuth('token_check', { hasToken: token !== null });
-      
+
       if (token === null) {
         setUser(null);
         logAuth('no_token_found');
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
 
       // Update API client
       api.defaults.headers.Authorization = `Bearer ${token}`;
-      
+
       // Update state
       setUser(userData);
       logAuth('login_complete', { userId: userData.id });
@@ -215,10 +215,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         email,
         password,
       });
-      
+
       const { access_token: token, user: userData } = response.data;
       logAuth('register_success', { userId: userData.id });
-      
+
       // Store auth data
       await AsyncStorage.multiSet([
         ['auth_token', token],
@@ -227,7 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
 
       // Update API client
       api.defaults.headers.Authorization = `Bearer ${token}`;
-      
+
       // Update state
       setUser(userData);
       logAuth('register_complete', { userId: userData.id });

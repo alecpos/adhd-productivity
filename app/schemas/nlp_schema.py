@@ -11,7 +11,7 @@ from app.schemas.base_schema import BaseSchema
 
 class NLPParserRequestSchema(BaseSchema):
     """Schema for NLP parsing requests."""
-    
+
     text: str = Field(..., description="Text to be parsed and analyzed")
     context: Optional[str] = Field(None, description="Additional context for parsing")
     options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Parsing options")
@@ -20,7 +20,7 @@ class NLPParserRequestSchema(BaseSchema):
 
 class NLPParserResponseSchema(BaseSchema):
     """Schema for NLP parsing responses."""
-    
+
     id: UUID
     user_id: UUID
     text: str = Field(..., description="Original text that was parsed")
@@ -34,7 +34,7 @@ class NLPParserResponseSchema(BaseSchema):
 
 class NLPAnalysisSchema(BaseSchema):
     """Schema for detailed NLP analysis."""
-    
+
     id: UUID
     text_id: UUID = Field(..., description="ID of the parsed text")
     sentiment_score: float = Field(..., ge=-1, le=1, description="Sentiment analysis score")
@@ -49,7 +49,7 @@ class NLPAnalysisSchema(BaseSchema):
 
 class NLPTaskParseSchema(BaseSchema):
     """Schema for parsing text into task data."""
-    
+
     title: str = Field(..., description="Extracted task title")
     description: Optional[str] = Field(None, description="Extracted task description")
     due_date: Optional[datetime] = Field(None, description="Extracted due date")
@@ -62,7 +62,7 @@ class NLPTaskParseSchema(BaseSchema):
 
 class TaskComplexityAnalysisSchema(BaseSchema):
     """Schema for ADHD-specific task complexity analysis."""
-    
+
     task_id: UUID
     complexity_level: int = Field(..., ge=1, le=5, description="Overall task complexity rating")
     time_estimate: int = Field(..., description="Estimated time in minutes")
@@ -75,7 +75,7 @@ class TaskComplexityAnalysisSchema(BaseSchema):
 
 class FocusStrategySchema(BaseSchema):
     """Schema for personalized focus strategies."""
-    
+
     strategy_id: UUID
     task_type: str = Field(..., description="Type of task this strategy is for")
     title: str = Field(..., description="Name of the strategy")
@@ -90,7 +90,7 @@ class FocusStrategySchema(BaseSchema):
 
 class NLPProcessingOptionsSchema(BaseSchema):
     """Schema for configuring NLP processing options."""
-    
+
     language: str = Field(default="en", description="Language code for processing")
     max_tokens: int = Field(default=512, description="Maximum tokens to process")
     ai_model_settings: Dict[str, Any] = Field(default_factory=dict, description="Model-specific settings")
@@ -114,4 +114,4 @@ __all__ = [
     "TaskComplexityAnalysisSchema",
     "FocusStrategySchema",
     "NLPProcessingOptionsSchema"
-] 
+]

@@ -256,4 +256,4 @@ def test_user_migration():
     }
     migrated = manager.migrate_schema("user", old_data, "1.0.0", "2.0.0")
     assert "old_field" not in migrated
-``` 
+```

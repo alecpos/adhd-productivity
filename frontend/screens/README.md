@@ -67,7 +67,7 @@ import { Task } from '../types';
 const TaskScreen = () => {
   const navigation = useNavigation();
   const { tasks, loading, error, fetchTasks } = useTasks();
-  
+
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -83,20 +83,20 @@ const TaskScreen = () => {
   return (
     <Container>
       <Typography variant="h1">Tasks</Typography>
-      
+
       {loading ? (
         <Spinner />
       ) : error ? (
         <ErrorDisplay message={error} onRetry={fetchTasks} />
       ) : (
-        <TaskList 
-          tasks={tasks} 
+        <TaskList
+          tasks={tasks}
           onTaskPress={handleTaskPress}
         />
       )}
-      
-      <Button 
-        variant="primary" 
+
+      <Button
+        variant="primary"
         onPress={handleAddTask}
       >
         Add New Task
@@ -151,4 +151,4 @@ When creating new screens:
 
 - [Navigation System](../docs/navigation.md)
 - [Screen Development](../docs/screen_development.md)
-- [State Management](../docs/state_management.md) 
+- [State Management](../docs/state_management.md)

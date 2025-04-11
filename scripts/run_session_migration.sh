@@ -44,7 +44,7 @@ with engine.connect() as conn:
         if not exists:
             raise Exception(f"Table {table} not found!")
         print(f"✓ Table {table} exists")
-        
+
         # Check data was migrated
         count = conn.execute(text(f"SELECT COUNT(*) FROM {table}")).scalar()
         print(f"  - {count} records in {table}")
@@ -53,4 +53,4 @@ print("\nMigration verification complete!")
 EOF
 
 echo "Migration completed successfully!"
-echo "Backup file created: session_migration_backup.sql" 
+echo "Backup file created: session_migration_backup.sql"

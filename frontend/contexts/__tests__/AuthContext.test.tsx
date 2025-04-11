@@ -110,7 +110,7 @@ describe('AuthContext', () => {
       },
     };
 
-    logTest('setup_mocks', { 
+    logTest('setup_mocks', {
       mockLoginResponse,
       apiPostMock: 'configured',
       asyncStorageMock: 'configured'
@@ -148,7 +148,7 @@ describe('AuthContext', () => {
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
 
-    logTest('test_complete', { 
+    logTest('test_complete', {
       name: 'successfully logs in a user',
       finalState: {
         user: result.current.user,
@@ -371,4 +371,4 @@ describe('AuthContext', () => {
     }).toThrow('useAuth must be used within an AuthProvider');
     consoleError.mockRestore();
   });
-}); 
+});

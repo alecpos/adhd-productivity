@@ -69,7 +69,7 @@ describe('Card Component', () => {
 
   it('renders with different variants', () => {
     const variants: Array<'elevated' | 'outlined' | 'filled'> = ['elevated', 'outlined', 'filled'];
-    
+
     variants.forEach((variant) => {
       render(
         <Card testID={`${variant}-card`} variant={variant}>
@@ -83,7 +83,7 @@ describe('Card Component', () => {
 
   it('renders with different sizes', () => {
     const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large'];
-    
+
     sizes.forEach((size) => {
       render(
         <Card testID={`${size}-card`} size={size}>
@@ -114,4 +114,4 @@ describe('Card Component', () => {
     );
     expect(screen.getByTestId('full-width-card')).toBeTruthy();
   });
-}); 
+});

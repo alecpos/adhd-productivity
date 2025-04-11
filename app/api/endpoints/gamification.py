@@ -60,7 +60,7 @@ class GamificationAction(BaseModel):
     target_motivator: MotivatorType
     difficulty: float
     engagement_score: float
-    
+
 class AdaptiveGamificationEngine:
     async def get_user_motivation_profile(self, user_id: str) -> UserMotivationProfile:
         return UserMotivationProfile(
@@ -72,14 +72,14 @@ class AdaptiveGamificationEngine:
             engagement_patterns={"morning": 0.8, "evening": 0.5},
             last_updated=datetime.now()
         )
-        
+
     async def update_user_motivation_profile(self, user_id: str, profile_data: Dict[str, Any]) -> UserMotivationProfile:
         profile = await self.get_user_motivation_profile(user_id)
         return profile
-        
+
     async def get_optimal_mechanics(self, user_id: str, context: Optional[Dict[str, Any]] = None) -> List[GamificationMechanic]:
         return [GamificationMechanic.CHALLENGES, GamificationMechanic.BADGES]
-        
+
     async def get_recommended_actions(self, user_id: str, count: int = 3) -> List[GamificationAction]:
         return [
             GamificationAction(
@@ -92,7 +92,7 @@ class AdaptiveGamificationEngine:
                 engagement_score=0.8
             )
         ]
-        
+
     async def track_effectiveness(self, user_id: str, action_name: str, engagement_score: float) -> Dict[str, Any]:
         return {"success": True, "updated_profile": True}
 
@@ -127,7 +127,7 @@ async def get_user_motivation_profile(
 ):
     """
     Get the user's motivation profile.
-    
+
     This endpoint returns the user's motivation profile, which includes their
     preferences for different motivation types, reward preferences, and the
     effectiveness of various game mechanics for this specific user.
@@ -151,7 +151,7 @@ async def update_user_motivation_profile(
 ):
     """
     Update the user's motivation profile.
-    
+
     This endpoint allows updating specific aspects of the user's motivation profile,
     such as their preferences for different motivation types or game mechanics.
     """
@@ -178,7 +178,7 @@ async def get_gamification_actions(
 ):
     """
     Get recommended gamification actions based on the current context.
-    
+
     This endpoint suggests the most effective gamification actions for the current
     user based on their motivation profile and the provided context (e.g., task
     difficulty, importance, current energy level).
@@ -209,7 +209,7 @@ async def get_optimal_mechanics(
 ):
     """
     Get the optimal game mechanics for the current user.
-    
+
     This endpoint returns the game mechanics that are most effective for the
     current user, based on their motivation profile and the provided context.
     """
@@ -222,7 +222,7 @@ async def get_optimal_mechanics(
     }
     # Filter out None values
     context = {k: v for k, v in context.items() if v is not None}
-    
+
     try:
         # Initialize the engine if needed
         engine = init_gamification_engine(
@@ -245,7 +245,7 @@ async def track_gamification_effectiveness(
 ):
     """
     Track the effectiveness of a gamification action.
-    
+
     This endpoint allows tracking how effective a specific gamification action was
     based on the user's engagement with it. This data is used to improve future
     recommendations.
@@ -261,4 +261,4 @@ async def track_gamification_effectiveness(
         )
         return {"success": True, "message": "Effectiveness tracking recorded"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to track gamification effectiveness: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Failed to track gamification effectiveness: {str(e)}")

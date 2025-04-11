@@ -41,9 +41,9 @@ export default function TasksScreen() {
 
   if (error) {
     return (
-      <ErrorBoundary 
-        error={new Error(error)} 
-        onRetry={fetchTasks} 
+      <ErrorBoundary
+        error={new Error(error)}
+        onRetry={fetchTasks}
       />
     );
   }
@@ -53,7 +53,7 @@ export default function TasksScreen() {
       <FlatList
         data={tasks}
         renderItem={({ item }) => (
-          <TaskCard 
+          <TaskCard
             task={{
               id: item.id,
               title: item.title || '',
