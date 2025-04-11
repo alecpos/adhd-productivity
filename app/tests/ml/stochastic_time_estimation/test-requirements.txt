@@ -21,7 +21,7 @@ keras==2.12.0
 # NLP Libraries
 nltk==3.9.1
 spacy==3.7.4
-transformers==4.30.0
+transformers==4.48.0
 
 # Data handling
 pandas==2.0.0
