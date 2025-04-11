@@ -1,12 +1,13 @@
 """Scheduling service module."""
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 from typing import Dict, Any, List, Optional
 from uuid import UUID, uuid4
 from dataclasses import dataclass
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
+import logging
 
 from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
 from app.models.scheduling_model import ScheduleBlock, BlockType, WorkHours, Break, Interruption, SchedulePreferences
@@ -29,7 +30,9 @@ from app.schemas.optimizer_schema import (
     FocusOptimizer as FocusOptimizerSchema,
     MentalHealthOptimizer as MentalHealthOptimizerSchema,
 )
-
+from app.services.task_service import TaskService
+from app.services.energy_service import EnergyService
+from app.services.focus_service import FocusService
 
 @dataclass
 class ScheduleSuggestionSchema(BaseService):

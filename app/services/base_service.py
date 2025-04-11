@@ -460,7 +460,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 select(self.model).offset(skip).limit(limit)
             )
             items = list(result.scalars().all())
-            return [self.schema_class.from_orm(item) for item in items]
+            return [self.schema_class.model_validate(item) for item in items]
         except Exception as e:
             raise ServiceError(f"Error retrieving items: {str(e)}")
 
@@ -484,7 +484,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             self.db.add(item)
             await self.db.commit()
             await self.db.refresh(item)
-            return self.schema_class.from_orm(item)
+            return self.schema_class.model_validate(item)
         except Exception as e:
             await self.db.rollback()
             raise ServiceError(f"Error creating item: {str(e)}")
@@ -503,7 +503,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
 
             await self.db.commit()
             await self.db.refresh(item)
-            return self.schema_class.from_orm(item)
+            return self.schema_class.model_validate(item)
         except Exception as e:
             await self.db.rollback()
             raise ServiceError(f"Error updating item: {str(e)}")
@@ -554,7 +554,7 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 select(self.model).where(getattr(self.model, field) == value)
             )
             item = result.scalar_one_or_none()
-            return self.schema_class.from_orm(item) if item else None
+            return self.schema_class.model_validate(item) if item else None
         except Exception as e:
             raise ServiceError(f"Error retrieving item by field: {str(e)}")
 
@@ -566,6 +566,19 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
                 select(self.model).where(getattr(self.model, field) == value)
             )
             items = list(result.scalars().all())
-            return [self.schema_class.from_orm(item) for item in items]
+            return [self.schema_class.model_validate(item) for item in items]
         except Exception as e:
             raise ServiceError(f"Error retrieving items by field: {str(e)}")
+
+    @with_retry()
+    async def get_one(self, filters: Dict[str, Any]) -> Optional[ModelType]:
+        """Get one item by filter criteria."""
+        try:
+            query = select(self.model)
+            for field, value in filters.items():
+                query = query.where(getattr(self.model, field) == value)
+                
+            result = await self.db.execute(query)
+            return result.scalar_one_or_none()
+        except Exception as e:
+            raise ServiceError(f"Error retrieving item by filters: {str(e)}")

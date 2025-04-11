@@ -56,13 +56,13 @@ class LLMService:
         for attempt in range(max_retries):
             try:
                 # First try to get model info to verify access
-                model_info("gpt2")
+                model_info("deepseek-ai/DeepSeek-R1")
                 
                 # Then initialize the inference client
                 self.text_generation_model = InferenceClient(
-                    model="gpt2",
+                    model="deepseek-ai/DeepSeek-R1",
                 )
-                logger.info("Successfully initialized GPT-2 model")
+                logger.info("Successfully initialized DeepSeek-R1 model")
                 return
             except (RepositoryNotFoundError, RevisionNotFoundError) as e:
                 logger.error(f"Model repository error: {str(e)}")
@@ -78,7 +78,7 @@ class LLMService:
                 if attempt < max_retries - 1:
                     sleep(retry_delay)
                 else:
-                    logger.error("Failed to initialize GPT-2 model after all retries")
+                    logger.error("Failed to initialize DeepSeek-R1 model after all retries")
                     self.text_generation_model = None
             except (requests.exceptions.ConnectionError, socket.gaierror) as e:
                 logger.warning(f"Network connection error: {str(e)}")
@@ -360,7 +360,7 @@ class LLMService:
             return {"name": "offline-fallback", "status": "offline"}
             
         try:
-            return model_info("gpt2")
+            return model_info("deepseek-ai/DeepSeek-R1")
         except Exception as e:
             logger.error(f"Error getting model info: {str(e)}")
             return {"name": "unknown", "status": "error", "error": str(e)}

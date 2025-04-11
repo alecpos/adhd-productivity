@@ -9,18 +9,21 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, Query, status
 from uuid import UUID
 
-from app.models.task_model import Task
-from app.schemas.task_schemas import (
+from app.models.task_model import TaskModel
+from app.schemas.task_schema import (
     TaskCreate, 
     TaskResponse, 
     TaskUpdate, 
     TaskListResponse,
-    TaskStats
+    TaskStatsSchema
 )
 from app.services.task_service import TaskService
-from app.utils.auth import get_current_user
+from app.core.security import get_current_user
 from app.utils.api_responses import (
     create_collection_response,
+    create_response,
+    not_found_response,
+    forbidden_response,
 )
 from app.utils.route_utils import (
     error_responses,
@@ -30,7 +33,9 @@ from app.utils.route_utils import (
     forbidden_error,
     validation_error,
 )
-from app.schemas.user_schemas import UserResponse
+from app.schemas.user_schema import UserResponseSchema
+from app.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Create router with prefix and tags
 router = APIRouter(
@@ -39,21 +44,27 @@ router = APIRouter(
     responses=error_responses(401),  # Add default 401 response to all routes
 )
 
+async def get_task_service(db: AsyncSession = Depends(get_db)) -> TaskService:
+    """Get task service instance."""
+    return TaskService(db)
 
 @router.get(
     "/user/{user_id}", 
     response_model=TaskListResponse,
     summary="Get User Tasks",
-    description="Retrieve all tasks for a specific user",
-    responses=error_responses(403, 404),
+    description="Get all tasks for a specific user with optional filters",
+    responses={
+        404: {"description": "User not found"},
+        403: {"description": "Not authorized to view these tasks"}
+    }
 )
 async def get_user_tasks(
     user_id: UUID = Depends(id_path_param("user")),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserResponseSchema = Depends(get_current_user),
     pagination: Dict[str, int] = Depends(pagination_params),
     status: Optional[str] = Query(None, description="Filter tasks by status"),
     priority: Optional[str] = Query(None, description="Filter tasks by priority"),
-    task_service: TaskService = Depends(),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Retrieve all tasks for a specific user.
@@ -105,8 +116,8 @@ async def get_user_tasks(
 )
 async def create_task(
     task: TaskCreate,
-    current_user: UserResponse = Depends(get_current_user),
-    task_service: TaskService = Depends(),
+    current_user: UserResponseSchema = Depends(get_current_user),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Create a new task for the current user.
@@ -123,10 +134,9 @@ async def create_task(
         400: If the task data is invalid
     """
     # Create the task
-    return await task_service.create_task(
-        task_data=task,
-        user_id=current_user.id,
-    )
+    task.user_id = current_user.id
+    created_task = await task_service.create(task)
+    return create_response(created_task)
 
 
 @router.get(
@@ -138,8 +148,8 @@ async def create_task(
 )
 async def get_task(
     task_id: UUID = Depends(id_path_param("task")),
-    current_user: UserResponse = Depends(get_current_user),
-    task_service: TaskService = Depends(),
+    current_user: UserResponseSchema = Depends(get_current_user),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Retrieve a specific task by ID.
@@ -157,7 +167,7 @@ async def get_task(
         404: If the task is not found
     """
     # Get the task
-    task = await task_service.get_task(task_id)
+    task = await task_service.get_task(task_id, current_user.id)
     
     # Check if the task exists
     if task is None:
@@ -167,7 +177,7 @@ async def get_task(
     if task.user_id != current_user.id and not current_user.is_admin:
         raise forbidden_error("You don't have permission to view this task")
     
-    return task
+    return create_response(task)
 
 
 @router.put(
@@ -180,8 +190,8 @@ async def get_task(
 async def update_task(
     task_update: TaskUpdate,
     task_id: UUID = Depends(id_path_param("task")),
-    current_user: UserResponse = Depends(get_current_user),
-    task_service: TaskService = Depends(),
+    current_user: UserResponseSchema = Depends(get_current_user),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Update a specific task by ID.
@@ -201,7 +211,7 @@ async def update_task(
         404: If the task is not found
     """
     # Get the task
-    task = await task_service.get_task(task_id)
+    task = await task_service.get_task(task_id, current_user.id)
     
     # Check if the task exists
     if task is None:
@@ -212,10 +222,8 @@ async def update_task(
         raise forbidden_error("You don't have permission to update this task")
     
     # Update the task
-    return await task_service.update_task(
-        task_id=task_id,
-        task_update=task_update,
-    )
+    updated_task = await task_service.update(task_id, task_update)
+    return create_response(updated_task)
 
 
 @router.delete(
@@ -227,8 +235,8 @@ async def update_task(
 )
 async def delete_task(
     task_id: UUID = Depends(id_path_param("task")),
-    current_user: UserResponse = Depends(get_current_user),
-    task_service: TaskService = Depends(),
+    current_user: UserResponseSchema = Depends(get_current_user),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Delete a specific task by ID.
@@ -246,7 +254,7 @@ async def delete_task(
         404: If the task is not found
     """
     # Get the task
-    task = await task_service.get_task(task_id)
+    task = await task_service.get_task(task_id, current_user.id)
     
     # Check if the task exists
     if task is None:
@@ -257,10 +265,10 @@ async def delete_task(
         raise forbidden_error("You don't have permission to delete this task")
     
     # Delete the task
-    await task_service.delete_task(task_id)
+    deleted_task = await task_service.delete(task_id)
     
     # Return no content (204)
-    return None
+    return create_response(deleted_task)
 
 
 @router.post(
@@ -272,9 +280,9 @@ async def delete_task(
 )
 async def complete_task(
     task_id: UUID = Depends(id_path_param("task")),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user: UserResponseSchema = Depends(get_current_user),
     actual_duration: Optional[int] = Query(None, description="Actual duration in minutes"),
-    task_service: TaskService = Depends(),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Mark a specific task as complete.
@@ -293,7 +301,7 @@ async def complete_task(
         404: If the task is not found
     """
     # Get the task
-    task = await task_service.get_task(task_id)
+    task = await task_service.get_task(task_id, current_user.id)
     
     # Check if the task exists
     if task is None:
@@ -304,21 +312,22 @@ async def complete_task(
         raise forbidden_error("You don't have permission to complete this task")
     
     # Complete the task
-    return await task_service.complete_task(
+    completed_task = await task_service.complete_task(
         task_id=task_id,
         actual_duration=actual_duration,
     )
+    return create_response(completed_task)
 
 
 @router.get(
     "/statistics",
-    response_model=TaskStats,
+    response_model=TaskStatsSchema,
     summary="Get Task Statistics",
     description="Get statistics about tasks for the current user",
 )
 async def get_task_statistics(
-    current_user: UserResponse = Depends(get_current_user),
-    task_service: TaskService = Depends(),
+    current_user: UserResponseSchema = Depends(get_current_user),
+    task_service: TaskService = Depends(get_task_service),
 ):
     """
     Get statistics about tasks for the current user.
@@ -331,4 +340,5 @@ async def get_task_statistics(
         Task statistics
     """
     # Get task statistics
-    return await task_service.get_task_statistics(current_user.id) 
+    stats = await task_service.get_task_statistics(current_user.id)
+    return create_response(stats) 

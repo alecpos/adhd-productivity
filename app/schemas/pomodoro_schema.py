@@ -111,16 +111,38 @@ class PomodoroResponseSchema(PomodoroSchema):
 
     id: UUID
     user_id: UUID
+    task_id: Optional[UUID] = None
+    work_duration: int = Field(default=25, ge=10, le=60, description="Focus time duration in minutes")
+    short_break_duration: int = Field(default=5, ge=3, le=30, description="Break time duration in minutes")
+    long_break_duration: int = Field(default=15, ge=10, le=45, description="Long break duration in minutes")
+    sessions_until_long_break: int = Field(default=4, ge=1, le=10, description="Number of sessions until long break")
+    status: str = PomodoroStatus.PENDING.value
     created_at: datetime
     updated_at: datetime
+    start_time: datetime = Field(default_factory=datetime.utcnow)
+    end_time: Optional[datetime] = None
+    completed_sessions: int = Field(default=0, ge=0)
+    current_session: int = Field(default=1, ge=1)
+    completed: bool = Field(default=False)
+    break_type: Optional[str] = BreakType.SHORT.value
     completed_cycles: Optional[int] = Field(None, ge=0)
     total_focus_time: Optional[int] = Field(None, ge=0)
+    interruption_count: Optional[int] = Field(default=0, ge=0)
     success_rate: Optional[float] = Field(None, ge=0, le=1)
     productivity_score: Optional[int] = Field(None, description="Session productivity score")
     focus_level: Optional[int] = Field(None, description="Session focus level")
+    focus_scores: List[Dict[str, Any]] = Field(default_factory=list)
+    completed_tasks: List[Any] = Field(default_factory=list)
+    breaks_taken: List[Dict[str, Any]] = Field(default_factory=list)
+    interruptions: List[Dict[str, Any]] = Field(default_factory=list)
+    meta_data: Dict[str, Any] = Field(default_factory=dict)
     notes: Optional[str] = Field(None, description="Session notes")
 
     model_config = ConfigDict(from_attributes=True)
+    
+    def dict(self, *args, **kwargs):
+        """Compatibility method for Pydantic v1 style dict() method."""
+        return self.model_dump(*args, **kwargs)
 
 
 class PomodoroStatsSchema(BaseModel):
@@ -130,6 +152,29 @@ class PomodoroStatsSchema(BaseModel):
     total_duration: int = Field(..., description="Total duration of all sessions in minutes")
     average_duration: float = Field(..., description="Average session duration in minutes")
     completion_rate: float = Field(..., description="Percentage of completed sessions")
+
+
+class SessionStatsSchema(BaseModel):
+    """Schema for basic session statistics."""
+
+    total_sessions: int = Field(..., description="Total number of Pomodoro sessions")
+    completed_sessions: int = Field(..., description="Number of completed sessions")
+    total_focus_time: int = Field(..., description="Total focus time in minutes")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DetailedAnalyticsSchema(BaseModel):
+    """Schema for detailed Pomodoro session analytics."""
+
+    total_sessions: int = Field(..., description="Total number of Pomodoro sessions")
+    completed_sessions: int = Field(..., description="Number of completed sessions")
+    active_sessions: int = Field(..., description="Number of active sessions")
+    avg_productivity: float = Field(..., description="Average productivity rating")
+    productivity_trend: float = Field(..., description="Trend in productivity ratings")
+    total_interruptions: int = Field(..., description="Total number of interruptions")
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PomodoroSettingsSchema(BaseModel):
@@ -155,15 +200,21 @@ class PomodoroCustomizationSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Add an alias for compatibility
+PomodoroResponse = PomodoroResponseSchema
+
 __all__ = [
     "PomodoroStatus",
     "PomodoroSchema",
     "PomodoroCreateSchema",
     "PomodoroUpdateSchema",
     "PomodoroResponseSchema",
+    "PomodoroResponse",
     "PomodoroStatsSchema",
     "PomodoroSettingsSchema",
     "PomodoroCustomizationSchema",
     "SessionStatusSchema",
     "SessionAnalyticsSchema",
+    "SessionStatsSchema",
+    "DetailedAnalyticsSchema",
 ]

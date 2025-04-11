@@ -1,5 +1,10 @@
 """Database configuration module."""
 
+import logging
+from typing import AsyncGenerator
+
+from fastapi import HTTPException
+from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker

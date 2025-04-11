@@ -79,7 +79,7 @@ class Settings(BaseSettings):
 
     # AI/ML settings
     HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
-    HUGGINGFACE_TEXT_MODEL: str = os.getenv("HUGGINGFACE_TEXT_MODEL", "gpt2")
+    HUGGINGFACE_TEXT_MODEL: str = os.getenv("HUGGINGFACE_TEXT_MODEL", "deepseek-ai/DeepSeek-R1")
     HUGGINGFACE_SENTIMENT_MODEL: str = os.getenv(
         "HUGGINGFACE_SENTIMENT_MODEL", 
         "distilbert-base-uncased-finetuned-sst-2-english"

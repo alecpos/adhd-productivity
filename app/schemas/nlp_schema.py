@@ -93,7 +93,7 @@ class NLPProcessingOptionsSchema(BaseSchema):
     
     language: str = Field(default="en", description="Language code for processing")
     max_tokens: int = Field(default=512, description="Maximum tokens to process")
-    model_preferences: Dict[str, Any] = Field(default_factory=dict, description="Model-specific settings")
+    ai_model_settings: Dict[str, Any] = Field(default_factory=dict, description="Model-specific settings")
     analysis_depth: str = Field(default="standard", description="Depth of analysis: quick, standard, or deep")
     custom_entities: Optional[List[Dict[str, Any]]] = Field(None, description="Custom entity definitions")
     confidence_threshold: float = Field(default=0.7, ge=0, le=1, description="Minimum confidence score threshold")

@@ -25,7 +25,7 @@ from enum import Enum
 import math
 
 from app.models.task_model import TaskModel
-from app.models.user_model import UserModel
+from app.models.user_model import UserModel 
 from app.ml.models import BaseMLModel
 
 logger = logging.getLogger(__name__)
@@ -650,31 +650,29 @@ class TimeBufferCalculator(BaseMLModel):
     
     def _calculate_context_impact_factor(self, context_changes: Dict[str, Any]) -> float:
         """
-        Calculate overall impact factor from context changes.
+        Calculate context impact factor based on context changes.
         
         Args:
-            context_changes: Dictionary with context change details
+            context_changes: Dictionary mapping context change types to change details
             
         Returns:
-            Impact factor as a multiplier (1.0 means no impact)
+            A multiplier factor for the base buffer time
         """
         if not context_changes:
             return 1.0
-        
-        # Start with base factor
-        impact_factor = 1.0
-        
-        # Calculate weighted impact
+            
+        cumulative_impact = 0
         for change_type, change_info in context_changes.items():
-            if change_type in self.context_change_weights:
-                weight = self.context_change_weights[change_type]
-                change_factor = change_info.get("change_factor", 0.0)
+            if not isinstance(change_info, dict) or 'change_factor' not in change_info:
+                continue
                 
-                # Each type of change can add up to its weight to the factor
-                impact_factor += weight * change_factor
-        
-        return impact_factor
-        
+            weight = self.context_change_weights.get(change_type, 0.1)
+            change_factor = change_info.get('change_factor', 0)
+            cumulative_impact += weight * change_factor
+            
+        # Ensure the impact factor is at least 1.0 and scale it reasonably
+        return max(1.0, 1.0 + cumulative_impact)
+    
     def calculate_opportunity_cost(
         self, 
         task1: Union[TaskModel, Dict[str, Any]], 
@@ -1164,4 +1162,207 @@ class TimeBufferCalculator(BaseMLModel):
             return calculator
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logger.error(f"Error loading model parameters: {e}")
-            return cls() 
+            return cls()
+    
+    async def weekly_resampling(
+        self,
+        user_id: str,
+        lookback_days: int = 90,
+        rolling_window_days: int = 7,
+        include_weekends: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Resample historical task transition data to weekly frequency with rolling averages.
+        
+        This method analyzes historical transition times between tasks and resamples the data
+        to weekly frequency, calculating rolling averages and other useful statistics to identify
+        patterns in task switching efficiency over time.
+        
+        Args:
+            user_id: ID of the user whose data will be analyzed
+            lookback_days: Number of days to look back for historical data
+            rolling_window_days: Size of the rolling window for averages (in days)
+            include_weekends: Whether to include weekend data in the analysis
+            
+        Returns:
+            Dictionary containing:
+            - weekly_transitions: Weekly resampled transition data
+            - weekly_stats: Statistics for each week
+            - rolling_averages: Rolling average transitions
+            - patterns: Identified weekly patterns
+        """
+        logger.info(f"Generating weekly transition time patterns for user {user_id}")
+        
+        # Get transition history
+        transitions = await self._get_transition_history(user_id)
+        
+        if not transitions:
+            logger.warning(f"No transition history found for user {user_id}")
+            return {
+                "error": "No transition history available",
+                "weekly_transitions": {},
+                "weekly_stats": {},
+                "rolling_averages": {},
+                "patterns": {}
+            }
+        
+        # Convert transitions to DataFrame for analysis
+        df = pd.DataFrame(transitions)
+        
+        # Ensure timestamp field is in datetime format
+        if 'timestamp' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+        elif 'transition_date' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['transition_date'])
+        else:
+            # If no timestamp field exists, create one based on current time
+            # This is a fallback and should be improved in production
+            logger.warning("No timestamp field found in transition data, using current date")
+            now = datetime.now()
+            # Create artificial timestamps spread over the lookback period
+            timestamps = [now - timedelta(days=i) for i in range(len(df))]
+            df['timestamp'] = timestamps
+        
+        # Filter to lookback period
+        start_date = datetime.now() - timedelta(days=lookback_days)
+        df = df[df['timestamp'] >= start_date]
+        
+        if df.empty:
+            logger.warning(f"No transition data available within lookback period for user {user_id}")
+            return {
+                "error": "No transition data within lookback period",
+                "weekly_transitions": {},
+                "weekly_stats": {},
+                "rolling_averages": {},
+                "patterns": {}
+            }
+        
+        # Remove weekend data if specified
+        if not include_weekends:
+            # 0 = Monday, 6 = Sunday in datetime.weekday()
+            df = df[df['timestamp'].dt.weekday < 5]
+        
+        # Extract numeric variables for analysis
+        numeric_cols = []
+        for col in df.columns:
+            if col in ['actual_minutes', 'predicted_minutes', 'buffer_minutes', 'transition_time']:
+                numeric_cols.append(col)
+            elif df[col].dtype in [np.int64, np.float64]:
+                numeric_cols.append(col)
+        
+        # Add derived columns for analysis
+        if 'actual_minutes' in df.columns and 'predicted_minutes' in df.columns:
+            df['prediction_error'] = df['actual_minutes'] - df['predicted_minutes']
+            df['prediction_error_pct'] = (df['prediction_error'] / df['predicted_minutes']) * 100
+            numeric_cols.extend(['prediction_error', 'prediction_error_pct'])
+        
+        # Set timestamp as index for resampling
+        df.set_index('timestamp', inplace=True)
+        
+        # Resample data to weekly frequency
+        weekly_aggs = {}
+        for col in numeric_cols:
+            weekly_aggs[col] = ['mean', 'min', 'max', 'std', 'count']
+        
+        weekly_df = df[numeric_cols].resample('W-MON').agg(weekly_aggs)
+        
+        # Flatten column MultiIndex
+        weekly_df.columns = ['_'.join(col).strip() for col in weekly_df.columns.values]
+        
+        # Add week number and year
+        weekly_df['year'] = weekly_df.index.year
+        weekly_df['week_number'] = weekly_df.index.isocalendar().week
+        
+        # Calculate rolling averages on daily data first
+        daily_df = df[numeric_cols].resample('D').mean()
+        
+        # Apply rolling window to the daily data
+        rolling_cols = {}
+        for col in numeric_cols:
+            rolling_col = f"{col}_rolling_{rolling_window_days}d"
+            daily_df[rolling_col] = daily_df[col].rolling(window=rolling_window_days, min_periods=1).mean()
+            rolling_cols[col] = rolling_col
+        
+        # Resample rolling averages to weekly to align with weekly_df
+        rolling_weekly = daily_df[[rolling_cols[col] for col in numeric_cols]].resample('W-MON').last()
+        
+        # Calculate week-over-week changes
+        for col in [c for c in weekly_df.columns if c.endswith('_mean')]:
+            weekly_df[f'{col}_wow_change'] = weekly_df[col].pct_change() * 100
+        
+        # Identify patterns in day of week variations
+        day_patterns = {}
+        for col in numeric_cols:
+            # Create a DataFrame grouped by day of week
+            day_data = df[col].groupby(df.index.weekday).agg(['mean', 'std', 'count'])
+            day_data.index = day_data.index.map(lambda x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x])
+            day_patterns[col] = day_data.to_dict()
+        
+        # Reset index to make timestamp a column again in weekly_df
+        weekly_df.reset_index(inplace=True)
+        weekly_df.rename(columns={'index': 'week_start'}, inplace=True)
+        
+        # Prepare result dictionary
+        result = {
+            "weekly_transitions": weekly_df.to_dict(orient='records'),
+            "weekly_stats": {
+                "total_weeks": len(weekly_df),
+                "average_transitions_per_week": weekly_df['actual_minutes_count'].mean() if 'actual_minutes_count' in weekly_df.columns else None,
+                "most_efficient_week": weekly_df.iloc[weekly_df['actual_minutes_mean'].idxmin()]['week_start'].strftime('%Y-%m-%d') if 'actual_minutes_mean' in weekly_df.columns and not weekly_df.empty else None,
+                "least_efficient_week": weekly_df.iloc[weekly_df['actual_minutes_mean'].idxmax()]['week_start'].strftime('%Y-%m-%d') if 'actual_minutes_mean' in weekly_df.columns and not weekly_df.empty else None,
+            },
+            "rolling_averages": rolling_weekly.to_dict(orient='records') if not rolling_weekly.empty else {},
+            "patterns": {
+                "day_of_week": day_patterns,
+                "weekly_trend": self._analyze_weekly_trend(weekly_df) if not weekly_df.empty else {}
+            }
+        }
+        
+        logger.info(f"Successfully generated weekly transition patterns for user {user_id}")
+        return result
+    
+    def _analyze_weekly_trend(self, weekly_df: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Analyze weekly trend to identify patterns over time.
+        
+        Args:
+            weekly_df: DataFrame with weekly data
+            
+        Returns:
+            Dictionary with trend analysis
+        """
+        trend_analysis = {}
+        
+        # Find columns that represent means of metrics
+        mean_cols = [col for col in weekly_df.columns if col.endswith('_mean')]
+        
+        for col in mean_cols:
+            if weekly_df[col].count() < 3:  # Need at least 3 data points for meaningful trend
+                continue
+                
+            # Simple linear trend (is it getting better or worse)
+            first_valid = weekly_df[col].first_valid_index()
+            last_valid = weekly_df[col].last_valid_index()
+            
+            if first_valid is None or last_valid is None:
+                continue
+                
+            first_value = weekly_df.loc[first_valid, col]
+            last_value = weekly_df.loc[last_valid, col]
+            
+            # Calculate percentage change
+            if abs(first_value) > 0.001:  # Avoid division by very small numbers
+                pct_change = ((last_value - first_value) / first_value) * 100
+            else:
+                pct_change = 0
+                
+            trend_analysis[col] = {
+                "first_value": first_value,
+                "last_value": last_value,
+                "change": last_value - first_value,
+                "pct_change": pct_change,
+                "direction": "improving" if pct_change < 0 else "worsening" if pct_change > 0 else "stable",
+                "weeks_analyzed": len(weekly_df)
+            }
+            
+        return trend_analysis 

@@ -20,11 +20,38 @@ class WorkHours(BaseModel):
     end_time: time = Field(..., description="End time of work hours")
     days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
 
+# Add WorkHoursSchema that inherits from BaseSchema for compatibility
+class WorkHoursSchema(BaseSchema):
+    """Work hours schema with BaseSchema inheritance."""
+    
+    start_time: time = Field(..., description="Start time of work hours")
+    end_time: time = Field(..., description="End time of work hours")
+    days_of_week: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4], description="Days of week (0=Monday, 6=Sunday)")
+
 class EnergyLevel(str, Enum):
     day_of_week: int = Field(..., ge=0, le=6)
     start_time: time
     end_time: time
     productivity_rating: Optional[int] = Field(None, ge=1, le=10)
+
+# Add BreakSchema that wraps the Break class from shared_components_schema
+class BreakSchema(BaseSchema):
+    """Break schema that inherits from BaseSchema."""
+    
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    duration: int = Field(..., description="Duration in minutes", ge=1)
+    type: str = Field(..., min_length=1, max_length=50)
+    effectiveness: Optional[int] = Field(None, ge=1, le=10)
+
+# Add InterruptionSchema that wraps the Interruption class
+class InterruptionSchema(BaseSchema):
+    """Interruption schema with BaseSchema inheritance."""
+    
+    time: datetime
+    type: str = Field(..., min_length=1, max_length=50)
+    duration: int = Field(..., description="Duration in minutes", ge=1)
+    impact: Optional[int] = Field(None, ge=-5, le=5)
 
 class TimeBlockInput(BaseSchema):
     """Input schema for time blocks used by energy optimizer."""
@@ -51,6 +78,20 @@ class EnergySchedulingPattern(BaseSchema):
     peak_hours: List[int] = Field(default_factory=list, description="Hours of the day with peak energy levels")
     trough_hours: List[int] = Field(default_factory=list, description="Hours of the day with low energy levels")
     hourly_energy_levels: Dict[int, float] = Field(default_factory=dict, description="Energy levels by hour")
+
+# Add SchedulePreferencesSchema that wraps the SchedulePreferences class
+class SchedulePreferencesSchema(BaseSchema):
+    """Schedule preferences schema with BaseSchema inheritance."""
+    
+    preferred_start_time: time = Field(default=time(9, 0))
+    preferred_end_time: time = Field(default=time(17, 0))
+    preferred_break_duration: int = Field(default=15, ge=5)  # minutes
+    min_break_interval: int = Field(default=90, ge=30)  # minutes
+    max_focus_duration: int = Field(default=120, ge=30)  # minutes
+    energy_patterns: List[EnergySchedulingPattern] = Field(default_factory=list)
+    preferred_task_order: Optional[List[BlockType]] = None
+    location_preferences: Optional[Dict[str, List[str]]] = None
+    environmental_preferences: Optional[EnvironmentalFactors] = None
 
 class SchedulePreferences(BaseSchema):
     """Schedule preferences model."""
@@ -211,6 +252,19 @@ class ApplyCircadianOptimizationResponse(BaseSchema):
     errors: List[str]
     total_errors: int
 
+# Add GenerateScheduleRequest class
+class GenerateScheduleRequest(BaseSchema):
+    """Request schema for generating a schedule."""
+    
+    user_id: UUID
+    start_date: datetime
+    end_date: datetime
+    include_tasks: bool = Field(default=True, description="Whether to include tasks in the schedule")
+    include_breaks: bool = Field(default=True, description="Whether to include breaks in the schedule")
+    preferences: Optional[SchedulePreferencesSchema] = None
+    optimization_type: Optional[str] = Field(default="energy", description="Type of optimization to use")
+    meta_data: Optional[Dict[str, Any]] = None
+
 __all__ = [
     "EnergySchedulingPattern",
     "SchedulePreferences",
@@ -224,10 +278,15 @@ __all__ = [
     "SchedulingSuggestion",
     "ScheduleResponseSchema",
     "WorkHours",
+    "WorkHoursSchema",
     "TimeBlockInput",
     "CircadianCalendarOptimizationRequest",
     "CircadianOptimizationResult",
     "CircadianCalendarOptimizationResponse",
     "ApplyCircadianOptimizationRequest",
-    "ApplyCircadianOptimizationResponse"
+    "ApplyCircadianOptimizationResponse",
+    "BreakSchema",
+    "InterruptionSchema",
+    "SchedulePreferencesSchema",
+    "GenerateScheduleRequest"
 ]

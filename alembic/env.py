@@ -1,10 +1,14 @@
 """Alembic environment configuration."""
 
+import os
 from logging.config import fileConfig
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from alembic import context
 
 # Load environment variables
 load_dotenv()
-
 
 # Import all models so they are known to SQLAlchemy
 from app.models.base_model import metadata

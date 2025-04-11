@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user_model import UserModel
 from app.services.auth_service import get_current_user
-from fastapi import APIRouter, Depends, Query, Path
+from fastapi import APIRouter, Depends, Query, Path, HTTPException
 from typing import List, Optional
 from uuid import UUID
 import logging
@@ -37,6 +37,7 @@ from app.utils.route_utils import (
     forbidden_error
 )
 from app.utils.exceptions import ResourceNotFoundError
+from app.models.enums_model import TaskState
 
 logger = logging.getLogger(__name__)
 task_router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -52,7 +53,7 @@ task_router = APIRouter(prefix="/tasks", tags=["tasks"])
 async def get_user_tasks(
     current_user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    status: Optional[str] = Query(None, description="Filter tasks by status"),
+    status: Optional[TaskState] = Query(None, description="Filter tasks by status"),
     priority: Optional[str] = Query(None, description="Filter tasks by priority"),
     due_before: Optional[str] = Query(None, description="Filter tasks due before this date (ISO format)"),
     due_after: Optional[str] = Query(None, description="Filter tasks due after this date (ISO format)"),
@@ -83,7 +84,7 @@ async def get_user_tasks(
         # Build filters dictionary
         filters = {}
         if status:
-            filters["status"] = status
+            filters["status"] = status.value
         if priority:
             filters["priority"] = priority
         if due_before:

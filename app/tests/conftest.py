@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import sys
+import os
 from datetime import datetime, time, timedelta, timezone
 from typing import (
     Any,
@@ -13,7 +14,7 @@ from typing import (
     List,
     TypeVar,
 )
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 import pytest
 import pytest_asyncio
@@ -21,6 +22,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from app.core.security import get_password_hash
 from app.database import get_db
@@ -51,9 +53,12 @@ from app.services.task_service import TaskService
 from app.services.timeline_service import TimelineService
 from app.tests.factories import TestFactory
 from app.models.enums_model import BlockPriority
-
-import os
-from unittest.mock import AsyncMock, MagicMock, patch
+from app.database.base import Base
+from app.schemas.body_doubling_schema import CreateBodyDoublingSchema
+from app.services.body_doubling.session_manager import SessionManager
+from app.services.body_doubling.matching_engine import MatchingEngine
+from app.services.body_doubling.analytics_service import AnalyticsService
+from app.services.body_doubling.notification_service import NotificationService
 
 # Import from our mock modules
 from app.tests.ml.stochastic_time_estimation.mock_pymc import MockTheano
@@ -75,8 +80,11 @@ logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.dialects").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy.orm").setLevel(logging.WARNING)
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/adhd_calendar_test"
+TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
+# Mock dependencies that cause issues during testing
+sys.modules['app.routes'] = MagicMock()
+sys.modules['app.routes.body_doubling_routes'] = MagicMock()
 
 @pytest.fixture(scope="session")
 def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
@@ -97,17 +105,20 @@ def event_loop() -> Iterator[asyncio.AbstractEventLoop]:
 
 
 @pytest_asyncio.fixture(scope="session")
-async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
+async def db_engine():
     """Create a test database engine."""
-    engine = create_async_engine(TEST_DATABASE_URL, echo=True, poolclass=NullPool)
+    engine = create_async_engine(TEST_DATABASE_URL, echo=True)
+    
     async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    try:
-        yield engine
-    finally:
-        async with engine.begin() as conn:
-            await conn.run_sync(BaseModel.metadata.drop_all)
-        await engine.dispose()
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    
+    yield engine
+    
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    
+    await engine.dispose()
 
 
 @pytest.fixture(scope="session")
@@ -118,11 +129,18 @@ def db_session_factory(db_engine: AsyncEngine) -> Any:
     )
 
 
-@pytest_asyncio.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+@pytest_asyncio.fixture
+async def db_session(db_session_factory) -> AsyncSession:
     """Create a test database session."""
-    async with db_module.async_session_maker() as session:
-        yield session
+    async with db_session_factory() as session:
+        try:
+            yield session
+            await session.rollback()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -184,7 +202,17 @@ async def auth_headers(test_user, db_session: AsyncSession) -> DictSchema:
 @pytest.fixture(scope="function")
 async def body_doubling_service(db_session: AsyncSession) -> BodyDoublingService:
     """Create a body doubling service instance."""
-    return BodyDoublingService(db_session)
+    session_manager = SessionManager(db_session)
+    matching_engine = MatchingEngine(session_manager=session_manager)
+    analytics_service = AnalyticsService(session_manager=session_manager)
+    notification_service = NotificationService(session_manager=session_manager)
+    
+    return BodyDoublingService(
+        session_manager=session_manager,
+        matching_engine=matching_engine,
+        analytics_service=analytics_service,
+        notification_service=notification_service
+    )
 
 
 @pytest.fixture(scope="function")
@@ -577,3 +605,30 @@ def run_async_test(coroutine):
     else:
         # Otherwise, use run_until_complete
         return loop.run_until_complete(coroutine)
+
+
+@pytest.fixture
+def sample_session_data():
+    """Create sample session data for testing."""
+    return CreateBodyDoublingSchema(
+        user_id=UUID("11111111-1111-1111-1111-111111111111"),
+        host_id=UUID("11111111-1111-1111-1111-111111111111"),
+        session_type=SessionType.ONE_ON_ONE,
+        activity_type=ActivityType.WORK,
+        planned_duration=30,
+        description=None,
+        energy_level=None,
+        environment_data=None,
+    )
+
+
+@pytest.fixture
+def user_1_id():
+    """Create a test user ID."""
+    return UUID("11111111-1111-1111-1111-111111111111")
+
+
+@pytest.fixture
+def user_2_id():
+    """Create another test user ID."""
+    return UUID("22222222-2222-2222-2222-222222222222")

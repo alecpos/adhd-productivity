@@ -22,7 +22,11 @@ from app.services.productivity_service import ProductivityService
 from app.services.scheduling_service import SchedulingService
 from app.services.subscription_service import SubscriptionService
 from app.services.user_service import UserService
-from app.services.body_doubling_service import BodyDoublingService
+from app.services.body_doubling.body_doubling_service import BodyDoublingService
+from app.services.body_doubling.session_manager import SessionManager
+from app.services.body_doubling.matching_engine import MatchingEngine
+from app.services.body_doubling.analytics_service import AnalyticsService
+from app.services.body_doubling.notification_service import NotificationService
 from app.services.outlook_calendar_service import OutlookCalendarService
 from app.services.apple_calendar_service import AppleCalendarService
 from app.services.google_calendar_service import GoogleCalendarService
@@ -277,7 +281,17 @@ def user_service(db_session):
 @pytest.fixture
 def body_doubling_service(db_session):
     """Create a body doubling service instance."""
-    return BodyDoublingService(db=db_session)
+    session_manager = SessionManager(db_session)
+    matching_engine = MatchingEngine(session_manager=session_manager)
+    analytics_service = AnalyticsService(session_manager=session_manager)
+    notification_service = NotificationService(session_manager=session_manager)
+    
+    return BodyDoublingService(
+        session_manager=session_manager,
+        matching_engine=matching_engine,
+        analytics_service=analytics_service,
+        notification_service=notification_service
+    )
 
 @pytest.fixture
 def outlook_calendar_service(db_session):

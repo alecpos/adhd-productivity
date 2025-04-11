@@ -10,9 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
 from app.services.base_service import BaseService, OPEN, CLOSED, HALF_OPEN
-from app.models.task_model import TaskModel, TaskStatus, TaskPriority
-from app.schemas.task_schema import TaskResponse, TaskCreate, TaskStatsSchema
-from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema, TaskCategory
+from app.models.task_model import TaskModel, TaskPriority
+from app.schemas.task_schema import TaskResponse, TaskCreate, TaskStatsSchema, TaskUpdate
+from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema, TaskCategory, TaskState
 from app.utils.decorators import handle_service_error
 from app.services.task_analyzer_service import TaskAnalyzerService
 
@@ -392,3 +392,97 @@ class TaskService(BaseService[TaskModel, TaskResponse, TaskCreate]):
         # In a real implementation, this would access the circuit breaker object
         # For now, we'll assume closed (healthy) state
         return CLOSED
+
+    def create_task(self, task: TaskCreate, user_id: str) -> TaskModel:
+        """Create a new task with proper state initialization."""
+        db_task = self.model(
+            user_id=user_id,
+            title=task.title,
+            description=task.description,
+            due_date=task.due_date,
+            estimated_duration=task.estimated_duration,
+            priority=task.priority,
+            difficulty=task.difficulty,
+            energy_required=task.energy_required,
+            focus_required=task.focus_required,
+            status=TaskState.TODO.value  # Initialize with TODO state
+        )
+        self.db.add(db_task)
+        self.db.commit()
+        self.db.refresh(db_task)
+        return db_task
+
+    def update_task_status(self, task_id: str, new_status: str, user_id: str) -> Optional[TaskModel]:
+        """Update task status with validation."""
+        task = self.db.query(self.model).filter(
+            self.model.id == task_id,
+            self.model.user_id == user_id
+        ).first()
+        
+        if not task:
+            return None
+            
+        if task.update_status(new_status):
+            self.db.commit()
+            self.db.refresh(task)
+            return task
+        return None
+
+    def get_task(self, task_id: str, user_id: str) -> Optional[TaskModel]:
+        """Get a task by ID with next states."""
+        task = self.db.query(self.model).filter(
+            self.model.id == task_id,
+            self.model.user_id == user_id
+        ).first()
+        
+        if task:
+            task.next_states = task.get_next_states()
+        return task
+
+    def get_user_tasks(self, user_id: str) -> List[TaskModel]:
+        """Get all tasks for a user with next states."""
+        tasks = self.db.query(self.model).filter(
+            self.model.user_id == user_id
+        ).all()
+        
+        for task in tasks:
+            task.next_states = task.get_next_states()
+        return tasks
+
+    def update_task(self, task_id: str, task_update: TaskUpdate, user_id: str) -> Optional[TaskModel]:
+        """Update task with status transition validation."""
+        task = self.db.query(self.model).filter(
+            self.model.id == task_id,
+            self.model.user_id == user_id
+        ).first()
+        
+        if not task:
+            return None
+            
+        # Handle status update separately if provided
+        if task_update.status and task_update.status != task.status:
+            if not task.update_status(task_update.status):
+                return None
+                
+        # Update other fields
+        for field, value in task_update.dict(exclude={'status'}).items():
+            if value is not None:
+                setattr(task, field, value)
+                
+        self.db.commit()
+        self.db.refresh(task)
+        task.next_states = task.get_next_states()
+        return task
+
+    def delete_task(self, task_id: str, user_id: str) -> bool:
+        """Delete a task."""
+        task = self.db.query(self.model).filter(
+            self.model.id == task_id,
+            self.model.user_id == user_id
+        ).first()
+        
+        if task:
+            self.db.delete(task)
+            self.db.commit()
+            return True
+        return False

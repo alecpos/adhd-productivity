@@ -7,7 +7,7 @@ to support proactive forgetfulness and distraction mitigation.
 from datetime import datetime
 from typing import List, Optional, Dict, Any, Union
 from uuid import UUID
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 
 from app.models.commitment_model import CommitmentSource, CommitmentStatus, CommitmentPriority
 
@@ -65,8 +65,7 @@ class CommitmentInDB(CommitmentBase):
     related_task_id: Optional[int] = None
     cross_references: Optional[List[int]] = None
     
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommitmentResponse(CommitmentInDB):

@@ -2,16 +2,20 @@
 
 
 Revision ID: 7530ac0f785c
-Revises: 27401518c139
-Create Date: 2025-02-02 12:18:18.098530
+Revises: 409e0267df36
+Create Date: 2024-02-04 05:44:00.000000
 
 """
+from typing import Union, Sequence
+from alembic import op
+import sqlalchemy as sa
+
 
 # Revision identifiers, used by Alembic
 revision: str = "7530ac0f785c"
-down_revision: Union[str, None] = "27401518c139"
+down_revision: Union[str, None] = "409e0267df36"
 branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+depends_on: Union[str, None] = None
 
 
 def upgrade():
