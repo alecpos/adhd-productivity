@@ -11,7 +11,7 @@ from app.services.google_calendar_service import GoogleCalendarService
 from app.services.apple_calendar_service import AppleCalendarService
 from app.services.outlook_calendar_service import OutlookCalendarService
 from app.services.calendar_sync_service import CalendarSyncService
-from app.models.calendar_model import CalendarEventModel
+from app.models.calendar_event_model import CalendarEventModel
 from app.schemas.calendar_schema import (
     CalendarEventSchema,
     CalendarEventCreateSchema,

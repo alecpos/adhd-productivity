@@ -60,8 +60,8 @@ class AnalyticsRouter(
         @handle_service_error
         async def export_user_data(
             user_id: UUID,
-            start_date: datetime | None = None,
-            end_date: datetime | None = None,
+            start_date: Optional[datetime] = None,
+            end_date: Optional[datetime] = None,
             db: AsyncSession = Depends(get_db),
         ):
             """Export all user data including analytics, tasks, and health records."""

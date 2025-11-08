@@ -12,7 +12,8 @@ from fastapi import HTTPException
 from app.services.base_service import BaseService
 from app.models.task_model import TaskModel
 from app.schemas.task_schema import TaskResponse, TaskCreate, TaskStatsSchema
-from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema, TaskCategory
+from app.models.enums_model import TaskStatus as TaskStatusSchema, BlockPriority as TaskPrioritySchema
+from app.models.task_category_model import TaskCategoryModel as TaskCategory
 from app.utils.decorators import handle_service_error
 
 logger = logging.getLogger(__name__)

@@ -21,6 +21,42 @@ SchemaType = TypeVar("SchemaType")
 CreateSchemaType = TypeVar("CreateSchemaType")
 T = TypeVar("T")
 
+
+def with_concurrency_control(
+    max_retries: int = 3,
+    initial_delay: float = 0.05,
+    max_delay: float = 0.5,
+    backoff_factor: float = 1.5,
+    retry_exceptions: Tuple = (
+        sqlalchemy.exc.OperationalError,
+        sqlalchemy.exc.InternalError,
+        sqlalchemy.exc.DBAPIError,
+        sqlalchemy.exc.TimeoutError,
+        asyncio.TimeoutError,
+    ),
+    error_message: Optional[str] = None,
+):
+    """Decorator for adding retry logic to async methods."""
+    def decorator(func: Callable[..., T]) -> Callable[..., T]:
+        @wraps(func)
+        async def wrapper(*args, **kwargs) -> T:
+            async def operation():
+                return await func(*args, **kwargs)
+
+            service_instance = args[0]  # Get the service instance from the method call
+            return await service_instance._with_retry(
+                operation=operation,
+                max_retries=max_retries,
+                initial_delay=initial_delay,
+                max_delay=max_delay,
+                backoff_factor=backoff_factor,
+                retry_exceptions=retry_exceptions,
+                error_message=error_message,
+            )
+        return wrapper
+    return decorator
+
+
 class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
     """Base service class with common CRUD operations."""
 
@@ -88,40 +124,6 @@ class BaseService(Generic[ModelType, SchemaType, CreateSchemaType]):
             raise last_exception
         raise ServiceError("Operation failed after retries")
 
-    @staticmethod
-    def with_concurrency_control(
-        max_retries: int = 3,
-        initial_delay: float = 0.05,
-        max_delay: float = 0.5,
-        backoff_factor: float = 1.5,
-        retry_exceptions: Tuple = (
-            sqlalchemy.exc.OperationalError,
-            sqlalchemy.exc.InternalError,
-            sqlalchemy.exc.DBAPIError,
-            sqlalchemy.exc.TimeoutError,
-            asyncio.TimeoutError,
-        ),
-        error_message: Optional[str] = None,
-    ):
-        """Decorator for adding retry logic to async methods."""
-        def decorator(func: Callable[..., T]) -> Callable[..., T]:
-            @wraps(func)
-            async def wrapper(*args, **kwargs) -> T:
-                async def operation():
-                    return await func(*args, **kwargs)
-
-                service_instance = args[0]  # Get the service instance from the method call
-                return await service_instance._with_retry(
-                    operation=operation,
-                    max_retries=max_retries,
-                    initial_delay=initial_delay,
-                    max_delay=max_delay,
-                    backoff_factor=backoff_factor,
-                    retry_exceptions=retry_exceptions,
-                    error_message=error_message,
-                )
-            return wrapper
-        return decorator
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[SchemaType]:
         """Get all items with pagination."""
