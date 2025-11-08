@@ -27,6 +27,7 @@ ENV/
 .env
 .venv
 .env.*
+!.env.example
 venv-tf/
 
 # IDE
