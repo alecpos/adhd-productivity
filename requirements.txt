@@ -29,6 +29,7 @@ opentelemetry-instrumentation-fastapi>=0.40b0
 alembic>=1.12.1
 asyncpg>=0.29.0
 SQLAlchemy-Utils>=0.41.1
+supabase>=2.3.0
 
 # Calendar Integration
 google-auth-oauthlib>=1.0.0
