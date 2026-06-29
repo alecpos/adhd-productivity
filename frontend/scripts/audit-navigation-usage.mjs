@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * Audits Expo Router layouts, tab/dashboard components, context hook usage,
- * API route usage, JSX props, and likely-unused imports across the frontend.
+ * API route usage, JSX props, likely-unused props, and likely-unused imports.
  *
  * Usage:
  *   cd frontend && npm run audit:navigation
@@ -24,6 +24,12 @@ const DEFAULT_SCAN_DIRS = [
   'services',
   'core',
   'types',
+  'navigation',
+  'screens',
+  'constants',
+  'utils',
+  'theme',
+  'lib',
 ];
 
 const SKIP_DIRS = new Set([
@@ -47,6 +53,7 @@ const NOISE_FILE_PATTERNS = [
   /(^|\/)schema_dump/i,
   /(^|\/)db_dump/i,
   /(^|\/)database_dump/i,
+  /(^|\/).+_export\.txt$/,
 ];
 
 function normalizePath(filePath) {
@@ -55,19 +62,13 @@ function normalizePath(filePath) {
 
 function resolveFrontendRoot() {
   const positional = process.argv.find(arg => !arg.startsWith('--') && arg !== process.argv[0] && arg !== process.argv[1]);
-  if (positional) {
-    return path.resolve(positional);
-  }
+  if (positional) return path.resolve(positional);
 
   const cwd = process.cwd();
-  if (fsSync.existsSync(path.join(cwd, 'app')) && fsSync.existsSync(path.join(cwd, 'package.json'))) {
-    return cwd;
-  }
+  if (fsSync.existsSync(path.join(cwd, 'app')) && fsSync.existsSync(path.join(cwd, 'package.json'))) return cwd;
 
   const nestedFrontend = path.join(cwd, 'frontend');
-  if (fsSync.existsSync(path.join(nestedFrontend, 'app')) && fsSync.existsSync(path.join(nestedFrontend, 'package.json'))) {
-    return nestedFrontend;
-  }
+  if (fsSync.existsSync(path.join(nestedFrontend, 'app')) && fsSync.existsSync(path.join(nestedFrontend, 'package.json'))) return nestedFrontend;
 
   return cwd;
 }
@@ -106,9 +107,7 @@ async function walkFiles(rootDir, relativeDir = '') {
 async function collectFiles(frontendRoot) {
   const fileSet = new Set();
   for (const dir of DEFAULT_SCAN_DIRS) {
-    for (const file of await walkFiles(frontendRoot, dir)) {
-      fileSet.add(file);
-    }
+    for (const file of await walkFiles(frontendRoot, dir)) fileSet.add(file);
   }
   return [...fileSet].sort();
 }
@@ -127,14 +126,14 @@ function countIdentifierUsages(source, identifier) {
   return matches?.length ?? 0;
 }
 
+function lineNumberForIndex(source, index) {
+  return source.slice(0, index).split('\n').length;
+}
+
 function parseImportLocals(clause) {
   if (!clause) return [];
 
-  const cleaned = clause
-    .replace(/^type\s+/, '')
-    .replace(/\n/g, ' ')
-    .trim();
-
+  const cleaned = clause.replace(/^type\s+/, '').replace(/\n/g, ' ').trim();
   const locals = [];
 
   const namespaceMatch = cleaned.match(/\*\s+as\s+([A-Za-z_$][\w$]*)/);
@@ -142,7 +141,7 @@ function parseImportLocals(clause) {
 
   const namedMatch = cleaned.match(/\{([^}]*)\}/);
   if (namedMatch) {
-    const named = namedMatch[1]
+    locals.push(...namedMatch[1]
       .split(',')
       .map(part => part.trim())
       .filter(Boolean)
@@ -151,15 +150,12 @@ function parseImportLocals(clause) {
         if (alias) return alias[1];
         return part.replace(/^type\s+/, '').split(/\s+/)[0];
       })
-      .filter(Boolean);
-    locals.push(...named);
+      .filter(Boolean));
   }
 
   const withoutNamed = cleaned.replace(/\{[^}]*\}/g, '').replace(/\*\s+as\s+[A-Za-z_$][\w$]*/g, '');
   const defaultCandidate = withoutNamed.split(',')[0]?.trim();
-  if (defaultCandidate && /^[A-Za-z_$][\w$]*$/.test(defaultCandidate)) {
-    locals.push(defaultCandidate);
-  }
+  if (defaultCandidate && /^[A-Za-z_$][\w$]*$/.test(defaultCandidate)) locals.push(defaultCandidate);
 
   return [...new Set(locals)];
 }
@@ -170,21 +166,16 @@ function parseImports(file, source) {
   let match;
 
   while ((match = importRegex.exec(source)) !== null) {
-    const clause = match.groups?.clause ?? '';
     imports.push({
       file,
       specifier: match.groups?.specifier ?? '',
       typeOnly: Boolean(match[1]),
-      locals: parseImportLocals(clause),
+      locals: parseImportLocals(match.groups?.clause ?? ''),
       line: lineNumberForIndex(source, match.index),
     });
   }
 
   return imports;
-}
-
-function lineNumberForIndex(source, index) {
-  return source.slice(0, index).split('\n').length;
 }
 
 function parseApiCalls(file, source) {
@@ -194,23 +185,11 @@ function parseApiCalls(file, source) {
 
   let match;
   while ((match = apiRegex.exec(source)) !== null) {
-    calls.push({
-      file,
-      client: match.groups.client,
-      method: match.groups.method ?? 'call',
-      route: match.groups.route,
-      line: lineNumberForIndex(source, match.index),
-    });
+    calls.push({ file, client: match.groups.client, method: match.groups.method ?? 'call', route: match.groups.route, line: lineNumberForIndex(source, match.index) });
   }
 
   while ((match = fetchRegex.exec(source)) !== null) {
-    calls.push({
-      file,
-      client: 'fetch',
-      method: 'call',
-      route: match.groups.route,
-      line: lineNumberForIndex(source, match.index),
-    });
+    calls.push({ file, client: 'fetch', method: 'call', route: match.groups.route, line: lineNumberForIndex(source, match.index) });
   }
 
   return calls;
@@ -218,35 +197,27 @@ function parseApiCalls(file, source) {
 
 function parseContextHooks(file, source) {
   const hooks = [];
+  const coreHooks = new Set(['useState', 'useEffect', 'useCallback', 'useMemo', 'useRef', 'useReducer', 'useContext', 'useImperativeHandle', 'useLayoutEffect']);
   const hookRegex = /\b(?<hook>use[A-Z][A-Za-z0-9_]*)\s*\(/g;
   let match;
+
   while ((match = hookRegex.exec(source)) !== null) {
     const hook = match.groups.hook;
-    if (['useState', 'useEffect', 'useCallback', 'useMemo', 'useRef', 'useReducer', 'useContext'].includes(hook)) {
-      continue;
-    }
-    hooks.push({ file, hook, line: lineNumberForIndex(source, match.index) });
+    if (!coreHooks.has(hook)) hooks.push({ file, hook, line: lineNumberForIndex(source, match.index) });
   }
+
   return hooks;
 }
 
 function routeCandidatesForScreen(layoutFile, screenName) {
   const baseDir = path.posix.dirname(layoutFile);
   const normalizedName = screenName.replace(/^\.\//, '').replace(/\/index$/, '/index');
-  const base = normalizedName === 'index'
-    ? path.posix.join(baseDir, 'index')
-    : path.posix.join(baseDir, normalizedName);
+  const base = normalizedName === 'index' ? path.posix.join(baseDir, 'index') : path.posix.join(baseDir, normalizedName);
 
   const candidates = [];
-  for (const ext of SOURCE_EXTENSIONS) {
-    candidates.push(`${base}${ext}`);
-  }
-  for (const ext of SOURCE_EXTENSIONS) {
-    candidates.push(`${base}/index${ext}`);
-  }
-  for (const ext of SOURCE_EXTENSIONS) {
-    candidates.push(`${base}/_layout${ext}`);
-  }
+  for (const ext of SOURCE_EXTENSIONS) candidates.push(`${base}${ext}`);
+  for (const ext of SOURCE_EXTENSIONS) candidates.push(`${base}/index${ext}`);
+  for (const ext of SOURCE_EXTENSIONS) candidates.push(`${base}/_layout${ext}`);
   return candidates;
 }
 
@@ -261,14 +232,7 @@ function parseExpoRouterScreens(file, source, allSourceFiles) {
     const name = match.groups.name;
     const candidates = routeCandidatesForScreen(file, name);
     const resolved = candidates.find(candidate => allSourceFiles.has(candidate));
-    screens.push({
-      file,
-      navigator: match.groups.navigator,
-      name,
-      line: lineNumberForIndex(source, match.index),
-      resolved: resolved ?? null,
-      candidates,
-    });
+    screens.push({ file, navigator: match.groups.navigator, name, line: lineNumberForIndex(source, match.index), resolved: resolved ?? null, candidates });
   }
 
   return screens;
@@ -281,21 +245,11 @@ function parseInnerTabs(file, source) {
   let match;
 
   while ((match = tabItemRegex.exec(source)) !== null) {
-    tabs.push({
-      file,
-      kind: 'Tab.Item',
-      title: match.groups.title,
-      line: lineNumberForIndex(source, match.index),
-    });
+    tabs.push({ file, kind: 'Tab.Item', title: match.groups.title, line: lineNumberForIndex(source, match.index) });
   }
 
   while ((match = tabViewRegex.exec(source)) !== null) {
-    tabs.push({
-      file,
-      kind: 'TabView.Item',
-      title: null,
-      line: lineNumberForIndex(source, match.index),
-    });
+    tabs.push({ file, kind: 'TabView.Item', title: null, line: lineNumberForIndex(source, match.index) });
   }
 
   return tabs;
@@ -308,23 +262,11 @@ function parseNavigationCalls(file, source) {
   let match;
 
   while ((match = routerRegex.exec(source)) !== null) {
-    calls.push({
-      file,
-      type: 'router',
-      method: match.groups.method,
-      target: match.groups.arg.trim(),
-      line: lineNumberForIndex(source, match.index),
-    });
+    calls.push({ file, type: 'router', method: match.groups.method, target: match.groups.arg.trim(), line: lineNumberForIndex(source, match.index) });
   }
 
   while ((match = linkRegex.exec(source)) !== null) {
-    calls.push({
-      file,
-      type: 'Link',
-      method: 'href',
-      target: match.groups.href,
-      line: lineNumberForIndex(source, match.index),
-    });
+    calls.push({ file, type: 'Link', method: 'href', target: match.groups.href, line: lineNumberForIndex(source, match.index) });
   }
 
   return calls;
@@ -343,16 +285,26 @@ function parsePropsDeclarations(file, source) {
         .map(line => line.trim())
         .map(line => line.match(/^([A-Za-z_$][\w$]*)\??\s*:/)?.[1])
         .filter(Boolean);
-      declarations.push({
-        file,
-        name: match.groups.name,
-        fields: [...new Set(fields)],
-        line: lineNumberForIndex(source, match.index),
-      });
+      declarations.push({ file, name: match.groups.name, component: match.groups.name.replace(/Props$/, ''), fields: [...new Set(fields)], line: lineNumberForIndex(source, match.index), start: match.index, end: regex.lastIndex });
     }
   }
 
   return declarations;
+}
+
+function buildPropUsageAudit(file, source, declarations) {
+  const audits = [];
+
+  for (const declaration of declarations) {
+    const sourceWithoutDeclaration = `${source.slice(0, declaration.start)}${source.slice(declaration.end)}`;
+    const fields = declaration.fields.map(field => {
+      const references = countIdentifierUsages(sourceWithoutDeclaration, field);
+      return { name: field, references, status: references > 0 ? 'used' : 'likely-unused' };
+    });
+    audits.push({ file, name: declaration.name, component: declaration.component, line: declaration.line, fields });
+  }
+
+  return audits;
 }
 
 function parseJsxProps(file, source) {
@@ -371,12 +323,7 @@ function parseJsxProps(file, source) {
     }
 
     if (props.length > 0) {
-      usages.push({
-        file,
-        component: match.groups.component,
-        props: [...new Set(props)].sort(),
-        line: lineNumberForIndex(source, match.index),
-      });
+      usages.push({ file, component: match.groups.component, props: [...new Set(props)].sort(), line: lineNumberForIndex(source, match.index) });
     }
   }
 
@@ -390,13 +337,7 @@ function likelyUnusedImports(file, source, imports) {
   for (const importEntry of imports) {
     for (const local of importEntry.locals) {
       if (countIdentifierUsages(withoutImports, local) === 0) {
-        unused.push({
-          file,
-          local,
-          specifier: importEntry.specifier,
-          line: importEntry.line,
-          confidence: importEntry.typeOnly ? 'medium' : 'high',
-        });
+        unused.push({ file, local, specifier: importEntry.specifier, line: importEntry.line, confidence: importEntry.typeOnly ? 'medium' : 'high' });
       }
     }
   }
@@ -416,32 +357,26 @@ function groupBy(items, keyFn) {
 
 function summarizeImports(imports) {
   return Object.entries(groupBy(imports, item => item.specifier))
-    .map(([specifier, entries]) => ({
-      specifier,
-      count: entries.length,
-      files: [...new Set(entries.map(entry => entry.file))].sort(),
-    }))
+    .map(([specifier, entries]) => ({ specifier, count: entries.length, files: [...new Set(entries.map(entry => entry.file))].sort() }))
     .sort((a, b) => b.count - a.count || a.specifier.localeCompare(b.specifier));
 }
 
 function summarizeApiCalls(apiCalls) {
   return Object.entries(groupBy(apiCalls, item => `${item.client}.${item.method} ${item.route}`))
-    .map(([signature, entries]) => ({
-      signature,
-      count: entries.length,
-      files: entries.map(entry => `${entry.file}:${entry.line}`).sort(),
-    }))
+    .map(([signature, entries]) => ({ signature, count: entries.length, files: entries.map(entry => `${entry.file}:${entry.line}`).sort() }))
     .sort((a, b) => b.count - a.count || a.signature.localeCompare(b.signature));
 }
 
 function summarizeContextHooks(hooks) {
   return Object.entries(groupBy(hooks, item => item.hook))
-    .map(([hook, entries]) => ({
-      hook,
-      count: entries.length,
-      files: entries.map(entry => `${entry.file}:${entry.line}`).sort(),
-    }))
+    .map(([hook, entries]) => ({ hook, count: entries.length, files: entries.map(entry => `${entry.file}:${entry.line}`).sort() }))
     .sort((a, b) => b.count - a.count || a.hook.localeCompare(b.hook));
+}
+
+function flattenLikelyUnusedProps(propUsageAudit) {
+  return propUsageAudit.flatMap(entry => entry.fields
+    .filter(field => field.status === 'likely-unused')
+    .map(field => ({ file: entry.file, component: entry.component, propsType: entry.name, prop: field.name, line: entry.line })));
 }
 
 function noiseFiles(allFiles) {
@@ -469,72 +404,61 @@ function makeMarkdownReport(report) {
   lines.push(`- API calls: ${report.summary.apiCalls}`);
   lines.push(`- Props declarations: ${report.summary.propDeclarations}`);
   lines.push(`- JSX prop usage sites: ${report.summary.jsxPropUsages}`);
+  lines.push(`- Likely-unused props: ${report.summary.likelyUnusedProps}`);
   lines.push(`- Likely-unused imports: ${report.summary.likelyUnusedImports}`);
   lines.push(`- Generated/export/db/schema noise candidates: ${report.summary.noiseCandidates}`);
   lines.push('');
 
   lines.push('## Expo Router Screens');
   lines.push('');
-  for (const screen of report.routeScreens) {
-    lines.push(`- \`${screen.file}:${screen.line}\` ${screen.navigator}.Screen \`${screen.name}\` -> ${screen.resolved ? `\`${screen.resolved}\`` : '**missing target**'}`);
-  }
+  for (const screen of report.routeScreens) lines.push(`- \`${screen.file}:${screen.line}\` ${screen.navigator}.Screen \`${screen.name}\` -> ${screen.resolved ? `\`${screen.resolved}\`` : '**missing target**'}`);
   if (report.routeScreens.length === 0) lines.push('- No Expo Router screen declarations found.');
   lines.push('');
 
   if (missingScreens.length > 0) {
     lines.push('## Missing Route Targets');
     lines.push('');
-    for (const screen of missingScreens) {
-      lines.push(`- \`${screen.file}:${screen.line}\` declares \`${screen.name}\`; checked: ${screen.candidates.map(candidate => `\`${candidate}\``).join(', ')}`);
-    }
+    for (const screen of missingScreens) lines.push(`- \`${screen.file}:${screen.line}\` declares \`${screen.name}\`; checked: ${screen.candidates.map(candidate => `\`${candidate}\``).join(', ')}`);
     lines.push('');
   }
 
   lines.push('## Inner Tabs / TabView');
   lines.push('');
-  for (const tab of report.innerTabs) {
-    lines.push(`- \`${tab.file}:${tab.line}\` ${tab.kind}${tab.title ? ` \`${tab.title}\`` : ''}`);
-  }
+  for (const tab of report.innerTabs) lines.push(`- \`${tab.file}:${tab.line}\` ${tab.kind}${tab.title ? ` \`${tab.title}\`` : ''}`);
   if (report.innerTabs.length === 0) lines.push('- No RNEUI Tab or TabView items found.');
   lines.push('');
 
   lines.push('## Navigation Calls');
   lines.push('');
-  for (const call of report.navigationCalls) {
-    lines.push(`- \`${call.file}:${call.line}\` ${call.type}.${call.method} -> \`${call.target}\``);
-  }
+  for (const call of report.navigationCalls) lines.push(`- \`${call.file}:${call.line}\` ${call.type}.${call.method} -> \`${call.target}\``);
   if (report.navigationCalls.length === 0) lines.push('- No router/Link navigation calls found.');
   lines.push('');
 
   lines.push('## Context Hook Usage');
   lines.push('');
-  for (const hook of report.contextHookSummary) {
-    lines.push(`- \`${hook.hook}\` (${hook.count}): ${hook.files.map(file => `\`${file}\``).join(', ')}`);
-  }
+  for (const hook of report.contextHookSummary) lines.push(`- \`${hook.hook}\` (${hook.count}): ${hook.files.map(file => `\`${file}\``).join(', ')}`);
   if (report.contextHookSummary.length === 0) lines.push('- No non-core hooks found.');
   lines.push('');
 
   lines.push('## API Calls');
   lines.push('');
-  for (const api of report.apiSummary) {
-    lines.push(`- \`${api.signature}\` (${api.count}): ${api.files.map(file => `\`${file}\``).join(', ')}`);
-  }
+  for (const api of report.apiSummary) lines.push(`- \`${api.signature}\` (${api.count}): ${api.files.map(file => `\`${file}\``).join(', ')}`);
   if (report.apiSummary.length === 0) lines.push('- No direct API calls found.');
   lines.push('');
 
-  lines.push('## Props Declared by Components');
+  lines.push('## Props Declared + Usage Heuristic');
   lines.push('');
-  for (const declaration of report.propDeclarations) {
-    lines.push(`- \`${declaration.file}:${declaration.line}\` ${declaration.name}: ${declaration.fields.map(field => `\`${field}\``).join(', ') || '_no fields parsed_'}`);
+  lines.push('The prop usage check removes the Props declaration from the file, then counts references to each field in the rest of that file. Confirm with TypeScript before deleting.');
+  lines.push('');
+  for (const declaration of report.propUsageAudit) {
+    lines.push(`- \`${declaration.file}:${declaration.line}\` ${declaration.name}: ${declaration.fields.map(field => `\`${field.name}\`=${field.status}(${field.references})`).join(', ') || '_no fields parsed_'}`);
   }
-  if (report.propDeclarations.length === 0) lines.push('- No Props interfaces/types found.');
+  if (report.propUsageAudit.length === 0) lines.push('- No Props interfaces/types found.');
   lines.push('');
 
   lines.push('## JSX Prop Usage Sites');
   lines.push('');
-  for (const usage of report.jsxPropUsages) {
-    lines.push(`- \`${usage.file}:${usage.line}\` <${usage.component}>: ${usage.props.map(prop => `\`${prop}\``).join(', ')}`);
-  }
+  for (const usage of report.jsxPropUsages) lines.push(`- \`${usage.file}:${usage.line}\` <${usage.component}>: ${usage.props.map(prop => `\`${prop}\``).join(', ')}`);
   if (report.jsxPropUsages.length === 0) lines.push('- No JSX prop usage sites found.');
   lines.push('');
 
@@ -542,20 +466,14 @@ function makeMarkdownReport(report) {
   lines.push('');
   lines.push('This is a regex-based signal. Confirm with TypeScript/ESLint before deleting.');
   lines.push('');
-  for (const unused of report.likelyUnusedImports) {
-    lines.push(`- \`${unused.file}:${unused.line}\` \`${unused.local}\` from \`${unused.specifier}\` (${unused.confidence})`);
-  }
+  for (const unused of report.likelyUnusedImports) lines.push(`- \`${unused.file}:${unused.line}\` \`${unused.local}\` from \`${unused.specifier}\` (${unused.confidence})`);
   if (report.likelyUnusedImports.length === 0) lines.push('- No likely-unused imports found by this heuristic.');
   lines.push('');
 
   lines.push('## Import Summary');
   lines.push('');
-  for (const item of report.importSummary.slice(0, 80)) {
-    lines.push(`- \`${item.specifier}\` (${item.count} files)`);
-  }
-  if (report.importSummary.length > 80) {
-    lines.push(`- ...and ${report.importSummary.length - 80} more import specifiers. See JSON for full output.`);
-  }
+  for (const item of report.importSummary.slice(0, 80)) lines.push(`- \`${item.specifier}\` (${item.count} files)`);
+  if (report.importSummary.length > 80) lines.push(`- ...and ${report.importSummary.length - 80} more import specifiers. See JSON for full output.`);
   if (report.importSummary.length === 0) lines.push('- No imports found.');
   lines.push('');
 
@@ -563,9 +481,7 @@ function makeMarkdownReport(report) {
   lines.push('');
   lines.push('These are generated exports, dumps, or schema/db artifacts that should not drive navigation logic. Review before deletion.');
   lines.push('');
-  for (const file of report.noiseCandidates) {
-    lines.push(`- \`${file}\``);
-  }
+  for (const file of report.noiseCandidates) lines.push(`- \`${file}\``);
   if (report.noiseCandidates.length === 0) lines.push('- No obvious generated export/db/schema noise candidates found.');
   lines.push('');
 
@@ -585,6 +501,7 @@ async function main() {
   const innerTabs = [];
   const navigationCalls = [];
   const propDeclarations = [];
+  const propUsageAudit = [];
   const jsxPropUsages = [];
   const likelyUnused = [];
 
@@ -593,6 +510,7 @@ async function main() {
     const absolute = path.join(frontendRoot, file);
     const source = await fs.readFile(absolute, 'utf8');
     const fileImports = parseImports(file, source);
+    const filePropDeclarations = parsePropsDeclarations(file, source);
 
     imports.push(...fileImports);
     apiCalls.push(...parseApiCalls(file, source));
@@ -600,11 +518,13 @@ async function main() {
     routeScreens.push(...parseExpoRouterScreens(file, source, allSourceFileSet));
     innerTabs.push(...parseInnerTabs(file, source));
     navigationCalls.push(...parseNavigationCalls(file, source));
-    propDeclarations.push(...parsePropsDeclarations(file, source));
+    propDeclarations.push(...filePropDeclarations);
+    propUsageAudit.push(...buildPropUsageAudit(file, source, filePropDeclarations));
     jsxPropUsages.push(...parseJsxProps(file, source));
     likelyUnused.push(...likelyUnusedImports(file, source, fileImports));
   }
 
+  const likelyUnusedProps = flattenLikelyUnusedProps(propUsageAudit);
   const report = {
     generatedAt: new Date().toISOString(),
     frontendRoot: normalizePath(frontendRoot),
@@ -618,6 +538,7 @@ async function main() {
       apiCalls: apiCalls.length,
       propDeclarations: propDeclarations.length,
       jsxPropUsages: jsxPropUsages.length,
+      likelyUnusedProps: likelyUnusedProps.length,
       likelyUnusedImports: likelyUnused.length,
       noiseCandidates: noiseFiles(allFiles).length,
     },
@@ -629,6 +550,8 @@ async function main() {
     apiSummary: summarizeApiCalls(apiCalls),
     apiCalls,
     propDeclarations,
+    propUsageAudit,
+    likelyUnusedProps,
     jsxPropUsages,
     likelyUnusedImports: likelyUnused.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line),
     importSummary: summarizeImports(imports),
