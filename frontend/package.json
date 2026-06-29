@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "test": "jest",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "audit:navigation": "node scripts/audit-navigation-usage.mjs",
     "lint:fix": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
     "fix:imports": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix --rule 'import/order: [\"error\", {\"newlines-between\":\"always\",\"groups\":[\"builtin\",\"external\",\"internal\",\"parent\",\"sibling\",\"index\"]}]'",
     "clean": "rimraf node_modules package-lock.json && npm install",
